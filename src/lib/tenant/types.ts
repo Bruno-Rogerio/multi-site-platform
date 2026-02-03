@@ -1,0 +1,55 @@
+export type SitePlan = "landing" | "pro";
+
+export type SectionType =
+  | "hero"
+  | "about"
+  | "services"
+  | "cta"
+  | "testimonials"
+  | "contact";
+
+export type ButtonStyle = "rounded" | "pill" | "square";
+
+export type ThemeSettings = {
+  primaryColor: string;
+  accentColor: string;
+  backgroundColor: string;
+  textColor: string;
+  fontFamily: string;
+  buttonStyle: ButtonStyle;
+};
+
+export type Section = {
+  id: string;
+  type: SectionType;
+  variant?: string;
+  order: number;
+  content: Record<string, unknown>;
+};
+
+export type Page = {
+  id: string;
+  siteId: string;
+  slug: string;
+  title: string;
+  sections: Section[];
+};
+
+export type Site = {
+  id: string;
+  name: string;
+  domain: string;
+  plan: SitePlan;
+  themeSettings: ThemeSettings;
+  homePage: Page;
+  createdAt?: string;
+};
+
+export const defaultThemeSettings: ThemeSettings = {
+  primaryColor: "#204ecf",
+  accentColor: "#36a66f",
+  backgroundColor: "#ffffff",
+  textColor: "#101426",
+  fontFamily: "Inter, system-ui, sans-serif",
+  buttonStyle: "rounded",
+};

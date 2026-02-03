@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Multi Site Platform (SaaS Multi-Tenant)
 
-## Getting Started
+Plataforma SaaS para profissionais autonomos (psicologos, terapeutas, coaches, etc.)
+com sites independentes por dominio em um unico deploy.
 
-First, run the development server:
+## Stack
+- Next.js (App Router)
+- Supabase (Postgres, Auth, Storage)
+- Multi-tenant por `Host` da requisicao
+
+## Primeiros passos
+1. Instale dependencias:
+
+```bash
+npm install
+```
+
+2. Configure variaveis locais:
+
+```bash
+cp .env.example .env.local
+```
+
+3. Rode o servidor:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Acesse:
+- Plataforma: `http://localhost:3000`
+- Login: `http://localhost:3000/login`
+- Admin: `http://localhost:3000/admin`
+- Tenant (exemplo): `http://cliente1.localtest.me:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Estrutura atual
+- `middleware.ts`: classifica host (plataforma x tenant) e faz rewrite interno
+- `src/app/page.tsx`: landing da plataforma SaaS
+- `src/app/t/[tenant]/page.tsx`: vertical slice do tenant (hero/services/cta)
+- `src/lib/tenant/host.ts`: helpers de dominio/subdominio
+- `src/lib/tenant/service.ts`: busca tenant no Supabase
+- `src/components/site/*`: componentes de secoes da landing page
+- `src/components/auth/*`: formularios de login e reset de senha
+- `src/lib/auth/session.ts`: sessao autenticada + perfil com role/site
+- `src/app/api/contact/route.ts`: endpoint do formulario de contato
+- `src/app/api/admin/users/route.ts`: provisionamento de usuarios (invite)
+- `supabase/schema.sql`: schema inicial + politicas RLS
+- `supabase/seed.sql`: seed local com `cliente1.localtest.me` e `app.localtest.me`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Como funciona o multi-tenant
+1. O app le o `host` da requisicao (`x-forwarded-host` ou `host`).
+2. `middleware.ts` decide se o host e plataforma ou tenant.
+3. Se for tenant, reescreve internamente para `/t/[tenant]/*`.
+4. Server Component busca o tenant na tabela `sites` via subdominio.
+5. Carrega pagina `home` e secoes da tabela `sections`.
+6. Aplica `theme_settings` para cores e tipografia.
 
-## Learn More
+### Variantes por tenant
+Cada secao pode definir `variant` na tabela `sections` para mudar layout sem clonar o projeto.
+Exemplos atuais:
+- `hero`: `default`, `split`, `centered`
+- `services`: `default`, `minimal`
+- `cta`: `default`, `banner`
 
-To learn more about Next.js, take a look at the following resources:
+## Banco de dados (Supabase)
+O arquivo `supabase/schema.sql` inclui tabelas:
+- `sites`
+- `pages`
+- `sections`
+- `posts`
+- `user_profiles`
+- `contact_messages`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Proximos passos recomendados
+1. Implementar CRUD real de secoes no painel.
+2. Criar upload de imagens com buckets por tenant.
+3. Adicionar suporte a dominio proprio de cliente no classificador de host.
+4. Criar tela admin para criar usuarios via `/api/admin/users`.
+5. Configurar templates de email (invite/recovery) no Supabase Auth.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Auth (robusto)
+- Nao existe auto-cadastro no produto.
+- Usuarios sao provisionados por admin via invite (`/api/admin/users`).
+- Primeiro acesso e recuperacao usam email + `/auth/callback` + `/reset-password`.
+- `user_profiles` e sincronizado automaticamente a partir de `auth.users` via trigger SQL.
+- RLS aplica escopo por role/site para evitar vazamento entre tenants.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Deploy
+Um unico projeto Next.js no Vercel, com varios dominios apontando para o mesmo deploy.
