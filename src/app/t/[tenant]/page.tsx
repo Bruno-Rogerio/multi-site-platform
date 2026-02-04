@@ -4,17 +4,12 @@ import { SectionRenderer } from "@/components/site/section-renderer";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
 import { SiteShell, buttonStyleClasses } from "@/components/site/site-shell";
 import { getSiteByTenantSubdomain } from "@/lib/tenant/service";
-import type { Section } from "@/lib/tenant/types";
 
 type TenantPageProps = {
   params: Promise<{ tenant: string }>;
 };
 
 export const dynamic = "force-dynamic";
-
-function getFirstSection(sections: Section[], type: Section["type"]): Section | null {
-  return sections.find((section) => section.type === type) ?? null;
-}
 
 export default async function TenantPublicPage({ params }: TenantPageProps) {
   const { tenant } = await params;
@@ -32,14 +27,7 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
     notFound();
   }
 
-  const orderedSections = [...site.homePage.sections].sort((a, b) => a.order - b.order);
-  const heroSection = getFirstSection(orderedSections, "hero");
-  const servicesSection = getFirstSection(orderedSections, "services");
-  const ctaSection =
-    getFirstSection(orderedSections, "cta") ?? getFirstSection(orderedSections, "contact");
-  const sectionsToRender = [heroSection, servicesSection, ctaSection].filter(
-    (section): section is Section => section !== null,
-  );
+  const sectionsToRender = [...site.homePage.sections].sort((a, b) => a.order - b.order);
 
   if (sectionsToRender.length === 0) {
     notFound();

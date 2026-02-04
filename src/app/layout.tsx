@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Sora } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Multi Site Platform",
-  description: "SaaS multi-tenant for autonomous professionals",
+  title: "BuildSphere",
+  description: "Plataforma SaaS multi-tenant para criacao de sites profissionais",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
-      <body className={`${geistSans.variable} antialiased`}>{children}</body>
+      <body className={`${sora.variable} antialiased`}>{children}</body>
     </html>
   );
 }

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import type { Site } from "@/lib/tenant/types";
 import type { Section } from "@/lib/tenant/types";
 
@@ -59,6 +61,7 @@ export function SectionRenderer({
     const subtitle = asString(section.content.subtitle);
     const ctaLabel = asString(section.content.ctaLabel, "Entrar em contato");
     const ctaHref = asString(section.content.ctaHref, "#contact");
+    const imageUrl = asString(section.content.imageUrl);
 
     if (variant === "split") {
       return (
@@ -78,12 +81,22 @@ export function SectionRenderer({
               {ctaLabel}
             </a>
           </div>
-          <div className="rounded-2xl border border-black/8 bg-[var(--site-background)] p-5">
-            <p className="text-sm font-semibold">Sessoes online em todo o Brasil</p>
-            <p className="mt-2 text-sm opacity-75">
-              Atendimento com plano terapeutico personalizado e acompanhamento semanal.
-            </p>
-          </div>
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1280}
+              height={720}
+              className="aspect-[16/9] h-auto w-full rounded-2xl border border-black/8 object-cover"
+            />
+          ) : (
+            <div className="rounded-2xl border border-black/8 bg-[var(--site-background)] p-5">
+              <p className="text-sm font-semibold">Sessoes online em todo o Brasil</p>
+              <p className="mt-2 text-sm opacity-75">
+                Atendimento com plano terapeutico personalizado e acompanhamento semanal.
+              </p>
+            </div>
+          )}
         </section>
       );
     }
@@ -98,6 +111,15 @@ export function SectionRenderer({
           )}
           <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
           {subtitle && <p className="mx-auto mt-4 max-w-2xl text-base opacity-80">{subtitle}</p>}
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1280}
+              height={720}
+              className="mx-auto mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-black/8 object-cover"
+            />
+          )}
           <a
             href={ctaHref}
             className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
@@ -117,6 +139,15 @@ export function SectionRenderer({
         )}
         <h1 className="text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
         {subtitle && <p className="mt-4 max-w-2xl text-base opacity-80">{subtitle}</p>}
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt={title}
+            width={1280}
+            height={720}
+            className="mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-black/8 object-cover"
+          />
+        )}
         <a
           href={ctaHref}
           className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
@@ -142,11 +173,21 @@ export function SectionRenderer({
   if (section.type === "services") {
     const title = asString(section.content.title, "Servicos");
     const items = asStringArray(section.content.items);
+    const imageUrl = asString(section.content.imageUrl);
 
     if (variant === "minimal") {
       return (
         <section className="rounded-3xl border border-black/8 bg-white p-6">
           <h2 className="text-2xl font-semibold">{title}</h2>
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={960}
+              height={720}
+              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-black/8 object-cover"
+            />
+          )}
           <ul className="mt-4 space-y-2">
             {items.map((item) => (
               <li key={item} className="flex items-center gap-2 text-sm">
@@ -162,6 +203,15 @@ export function SectionRenderer({
     return (
       <section className="rounded-3xl border border-black/8 bg-white p-6">
         <h2 className="text-2xl font-semibold">{title}</h2>
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt={title}
+            width={960}
+            height={720}
+            className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-black/8 object-cover"
+          />
+        )}
         <ul className="mt-4 grid gap-3 sm:grid-cols-2">
           {items.map((item) => (
             <li
@@ -181,12 +231,22 @@ export function SectionRenderer({
     const description = asString(section.content.description);
     const buttonLabel = asString(section.content.buttonLabel, "Entrar em contato");
     const buttonHref = asString(section.content.buttonHref, "#cta");
+    const imageUrl = asString(section.content.imageUrl);
 
     if (variant === "banner") {
       return (
         <section id="cta" className="rounded-3xl bg-[var(--site-primary)] p-6 text-white">
           <h2 className="text-2xl font-semibold">{title}</h2>
           {description && <p className="mt-3 text-sm text-white/90">{description}</p>}
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1280}
+              height={720}
+              className="mt-4 aspect-[16/9] h-auto w-full rounded-2xl border border-white/25 object-cover"
+            />
+          )}
           <a
             href={buttonHref}
             className={`mt-5 inline-flex border border-white/30 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 ${buttonStyleClassName}`}
@@ -201,6 +261,15 @@ export function SectionRenderer({
       <section id="cta" className="rounded-3xl border border-black/8 bg-white p-6">
         <h2 className="text-2xl font-semibold">{title}</h2>
         {description && <p className="mt-3 text-sm opacity-80">{description}</p>}
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt={title}
+            width={1280}
+            height={720}
+            className="mt-4 aspect-[16/9] h-auto w-full rounded-2xl border border-black/8 object-cover"
+          />
+        )}
         <a
           href={buttonHref}
           className={`mt-5 inline-flex bg-[var(--site-primary)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}

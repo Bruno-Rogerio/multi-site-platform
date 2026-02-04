@@ -35,8 +35,9 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus(null);
+    const formElement = event.currentTarget;
 
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(formElement);
     const email = String(formData.get("email") ?? "").trim().toLowerCase();
 
     if (!email) {
@@ -62,7 +63,13 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
     });
 
     const payload = (await response.json().catch(() => null)) as
-      | { error?: string; details?: string; message?: string }
+      | {
+          error?: string;
+          details?: string;
+          message?: string;
+          temporaryPassword?: string;
+          provisionMode?: "invite" | "password";
+        }
       | null;
 
     setIsLoading(false);
@@ -74,14 +81,16 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
       return;
     }
 
-    event.currentTarget.reset();
+    formElement.reset();
     setRole("client");
     setSiteId(orderedSites[0]?.id ?? "");
     setStatus({
       type: "success",
       message:
-        payload?.message ??
-        "Convite enviado com sucesso. O usuario recebera email para definir senha.",
+        payload?.temporaryPassword
+          ? `${payload?.message ?? "Usuario criado."} Senha temporaria: ${payload.temporaryPassword}`
+          : payload?.message ??
+            "Convite enviado com sucesso. O usuario recebera email para definir senha.",
     });
   }
 
@@ -91,8 +100,8 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
         <p
           className={`rounded-lg px-3 py-2 text-xs ${
             status.type === "error"
-              ? "border border-red-300 bg-red-50 text-red-700"
-              : "border border-emerald-300 bg-emerald-50 text-emerald-700"
+              ? "border border-red-300/40 bg-red-500/10 text-red-200"
+              : "border border-emerald-300/40 bg-emerald-500/10 text-emerald-200"
           }`}
         >
           {status.message}
@@ -100,7 +109,7 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
       )}
 
       <div>
-        <label className="text-xs font-semibold uppercase tracking-wide opacity-70" htmlFor="invite-email">
+        <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="invite-email">
           E-mail
         </label>
         <input
@@ -108,21 +117,21 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
           name="email"
           type="email"
           required
-          className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
+          className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
           placeholder="novo.usuario@cliente.com"
         />
       </div>
 
       <div className="grid gap-3 md:grid-cols-2">
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wide opacity-70" htmlFor="invite-role">
+          <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="invite-role">
             Perfil
           </label>
           <select
             id="invite-role"
             value={role}
             onChange={(event) => setRole(event.target.value as "admin" | "client")}
-            className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
+            className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
           >
             <option value="client">Cliente</option>
             <option value="admin">Admin da plataforma</option>
@@ -130,7 +139,7 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
         </div>
 
         <div>
-          <label className="text-xs font-semibold uppercase tracking-wide opacity-70" htmlFor="invite-site">
+          <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="invite-site">
             Site do cliente
           </label>
           <select
@@ -138,7 +147,7 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
             value={siteId}
             onChange={(event) => setSiteId(event.target.value)}
             disabled={!isClientRole}
-            className="mt-1 w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500 disabled:cursor-not-allowed disabled:bg-black/[0.03]"
+            className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE] disabled:cursor-not-allowed disabled:bg-[#0B1020]/60"
           >
             {orderedSites.length === 0 ? (
               <option value="">Nenhum site disponivel</option>
@@ -156,7 +165,7 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
       <button
         type="submit"
         disabled={!canSubmit}
-        className="w-full rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? "Enviando convite..." : "Convidar usuario"}
       </button>

@@ -17,6 +17,7 @@ export type ThemeSettings = {
   textColor: string;
   fontFamily: string;
   buttonStyle: ButtonStyle;
+  logoUrl?: string;
 };
 
 export type Section = {

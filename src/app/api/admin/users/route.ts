@@ -10,8 +10,24 @@ type CreateUserPayload = {
   siteId?: string | null;
 };
 
+type ProvisionMode = "invite" | "password";
+
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function getProvisionMode(): ProvisionMode {
+  return process.env.SUPABASE_AUTH_PROVISION_MODE === "password" ? "password" : "invite";
+}
+
+function generateTemporaryPassword(length = 14): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%";
+  let password = "";
+  for (let index = 0; index < length; index += 1) {
+    const random = Math.floor(Math.random() * alphabet.length);
+    password += alphabet[random];
+  }
+  return password;
 }
 
 export async function POST(request: Request) {
@@ -58,6 +74,37 @@ export async function POST(request: Request) {
     );
   }
 
+  const provisionMode = getProvisionMode();
+
+  if (provisionMode === "password") {
+    const temporaryPassword = generateTemporaryPassword();
+    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: temporaryPassword,
+      email_confirm: true,
+      user_metadata: {
+        role,
+        site_id: siteId,
+      },
+    });
+
+    if (error) {
+      return NextResponse.json(
+        { error: "Could not create user.", details: error.message },
+        { status: 400 },
+      );
+    }
+
+    return NextResponse.json({
+      ok: true,
+      message:
+        "Usuario criado com senha temporaria. Compartilhe por canal seguro e force troca no primeiro acesso.",
+      userId: data.user?.id ?? null,
+      provisionMode,
+      temporaryPassword,
+    });
+  }
+
   const redirectTo = `${requestUrl.origin}/auth/callback?next=/reset-password`;
   const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
     redirectTo,
@@ -68,12 +115,16 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    return NextResponse.json({ error: "Could not invite user.", details: error.message }, { status: 400 });
+    return NextResponse.json(
+      { error: "Could not invite user.", details: error.message },
+      { status: 400 },
+    );
   }
 
   return NextResponse.json({
     ok: true,
     message: "User invited successfully. They will set password via email.",
     userId: data.user?.id ?? null,
+    provisionMode,
   });
 }

@@ -1,20 +1,28 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f8fc;
-  --foreground: #101426;
+  --background: #0b1020;
+  --foreground: #eaf0ff;
+  --platform-surface: #12182b;
+  --platform-text: #eaf0ff;
+  --platform-primary: #3b82f6;
+  --platform-secondary: #7c5cff;
+  --platform-accent: #22d3ee;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sora);
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(1000px 600px at 80% -10%, rgba(124, 92, 255, 0.2), transparent 60%),
+    radial-gradient(800px 500px at -20% 10%, rgba(34, 211, 238, 0.16), transparent 55%),
+    var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), sans-serif;
+  font-family: var(--font-sora), sans-serif;
 }
 
 a {
@@ -25,4 +33,19 @@ button,
 input,
 textarea {
   font: inherit;
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.35s ease-out both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

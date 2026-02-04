@@ -14,6 +14,10 @@ const RESERVED_SUBDOMAINS = new Set([
   "login",
 ]);
 
+export function isReservedSubdomain(subdomain: string): boolean {
+  return RESERVED_SUBDOMAINS.has(subdomain.toLowerCase().trim());
+}
+
 type HostClassification =
   | { kind: "platform"; hostname: string }
   | { kind: "tenant"; hostname: string; tenant: string }

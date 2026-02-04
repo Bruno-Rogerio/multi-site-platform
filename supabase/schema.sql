@@ -391,3 +391,163 @@ for all
 to authenticated
 using (public.current_user_role() = 'admin')
 with check (public.current_user_role() = 'admin');
+
+-- Preset library for onboarding (styles, palettes and layout templates).
+create table if not exists public.style_presets (
+  id text primary key,
+  category text not null check (category in ('site', 'header', 'hero', 'services', 'cta')),
+  name text not null,
+  description text not null default '',
+  preview_config jsonb not null default '{}'::jsonb,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.palette_presets (
+  id text primary key,
+  name text not null,
+  primary_color text not null,
+  accent_color text not null,
+  background_color text not null,
+  text_color text not null,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.template_presets (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  name text not null,
+  description text not null default '',
+  site_style_id text references public.style_presets(id) on delete set null,
+  palette_id text references public.palette_presets(id) on delete set null,
+  section_variants jsonb not null default '{}'::jsonb,
+  theme_overrides jsonb not null default '{}'::jsonb,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.onboarding_drafts (
+  id uuid primary key default gen_random_uuid(),
+  site_id uuid references public.sites(id) on delete set null,
+  status text not null check (status in ('draft', 'checkout_pending', 'active', 'archived')) default 'draft',
+  payload jsonb not null default '{}'::jsonb,
+  selected_addons jsonb not null default '[]'::jsonb,
+  monthly_total numeric(10,2),
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_style_presets_category_active on public.style_presets(category, is_active);
+create index if not exists idx_palette_presets_active on public.palette_presets(is_active);
+create index if not exists idx_template_presets_active on public.template_presets(is_active);
+create index if not exists idx_onboarding_drafts_status_created_at on public.onboarding_drafts(status, created_at desc);
+
+alter table public.style_presets enable row level security;
+alter table public.palette_presets enable row level security;
+alter table public.template_presets enable row level security;
+alter table public.onboarding_drafts enable row level security;
+
+drop policy if exists "anon can read style presets" on public.style_presets;
+drop policy if exists "admins can manage style presets" on public.style_presets;
+drop policy if exists "anon can read palette presets" on public.palette_presets;
+drop policy if exists "admins can manage palette presets" on public.palette_presets;
+drop policy if exists "anon can read template presets" on public.template_presets;
+drop policy if exists "admins can manage template presets" on public.template_presets;
+drop policy if exists "admins can read onboarding drafts" on public.onboarding_drafts;
+drop policy if exists "admins can manage onboarding drafts" on public.onboarding_drafts;
+
+create policy "anon can read style presets"
+on public.style_presets
+for select
+to anon
+using (is_active = true);
+
+create policy "admins can manage style presets"
+on public.style_presets
+for all
+to authenticated
+using (public.current_user_role() = 'admin')
+with check (public.current_user_role() = 'admin');
+
+create policy "anon can read palette presets"
+on public.palette_presets
+for select
+to anon
+using (is_active = true);
+
+create policy "admins can manage palette presets"
+on public.palette_presets
+for all
+to authenticated
+using (public.current_user_role() = 'admin')
+with check (public.current_user_role() = 'admin');
+
+create policy "anon can read template presets"
+on public.template_presets
+for select
+to anon
+using (is_active = true);
+
+create policy "admins can manage template presets"
+on public.template_presets
+for all
+to authenticated
+using (public.current_user_role() = 'admin')
+with check (public.current_user_role() = 'admin');
+
+create policy "admins can read onboarding drafts"
+on public.onboarding_drafts
+for select
+to authenticated
+using (public.current_user_role() = 'admin');
+
+create policy "admins can manage onboarding drafts"
+on public.onboarding_drafts
+for all
+to authenticated
+using (public.current_user_role() = 'admin')
+with check (public.current_user_role() = 'admin');
+
+-- Billing profiles for invoice/compliance metadata and checkout linkage.
+create table if not exists public.billing_profiles (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null unique references auth.users(id) on delete cascade,
+  site_id uuid not null references public.sites(id) on delete cascade,
+  full_name text not null,
+  document text not null,
+  document_type text not null check (document_type in ('cpf', 'cnpj')),
+  email text not null,
+  stripe_customer_id text,
+  billing_status text not null default 'checkout_pending' check (billing_status in ('checkout_pending', 'active', 'past_due', 'canceled')),
+  monthly_amount numeric(10,2),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists idx_billing_profiles_site_id on public.billing_profiles(site_id);
+create index if not exists idx_billing_profiles_billing_status on public.billing_profiles(billing_status);
+
+alter table public.billing_profiles enable row level security;
+
+drop policy if exists "admins can read billing profiles" on public.billing_profiles;
+drop policy if exists "admins can manage billing profiles" on public.billing_profiles;
+drop policy if exists "clients can read own billing profile" on public.billing_profiles;
+
+create policy "admins can read billing profiles"
+on public.billing_profiles
+for select
+to authenticated
+using (public.current_user_role() = 'admin');
+
+create policy "admins can manage billing profiles"
+on public.billing_profiles
+for all
+to authenticated
+using (public.current_user_role() = 'admin')
+with check (public.current_user_role() = 'admin');
+
+create policy "clients can read own billing profile"
+on public.billing_profiles
+for select
+to authenticated
+using (user_id = auth.uid());

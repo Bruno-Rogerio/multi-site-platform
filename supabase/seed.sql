@@ -143,4 +143,69 @@ values
     3
   );
 
+insert into public.style_presets (id, category, name, description, preview_config, is_active)
+values
+  ('minimal-clean', 'site', 'Minimal Clean', 'Limpo, leve e focado em clareza.', '{"vibe":"Aereo"}'::jsonb, true),
+  ('soft-human', 'site', 'Soft Human', 'Acolhedor para saude e consultoria.', '{"vibe":"Empatico"}'::jsonb, true),
+  ('editorial', 'site', 'Editorial Premium', 'Visual elegante com credibilidade.', '{"vibe":"Luxo"}'::jsonb, true),
+  ('tech-modern', 'site', 'Tech Modern', 'Impacto digital e energia tech.', '{"vibe":"Inovador"}'::jsonb, true),
+  ('bold-contrast', 'site', 'Bold Contrast', 'Tipografia forte e secoes marcantes.', '{"vibe":"Atitude"}'::jsonb, true),
+  ('organic-warm', 'site', 'Organic Warm', 'Tons quentes e proximidade humana.', '{"vibe":"Calor"}'::jsonb, true)
+on conflict (id) do update
+set
+  category = excluded.category,
+  name = excluded.name,
+  description = excluded.description,
+  preview_config = excluded.preview_config,
+  is_active = excluded.is_active;
+
+insert into public.palette_presets (id, name, primary_color, accent_color, background_color, text_color, is_active)
+values
+  ('buildsphere', 'BuildSphere', '#3B82F6', '#22D3EE', '#0B1020', '#EAF0FF', true),
+  ('midnight-violet', 'Midnight Violet', '#7C5CFF', '#38BDF8', '#111827', '#EEF2FF', true),
+  ('aurora-soft', 'Aurora Soft', '#2563EB', '#A78BFA', '#F8FAFC', '#0F172A', true),
+  ('warm-premium', 'Warm Premium', '#C2410C', '#FB7185', '#1C1917', '#FFF7ED', true),
+  ('forest-trust', 'Forest Trust', '#15803D', '#22C55E', '#0F172A', '#ECFDF5', true),
+  ('mono-pro', 'Mono Pro', '#111827', '#52525B', '#FAFAFA', '#09090B', true)
+on conflict (id) do update
+set
+  name = excluded.name,
+  primary_color = excluded.primary_color,
+  accent_color = excluded.accent_color,
+  background_color = excluded.background_color,
+  text_color = excluded.text_color,
+  is_active = excluded.is_active;
+
+insert into public.template_presets (slug, name, description, site_style_id, palette_id, section_variants, theme_overrides, is_active)
+values
+  (
+    'therapy-pro-split',
+    'Therapy Pro Split',
+    'Template de servico com hero split e CTA banner.',
+    'soft-human',
+    'buildsphere',
+    '{"hero":"split","services":"minimal","cta":"banner"}'::jsonb,
+    '{}'::jsonb,
+    true
+  ),
+  (
+    'consulting-editorial',
+    'Consulting Editorial',
+    'Template premium com narrativa mais institucional.',
+    'editorial',
+    'midnight-violet',
+    '{"hero":"centered","services":"default","cta":"default"}'::jsonb,
+    '{}'::jsonb,
+    true
+  )
+on conflict (slug) do update
+set
+  name = excluded.name,
+  description = excluded.description,
+  site_style_id = excluded.site_style_id,
+  palette_id = excluded.palette_id,
+  section_variants = excluded.section_variants,
+  theme_overrides = excluded.theme_overrides,
+  is_active = excluded.is_active;
+
 commit;

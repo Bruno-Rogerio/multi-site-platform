@@ -117,7 +117,7 @@ export function LoginForm() {
   return (
     <form className="mt-6 space-y-3" onSubmit={onLogin}>
       {presetMessage && (
-        <p className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+        <p className="rounded-lg border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
           {presetMessage}
         </p>
       )}
@@ -125,15 +125,15 @@ export function LoginForm() {
         <p
           className={`rounded-lg px-3 py-2 text-xs ${
             status.type === "error"
-              ? "border border-red-300 bg-red-50 text-red-700"
-              : "border border-emerald-300 bg-emerald-50 text-emerald-700"
+              ? "border border-red-300/40 bg-red-500/10 text-red-200"
+              : "border border-emerald-300/40 bg-emerald-500/10 text-emerald-200"
           }`}
         >
           {status.message}
         </p>
       )}
 
-      <label className="block text-xs font-semibold uppercase tracking-wide opacity-70" htmlFor="email">
+      <label className="block text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="email">
         E-mail
       </label>
       <input
@@ -141,12 +141,12 @@ export function LoginForm() {
         name="email"
         type="email"
         required
-        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
+        className="w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
         placeholder="voce@cliente.com"
       />
 
       <label
-        className="mt-2 block text-xs font-semibold uppercase tracking-wide opacity-70"
+        className="mt-2 block text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60"
         htmlFor="password"
       >
         Senha
@@ -156,14 +156,14 @@ export function LoginForm() {
         name="password"
         type="password"
         required
-        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
+        className="w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
         placeholder="Sua senha"
       />
 
       <button
         type="submit"
         disabled={isLoading}
-        className="mt-2 w-full rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-2 w-full rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? "Entrando..." : "Entrar"}
       </button>
@@ -172,7 +172,7 @@ export function LoginForm() {
         type="button"
         onClick={onForgotPassword}
         disabled={isLoading}
-        className="w-full rounded-lg border border-black/15 px-4 py-2 text-sm font-semibold transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-lg border border-white/20 bg-white/[0.02] px-4 py-2 text-sm font-semibold text-[var(--platform-text)] transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-60"
       >
         Recuperar senha
       </button>

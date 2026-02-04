@@ -58,15 +58,15 @@ export function ResetPasswordForm() {
         <p
           className={`rounded-lg px-3 py-2 text-xs ${
             status.type === "error"
-              ? "border border-red-300 bg-red-50 text-red-700"
-              : "border border-emerald-300 bg-emerald-50 text-emerald-700"
+              ? "border border-red-300/40 bg-red-500/10 text-red-200"
+              : "border border-emerald-300/40 bg-emerald-500/10 text-emerald-200"
           }`}
         >
           {status.message}
         </p>
       )}
       <label
-        className="block text-xs font-semibold uppercase tracking-wide opacity-70"
+        className="block text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60"
         htmlFor="password"
       >
         Nova senha
@@ -77,12 +77,12 @@ export function ResetPasswordForm() {
         type="password"
         required
         minLength={8}
-        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
+        className="w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
         placeholder="Minimo de 8 caracteres"
       />
 
       <label
-        className="block text-xs font-semibold uppercase tracking-wide opacity-70"
+        className="block text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60"
         htmlFor="password_confirm"
       >
         Confirmar senha
@@ -93,14 +93,14 @@ export function ResetPasswordForm() {
         type="password"
         required
         minLength={8}
-        className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-sm outline-none transition focus:border-indigo-500"
+        className="w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
         placeholder="Repita a senha"
       />
 
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full rounded-lg bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isLoading ? "Atualizando..." : "Atualizar senha"}
       </button>
