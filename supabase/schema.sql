@@ -551,3 +551,35 @@ on public.billing_profiles
 for select
 to authenticated
 using (user_id = auth.uid());
+
+-- Singleton config for SaaS/platform branding (admin-only).
+create table if not exists public.platform_settings (
+  id int primary key check (id = 1),
+  settings jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.platform_settings enable row level security;
+
+drop policy if exists "admins can read platform settings" on public.platform_settings;
+drop policy if exists "admins can manage platform settings" on public.platform_settings;
+drop policy if exists "anon can read platform settings" on public.platform_settings;
+
+create policy "anon can read platform settings"
+on public.platform_settings
+for select
+to anon
+using (true);
+
+create policy "admins can read platform settings"
+on public.platform_settings
+for select
+to authenticated
+using (public.current_user_role() = 'admin');
+
+create policy "admins can manage platform settings"
+on public.platform_settings
+for all
+to authenticated
+using (public.current_user_role() = 'admin')
+with check (public.current_user_role() = 'admin');

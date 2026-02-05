@@ -54,6 +54,7 @@ export function SectionRenderer({
   buttonStyleClassName,
 }: SectionRendererProps) {
   const variant = section.variant ?? "default";
+  const surfaceClassName = "border border-[var(--site-border)] bg-[var(--site-surface)]";
 
   if (section.type === "hero") {
     const eyebrow = asString(section.content.eyebrow);
@@ -65,7 +66,7 @@ export function SectionRenderer({
 
     if (variant === "split") {
       return (
-        <section className="grid gap-5 rounded-3xl border border-black/8 bg-white/90 p-8 shadow-sm md:grid-cols-2 md:items-center">
+        <section className={`grid gap-5 rounded-3xl p-8 shadow-sm md:grid-cols-2 md:items-center ${surfaceClassName}`}>
           <div>
             {eyebrow && (
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
@@ -87,10 +88,10 @@ export function SectionRenderer({
               alt={title}
               width={1280}
               height={720}
-              className="aspect-[16/9] h-auto w-full rounded-2xl border border-black/8 object-cover"
+              className="aspect-[16/9] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
             />
           ) : (
-            <div className="rounded-2xl border border-black/8 bg-[var(--site-background)] p-5">
+            <div className="rounded-2xl border border-[var(--site-border)] bg-[var(--site-background)] p-5">
               <p className="text-sm font-semibold">Sessoes online em todo o Brasil</p>
               <p className="mt-2 text-sm opacity-75">
                 Atendimento com plano terapeutico personalizado e acompanhamento semanal.
@@ -103,7 +104,7 @@ export function SectionRenderer({
 
     if (variant === "centered") {
       return (
-        <section className="rounded-3xl border border-black/8 bg-white/90 p-8 text-center shadow-sm">
+        <section className={`rounded-3xl p-8 text-center shadow-sm ${surfaceClassName}`}>
           {eyebrow && (
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
               {eyebrow}
@@ -117,7 +118,7 @@ export function SectionRenderer({
               alt={title}
               width={1280}
               height={720}
-              className="mx-auto mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-black/8 object-cover"
+              className="mx-auto mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
             />
           )}
           <a
@@ -131,7 +132,7 @@ export function SectionRenderer({
     }
 
     return (
-      <section className="rounded-3xl border border-black/8 bg-white/90 p-8 shadow-sm">
+      <section className={`rounded-3xl p-8 shadow-sm ${surfaceClassName}`}>
         {eyebrow && (
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
             {eyebrow}
@@ -145,7 +146,7 @@ export function SectionRenderer({
             alt={title}
             width={1280}
             height={720}
-            className="mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-black/8 object-cover"
+            className="mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
           />
         )}
         <a
@@ -163,7 +164,7 @@ export function SectionRenderer({
     const body = asString(section.content.body);
 
     return (
-      <section className="rounded-3xl border border-black/8 bg-white p-6">
+      <section className={`rounded-3xl p-6 ${surfaceClassName}`}>
         <h2 className="text-2xl font-semibold">{title}</h2>
         {body && <p className="mt-4 whitespace-pre-line leading-7 opacity-85">{body}</p>}
       </section>
@@ -177,7 +178,7 @@ export function SectionRenderer({
 
     if (variant === "minimal") {
       return (
-        <section className="rounded-3xl border border-black/8 bg-white p-6">
+        <section className={`rounded-3xl p-6 ${surfaceClassName}`}>
           <h2 className="text-2xl font-semibold">{title}</h2>
           {imageUrl && (
             <Image
@@ -185,12 +186,12 @@ export function SectionRenderer({
               alt={title}
               width={960}
               height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-black/8 object-cover"
+              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
             />
           )}
           <ul className="mt-4 space-y-2">
-            {items.map((item) => (
-              <li key={item} className="flex items-center gap-2 text-sm">
+            {items.map((item, index) => (
+              <li key={`${item}-${index}`} className="flex items-center gap-2 text-sm">
                 <span className="h-2 w-2 rounded-full bg-[var(--site-accent)]" />
                 <span>{item}</span>
               </li>
@@ -201,7 +202,7 @@ export function SectionRenderer({
     }
 
     return (
-      <section className="rounded-3xl border border-black/8 bg-white p-6">
+      <section className={`rounded-3xl p-6 ${surfaceClassName}`}>
         <h2 className="text-2xl font-semibold">{title}</h2>
         {imageUrl && (
           <Image
@@ -209,14 +210,14 @@ export function SectionRenderer({
             alt={title}
             width={960}
             height={720}
-            className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-black/8 object-cover"
+            className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
           />
         )}
         <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <li
-              key={item}
-              className="rounded-2xl border border-black/5 bg-[var(--site-background)] px-4 py-3 text-sm font-medium"
+              key={`${item}-${index}`}
+              className="rounded-2xl border border-[var(--site-border)] bg-[var(--site-background)] px-4 py-3 text-sm font-medium"
             >
               {item}
             </li>
@@ -258,7 +259,7 @@ export function SectionRenderer({
     }
 
     return (
-      <section id="cta" className="rounded-3xl border border-black/8 bg-white p-6">
+      <section id="cta" className={`rounded-3xl p-6 ${surfaceClassName}`}>
         <h2 className="text-2xl font-semibold">{title}</h2>
         {description && <p className="mt-3 text-sm opacity-80">{description}</p>}
         {imageUrl && (
@@ -267,7 +268,7 @@ export function SectionRenderer({
             alt={title}
             width={1280}
             height={720}
-            className="mt-4 aspect-[16/9] h-auto w-full rounded-2xl border border-black/8 object-cover"
+            className="mt-4 aspect-[16/9] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
           />
         )}
         <a
@@ -285,13 +286,13 @@ export function SectionRenderer({
     const testimonials = asTestimonials(section.content.items);
 
     return (
-      <section className="rounded-3xl border border-black/8 bg-white p-6">
+      <section className={`rounded-3xl p-6 ${surfaceClassName}`}>
         <h2 className="text-2xl font-semibold">{title}</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           {testimonials.map((testimonial) => (
             <article
               key={`${testimonial.author}-${testimonial.quote}`}
-              className="rounded-2xl border border-black/5 p-4"
+              className="rounded-2xl border border-[var(--site-border)] p-4"
             >
               <p className="text-sm leading-6 opacity-85">
                 &ldquo;{testimonial.quote}&rdquo;
@@ -316,7 +317,7 @@ export function SectionRenderer({
     return (
       <section
         id="contact"
-        className="rounded-3xl border border-black/8 bg-white p-6 md:grid md:grid-cols-2 md:gap-6"
+        className={`rounded-3xl p-6 md:grid md:grid-cols-2 md:gap-6 ${surfaceClassName}`}
       >
         <div className="mb-6 md:mb-0">
           <h2 className="text-2xl font-semibold">{title}</h2>

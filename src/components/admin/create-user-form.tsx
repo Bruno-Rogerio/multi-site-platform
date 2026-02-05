@@ -16,12 +16,13 @@ type FormStatus =
 
 type CreateUserFormProps = {
   sites: SiteOption[];
+  mode?: "all" | "internal";
 };
 
-export function CreateUserForm({ sites }: CreateUserFormProps) {
+export function CreateUserForm({ sites, mode = "all" }: CreateUserFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [status, setStatus] = useState<FormStatus>(null);
-  const [role, setRole] = useState<"admin" | "client">("client");
+  const [role, setRole] = useState<"admin" | "client">(mode === "internal" ? "admin" : "client");
   const [siteId, setSiteId] = useState<string>(sites[0]?.id ?? "");
 
   const isClientRole = role === "client";
@@ -82,7 +83,7 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
     }
 
     formElement.reset();
-    setRole("client");
+    setRole(mode === "internal" ? "admin" : "client");
     setSiteId(orderedSites[0]?.id ?? "");
     setStatus({
       type: "success",
@@ -122,44 +123,54 @@ export function CreateUserForm({ sites }: CreateUserFormProps) {
         />
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className={`grid gap-3 ${mode === "internal" ? "md:grid-cols-1" : "md:grid-cols-2"}`}>
         <div>
           <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="invite-role">
             Perfil
           </label>
-          <select
-            id="invite-role"
-            value={role}
-            onChange={(event) => setRole(event.target.value as "admin" | "client")}
-            className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
-          >
-            <option value="client">Cliente</option>
-            <option value="admin">Admin da plataforma</option>
-          </select>
+          {mode === "internal" ? (
+            <input
+              value="Admin da plataforma"
+              disabled
+              className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020]/60 px-3 py-2 text-sm text-[var(--platform-text)]/70 outline-none"
+            />
+          ) : (
+            <select
+              id="invite-role"
+              value={role}
+              onChange={(event) => setRole(event.target.value as "admin" | "client")}
+              className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+            >
+              <option value="client">Cliente</option>
+              <option value="admin">Admin da plataforma</option>
+            </select>
+          )}
         </div>
 
-        <div>
-          <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="invite-site">
-            Site do cliente
-          </label>
-          <select
-            id="invite-site"
-            value={siteId}
-            onChange={(event) => setSiteId(event.target.value)}
-            disabled={!isClientRole}
-            className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE] disabled:cursor-not-allowed disabled:bg-[#0B1020]/60"
-          >
-            {orderedSites.length === 0 ? (
-              <option value="">Nenhum site disponivel</option>
-            ) : (
-              orderedSites.map((site) => (
-                <option key={site.id} value={site.id}>
-                  {site.name} - {site.domain}
-                </option>
-              ))
-            )}
-          </select>
-        </div>
+        {mode !== "internal" ? (
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="invite-site">
+              Site do cliente
+            </label>
+            <select
+              id="invite-site"
+              value={siteId}
+              onChange={(event) => setSiteId(event.target.value)}
+              disabled={!isClientRole}
+              className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE] disabled:cursor-not-allowed disabled:bg-[#0B1020]/60"
+            >
+              {orderedSites.length === 0 ? (
+                <option value="">Nenhum site disponivel</option>
+              ) : (
+                orderedSites.map((site) => (
+                  <option key={site.id} value={site.id}>
+                    {site.name} - {site.domain}
+                  </option>
+                ))
+              )}
+            </select>
+          </div>
+        ) : null}
       </div>
 
       <button

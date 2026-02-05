@@ -208,4 +208,19 @@ set
   theme_overrides = excluded.theme_overrides,
   is_active = excluded.is_active;
 
+insert into public.platform_settings (id, settings)
+values
+  (
+    1,
+    '{
+      "brand_name": "BuildSphere",
+      "logo_url": "",
+      "hero_image_url": "",
+      "dashboard_banner_url": ""
+    }'::jsonb
+  )
+on conflict (id) do update
+set
+  settings = excluded.settings;
+
 commit;

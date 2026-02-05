@@ -7,6 +7,7 @@ import { isReservedSubdomain } from "@/lib/tenant/host";
 const SUBDOMAIN_REGEX = /^[a-z0-9-]{3,30}$/;
 
 type OnboardingDraftPayload = {
+  creationMode?: "template" | "builder" | "builder-premium";
   siteStyle: string;
   paletteId?: string;
   customColors?: {
@@ -226,9 +227,17 @@ export async function POST(request: Request) {
     paletteId: payload.paletteId ?? "buildsphere",
     headerStyle: payload.headerStyle,
     motionStyle: payload.motionStyle ?? "motion-reveal",
+    creationMode: payload.creationMode ?? "template",
     addons: payload.addonsSelected ?? [],
     onboardingDraft: true,
   };
+
+  // Keep "minimal clean" visually clean even when user picks a strong palette.
+  if (payload.siteStyle === "minimal-clean") {
+    const minimal = themeBySiteStyle("minimal-clean");
+    themeSettings.backgroundColor = minimal.backgroundColor;
+    themeSettings.textColor = minimal.textColor;
+  }
 
   const { data: site, error: siteError } = await admin
     .from("sites")

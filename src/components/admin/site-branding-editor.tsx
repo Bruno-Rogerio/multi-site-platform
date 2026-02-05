@@ -34,15 +34,17 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [lastSelectedFileName, setLastSelectedFileName] = useState("");
   const [status, setStatus] = useState<Status>(null);
+  const effectiveSiteId = selectedSiteId || defaultSiteId || sites[0]?.id || "";
 
   const selectedSite = useMemo(
-    () => sites.find((site) => site.id === selectedSiteId) ?? null,
-    [sites, selectedSiteId],
+    () => sites.find((site) => site.id === effectiveSiteId) ?? null,
+    [sites, effectiveSiteId],
   );
 
   useEffect(() => {
-    if (!selectedSiteId) {
+    if (!effectiveSiteId) {
       return;
     }
 
@@ -50,7 +52,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
       setIsLoading(true);
       setStatus(null);
 
-      const response = await fetch(`/api/admin/site-theme?siteId=${encodeURIComponent(selectedSiteId)}`, {
+      const response = await fetch(`/api/admin/site-theme?siteId=${encodeURIComponent(effectiveSiteId)}`, {
         method: "GET",
         cache: "no-store",
       });
@@ -73,17 +75,17 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
     };
 
     void loadTheme();
-  }, [selectedSiteId]);
+  }, [effectiveSiteId]);
 
   async function onSave() {
-    if (!selectedSiteId) {
+    if (!effectiveSiteId) {
       return;
     }
 
     setIsSaving(true);
     setStatus(null);
 
-    const response = await fetch(`/api/admin/site-theme?siteId=${encodeURIComponent(selectedSiteId)}`, {
+    const response = await fetch(`/api/admin/site-theme?siteId=${encodeURIComponent(effectiveSiteId)}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ themeSettings }),
@@ -107,7 +109,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
   }
 
   async function onUploadLogo(file: File) {
-    if (!selectedSiteId) {
+    if (!effectiveSiteId) {
       return;
     }
 
@@ -115,7 +117,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
     setStatus(null);
 
     const formData = new FormData();
-    formData.append("siteId", selectedSiteId);
+    formData.append("siteId", effectiveSiteId);
     formData.append("sectionType", "branding");
     formData.append("slot", "logo");
     formData.append("file", file);
@@ -157,7 +159,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
           </label>
           <select
             id="branding-site"
-            value={selectedSiteId}
+            value={effectiveSiteId}
             onChange={(event) => setSelectedSiteId(event.target.value)}
             className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
           >
@@ -178,22 +180,30 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
           <input
             type="file"
             accept="image/*"
-            disabled={isUploading || isLoading}
+            disabled={isUploading || isLoading || !effectiveSiteId}
             onChange={async (event) => {
+              const inputElement = event.currentTarget;
               const file = event.target.files?.[0];
               if (file) {
+                setLastSelectedFileName(file.name);
                 const validationError = await validateImageForSlot(file, "logo");
                 if (validationError) {
                   setStatus({ type: "error", message: validationError });
-                  event.currentTarget.value = "";
+                  inputElement.value = "";
                   return;
                 }
                 void onUploadLogo(file);
               }
-              event.currentTarget.value = "";
+              inputElement.value = "";
             }}
             className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] file:mr-3 file:rounded-md file:border-0 file:bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white"
           />
+          {!effectiveSiteId ? (
+            <p className="mt-1 text-[11px] text-amber-200">Selecione um site para enviar o logo.</p>
+          ) : null}
+          {lastSelectedFileName ? (
+            <p className="mt-1 text-[11px] text-[var(--platform-text)]/65">Arquivo selecionado: {lastSelectedFileName}</p>
+          ) : null}
         </div>
       </div>
 

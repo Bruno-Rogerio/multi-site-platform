@@ -5,6 +5,7 @@ import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
 
 const BASE_MONTHLY_PRICE = 59.9;
 const ADDON_PRICES: Record<string, number> = {
+  "premium-design": 19.9,
   "extra-section": 9.9,
   blog: 29.9,
   "lead-capture": 19.9,
@@ -14,6 +15,7 @@ const ADDON_PRICES: Record<string, number> = {
 
 type RegisterCheckoutPayload = {
   siteId: string;
+  creationMode?: "template" | "builder" | "builder-premium";
   fullName: string;
   document: string;
   email: string;

@@ -454,17 +454,18 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                       accept="image/*"
                       disabled={uploadingSectionId === section.id}
                       onChange={async (event) => {
+                        const inputElement = event.currentTarget;
                         const file = event.target.files?.[0];
                         if (file) {
                           const validationError = await validateImageForSlot(file, "hero");
                           if (validationError) {
                             setStatus({ type: "error", message: validationError });
-                            event.currentTarget.value = "";
+                            inputElement.value = "";
                             return;
                           }
                           void uploadImageForSection(section, file);
                         }
-                        event.currentTarget.value = "";
+                        inputElement.value = "";
                       }}
                       className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] file:mr-3 file:rounded-md file:border-0 file:bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white"
                     />
@@ -538,17 +539,18 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                       accept="image/*"
                       disabled={uploadingSectionId === section.id}
                       onChange={async (event) => {
+                        const inputElement = event.currentTarget;
                         const file = event.target.files?.[0];
                         if (file) {
                           const validationError = await validateImageForSlot(file, "services");
                           if (validationError) {
                             setStatus({ type: "error", message: validationError });
-                            event.currentTarget.value = "";
+                            inputElement.value = "";
                             return;
                           }
                           void uploadImageForSection(section, file);
                         }
-                        event.currentTarget.value = "";
+                        inputElement.value = "";
                       }}
                       className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] file:mr-3 file:rounded-md file:border-0 file:bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white"
                     />
@@ -593,17 +595,18 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                       accept="image/*"
                       disabled={uploadingSectionId === section.id}
                       onChange={async (event) => {
+                        const inputElement = event.currentTarget;
                         const file = event.target.files?.[0];
                         if (file) {
                           const validationError = await validateImageForSlot(file, "cta");
                           if (validationError) {
                             setStatus({ type: "error", message: validationError });
-                            event.currentTarget.value = "";
+                            inputElement.value = "";
                             return;
                           }
                           void uploadImageForSection(section, file);
                         }
-                        event.currentTarget.value = "";
+                        inputElement.value = "";
                       }}
                       className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] file:mr-3 file:rounded-md file:border-0 file:bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white"
                     />
