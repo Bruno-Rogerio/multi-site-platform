@@ -63,7 +63,7 @@ export function StickyHeader({ brandElement }: StickyHeaderProps) {
               href="/quero-comecar"
               className="ml-1 rounded-full bg-[linear-gradient(135deg,#3B82F6,#7C5CFF)] px-4 py-2 text-[13px] font-semibold text-white transition hover:brightness-110"
             >
-              Comecar agora
+              Começar agora
             </Link>
           </nav>
 

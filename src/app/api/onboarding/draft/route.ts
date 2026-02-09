@@ -88,19 +88,18 @@ function toItems(highlights: string): string[] {
 }
 
 function mapHeroVariant(input: string): string {
-  if (input === "hero-split") return "split";
-  if (input === "hero-centered") return "centered";
-  return "default";
+  const valid = ["centered", "minimal", "split", "card", "centered-gradient"];
+  return valid.includes(input) ? input : "centered";
 }
 
 function mapServicesVariant(input: string): string {
-  if (input === "services-list" || input === "services-steps") return "minimal";
-  return "default";
+  const valid = ["default", "minimal-list", "masonry", "columns", "steps"];
+  return valid.includes(input) ? input : "default";
 }
 
 function mapCtaVariant(input: string): string {
-  if (input === "cta-banner") return "banner";
-  return "default";
+  const valid = ["banner", "centered", "banner-gradient", "centered-gradient", "double"];
+  return valid.includes(input) ? input : "banner";
 }
 
 function themeBySiteStyle(style: string) {

@@ -12,6 +12,8 @@ export type ServiceCardData = {
   title: string;
   description: string;
   iconName: string;
+  icon?: string; // alias for iconName, used by some components
+  imageUrl?: string; // optional image for the card
 };
 
 export type CtaTypeId = "whatsapp" | "email" | "instagram" | "linkedin" | "facebook";
@@ -41,7 +43,7 @@ export type WizardState = {
   paletteId: string;
   customColors: { primary: string; accent: string; background: string; text: string };
   fontFamily: string;
-  buttonStyle: "rounded" | "pill" | "square";
+  buttonStyle: "rounded" | "pill" | "square" | "soft";
 
   // Section builder
   heroVariant: string;
@@ -58,6 +60,7 @@ export type WizardState = {
   // CTA system
   selectedCtaTypes: CtaTypeId[];
   floatingCtaEnabled: boolean;
+  floatingCtaChannels: CtaTypeId[];
   ctaConfig: Partial<Record<CtaTypeId, { label: string; url: string }>>;
 
   // Icon pack
@@ -68,6 +71,10 @@ export type WizardState = {
 
   // Content editing
   content: Record<string, string>;
+
+  // Images
+  heroImage: string;
+  logoUrl: string;
 
   // Business info
   businessName: string;
@@ -95,7 +102,7 @@ export type WizardState = {
   checkoutState: "idle" | "submitting" | "success" | "error";
   checkoutMessage: string;
   checkoutUrl: string;
-  premiumGateModal: { open: boolean; featureId: string; featurePrice: number } | null;
+  premiumGateModal: { open: boolean; featureId: string; featurePrice: number; pendingCtaTypeId?: CtaTypeId } | null;
 };
 
 export type WizardAction =
@@ -106,7 +113,7 @@ export type WizardAction =
   | { type: "SET_PALETTE"; id: string }
   | { type: "SET_CUSTOM_COLOR"; key: string; value: string }
   | { type: "SET_FONT"; family: string }
-  | { type: "SET_BUTTON_STYLE"; style: "rounded" | "pill" | "square" }
+  | { type: "SET_BUTTON_STYLE"; style: "rounded" | "pill" | "square" | "soft" }
   | { type: "SET_HERO_VARIANT"; variant: string }
   | { type: "SET_SERVICES_VARIANT"; variant: string }
   | { type: "SET_SERVICES_DISPLAY"; mode: "grid" | "list" }
@@ -121,6 +128,7 @@ export type WizardAction =
   | { type: "TOGGLE_CTA_TYPE"; ctaTypeId: CtaTypeId }
   | { type: "SET_CTA_CONFIG"; ctaTypeId: CtaTypeId; config: { label: string; url: string } }
   | { type: "SET_FLOATING_CTA"; enabled: boolean }
+  | { type: "SET_FLOATING_CTA_CHANNELS"; channels: CtaTypeId[] }
   | { type: "SET_ICON_PACK"; pack: "basic" | "premium" }
   | { type: "TOGGLE_ADDON"; addonId: string }
   | { type: "UPDATE_CONTENT"; key: string; value: string }
@@ -133,6 +141,8 @@ export type WizardAction =
   | { type: "SET_SUBMIT_STATE"; state: WizardState["submitState"]; message?: string }
   | { type: "SET_DRAFT"; siteId: string; url: string }
   | { type: "SET_CHECKOUT_STATE"; state: WizardState["checkoutState"]; message?: string; url?: string }
-  | { type: "OPEN_PREMIUM_GATE"; featureId: string; featurePrice: number }
+  | { type: "OPEN_PREMIUM_GATE"; featureId: string; featurePrice: number; pendingCtaTypeId?: CtaTypeId }
   | { type: "CLOSE_PREMIUM_GATE" }
-  | { type: "UPGRADE_TO_PREMIUM" };
+  | { type: "UPGRADE_TO_PREMIUM" }
+  | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl"; url: string }
+  | { type: "RESET_WIZARD" };
