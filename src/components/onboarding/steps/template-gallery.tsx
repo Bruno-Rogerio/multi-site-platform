@@ -99,7 +99,6 @@ export function TemplateGallery() {
     const template = getTemplateBySlug(slug);
     if (template) {
       dispatch({ type: "SET_PALETTE", id: template.paletteId });
-      dispatch({ type: "SET_SITE_STYLE", id: template.siteStyleId });
       dispatch({ type: "SET_HERO_VARIANT", variant: template.heroVariant });
       dispatch({ type: "SET_SERVICES_VARIANT", variant: template.servicesVariant });
       dispatch({ type: "SET_CTA_VARIANT", variant: template.ctaVariant });
@@ -117,11 +116,11 @@ export function TemplateGallery() {
           Escolha o template
         </p>
         <h1 className="mt-2 text-2xl font-black text-[var(--platform-text)] md:text-3xl">
-          Layouts prontos para seu negocio
+          Layouts prontos para seu negócio
         </h1>
         <p className="mt-2 max-w-xl text-sm text-[var(--platform-text)]/60">
           Cada template foi criado pensando em um tipo de profissional. Escolha o que
-          mais combina com voce e personalize o conteudo.
+          mais combina com você e personalize o conteúdo.
         </p>
       </div>
 

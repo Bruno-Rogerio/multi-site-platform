@@ -139,7 +139,7 @@ export function TemplateContentEditor() {
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-semibold text-[var(--platform-text)]">Servicos</h3>
+              <h3 className="text-sm font-semibold text-[var(--platform-text)]">Serviços</h3>
               <p className="text-xs text-[var(--platform-text)]/50">O que você oferece aos seus clientes</p>
             </div>
 
@@ -204,7 +204,7 @@ export function TemplateContentEditor() {
 
           <div className="mt-4 space-y-4">
             <div>
-              <label className="text-xs font-medium text-[var(--platform-text)]/60">Titulo</label>
+              <label className="text-xs font-medium text-[var(--platform-text)]/60">Título</label>
               <input
                 type="text"
                 value={content.ctaTitle || ""}

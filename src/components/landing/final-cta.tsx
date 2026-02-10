@@ -29,8 +29,8 @@ export function FinalCta() {
             Pronto para ter seu site profissional?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-white/85">
-            Junte-se a centenas de profissionais que ja transformaram sua
-            presenca online com a BuildSphere.
+            Junte-se a centenas de profissionais que já transformaram sua
+            presença online com a BuildSphere.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -38,7 +38,7 @@ export function FinalCta() {
               href="/quero-comecar"
               className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-bold text-[#0B1020] shadow-[0_14px_40px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
             >
-              Comecar agora
+              Começar agora
               <ArrowRight
                 size={16}
                 className="transition-transform duration-300 group-hover:translate-x-1"

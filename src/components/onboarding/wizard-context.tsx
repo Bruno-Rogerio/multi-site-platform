@@ -8,7 +8,7 @@ import {
   type ReactNode,
   type Dispatch,
 } from "react";
-import type { WizardState, WizardAction, OnboardingPlan, StepDefinition } from "@/lib/onboarding/types";
+import type { WizardState, WizardAction, StepDefinition, CtaTypeId } from "@/lib/onboarding/types";
 import { getStepsForPlan } from "@/lib/onboarding/plans";
 import { calculateMonthlyTotal } from "@/lib/onboarding/pricing";
 import {
@@ -31,7 +31,6 @@ const initialState: WizardState = {
   selectedTemplateSlug: null,
 
   // Style & palette
-  siteStyleId: "tech-modern",
   paletteId: "buildsphere",
   customColors: { primary: "#3B82F6", accent: "#22D3EE", background: "#0B1020", text: "#EAF0FF" },
   fontFamily: "Sora, sans-serif",
@@ -96,25 +95,47 @@ const initialState: WizardState = {
   checkoutState: "idle",
   checkoutMessage: "",
   checkoutUrl: "",
-  premiumGateModal: null,
 };
+
+/* ─── Free defaults (used when toggling section premium off) ─── */
+
+const FREE_PALETA_DEFAULTS = {
+  paletteId: "buildsphere",
+} as const;
+
+const FREE_TIPOGRAFIA_DEFAULTS = {
+  fontFamily: "Sora, sans-serif",
+} as const;
+
+const FREE_VARIANTES_DEFAULTS = {
+  heroVariant: "centered",
+  servicesVariant: "default",
+  ctaVariant: "banner",
+  motionStyle: "motion-fade",
+} as const;
+
+const FREE_CANAIS_DEFAULTS = {
+  floatingCtaEnabled: false,
+  floatingCtaChannels: [] as CtaTypeId[],
+} as const;
+
+const FREE_CARDS_DEFAULTS = {
+  selectedIconPack: "basic" as const,
+} as const;
 
 /* ─── Reducer ─── */
 
 function wizardReducer(state: WizardState, action: WizardAction): WizardState {
   switch (action.type) {
     case "SET_PLAN":
-      // Reset all visual/structural configs when switching plans to prevent "cheating"
       return {
         ...initialState,
-        // Keep business info that user already entered
         businessName: state.businessName,
         businessSegment: state.businessSegment,
         businessCity: state.businessCity,
         businessHighlights: state.businessHighlights,
         targetAudience: state.targetAudience,
         preferredSubdomain: state.preferredSubdomain,
-        // Set new plan
         selectedPlan: action.plan,
         currentStep: state.currentStep,
       };
@@ -124,9 +145,6 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SELECT_TEMPLATE":
       return { ...state, selectedTemplateSlug: action.slug };
-
-    case "SET_SITE_STYLE":
-      return { ...state, siteStyleId: action.id };
 
     case "SET_PALETTE":
       return { ...state, paletteId: action.id };
@@ -202,7 +220,6 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
     case "TOGGLE_CTA_TYPE": {
       const isSelected = state.selectedCtaTypes.includes(action.ctaTypeId);
       if (isSelected) {
-        // Removing: clean up ctaConfig and auto-disable floatingCta if last type removed
         const newTypes = state.selectedCtaTypes.filter((id) => id !== action.ctaTypeId);
         const { [action.ctaTypeId]: _removed, ...remainingConfig } = state.ctaConfig;
         return {
@@ -226,7 +243,6 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_FLOATING_CTA": {
       const newEnabled = action.enabled;
-      // When enabling, auto-populate channels with first selected CTA if empty
       const autoChannels = newEnabled && state.floatingCtaChannels.length === 0 && state.selectedCtaTypes.length > 0
         ? [state.selectedCtaTypes[0]]
         : state.floatingCtaChannels;
@@ -234,18 +250,11 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         ...state,
         floatingCtaEnabled: newEnabled,
         floatingCtaChannels: newEnabled ? autoChannels : state.floatingCtaChannels,
-        // Remove addon when disabling so price goes back to 0
-        addonsSelected: newEnabled
-          ? state.addonsSelected
-          : state.addonsSelected.filter((id) => id !== "floating-cta"),
       };
     }
 
     case "SET_FLOATING_CTA_CHANNELS":
-      return {
-        ...state,
-        floatingCtaChannels: action.channels,
-      };
+      return { ...state, floatingCtaChannels: action.channels };
 
     case "SET_ICON_PACK":
       return { ...state, selectedIconPack: action.pack };
@@ -260,12 +269,53 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
       };
     }
 
+    case "TOGGLE_SECTION_PREMIUM": {
+      const { sectionId } = action;
+      const isActive = state.addonsSelected.includes(sectionId);
+
+      if (isActive) {
+        // Turning OFF: remove addon and reset to free defaults for that section
+        const newAddons = state.addonsSelected.filter((id) => id !== sectionId);
+        const base = { ...state, addonsSelected: newAddons };
+
+        switch (sectionId) {
+          case "premium-paleta":
+            return { ...base, ...FREE_PALETA_DEFAULTS };
+          case "premium-tipografia":
+            return { ...base, ...FREE_TIPOGRAFIA_DEFAULTS };
+          case "premium-variantes":
+            return { ...base, ...FREE_VARIANTES_DEFAULTS };
+          case "premium-canais":
+            return {
+              ...base,
+              ...FREE_CANAIS_DEFAULTS,
+              // Trim CTA types to free limit (2)
+              selectedCtaTypes: state.selectedCtaTypes.slice(0, 2),
+            };
+          case "premium-cards":
+            return {
+              ...base,
+              ...FREE_CARDS_DEFAULTS,
+              // Trim service cards to free limit (4)
+              serviceCards: state.serviceCards.slice(0, 4),
+            };
+          default:
+            return base;
+        }
+      }
+
+      // Turning ON: add addon
+      return {
+        ...state,
+        addonsSelected: [...state.addonsSelected, sectionId],
+      };
+    }
+
     case "UPDATE_CONTENT":
       return { ...state, content: { ...state.content, [action.key]: action.value } };
 
     case "SET_BUSINESS_FIELD": {
       const newState = { ...state, [action.key]: action.value };
-      // Sync businessHighlights → content.slogan
       if (action.key === "businessHighlights") {
         newState.content = { ...newState.content, slogan: action.value };
       }
@@ -299,28 +349,6 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         checkoutState: action.state,
         checkoutMessage: action.message ?? "",
         checkoutUrl: action.url ?? "",
-      };
-
-    case "OPEN_PREMIUM_GATE":
-      return {
-        ...state,
-        premiumGateModal: {
-          open: true,
-          featureId: action.featureId,
-          featurePrice: action.featurePrice,
-          pendingCtaTypeId: action.pendingCtaTypeId,
-        },
-      };
-
-    case "CLOSE_PREMIUM_GATE":
-      return { ...state, premiumGateModal: null };
-
-    case "UPGRADE_TO_PREMIUM":
-      return {
-        ...state,
-        selectedPlan: "premium-full",
-        addonsSelected: [],
-        premiumGateModal: null,
       };
 
     case "SET_IMAGE":

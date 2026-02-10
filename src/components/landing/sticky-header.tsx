@@ -8,7 +8,7 @@ import { MobileNav } from "./mobile-nav";
 const navLinks = [
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Como funciona", href: "#como-funciona" },
-  { label: "Precos", href: "#precos" },
+  { label: "Preços", href: "#precos" },
   { label: "FAQ", href: "#faq" },
 ];
 

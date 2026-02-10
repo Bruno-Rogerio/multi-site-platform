@@ -28,12 +28,12 @@ export function ImageUpload({
 
   async function handleUpload(file: File) {
     if (!file.type.startsWith("image/")) {
-      setError("Apenas imagens sao permitidas");
+      setError("Apenas imagens são permitidas");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("Arquivo muito grande. Maximo 5MB");
+      setError("Arquivo muito grande. Máximo 5MB");
       return;
     }
 

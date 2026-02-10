@@ -10,8 +10,7 @@ import { PreviewServices } from "./preview-services";
 import { PreviewCta } from "./preview-cta";
 import { PreviewContact } from "./preview-contact";
 import { PreviewFloatingCta } from "./preview-floating-cta";
-import { getPaletteById } from "@/lib/onboarding/palettes";
-import { getSiteStyleById, getStyleCssVars } from "@/lib/onboarding/site-styles";
+import { getPaletteById, getPaletteStyleVars } from "@/lib/onboarding/palettes";
 
 type DeviceMode = "desktop" | "mobile";
 
@@ -88,10 +87,9 @@ const getMotionVariants = (style: string): MotionVariants => {
 export function LivePreviewPanel() {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const { state } = useWizard();
-  const { paletteId, customColors, siteStyleId, floatingCtaEnabled, fontFamily, motionStyle, enabledSections } = state;
+  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, enabledSections } = state;
 
   const palette = paletteId ? getPaletteById(paletteId) : null;
-  const siteStyle = siteStyleId ? getSiteStyleById(siteStyleId) : null;
   const { container: containerVariants, item: itemVariants } = getMotionVariants(motionStyle);
 
   // Load Google Font dynamically
@@ -140,15 +138,15 @@ export function LivePreviewPanel() {
       };
     }
 
-    // Site style vars
-    const styleVars = siteStyle ? getStyleCssVars(siteStyle) : {
+    // Style vars derived from palette
+    const styleVars = palette ? getPaletteStyleVars(palette) : {
       "--preview-radius": "12px",
       "--preview-spacing": "16px",
       "--preview-shadow": "none",
     };
 
     return { ...colorVars, ...styleVars } as React.CSSProperties;
-  }, [palette, paletteId, customColors, siteStyle]);
+  }, [palette, paletteId, customColors]);
 
   return (
     <div className="flex flex-col h-[600px]">

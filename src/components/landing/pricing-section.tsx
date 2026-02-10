@@ -19,38 +19,53 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    name: "Essencial",
+    name: "Básico",
     price: "R$ 59,90",
-    priceNote: "/mes",
+    priceNote: "/mês",
     description:
-      "Para quem quer um site profissional com layouts prontos ou modo construtor.",
+      "Escolha um layout pronto e personalize o conteúdo. Ideal para quem quer praticidade e velocidade.",
     features: [
       "Site profissional completo",
-      "Subdominio personalizado",
-      "Painel de edicao intuitivo",
-      "Design responsivo",
+      "8+ layouts prontos",
+      "Subdomínio personalizado",
+      "Design 100% responsivo",
       "SSL e hospedagem inclusa",
-      "Suporte por email",
-      "Atualizacoes automaticas",
+      "Suporte por e-mail",
     ],
-    extraNote: "Recursos premium disponiveis como add-ons",
-    cta: "Comecar agora",
+    cta: "Começar agora",
+  },
+  {
+    name: "Construir",
+    price: "R$ 79,90",
+    priceNote: "/mês + add-ons",
+    description:
+      "Monte seu site do zero com controle total sobre cada detalhe. Recursos premium disponíveis como extras.",
+    features: [
+      "Tudo do plano Básico",
+      "Paleta de cores personalizável",
+      "Escolha de tipografia e botões",
+      "Variantes de layout por seção",
+      "2 canais de contato inclusos",
+      "Expansível com add-ons premium",
+    ],
+    extraNote: "Add-ons a partir de R$ 9,90/mês",
+    cta: "Começar a construir",
   },
   {
     name: "Premium Full",
     badge: "Recomendado",
     price: "R$ 109,80",
-    priceNote: "/mes",
+    priceNote: "/mês",
     description:
-      "Todos os recursos premium liberados. A experiencia completa da BuildSphere.",
+      "Todos os recursos premium desbloqueados. A experiência completa sem limites.",
     features: [
-      "Tudo do plano Essencial",
-      "Construtor completo desbloqueado",
-      "Todas as paletas e estilos",
-      "Motion e animacoes premium",
-      "Layouts exclusivos",
+      "Tudo do plano Construir",
+      "Todas as paletas e fontes premium",
+      "Variantes e animações exclusivas",
+      "Canais de contato ilimitados",
+      "Cards e seções sem limite",
+      "Ícones premium liberados",
       "Prioridade no suporte",
-      "Recursos futuros inclusos",
     ],
     cta: "Quero o Premium",
     highlighted: true,
@@ -64,7 +79,7 @@ export function PricingSection() {
   return (
     <div
       ref={ref}
-      className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2"
+      className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-3"
     >
       {plans.map((plan, i) => (
         <motion.div

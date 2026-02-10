@@ -92,9 +92,9 @@ export function SectionRenderer({
             />
           ) : (
             <div className="rounded-2xl border border-[var(--site-border)] bg-[var(--site-background)] p-5">
-              <p className="text-sm font-semibold">Sessoes online em todo o Brasil</p>
+              <p className="text-sm font-semibold">Sessões online em todo o Brasil</p>
               <p className="mt-2 text-sm opacity-75">
-                Atendimento com plano terapeutico personalizado e acompanhamento semanal.
+                Atendimento com plano terapêutico personalizado e acompanhamento semanal.
               </p>
             </div>
           )}
@@ -172,7 +172,7 @@ export function SectionRenderer({
   }
 
   if (section.type === "services") {
-    const title = asString(section.content.title, "Servicos");
+    const title = asString(section.content.title, "Serviços");
     const items = asStringArray(section.content.items);
     const imageUrl = asString(section.content.imageUrl);
 

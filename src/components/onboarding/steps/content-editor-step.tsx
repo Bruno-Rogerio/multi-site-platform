@@ -536,13 +536,13 @@ export function ContentEditorStep() {
       {/* Header */}
       <div className="mb-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
-          Conteudo
+          Conteúdo
         </p>
         <h1 className="mt-2 text-2xl font-black text-[var(--platform-text)] md:text-3xl">
           Escreva os textos do seu site
         </h1>
         <p className="mt-2 max-w-xl text-sm text-[var(--platform-text)]/60">
-          Personalize cada secao com suas palavras. O preview ao lado mostra as mudancas em tempo real.
+          Personalize cada seção com suas palavras. O preview ao lado mostra as mudanças em tempo real.
         </p>
       </div>
 

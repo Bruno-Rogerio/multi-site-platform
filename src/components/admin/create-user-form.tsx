@@ -42,7 +42,7 @@ export function CreateUserForm({ sites, mode = "all" }: CreateUserFormProps) {
     const email = String(formData.get("email") ?? "").trim().toLowerCase();
 
     if (!email) {
-      setStatus({ type: "error", message: "Informe o e-mail do usuario." });
+      setStatus({ type: "error", message: "Informe o e-mail do usuário." });
       return;
     }
 
@@ -76,7 +76,7 @@ export function CreateUserForm({ sites, mode = "all" }: CreateUserFormProps) {
     setIsLoading(false);
 
     if (!response.ok) {
-      const fallbackMessage = "Nao foi possivel convidar o usuario.";
+      const fallbackMessage = "Não foi possível convidar o usuário.";
       const detail = payload?.details ? ` ${payload.details}` : "";
       setStatus({ type: "error", message: `${payload?.error ?? fallbackMessage}${detail}`.trim() });
       return;
@@ -89,9 +89,9 @@ export function CreateUserForm({ sites, mode = "all" }: CreateUserFormProps) {
       type: "success",
       message:
         payload?.temporaryPassword
-          ? `${payload?.message ?? "Usuario criado."} Senha temporaria: ${payload.temporaryPassword}`
+          ? `${payload?.message ?? "Usuário criado."} Senha temporária: ${payload.temporaryPassword}`
           : payload?.message ??
-            "Convite enviado com sucesso. O usuario recebera email para definir senha.",
+            "Convite enviado com sucesso. O usuário receberá email para definir senha.",
     });
   }
 
@@ -160,7 +160,7 @@ export function CreateUserForm({ sites, mode = "all" }: CreateUserFormProps) {
               className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE] disabled:cursor-not-allowed disabled:bg-[#0B1020]/60"
             >
               {orderedSites.length === 0 ? (
-                <option value="">Nenhum site disponivel</option>
+                <option value="">Nenhum site disponível</option>
               ) : (
                 orderedSites.map((site) => (
                   <option key={site.id} value={site.id}>
@@ -178,7 +178,7 @@ export function CreateUserForm({ sites, mode = "all" }: CreateUserFormProps) {
         disabled={!canSubmit}
         className="w-full rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {isLoading ? "Enviando convite..." : "Convidar usuario"}
+        {isLoading ? "Enviando convite..." : "Convidar usuário"}
       </button>
     </form>
   );

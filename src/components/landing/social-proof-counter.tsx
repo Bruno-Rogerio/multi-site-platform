@@ -33,7 +33,7 @@ const metrics: Metric[] = [
   },
   {
     value: "4.9",
-    label: "Satisfacao dos clientes",
+    label: "Satisfação dos clientes",
     numericTarget: 4.9,
     suffix: "/5",
   },

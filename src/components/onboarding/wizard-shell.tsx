@@ -4,7 +4,6 @@ import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WizardProvider, useWizard } from "./wizard-context";
 import { StepIndicator } from "./step-indicator";
-import { PremiumGateModal } from "./premium-gate-modal";
 import { formatPrice } from "@/lib/onboarding/pricing";
 
 // Steps (will be imported once created)
@@ -110,8 +109,6 @@ function WizardContent() {
         </div>
       </div>
 
-      {/* Premium gate modal */}
-      <PremiumGateModal />
     </div>
   );
 }

@@ -21,13 +21,13 @@ export const dynamic = "force-dynamic";
 const features: { iconName: IconName; title: string; description: string }[] = [
   {
     iconName: "Globe",
-    title: "Dominio profissional",
+    title: "Domínio profissional",
     description:
-      "Seu site com subdominio personalizado ou dominio proprio. Presenca online seria desde o primeiro dia.",
+      "Seu site com subdomínio personalizado ou domínio próprio. Presença online séria desde o primeiro dia.",
   },
   {
     iconName: "Palette",
-    title: "Visual personalizavel",
+    title: "Visual personalizável",
     description:
       "Escolha entre estilos, paletas e layouts. Seu site reflete a identidade do seu trabalho.",
   },
@@ -35,25 +35,25 @@ const features: { iconName: IconName; title: string; description: string }[] = [
     iconName: "Smartphone",
     title: "Responsivo em qualquer tela",
     description:
-      "Design adaptado para desktop, tablet e celular. Seus visitantes tem a melhor experiencia sempre.",
+      "Design adaptado para desktop, tablet e celular. Seus visitantes tem a melhor experiência sempre.",
   },
   {
     iconName: "Zap",
     title: "Performance otimizada",
     description:
-      "Carregamento ultra-rapido com infraestrutura moderna. SEO e velocidade que fazem diferenca.",
+      "Carregamento ultra-rápido com infraestrutura moderna. SEO e velocidade que fazem diferença.",
   },
   {
     iconName: "Shield",
-    title: "Seguro e confiavel",
+    title: "Seguro e confiável",
     description:
-      "SSL, backups automaticos e infraestrutura profissional. Seus dados e os de seus clientes protegidos.",
+      "SSL, backups automáticos e infraestrutura profissional. Seus dados e os de seus clientes protegidos.",
   },
   {
     iconName: "PenTool",
-    title: "Edicao sem codigo",
+    title: "Edição sem código",
     description:
-      "Painel intuitivo para atualizar textos, imagens e informacoes. Voce no controle total.",
+      "Painel intuitivo para atualizar textos, imagens e informações. Você no controle total.",
   },
 ];
 
@@ -61,37 +61,37 @@ const faqItems: FaqItem[] = [
   {
     question: "Preciso saber programar para usar a BuildSphere?",
     answer:
-      "Nao! A BuildSphere foi criada pensando em profissionais que nao tem conhecimento tecnico. Todo o processo de configuracao e edicao e visual e intuitivo.",
+      "Não! A BuildSphere foi criada pensando em profissionais que não tem conhecimento técnico. Todo o processo de configuração e edição é visual e intuitivo.",
   },
   {
-    question: "Posso usar meu proprio dominio?",
+    question: "Posso usar meu próprio domínio?",
     answer:
-      "Sim. Voce pode usar um subdominio gratuito (seunome.buildsphere.app) ou conectar um dominio proprio que ja possua.",
+      "Sim. Você pode usar um subdomínio gratuito (seunome.buildsphere.app) ou conectar um domínio próprio que já possua.",
   },
   {
     question: "Quanto tempo leva para ter meu site no ar?",
     answer:
-      "Menos de 5 minutos. Nosso assistente de configuracao guia voce por todas as etapas e seu site fica online imediatamente apos a conclusao.",
+      "Menos de 5 minutos. Nosso assistente de configuração guia você por todas as etapas e seu site fica online imediatamente após a conclusão.",
   },
   {
     question: "Existe taxa de setup ou contrato de fidelidade?",
     answer:
-      "Nao. O plano e mensal e voce pode cancelar a qualquer momento. Nao cobramos taxa de setup nem exigimos permanencia minima.",
+      "Não. O plano é mensal e você pode cancelar a qualquer momento. Não cobramos taxa de setup nem exigimos permanência mínima.",
   },
   {
     question: "Posso editar meu site depois de publicado?",
     answer:
-      "Sim! Voce tem acesso a um painel administrativo completo onde pode alterar textos, imagens, cores e informacoes sempre que precisar.",
+      "Sim! Você tem acesso a um painel administrativo completo onde pode alterar textos, imagens, cores e informações sempre que precisar.",
   },
   {
-    question: "A BuildSphere e indicada para quais profissionais?",
+    question: "A BuildSphere é indicada para quais profissionais?",
     answer:
-      "Psicologos, terapeutas, coaches, nutricionistas, consultores e qualquer profissional autonomo que precise de presenca online profissional.",
+      "Psicólogos, terapeutas, coaches, nutricionistas, consultores e qualquer profissional autônomo que precise de presença online profissional.",
   },
   {
     question: "Meu site aparece no Google?",
     answer:
-      "Sim. Todos os sites sao otimizados para mecanismos de busca (SEO) com boas praticas de performance, meta tags e estrutura semantica.",
+      "Sim. Todos os sites são otimizados para mecanismos de busca (SEO) com boas práticas de performance, meta tags e estrutura semântica.",
   },
 ];
 
@@ -132,11 +132,11 @@ export default async function PlatformLandingPage() {
                 Como funciona
               </p>
               <h2 className="mt-3 text-3xl font-black text-[var(--platform-text)] md:text-4xl">
-                Tres passos para seu site profissional
+                Três passos para seu site profissional
               </h2>
               <p className="mt-3 max-w-2xl text-base text-[var(--platform-text)]/60">
-                Um processo simples e guiado. Voce nao precisa de conhecimento
-                tecnico.
+                Um processo simples e guiado. Você não precisa de conhecimento
+                técnico.
               </p>
             </AnimatedSection>
 
@@ -152,11 +152,11 @@ export default async function PlatformLandingPage() {
                 Funcionalidades
               </p>
               <h2 className="mt-3 text-3xl font-black text-[var(--platform-text)] md:text-4xl">
-                Tudo que voce precisa em um so lugar
+                Tudo que você precisa em um só lugar
               </h2>
               <p className="mt-3 max-w-2xl text-base text-[var(--platform-text)]/60">
-                Recursos pensados para profissionais que querem uma presenca
-                online de qualidade sem complicacao.
+                Recursos pensados para profissionais que querem uma presença
+                online de qualidade sem complicação.
               </p>
             </AnimatedSection>
 
@@ -179,13 +179,13 @@ export default async function PlatformLandingPage() {
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
-                Veja na pratica
+                Veja na prática
               </p>
               <h2 className="mt-3 text-3xl font-black text-[var(--platform-text)] md:text-4xl">
                 Sites que impressionam seus clientes
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-base text-[var(--platform-text)]/60">
-                Cada site e unico, com a identidade visual do profissional. Veja
+                Cada site é único, com a identidade visual do profissional. Veja
                 como um site criado na BuildSphere se parece.
               </p>
             </AnimatedSection>
@@ -194,18 +194,18 @@ export default async function PlatformLandingPage() {
           </div>
         </section>
 
-        {/* ─── Precos ─── */}
+        {/* ─── Preços ─── */}
         <section id="precos" className="py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
-                Precos
+                Preços
               </p>
               <h2 className="mt-3 text-3xl font-black text-[var(--platform-text)] md:text-4xl">
                 Simples e transparente
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-base text-[var(--platform-text)]/60">
-                Escolha o plano ideal para voce. Sem taxa de setup, sem custo
+                Escolha o plano ideal para você. Sem taxa de setup, sem custo
                 oculto.
               </p>
             </AnimatedSection>
@@ -225,7 +225,7 @@ export default async function PlatformLandingPage() {
                 Perguntas frequentes
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-base text-[var(--platform-text)]/60">
-                Tire suas duvidas sobre a plataforma.
+                Tire suas dúvidas sobre a plataforma.
               </p>
             </AnimatedSection>
 

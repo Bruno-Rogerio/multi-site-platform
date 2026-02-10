@@ -39,7 +39,6 @@ export type WizardState = {
   selectedTemplateSlug: string | null;
 
   // Style & palette (builder/premium)
-  siteStyleId: string;
   paletteId: string;
   customColors: { primary: string; accent: string; background: string; text: string };
   fontFamily: string;
@@ -102,14 +101,12 @@ export type WizardState = {
   checkoutState: "idle" | "submitting" | "success" | "error";
   checkoutMessage: string;
   checkoutUrl: string;
-  premiumGateModal: { open: boolean; featureId: string; featurePrice: number; pendingCtaTypeId?: CtaTypeId } | null;
 };
 
 export type WizardAction =
   | { type: "SET_PLAN"; plan: OnboardingPlan }
   | { type: "CONFIRM_PLAN" }
   | { type: "SELECT_TEMPLATE"; slug: string }
-  | { type: "SET_SITE_STYLE"; id: string }
   | { type: "SET_PALETTE"; id: string }
   | { type: "SET_CUSTOM_COLOR"; key: string; value: string }
   | { type: "SET_FONT"; family: string }
@@ -141,8 +138,6 @@ export type WizardAction =
   | { type: "SET_SUBMIT_STATE"; state: WizardState["submitState"]; message?: string }
   | { type: "SET_DRAFT"; siteId: string; url: string }
   | { type: "SET_CHECKOUT_STATE"; state: WizardState["checkoutState"]; message?: string; url?: string }
-  | { type: "OPEN_PREMIUM_GATE"; featureId: string; featurePrice: number; pendingCtaTypeId?: CtaTypeId }
-  | { type: "CLOSE_PREMIUM_GATE" }
-  | { type: "UPGRADE_TO_PREMIUM" }
+  | { type: "TOGGLE_SECTION_PREMIUM"; sectionId: "premium-paleta" | "premium-tipografia" | "premium-variantes" | "premium-canais" | "premium-cards" }
   | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl"; url: string }
   | { type: "RESET_WIZARD" };

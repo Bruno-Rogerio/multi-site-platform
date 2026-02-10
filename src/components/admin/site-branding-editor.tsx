@@ -66,7 +66,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
       if (!response.ok) {
         setStatus({
           type: "error",
-          message: `${payload?.error ?? "Nao foi possivel carregar branding."} ${payload?.details ?? ""}`.trim(),
+          message: `${payload?.error ?? "Não foi possível carregar branding."} ${payload?.details ?? ""}`.trim(),
         });
         return;
       }
@@ -100,7 +100,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
     if (!response.ok) {
       setStatus({
         type: "error",
-        message: `${payload?.error ?? "Nao foi possivel salvar branding."} ${payload?.details ?? ""}`.trim(),
+        message: `${payload?.error ?? "Não foi possível salvar branding."} ${payload?.details ?? ""}`.trim(),
       });
       return;
     }
@@ -136,7 +136,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
     if (!response.ok || !payload?.url) {
       setStatus({
         type: "error",
-        message: `${payload?.error ?? "Nao foi possivel enviar logo."} ${payload?.details ?? ""}`.trim(),
+        message: `${payload?.error ?? "Não foi possível enviar logo."} ${payload?.details ?? ""}`.trim(),
       });
       return;
     }
@@ -149,7 +149,7 @@ export function SiteBrandingEditor({ sites, defaultSiteId }: SiteBrandingEditorP
     <section className="mt-8 rounded-2xl border border-white/10 bg-[#12182B] p-5 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
       <h2 className="text-lg font-semibold text-[var(--platform-text)]">Branding do header</h2>
       <p className="mt-1 text-sm text-[var(--platform-text)]/70">
-        Gerencie o logo e elementos basicos de identidade visual por site.
+        Gerencie o logo e elementos básicos de identidade visual por site.
       </p>
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">

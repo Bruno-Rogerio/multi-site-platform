@@ -72,7 +72,7 @@ export function PreviewContact({ deviceMode }: PreviewContactProps) {
           color: "var(--preview-muted)",
         }}
       >
-        {content.footerText || `© 2025 ${businessName || "Seu Negocio"}`}
+        {content.footerText || `© 2026 ${businessName || "Seu Negócio"}`}
       </div>
     </footer>
   );

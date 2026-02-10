@@ -36,7 +36,7 @@ export function PlatformBrandingEditor() {
     if (!response.ok) {
       setStatus({
         type: "error",
-        message: `${payload?.error ?? "Nao foi possivel carregar branding da plataforma."} ${payload?.details ?? ""}`.trim(),
+        message: `${payload?.error ?? "Não foi possível carregar branding da plataforma."} ${payload?.details ?? ""}`.trim(),
       });
       return;
     }
@@ -66,7 +66,7 @@ export function PlatformBrandingEditor() {
     if (!response.ok) {
       setStatus({
         type: "error",
-        message: `${payload?.error ?? "Nao foi possivel salvar branding da plataforma."} ${payload?.details ?? ""}`.trim(),
+        message: `${payload?.error ?? "Não foi possível salvar branding da plataforma."} ${payload?.details ?? ""}`.trim(),
       });
       return;
     }
@@ -100,14 +100,14 @@ export function PlatformBrandingEditor() {
     }
 
     setSettings((current) => ({ ...current, [slot]: payload.url }));
-    setStatus({ type: "success", message: "Upload concluido. Salve para aplicar." });
+    setStatus({ type: "success", message: "Upload concluído. Salve para aplicar." });
   }
 
   return (
     <section className="mt-8 rounded-2xl border border-white/10 bg-[#12182B] p-5">
       <h2 className="text-lg font-semibold text-[var(--platform-text)]">Branding da plataforma</h2>
       <p className="mt-2 text-sm text-[var(--platform-text)]/75">
-        Ajuste logo e imagens institucionais do SaaS (nao afeta tenants de clientes).
+        Ajuste logo e imagens institucionais do SaaS (não afeta tenants de clientes).
       </p>
 
       {status ? (

@@ -11,7 +11,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
   const { state, maxServiceCards } = useWizard();
   const { content, serviceCards, fontFamily, servicesVariant, servicesDisplayMode } = state;
 
-  const title = content.servicesTitle || "Servicos";
+  const title = content.servicesTitle || "Serviços";
   const subtitle = content.servicesSubtitle || "";
   const cards = serviceCards.slice(0, maxServiceCards);
 
@@ -36,7 +36,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
               <div key={index} className="flex items-center gap-2 py-1">
                 {Icon && <Icon size={10} style={{ color: "var(--preview-primary)" }} />}
                 <span className="text-[8px]" style={{ color: "var(--preview-text)" }}>
-                  {card.title || `Servico ${index + 1}`}
+                  {card.title || `Serviço ${index + 1}`}
                 </span>
               </div>
             );
@@ -59,10 +59,12 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
             return (
               <div
                 key={index}
-                className="flex-1 rounded-lg p-2 text-center"
+                className="flex-1 p-2 text-center"
                 style={{
+                  borderRadius: "var(--preview-radius)",
                   backgroundColor: index === 0 ? `var(--preview-primary)10` : `var(--preview-accent)10`,
                   border: `1px solid ${index === 0 ? "var(--preview-primary)" : "var(--preview-accent)"}20`,
+                  boxShadow: "var(--preview-shadow)",
                 }}
               >
                 {Icon && (
@@ -71,7 +73,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   </div>
                 )}
                 <h3 className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}>
-                  {card.title || `Opcao ${index + 1}`}
+                  {card.title || `Opção ${index + 1}`}
                 </h3>
                 {card.description && (
                   <p className="text-[6px] mt-0.5" style={{ color: "var(--preview-muted)" }}>
@@ -136,10 +138,12 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
       return (
         <div
           key={index}
-          className="rounded-md border overflow-hidden"
+          className="border overflow-hidden"
           style={{
             borderColor: `var(--preview-text)18`,
             backgroundColor: `var(--preview-text)08`,
+            borderRadius: "var(--preview-radius)",
+            boxShadow: "var(--preview-shadow)",
           }}
         >
           {card.imageUrl && (
@@ -154,7 +158,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
               </div>
             )}
             <h3 className={`font-semibold ${isTall ? "text-[9px]" : "text-[8px]"}`} style={{ color: "var(--preview-text)" }}>
-              {card.title || `Servico ${index + 1}`}
+              {card.title || `Serviço ${index + 1}`}
             </h3>
             {card.description && (
               <p className={`text-[6px] mt-0.5 ${isTall ? "" : "line-clamp-1"}`} style={{ color: "var(--preview-muted)" }}>
@@ -211,10 +215,12 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           return (
             <div
               key={index}
-              className="rounded-md border overflow-hidden"
+              className="border overflow-hidden"
               style={{
                 borderColor: `var(--preview-text)18`,
                 backgroundColor: `var(--preview-text)08`,
+                borderRadius: "var(--preview-radius)",
+                boxShadow: "var(--preview-shadow)",
               }}
             >
               {card.imageUrl && (
@@ -229,7 +235,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   </div>
                 )}
                 <h3 className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}>
-                  {card.title || `Servico ${index + 1}`}
+                  {card.title || `Serviço ${index + 1}`}
                 </h3>
                 {card.description && (
                   <p className="text-[6px] mt-0.5 line-clamp-2" style={{ color: "var(--preview-muted)" }}>

@@ -10,21 +10,21 @@ const steps = [
     icon: PenTool,
     title: "Configure",
     description:
-      "Escolha o estilo, cores e estrutura do seu site no nosso assistente visual. Tudo intuitivo, sem codigo.",
+      "Escolha o estilo, cores e estrutura do seu site no nosso assistente visual. Tudo intuitivo, sem código.",
   },
   {
     number: "02",
     icon: Rocket,
     title: "Publique",
     description:
-      "Com um clique, seu site esta no ar com dominio profissional. Pronto para receber visitantes.",
+      "Com um clique, seu site está no ar com domínio profissional. Pronto para receber visitantes.",
   },
   {
     number: "03",
     icon: LayoutDashboard,
     title: "Gerencie",
     description:
-      "Edite conteudo, imagens e informacoes a qualquer momento pelo painel administrativo.",
+      "Edite conteúdo, imagens e informações a qualquer momento pelo painel administrativo.",
   },
 ];
 

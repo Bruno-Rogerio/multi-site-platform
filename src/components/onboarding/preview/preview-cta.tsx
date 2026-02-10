@@ -58,8 +58,9 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
     return (
       <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
         <div
-          className="rounded-lg p-3 flex items-center justify-between gap-2"
+          className="p-3 flex items-center justify-between gap-2"
           style={{
+            borderRadius: "var(--preview-radius)",
             backgroundColor: `var(--preview-primary)10`,
             border: `1px solid var(--preview-primary)20`,
           }}
@@ -85,8 +86,9 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
     return (
       <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
         <div
-          className="rounded-lg p-3 flex items-center justify-between gap-2"
+          className="p-3 flex items-center justify-between gap-2"
           style={{
+            borderRadius: "var(--preview-radius)",
             background: `linear-gradient(135deg, var(--preview-primary), var(--preview-accent))`,
           }}
         >
@@ -194,8 +196,9 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
   return (
     <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
       <div
-        className="rounded-lg p-3"
+        className="p-3"
         style={{
+          borderRadius: "var(--preview-radius)",
           backgroundColor: `var(--preview-primary)10`,
           border: `1px solid var(--preview-primary)20`,
         }}

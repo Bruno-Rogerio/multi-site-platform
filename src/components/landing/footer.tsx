@@ -3,7 +3,7 @@ import Link from "next/link";
 const productLinks = [
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Como funciona", href: "#como-funciona" },
-  { label: "Precos", href: "#precos" },
+  { label: "Preços", href: "#precos" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -73,7 +73,7 @@ export function Footer({ brandElement }: FooterProps) {
             &copy; 2026 BuildSphere. Todos os direitos reservados.
           </p>
           <p className="text-xs text-[var(--platform-text)]/40">
-            Feito para profissionais autonomos
+            Feito para profissionais autônomos
           </p>
         </div>
       </div>

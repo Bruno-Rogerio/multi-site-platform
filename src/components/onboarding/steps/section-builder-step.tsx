@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Check,
@@ -11,12 +11,10 @@ import {
   Plus,
   Trash2,
   GripVertical,
-  ImageIcon,
-  X,
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
-import { PremiumBadge } from "../premium-badge";
+import { SectionPremiumToggle } from "../premium-step-toggle";
 import { ImageUpload } from "../builders/image-upload";
 import {
   heroVariants,
@@ -24,20 +22,29 @@ import {
   ctaVariants,
   motionStyles,
 } from "@/lib/onboarding/section-styles";
-import { ctaTypes, type CtaTypeDefinition } from "@/lib/onboarding/cta-types";
+import { ctaTypes } from "@/lib/onboarding/cta-types";
 import type { CtaTypeId, OnboardingPlan } from "@/lib/onboarding/types";
 import { basicIconPack, premiumIconPack } from "@/lib/onboarding/icon-packs";
-import { isFeatureUnlocked, getFeatureLimits, premiumFeatures } from "@/lib/onboarding/premium-gate";
+import {
+  isFeatureUnlocked,
+  getServiceCardsLimit,
+  getCtaTypesLimit,
+  getFloatingCtaSlotsLimit,
+} from "@/lib/onboarding/premium-gate";
 import * as LucideIcons from "lucide-react";
 
-type SectionType = "hero" | "services" | "cta" | "contact";
+/* ─── Premium hint hook ─── */
 
-const sectionLabels: Record<SectionType, string> = {
-  hero: "Hero",
-  services: "Serviços",
-  cta: "Call to Action",
-  contact: "Contato",
-};
+function usePremiumHint(message: string) {
+  const [hint, setHint] = useState("");
+  const showHint = useCallback(() => {
+    setHint(message);
+    setTimeout(() => setHint(""), 2500);
+  }, [message]);
+  return { hint, showHint };
+}
+
+/* ─── Sub-components ─── */
 
 function VariantSelector({
   label,
@@ -47,7 +54,7 @@ function VariantSelector({
   plan,
   addons,
   featureId,
-  dispatch,
+  onLocked,
 }: {
   label: string;
   variants: Array<{ id: string; name: string; description?: string; premium?: boolean }>;
@@ -56,7 +63,7 @@ function VariantSelector({
   plan: OnboardingPlan | null;
   addons: string[];
   featureId: string;
-  dispatch: ReturnType<typeof useWizard>["dispatch"];
+  onLocked: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const selected = variants.find((v) => v.id === selectedId);
@@ -102,15 +109,7 @@ function VariantSelector({
                   key={variant.id}
                   onClick={() => {
                     if (locked) {
-                      // Open premium gate to allow purchase
-                      const feature = premiumFeatures.find((f) => f.id === featureId);
-                      if (feature) {
-                        dispatch({
-                          type: "OPEN_PREMIUM_GATE",
-                          featureId,
-                          featurePrice: feature.monthlyPrice,
-                        });
-                      }
+                      onLocked();
                       setIsOpen(false);
                     } else {
                       onSelect(variant.id);
@@ -148,7 +147,7 @@ function VariantSelector({
                       </span>
                     )}
                   </div>
-                  {variant.premium && <PremiumBadge price={9.9} />}
+                  {locked && <Lock size={12} className="shrink-0 text-[#A78BFA]" />}
                   {selectedId === variant.id && (
                     <Check size={14} className="shrink-0 text-[#22D3EE]" />
                   )}
@@ -169,7 +168,7 @@ function CtaTypeSelector({
   ctaConfig,
   plan,
   addons,
-  dispatch,
+  onLocked,
 }: {
   selectedTypes: CtaTypeId[];
   onToggle: (id: CtaTypeId) => void;
@@ -177,10 +176,9 @@ function CtaTypeSelector({
   ctaConfig: Partial<Record<CtaTypeId, { label: string; url: string }>>;
   plan: OnboardingPlan | null;
   addons: string[];
-  dispatch: ReturnType<typeof useWizard>["dispatch"];
+  onLocked: () => void;
 }) {
-  const limits = getFeatureLimits(plan, addons);
-  const maxCtas = limits.maxCtas;
+  const maxCtas = getCtaTypesLimit(plan, addons);
 
   return (
     <div>
@@ -193,18 +191,6 @@ function CtaTypeSelector({
             {selectedTypes.length}/{maxCtas} selecionados
           </p>
         </div>
-        {selectedTypes.length >= maxCtas && plan !== "premium-full" && (
-          <PremiumBadge
-            price={9.9}
-            onClick={() =>
-              dispatch({
-                type: "OPEN_PREMIUM_GATE",
-                featureId: "extra-cta-types",
-                featurePrice: 9.9,
-              })
-            }
-          />
-        )}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -219,14 +205,8 @@ function CtaTypeSelector({
               onClick={() => {
                 if (canSelect) {
                   onToggle(cta.id);
-                } else if (!isSelected) {
-                  // At limit — open premium gate with this CTA as pending
-                  dispatch({
-                    type: "OPEN_PREMIUM_GATE",
-                    featureId: "extra-cta-types",
-                    featurePrice: 9.9,
-                    pendingCtaTypeId: cta.id,
-                  });
+                } else {
+                  onLocked();
                 }
               }}
               className={`flex items-center gap-2 rounded-lg border p-3 transition ${
@@ -294,13 +274,13 @@ function IconPicker({
   onSelect,
   plan,
   addons,
-  dispatch,
+  onLocked,
 }: {
   selectedIcon: string;
   onSelect: (icon: string) => void;
   plan: OnboardingPlan | null;
   addons: string[];
-  dispatch: ReturnType<typeof useWizard>["dispatch"];
+  onLocked: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const hasPremiumIcons = isFeatureUnlocked("premium-icon-pack", plan, addons);
@@ -339,11 +319,7 @@ function IconPicker({
               {!hasPremiumIcons && (
                 <button
                   onClick={() => {
-                    dispatch({
-                      type: "OPEN_PREMIUM_GATE",
-                      featureId: "premium-icon-pack",
-                      featurePrice: 9.9,
-                    });
+                    onLocked();
                     setIsOpen(false);
                   }}
                   className="flex items-center gap-1 text-xs text-[#A78BFA]"
@@ -396,12 +372,14 @@ function ServiceCardEditor({
   plan,
   addons,
   dispatch,
+  onLocked,
 }: {
   index: number;
   card: { title: string; description: string; iconName: string; icon?: string; imageUrl?: string };
   plan: OnboardingPlan | null;
   addons: string[];
   dispatch: ReturnType<typeof useWizard>["dispatch"];
+  onLocked: () => void;
 }) {
   const iconKey = card.icon || card.iconName;
   return (
@@ -415,7 +393,7 @@ function ServiceCardEditor({
           }
           plan={plan}
           addons={addons}
-          dispatch={dispatch}
+          onLocked={onLocked}
         />
       </div>
 
@@ -455,6 +433,8 @@ function ServiceCardEditor({
   );
 }
 
+/* ─── Main step ─── */
+
 export function SectionBuilderStep() {
   const { state, dispatch } = useWizard();
   const {
@@ -471,7 +451,12 @@ export function SectionBuilderStep() {
   } = state;
 
   const plan = selectedPlan || "construir";
-  const limits = getFeatureLimits(plan, addonsSelected);
+  const maxCards = getServiceCardsLimit(plan, addonsSelected);
+  const maxFloatingCtas = getFloatingCtaSlotsLimit(plan, addonsSelected);
+  const { hint: variantesHint, showHint: showVariantesHint } = usePremiumHint("Ative o Premium Variantes para desbloquear layouts premium");
+  const { hint: canaisHint, showHint: showCanaisHint } = usePremiumHint("Ative o Premium Canais para desbloquear mais canais e botão flutuante");
+  const { hint: cardsHint, showHint: showCardsHint } = usePremiumHint("Ative o Premium Cards para desbloquear mais cards e ícones premium");
+  const activeHint = variantesHint || canaisHint || cardsHint;
 
   function handleToggleCta(ctaId: CtaTypeId) {
     dispatch({ type: "TOGGLE_CTA_TYPE", ctaTypeId: ctaId });
@@ -487,14 +472,10 @@ export function SectionBuilderStep() {
   }
 
   function handleAddServiceCard() {
-    if (serviceCards.length < limits.maxCards) {
+    if (serviceCards.length < maxCards) {
       dispatch({ type: "ADD_SERVICE_CARD" });
     } else {
-      dispatch({
-        type: "OPEN_PREMIUM_GATE",
-        featureId: "extra-service-cards",
-        featurePrice: 9.9,
-      });
+      showCardsHint();
     }
   }
 
@@ -506,11 +487,7 @@ export function SectionBuilderStep() {
     if (floatingCtaEnabled || isFeatureUnlocked("floating-cta", plan, addonsSelected)) {
       dispatch({ type: "SET_FLOATING_CTA", enabled: !floatingCtaEnabled });
     } else {
-      dispatch({
-        type: "OPEN_PREMIUM_GATE",
-        featureId: "floating-cta",
-        featurePrice: 9.9,
-      });
+      showCanaisHint();
     }
   }
 
@@ -529,6 +506,21 @@ export function SectionBuilderStep() {
         </p>
       </div>
 
+      {/* Toast hint */}
+      <AnimatePresence>
+        {activeHint && (
+          <motion.div
+            key={activeHint}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="mb-4 rounded-lg border border-[#A78BFA]/30 bg-[#7C5CFF]/10 px-4 py-2 text-center text-xs text-[#A78BFA]"
+          >
+            {activeHint}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="space-y-6">
         {/* Section Variants */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
@@ -546,6 +538,9 @@ export function SectionBuilderStep() {
             </div>
           </div>
 
+          {/* Toggle for variants premium */}
+          <SectionPremiumToggle sectionId="premium-variantes" />
+
           <div className="grid gap-4 sm:grid-cols-2">
             <VariantSelector
               label="Hero"
@@ -555,7 +550,7 @@ export function SectionBuilderStep() {
               plan={plan}
               addons={addonsSelected}
               featureId="premium-hero-variants"
-              dispatch={dispatch}
+              onLocked={showVariantesHint}
             />
             <VariantSelector
               label="Serviços"
@@ -565,7 +560,7 @@ export function SectionBuilderStep() {
               plan={plan}
               addons={addonsSelected}
               featureId="premium-services-variants"
-              dispatch={dispatch}
+              onLocked={showVariantesHint}
             />
             <VariantSelector
               label="Call to Action"
@@ -575,7 +570,7 @@ export function SectionBuilderStep() {
               plan={plan}
               addons={addonsSelected}
               featureId="premium-cta-variants"
-              dispatch={dispatch}
+              onLocked={showVariantesHint}
             />
             <VariantSelector
               label="Animações"
@@ -585,13 +580,19 @@ export function SectionBuilderStep() {
               plan={plan}
               addons={addonsSelected}
               featureId="advanced-motion"
-              dispatch={dispatch}
+              onLocked={showVariantesHint}
             />
           </div>
         </div>
 
         {/* CTA Types */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+          <h3 className="text-sm font-semibold text-[var(--platform-text)] mb-1">Canais de contato</h3>
+          <p className="text-xs text-[var(--platform-text)]/50 mb-4">Defina como seus clientes entram em contato</p>
+
+          {/* Toggle for channels premium */}
+          <SectionPremiumToggle sectionId="premium-canais" />
+
           <CtaTypeSelector
             selectedTypes={selectedCtaTypes}
             onToggle={handleToggleCta}
@@ -599,7 +600,7 @@ export function SectionBuilderStep() {
             ctaConfig={ctaConfig}
             plan={plan}
             addons={addonsSelected}
-            dispatch={dispatch}
+            onLocked={showCanaisHint}
           />
 
           {/* Floating CTA toggle */}
@@ -611,12 +612,12 @@ export function SectionBuilderStep() {
                 </p>
                 <p className="text-xs text-[var(--platform-text)]/50">
                   Aparece fixo no canto da tela
-                  {plan === "premium-full" ? " (ate 2)" : ""}
+                  {plan === "premium-full" ? " (até 2)" : ""}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 {!isFeatureUnlocked("floating-cta", plan, addonsSelected) && (
-                  <PremiumBadge price={9.9} />
+                  <Lock size={12} className="text-[#A78BFA]" />
                 )}
                 <button
                   onClick={handleToggleFloatingCta}
@@ -637,14 +638,14 @@ export function SectionBuilderStep() {
             {floatingCtaEnabled && selectedCtaTypes.length > 0 && (
               <div className="mt-3 border-t border-white/10 pt-3">
                 <p className="text-xs text-[var(--platform-text)]/50 mb-2">
-                  Canais no botão flutuante ({state.floatingCtaChannels.length}/{limits.maxFloatingCtas})
+                  Canais no botão flutuante ({state.floatingCtaChannels.length}/{maxFloatingCtas})
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {selectedCtaTypes.map((ctaId) => {
                     const ctaDef = ctaTypes.find((c) => c.id === ctaId);
                     if (!ctaDef) return null;
                     const isInFloating = state.floatingCtaChannels.includes(ctaId);
-                    const canAdd = isInFloating || state.floatingCtaChannels.length < limits.maxFloatingCtas;
+                    const canAdd = isInFloating || state.floatingCtaChannels.length < maxFloatingCtas;
                     const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[ctaDef.icon];
 
                     return (
@@ -685,13 +686,16 @@ export function SectionBuilderStep() {
 
         {/* Service Cards */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+          {/* Toggle for cards premium */}
+          <SectionPremiumToggle sectionId="premium-cards" />
+
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-semibold text-[var(--platform-text)]">
                 Cards de serviço
               </h3>
               <p className="text-xs text-[var(--platform-text)]/50">
-                {serviceCards.length}/{limits.maxCards} cards
+                {serviceCards.length}/{maxCards} cards
               </p>
             </div>
             <button
@@ -700,8 +704,8 @@ export function SectionBuilderStep() {
             >
               <Plus size={14} />
               Adicionar
-              {serviceCards.length >= limits.maxCards && plan !== "premium-full" && (
-                <PremiumBadge price={9.9} />
+              {serviceCards.length >= maxCards && (
+                <Lock size={10} className="ml-1 text-[#A78BFA]" />
               )}
             </button>
           </div>
@@ -715,6 +719,7 @@ export function SectionBuilderStep() {
                   plan={plan}
                   addons={addonsSelected}
                   dispatch={dispatch}
+                  onLocked={showCardsHint}
                 />
                 {serviceCards.length > 1 && (
                   <button

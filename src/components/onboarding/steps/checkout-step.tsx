@@ -64,7 +64,6 @@ export function CheckoutStep() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           creationMode: deriveCreationMode(),
-          siteStyle: state.siteStyleId,
           paletteId: state.paletteId,
           customColors: state.customColors,
           headerStyle: "default",
@@ -127,7 +126,7 @@ export function CheckoutStep() {
           Finalize sua conta
         </p>
         <h1 className="mt-2 text-2xl font-black text-[var(--platform-text)] md:text-3xl">
-          Quase la! Crie sua conta
+          Quase lá! Crie sua conta
         </h1>
         <p className="mt-2 max-w-xl text-sm text-[var(--platform-text)]/60">
           Preencha seus dados para criar sua conta e ativar seu site.
@@ -186,7 +185,7 @@ export function CheckoutStep() {
                     type={showPassword ? "text" : "password"}
                     value={ownerPassword}
                     onChange={(e) => handleChange("ownerPassword", e.target.value)}
-                    placeholder="Minimo 8 caracteres"
+                    placeholder="Mínimo 8 caracteres"
                     className={`mt-1 w-full rounded-lg border bg-white/[0.04] px-4 py-3 pr-12 text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:outline-none ${
                       ownerPassword && !passwordValid.valid
                         ? "border-red-400/50 focus:border-red-400"
@@ -249,7 +248,7 @@ export function CheckoutStep() {
                 </a>{" "}
                 e{" "}
                 <a href="/privacidade" className="text-[#22D3EE] hover:underline">
-                  Politica de Privacidade
+                  Política de Privacidade
                 </a>
               </span>
             </label>
@@ -360,7 +359,7 @@ export function CheckoutStep() {
               {preferredSubdomain || "seusite"}.bsph.com.br
             </p>
             <p className="mt-1 text-xs text-[var(--platform-text)]/40">
-              {businessName || "Seu negocio"}
+              {businessName || "Seu negócio"}
             </p>
           </div>
         </div>

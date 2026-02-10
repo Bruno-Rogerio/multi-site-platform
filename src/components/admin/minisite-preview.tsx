@@ -87,7 +87,7 @@ export function MiniSitePreview({
                 : "border border-emerald-300/40 bg-emerald-500/10 text-emerald-200"
             }`}
           >
-            {hasUnsavedChanges ? "Nao salvo" : "Sincronizado"}
+            {hasUnsavedChanges ? "Não salvo" : "Sincronizado"}
           </span>
         </div>
       </div>
@@ -174,12 +174,12 @@ export function MiniSitePreview({
                       className={`rounded-xl border border-white/10 bg-white/[0.02] p-4 ${sectionContainerClassName}`}
                     >
                       <h3 className="text-sm font-semibold text-[var(--platform-text)]">
-                        {asString(section.content.title, "Servicos")}
+                        {asString(section.content.title, "Serviços")}
                       </h3>
                       {asString(section.content.imageUrl) && (
                         <Image
                           src={asString(section.content.imageUrl)}
-                          alt={asString(section.content.title, "Servicos")}
+                          alt={asString(section.content.title, "Serviços")}
                           width={960}
                           height={720}
                           className="mt-3 aspect-[4/3] h-auto w-full rounded-lg border border-white/15 object-cover"
@@ -235,7 +235,7 @@ export function MiniSitePreview({
                     }}
                     className={`rounded-xl border border-white/10 bg-white/[0.02] p-4 ${sectionContainerClassName}`}
                   >
-                    <p className="text-xs text-[var(--platform-text)]/80">Secao {section.type}</p>
+                    <p className="text-xs text-[var(--platform-text)]/80">Seção {section.type}</p>
                   </section>
                 );
               })}

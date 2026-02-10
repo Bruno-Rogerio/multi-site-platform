@@ -1,13 +1,13 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Check, Palette, Type, MousePointer2, Sparkles, Lock, Pipette } from "lucide-react";
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, Palette, Type, MousePointer2, Lock, Pipette } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
-import { PremiumBadge } from "../premium-badge";
+import { SectionPremiumToggle } from "../premium-step-toggle";
 import { palettePresets, type PalettePreset } from "@/lib/onboarding/palettes";
-import { siteStylePresets, type SiteStylePreset } from "@/lib/onboarding/site-styles";
-import { isFeatureUnlocked, getFeaturePrice } from "@/lib/onboarding/premium-gate";
+import { isFeatureUnlocked } from "@/lib/onboarding/premium-gate";
 
 type FontOption = {
   family: string;
@@ -32,45 +32,6 @@ const buttonStyles: { id: "rounded" | "pill" | "square" | "soft"; label: string;
   { id: "soft", label: "Suave (soft)", preview: "rounded-xl" },
 ];
 
-function SiteStyleCard({
-  style,
-  isSelected,
-  onSelect,
-}: {
-  style: SiteStylePreset;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <motion.button
-      onClick={onSelect}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className={`relative rounded-xl border p-4 text-left transition-all ${
-        isSelected
-          ? "border-[#22D3EE]/50 bg-[#22D3EE]/10"
-          : "border-white/10 bg-white/[0.02] hover:border-white/20"
-      }`}
-    >
-      <div className="flex items-start justify-between">
-        <div>
-          <h4 className="font-semibold text-[var(--platform-text)]">{style.name}</h4>
-          <p className="text-xs text-[var(--platform-text)]/50">{style.description}</p>
-        </div>
-        <div
-          className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all ${
-            isSelected
-              ? "border-[#22D3EE] bg-[#22D3EE] text-[#0B1020]"
-              : "border-white/20"
-          }`}
-        >
-          {isSelected && <Check size={12} strokeWidth={3} />}
-        </div>
-      </div>
-    </motion.button>
-  );
-}
-
 function PaletteCard({
   palette,
   isSelected,
@@ -91,31 +52,14 @@ function PaletteCard({
           : "border-white/10 hover:border-white/20"
       }`}
     >
-      {/* Color swatches */}
       <div className="flex gap-1 mb-2">
-        <div
-          className="h-8 w-8 rounded-lg"
-          style={{ backgroundColor: palette.primary }}
-        />
-        <div
-          className="h-8 w-8 rounded-lg"
-          style={{ backgroundColor: palette.accent }}
-        />
-        <div
-          className="h-8 w-8 rounded-lg border border-white/10"
-          style={{ backgroundColor: palette.background }}
-        />
-        <div
-          className="h-8 w-8 rounded-lg"
-          style={{ backgroundColor: palette.text }}
-        />
+        <div className="h-8 w-8 rounded-lg" style={{ backgroundColor: palette.primary }} />
+        <div className="h-8 w-8 rounded-lg" style={{ backgroundColor: palette.accent }} />
+        <div className="h-8 w-8 rounded-lg border border-white/10" style={{ backgroundColor: palette.background }} />
+        <div className="h-8 w-8 rounded-lg" style={{ backgroundColor: palette.text }} />
       </div>
-
-      {/* Name */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium text-[var(--platform-text)]">
-          {palette.name}
-        </span>
+        <span className="text-xs font-medium text-[var(--platform-text)]">{palette.name}</span>
         {isSelected && (
           <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#22D3EE]">
             <Check size={10} strokeWidth={3} className="text-[#0B1020]" />
@@ -156,23 +100,30 @@ function CustomColorInput({
   );
 }
 
+function usePremiumHint(message: string) {
+  const [hint, setHint] = useState("");
+  const showHint = useCallback(() => {
+    setHint(message);
+    setTimeout(() => setHint(""), 2500);
+  }, [message]);
+  return { hint, showHint };
+}
+
 export function StylePaletteStep() {
   const { state, dispatch } = useWizard();
-  const { paletteId, siteStyleId, fontFamily, buttonStyle, selectedPlan, addonsSelected, customColors } = state;
+  const { paletteId, fontFamily, buttonStyle, selectedPlan, addonsSelected, customColors } = state;
 
   const plan = selectedPlan || "construir";
   const hasCustomColors = isFeatureUnlocked("custom-colors", plan, addonsSelected);
   const hasPremiumFonts = isFeatureUnlocked("premium-fonts", plan, addonsSelected);
+  const { hint: paletaHint, showHint: showPaletaHint } = usePremiumHint("Ative o Premium Paleta para desbloquear cores personalizadas");
+  const { hint: tipoHint, showHint: showTipoHint } = usePremiumHint("Ative o Premium Tipografia para desbloquear esta fonte");
 
   function handleSelectCustomColors() {
     if (hasCustomColors) {
       dispatch({ type: "SET_PALETTE", id: "custom" });
     } else {
-      dispatch({
-        type: "OPEN_PREMIUM_GATE",
-        featureId: "custom-colors",
-        featurePrice: getFeaturePrice("custom-colors"),
-      });
+      showPaletaHint();
     }
   }
 
@@ -180,13 +131,11 @@ export function StylePaletteStep() {
     if (!font.premium || hasPremiumFonts) {
       dispatch({ type: "SET_FONT", family: font.family });
     } else {
-      dispatch({
-        type: "OPEN_PREMIUM_GATE",
-        featureId: "premium-fonts",
-        featurePrice: getFeaturePrice("premium-fonts"),
-      });
+      showTipoHint();
     }
   }
+
+  const activeHint = paletaHint || tipoHint;
 
   return (
     <div>
@@ -199,39 +148,26 @@ export function StylePaletteStep() {
           Defina a identidade do seu site
         </h1>
         <p className="mt-2 max-w-xl text-sm text-[var(--platform-text)]/60">
-          Escolha o estilo, cores e tipografia que representam seu negócio.
+          Escolha cores e tipografia que representam seu negócio.
         </p>
       </div>
 
+      {/* Toast hint */}
+      <AnimatePresence>
+        {activeHint && (
+          <motion.div
+            key={activeHint}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="mb-4 rounded-lg border border-[#A78BFA]/30 bg-[#7C5CFF]/10 px-4 py-2 text-center text-xs text-[#A78BFA]"
+          >
+            {activeHint}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="space-y-8">
-        {/* Site Style */}
-        <div>
-          <div className="flex items-center gap-2 mb-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#7C5CFF]/20">
-              <Palette size={16} className="text-[#A78BFA]" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--platform-text)]">
-                Estilo do site
-              </h3>
-              <p className="text-xs text-[var(--platform-text)]/50">
-                Define a personalidade visual geral
-              </p>
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {siteStylePresets.map((style) => (
-              <SiteStyleCard
-                key={style.id}
-                style={style}
-                isSelected={siteStyleId === style.id}
-                onSelect={() => dispatch({ type: "SET_SITE_STYLE", id: style.id })}
-              />
-            ))}
-          </div>
-        </div>
-
         {/* Color Palette */}
         <div>
           <div className="flex items-center gap-2 mb-4">
@@ -243,10 +179,13 @@ export function StylePaletteStep() {
                 Paleta de cores
               </h3>
               <p className="text-xs text-[var(--platform-text)]/50">
-                As cores principais do seu site
+                As cores e o estilo visual do seu site
               </p>
             </div>
           </div>
+
+          {/* Toggle for palette premium */}
+          <SectionPremiumToggle sectionId="premium-paleta" />
 
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
             {palettePresets.map((palette) => (
@@ -266,21 +205,24 @@ export function StylePaletteStep() {
               className={`relative rounded-xl border p-3 transition-all ${
                 paletteId === "custom"
                   ? "border-[#22D3EE]/50 shadow-[0_0_20px_rgba(34,211,238,0.15)]"
+                  : !hasCustomColors
+                  ? "border-white/5 opacity-50 hover:opacity-70"
                   : "border-white/10 hover:border-white/20"
               }`}
             >
               <div className="flex gap-1 mb-2">
                 <div className="flex h-8 w-full items-center justify-center rounded-lg border border-dashed border-white/20 bg-white/[0.04]">
-                  <Pipette size={14} className="text-[var(--platform-text)]/50" />
+                  {!hasCustomColors ? (
+                    <Lock size={14} className="text-[#A78BFA]" />
+                  ) : (
+                    <Pipette size={14} className="text-[var(--platform-text)]/50" />
+                  )}
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-[var(--platform-text)]">
                   Personalizar
                 </span>
-                {!hasCustomColors && (
-                  <Sparkles size={12} className="text-[#A78BFA]" />
-                )}
                 {paletteId === "custom" && (
                   <div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#22D3EE]">
                     <Check size={10} strokeWidth={3} className="text-[#0B1020]" />
@@ -291,10 +233,10 @@ export function StylePaletteStep() {
           </div>
 
           {/* Custom color inputs */}
-          {paletteId === "custom" && (
+          {paletteId === "custom" && hasCustomColors && (
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 rounded-xl border border-white/10 bg-white/[0.02] p-4">
               <CustomColorInput
-                label="Primaria"
+                label="Primária"
                 value={customColors.primary}
                 onChange={(val) => dispatch({ type: "SET_CUSTOM_COLOR", key: "primary", value: val })}
               />
@@ -333,6 +275,9 @@ export function StylePaletteStep() {
             </div>
           </div>
 
+          {/* Toggle for typography premium */}
+          <SectionPremiumToggle sectionId="premium-tipografia" />
+
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {fontOptions.map((font) => {
               const isLocked = font.premium && !hasPremiumFonts;
@@ -344,7 +289,7 @@ export function StylePaletteStep() {
                     fontFamily === font.family
                       ? "border-[#22D3EE]/50 bg-[#22D3EE]/10"
                       : isLocked
-                      ? "border-white/5 bg-white/[0.01] opacity-60 hover:opacity-80"
+                      ? "border-white/5 bg-white/[0.01] opacity-50 hover:opacity-70"
                       : "border-white/10 bg-white/[0.02] hover:border-white/20"
                   }`}
                 >
@@ -398,7 +343,6 @@ export function StylePaletteStep() {
                     : "border-white/10 bg-white/[0.02] hover:border-white/20"
                 }`}
               >
-                {/* Preview button */}
                 <div
                   className={`h-6 w-16 bg-[linear-gradient(135deg,#3B82F6,#7C5CFF)] ${style.preview}`}
                 />
@@ -412,7 +356,7 @@ export function StylePaletteStep() {
       </div>
 
       {/* Navigation */}
-      <StepNavigation canProceed={!!(paletteId || paletteId === "custom") && !!siteStyleId} />
+      <StepNavigation canProceed={!!(paletteId || paletteId === "custom")} />
     </div>
   );
 }

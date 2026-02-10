@@ -36,7 +36,7 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
               className="text-xs font-bold truncate leading-tight"
               style={{ color: "var(--preview-primary)" }}
             >
-              {businessName || "Seu Negocio"}
+              {businessName || "Seu Negócio"}
             </div>
             {slogan && (
               <div
@@ -56,7 +56,7 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
               className="text-[8px]"
               style={{ color: "var(--preview-muted)" }}
             >
-              Servicos
+              Serviços
             </span>
             <span
               className="text-[8px]"

@@ -16,7 +16,7 @@ export function HeroAnimatedHeadline() {
           transition={{ duration: 0.5, delay: 0.1 }}
         >
           <Sparkles size={14} />
-          Plataforma para profissionais autonomos
+          Plataforma para profissionais autônomos
         </motion.p>
 
         <motion.h1
@@ -38,8 +38,8 @@ export function HeroAnimatedHeadline() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
         >
-          Crie um site elegante para sua pratica profissional. Sem codigo, sem
-          complicacao. Configure tudo sozinho e tenha presenca online em poucos
+          Crie um site elegante para sua prática profissional. Sem código, sem
+          complicação — configure tudo sozinho e tenha presença online em poucos
           minutos.
         </motion.p>
 
@@ -53,7 +53,7 @@ export function HeroAnimatedHeadline() {
             href="/quero-comecar"
             className="group inline-flex items-center gap-2 rounded-xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-8 py-4 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(59,130,246,0.4)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(124,92,255,0.5)]"
           >
-            Comecar agora
+            Começar agora
             <ArrowRight
               size={16}
               className="transition-transform duration-300 group-hover:translate-x-1"

@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 const navLinks = [
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Como funciona", href: "#como-funciona" },
-  { label: "Precos", href: "#precos" },
+  { label: "Preços", href: "#precos" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -53,7 +53,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               onClick={onClose}
               className="mt-6 rounded-xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-8 py-4 text-base font-semibold text-white shadow-[0_14px_40px_rgba(59,130,246,0.4)] transition hover:brightness-110"
             >
-              Comecar agora
+              Começar agora
             </Link>
           </nav>
         </motion.div>

@@ -19,7 +19,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
       ? "12px"
       : "6px";
 
-  const title = content.heroTitle || "Seu titulo principal aqui";
+  const title = content.heroTitle || "Seu título principal aqui";
   const subtitle = content.heroSubtitle || "";
   const eyebrow = content.heroEyebrow || "";
   const ctaLabel = content.heroCtaLabel || "Saiba mais";
@@ -51,15 +51,18 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
   function HeroImage() {
     if (heroImage) {
       return (
-        <div className={`rounded-lg overflow-hidden ${deviceMode === "mobile" ? "h-16 w-full" : "h-20 w-20"}`}>
+        <div
+          className={`overflow-hidden ${deviceMode === "mobile" ? "h-16 w-full" : "h-20 w-20"}`}
+          style={{ borderRadius: "var(--preview-radius)" }}
+        >
           <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
         </div>
       );
     }
     return (
       <div
-        className={`rounded-lg ${deviceMode === "mobile" ? "h-16 w-full" : "h-20 w-20"}`}
-        style={{ backgroundColor: `var(--preview-primary)20`, border: `1px dashed var(--preview-primary)40` }}
+        className={`${deviceMode === "mobile" ? "h-16 w-full" : "h-20 w-20"}`}
+        style={{ borderRadius: "var(--preview-radius)", backgroundColor: `var(--preview-primary)20`, border: `1px dashed var(--preview-primary)40` }}
       >
         <div className="flex h-full items-center justify-center">
           <span className="text-[6px]" style={{ color: "var(--preview-primary)" }}>Imagem</span>
@@ -81,6 +84,11 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
             : undefined,
         }}
       >
+        {heroImage && (
+          <div className="mx-auto mb-3 h-20 w-full max-w-[70%] overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
+            <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+          </div>
+        )}
         {eyebrow && (
           <p className="text-[7px] font-semibold uppercase tracking-wider mb-1" style={{ color: hasGradient ? "rgba(255,255,255,0.8)" : "var(--preview-accent)" }}>
             {eyebrow}
@@ -113,6 +121,11 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
   if (heroVariant === "minimal") {
     return (
       <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+        {heroImage && (
+          <div className="mb-3 h-16 w-full overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
+            <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+          </div>
+        )}
         <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}>
           {title}
         </h1>
@@ -158,13 +171,19 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
     return (
       <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
         <div
-          className="rounded-xl p-4 text-center border-2"
+          className="p-4 text-center border-2 overflow-hidden"
           style={{
+            borderRadius: "var(--preview-radius)",
             backgroundColor: `var(--preview-primary)12`,
             borderColor: `var(--preview-primary)40`,
             boxShadow: `0 4px 20px var(--preview-primary)15`,
           }}
         >
+          {heroImage && (
+            <div className="-mx-4 -mt-4 mb-3 h-20 overflow-hidden">
+              <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+            </div>
+          )}
           {eyebrow && (
             <p className="text-[7px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--preview-accent)" }}>
               {eyebrow}

@@ -108,10 +108,10 @@ export function PlanSelection() {
           Passo 1
         </p>
         <h1 className="mt-2 text-2xl font-black text-[var(--platform-text)] md:text-3xl">
-          Como voce quer criar seu site?
+          Como você quer criar seu site?
         </h1>
         <p className="mt-2 max-w-xl text-sm text-[var(--platform-text)]/60">
-          Escolha o modo que melhor se adapta ao seu momento. Voce pode comecar com um
+          Escolha o modo que melhor se adapta ao seu momento. Você pode começar com um
           template pronto ou construir do zero com total liberdade.
         </p>
       </div>

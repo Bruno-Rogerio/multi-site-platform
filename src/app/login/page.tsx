@@ -34,7 +34,7 @@ export default async function LoginPage({ searchParams }: Props) {
               Pagamento confirmado!
             </p>
             <p className="mt-1 text-xs text-green-400/80">
-              Sua conta foi criada com sucesso. Faca login abaixo com o email e senha que voce cadastrou.
+              Sua conta foi criada com sucesso. Faça login abaixo com o email e senha que você cadastrou.
             </p>
           </div>
         )}
@@ -43,8 +43,8 @@ export default async function LoginPage({ searchParams }: Props) {
         <h1 className="mt-3 text-3xl font-bold text-[var(--platform-text)]">Acesso da plataforma</h1>
         <p className="mt-3 text-sm text-[var(--platform-text)]/75">
           {checkoutSuccess
-            ? "Use o email e senha que voce criou durante o cadastro."
-            : "Acesso somente para usuarios criados pela plataforma. Nao existe auto-cadastro."}
+            ? "Use o email e senha que você criou durante o cadastro."
+            : "Acesso somente para usuários criados pela plataforma. Não existe auto-cadastro."}
         </p>
         <LoginForm />
       </section>

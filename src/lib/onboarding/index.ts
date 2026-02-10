@@ -3,7 +3,6 @@
 export * from "./types";
 export * from "./plans";
 export * from "./palettes";
-export * from "./site-styles";
 export * from "./section-styles";
 export * from "./templates";
 export * from "./icon-packs";

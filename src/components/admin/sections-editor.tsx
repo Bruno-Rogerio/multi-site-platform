@@ -103,7 +103,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
       setState("idle");
       setStatus({
         type: "error",
-        message: `${payload?.error ?? "Nao foi possivel carregar secoes."} ${payload?.details ?? ""}`.trim(),
+        message: `${payload?.error ?? "Não foi possível carregar seções."} ${payload?.details ?? ""}`.trim(),
       });
       return;
     }
@@ -171,7 +171,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
     }));
     setStatus({
       type: "success",
-      message: "Imagem enviada. Clique em salvar secao para publicar.",
+      message: "Imagem enviada. Clique em salvar seção para publicar.",
     });
   }
 
@@ -193,7 +193,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
 
     if (!response.ok || !payload?.section) {
       throw new Error(
-        `${payload?.error ?? "Nao foi possivel salvar secao."} ${payload?.details ?? ""}`.trim(),
+        `${payload?.error ?? "Não foi possível salvar seção."} ${payload?.details ?? ""}`.trim(),
       );
     }
 
@@ -214,11 +214,11 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
         ...current,
         [savedSection.id]: serializeSection(savedSection),
       }));
-      setStatus({ type: "success", message: `Secao "${savedSection.type}" atualizada com sucesso.` });
+      setStatus({ type: "success", message: `Seção "${savedSection.type}" atualizada com sucesso.` });
     } catch (error) {
       setStatus({
         type: "error",
-        message: error instanceof Error ? error.message : "Nao foi possivel salvar secao.",
+        message: error instanceof Error ? error.message : "Não foi possível salvar seção.",
       });
     } finally {
       setState("idle");
@@ -228,7 +228,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
   async function saveAllSections() {
     const dirtySections = sections.filter((section) => dirtySectionIds.includes(section.id));
     if (dirtySections.length === 0) {
-      setStatus({ type: "success", message: "Nao ha alteracoes pendentes para salvar." });
+      setStatus({ type: "success", message: "Não há alterações pendentes para salvar." });
       return;
     }
 
@@ -257,12 +257,12 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
       }));
       setStatus({
         type: "success",
-        message: `${updatedById.size} secoes salvas com sucesso.`,
+        message: `${updatedById.size} seções salvas com sucesso.`,
       });
     } catch (error) {
       setStatus({
         type: "error",
-        message: error instanceof Error ? error.message : "Nao foi possivel salvar todas as secoes.",
+        message: error instanceof Error ? error.message : "Não foi possível salvar todas as seções.",
       });
     } finally {
       setState("idle");
@@ -272,9 +272,9 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
   if (!hasSites) {
     return (
       <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <h2 className="text-lg font-semibold text-[var(--platform-text)]">Editor de secoes</h2>
+        <h2 className="text-lg font-semibold text-[var(--platform-text)]">Editor de seções</h2>
         <p className="mt-2 text-sm text-[var(--platform-text)]/70">
-          Nenhum site disponivel para edicao neste usuario.
+          Nenhum site disponível para edição neste usuário.
         </p>
       </section>
     );
@@ -284,7 +284,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
     <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--platform-text)]">Editor de secoes</h2>
+          <h2 className="text-lg font-semibold text-[var(--platform-text)]">Editor de seções</h2>
           <p className="mt-1 text-sm text-[var(--platform-text)]/70">
             Ajuste Hero, Services e CTA em tempo real para cada tenant.
           </p>
@@ -324,8 +324,8 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
         </button>
         <span className="text-xs text-[var(--platform-text)]/65">
           {hasUnsavedChanges
-            ? `${dirtySectionIds.length} secoes com alteracao pendente.`
-            : "Sem alteracoes pendentes."}
+            ? `${dirtySectionIds.length} seções com alteração pendente.`
+            : "Sem alterações pendentes."}
         </span>
       </div>
 
@@ -342,7 +342,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
       )}
 
       {state === "loading" ? (
-        <p className="mt-4 text-sm text-[var(--platform-text)]/70">Carregando secoes...</p>
+        <p className="mt-4 text-sm text-[var(--platform-text)]/70">Carregando seções...</p>
       ) : null}
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_1.1fr] xl:items-start">
@@ -369,7 +369,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                       dirtySectionIds.includes(section.id) ? "text-amber-200" : "text-emerald-200"
                     }`}
                   >
-                    {dirtySectionIds.includes(section.id) ? "Nao salvo" : "Sincronizado"}
+                    {dirtySectionIds.includes(section.id) ? "Não salvo" : "Sincronizado"}
                   </p>
                 </div>
                 <button
@@ -378,7 +378,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                   disabled={state === "saving"}
                   className="rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {state === "saving" ? "Salvando..." : "Salvar secao"}
+                  {state === "saving" ? "Salvando..." : "Salvar seção"}
                 </button>
               </div>
 
@@ -420,8 +420,8 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   {[
                     ["eyebrow", "Eyebrow"],
-                    ["title", "Titulo"],
-                    ["subtitle", "Subtitulo"],
+                    ["title", "Título"],
+                    ["subtitle", "Subtítulo"],
                     ["ctaLabel", "CTA Label"],
                     ["ctaHref", "CTA Link"],
                     ["imageUrl", "Imagem (URL)"],
@@ -477,7 +477,7 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                 <div className="mt-4 grid gap-3">
                   <div>
                     <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
-                      Titulo
+                      Título
                     </label>
                     <input
                       value={asString(section.content.title)}
@@ -561,10 +561,10 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
               {section.type === "cta" ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   {[
-                    ["title", "Titulo"],
-                    ["description", "Descricao"],
-                    ["buttonLabel", "Botao"],
-                    ["buttonHref", "Link do botao"],
+                    ["title", "Título"],
+                    ["description", "Descrição"],
+                    ["buttonLabel", "Botão"],
+                    ["buttonHref", "Link do botão"],
                     ["imageUrl", "Imagem (URL)"],
                   ].map(([key, label]) => (
                     <div key={key}>

@@ -43,7 +43,7 @@ export function ProductMockup() {
             </div>
             <div className="flex gap-4">
               <span className="text-xs text-[var(--platform-text)]/50">Sobre</span>
-              <span className="text-xs text-[var(--platform-text)]/50">Servicos</span>
+              <span className="text-xs text-[var(--platform-text)]/50">Serviços</span>
               <span className="text-xs text-[var(--platform-text)]/50">Contato</span>
             </div>
           </div>
@@ -52,14 +52,14 @@ export function ProductMockup() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-3 rounded-xl border border-white/10 bg-white/[0.02] p-5">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-[#22D3EE]">
-                Psicologia Clinica
+                Psicologia Clínica
               </p>
               <p className="text-lg font-bold leading-tight text-[var(--platform-text)]">
                 Cuidado emocional para viver com mais clareza
               </p>
               <p className="text-xs leading-relaxed text-[var(--platform-text)]/55">
                 Atendimento humanizado para adultos e adolescentes. Acolhimento
-                profissional em cada sessao.
+                profissional em cada sessão.
               </p>
               <div className="h-8 w-28 rounded-lg bg-[linear-gradient(135deg,#7C5CFF,#22D3EE)] pt-1.5 text-center text-[10px] font-semibold text-white">
                 Agendar consulta
@@ -70,7 +70,7 @@ export function ProductMockup() {
 
           {/* Services grid */}
           <div className="grid grid-cols-3 gap-3">
-            {["Terapia individual", "Terapia de casal", "Orientacao parental"].map(
+            {["Terapia individual", "Terapia de casal", "Orientação parental"].map(
               (service) => (
                 <div
                   key={service}
@@ -88,10 +88,10 @@ export function ProductMockup() {
           {/* CTA */}
           <div className="rounded-xl bg-[linear-gradient(135deg,#7C5CFF,#3B82F6,#22D3EE)] p-4 text-center">
             <p className="text-sm font-bold text-white">
-              Pronta para dar o proximo passo?
+              Pronta para dar o próximo passo?
             </p>
             <p className="mt-1 text-[10px] text-white/70">
-              Agende sua primeira sessao com desconto especial
+              Agende sua primeira sessão com desconto especial
             </p>
           </div>
         </div>
