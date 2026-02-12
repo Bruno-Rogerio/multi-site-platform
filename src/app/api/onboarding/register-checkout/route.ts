@@ -152,7 +152,7 @@ export async function POST(request: Request) {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Informe um e-mail valido." }, { status: 400 });
   }
-  if (!(document.length === 11 || document.length === 14)) {
+  if (document && !(document.length === 11 || document.length === 14)) {
     return NextResponse.json({ error: "Informe CPF ou CNPJ valido." }, { status: 400 });
   }
   if (!validatePassword(password)) {
@@ -193,24 +193,55 @@ export async function POST(request: Request) {
     );
   }
 
+  const userMeta = {
+    role: "client",
+    site_id: site.id,
+    full_name: fullName,
+    document: document || undefined,
+    document_type: document ? (document.length === 11 ? "cpf" : "cnpj") : undefined,
+  };
+
+  let userId: string;
+
+  // Try to create new user
   const { data: createdUser, error: userError } = await supabaseAdmin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    user_metadata: {
-      role: "client",
-      site_id: site.id,
-      full_name: fullName,
-      document,
-      document_type: document.length === 11 ? "cpf" : "cnpj",
-    },
+    user_metadata: userMeta,
   });
 
-  if (userError || !createdUser.user) {
+  if (userError) {
+    // If user already exists, find and reuse
+    if (userError.message?.toLowerCase().includes("already") || userError.status === 422) {
+      const { data: userList } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+      const existing = userList?.users?.find((u) => u.email?.toLowerCase() === email);
+
+      if (!existing) {
+        return NextResponse.json(
+          { error: "Nao foi possivel criar usuario.", details: userError.message },
+          { status: 400 },
+        );
+      }
+
+      userId = existing.id;
+      await supabaseAdmin.auth.admin.updateUser(userId, {
+        password,
+        user_metadata: userMeta,
+      });
+    } else {
+      return NextResponse.json(
+        { error: "Nao foi possivel criar usuario.", details: userError.message },
+        { status: 400 },
+      );
+    }
+  } else if (!createdUser.user) {
     return NextResponse.json(
-      { error: "Nao foi possivel criar usuario.", details: userError?.message },
+      { error: "Nao foi possivel criar usuario." },
       { status: 400 },
     );
+  } else {
+    userId = createdUser.user.id;
   }
 
   const monthlyAmount = toMonthlyAmount(addonsSelected);
@@ -229,11 +260,11 @@ export async function POST(request: Request) {
     // Create billing profile as active (no Stripe)
     await supabaseAdmin.from("billing_profiles").upsert(
       {
-        user_id: createdUser.user.id,
+        user_id: userId,
         site_id: site.id,
         full_name: fullName,
-        document,
-        document_type: document.length === 11 ? "cpf" : "cnpj",
+        document: document || null,
+        document_type: document ? (document.length === 11 ? "cpf" : "cnpj") : null,
         email,
         stripe_customer_id: "bypass_dev",
         billing_status: "active",
@@ -257,7 +288,7 @@ export async function POST(request: Request) {
     customerId = await createStripeCustomer(
       stripeSecretKey,
       payload,
-      document.length === 11 ? "cpf" : "cnpj",
+      document ? (document.length === 11 ? "cpf" : "cnpj") : "cpf",
     );
     checkoutUrl = await createStripeCheckoutSession(
       stripeSecretKey,
@@ -278,11 +309,11 @@ export async function POST(request: Request) {
 
   const { error: billingError } = await supabaseAdmin.from("billing_profiles").upsert(
     {
-      user_id: createdUser.user.id,
+      user_id: userId,
       site_id: site.id,
       full_name: fullName,
-      document,
-      document_type: document.length === 11 ? "cpf" : "cnpj",
+      document: document || null,
+      document_type: document ? (document.length === 11 ? "cpf" : "cnpj") : null,
       email,
       stripe_customer_id: customerId,
       billing_status: "checkout_pending",

@@ -200,15 +200,29 @@ export async function POST(request: Request) {
 
   const { data: existingSite } = await admin
     .from("sites")
-    .select("id")
+    .select("id,theme_settings")
     .eq("domain", domain)
     .maybeSingle();
 
   if (existingSite) {
-    return NextResponse.json(
-      { error: "Esse subdominio ja esta em uso. Escolha outro." },
-      { status: 409 },
-    );
+    const settings = existingSite.theme_settings as Record<string, unknown> | null;
+
+    // If it's an active site (not a draft), reject
+    if (!settings?.onboardingDraft) {
+      return NextResponse.json(
+        { error: "Esse subdominio ja esta em uso. Escolha outro." },
+        { status: 409 },
+      );
+    }
+
+    // It's a previous draft — reuse it
+    return NextResponse.json({
+      ok: true,
+      siteId: existingSite.id,
+      domain,
+      draftUrl: buildPublicUrl(domain, hostHeader),
+      reused: true,
+    });
   }
 
   const themeSettings = {
