@@ -225,7 +225,7 @@ export async function POST(request: Request) {
       }
 
       userId = existing.id;
-      await supabaseAdmin.auth.admin.updateUser(userId, {
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
         password,
         user_metadata: userMeta,
       });
