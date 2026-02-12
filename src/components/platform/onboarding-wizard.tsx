@@ -1374,7 +1374,7 @@ export function OnboardingWizard() {
               className="ml-2 h-5 flex-1 rounded-md border border-white/10 bg-white/[0.04] px-2 text-[10px] leading-5"
               style={{ color: previewText.primary }}
             >
-              {normalizeSubdomain(preferredSubdomain || "meu-site")}.localtest.me
+              {normalizeSubdomain(preferredSubdomain || "meu-site")}.{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
             </div>
           </div>
 

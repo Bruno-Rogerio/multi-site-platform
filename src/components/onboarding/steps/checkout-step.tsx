@@ -108,10 +108,16 @@ export function CheckoutStep() {
         throw new Error(data.error || "Erro ao processar pagamento");
       }
 
-      const { checkoutUrl } = await checkoutResponse.json();
+      const checkoutData = await checkoutResponse.json();
+
+      if (checkoutData.bypass) {
+        // Payment bypassed (dev mode) — site already activated
+        window.location.href = "/login?checkout=success";
+        return;
+      }
 
       // Redirect to Stripe checkout
-      window.location.href = checkoutUrl;
+      window.location.href = checkoutData.checkoutUrl;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro desconhecido");
       setIsSubmitting(false);
@@ -356,7 +362,7 @@ export function CheckoutStep() {
           <div className="mt-4 rounded-xl border border-white/10 bg-[#12182B]/60 p-4">
             <p className="text-xs text-[var(--platform-text)]/50 mb-2">Seu site:</p>
             <p className="font-mono text-sm text-[#22D3EE]">
-              {preferredSubdomain || "seusite"}.bsph.com.br
+              {preferredSubdomain || "seusite"}.{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
             </p>
             <p className="mt-1 text-xs text-[var(--platform-text)]/40">
               {businessName || "Seu negócio"}

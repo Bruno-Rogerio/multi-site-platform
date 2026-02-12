@@ -39,21 +39,13 @@ function normalizeSubdomain(input: string): string {
     .replace(/^-|-$/g, "");
 }
 
-function resolveRootDomain(hostHeader: string): string {
+function resolveRootDomain(): string {
   const configured =
     process.env.PLATFORM_ROOT_DOMAIN ??
     process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ??
     "";
 
-  if (configured) {
-    return configured.toLowerCase().trim();
-  }
-
-  if (hostHeader.includes("localtest.me")) {
-    return "localtest.me";
-  }
-
-  return "localtest.me";
+  return configured.toLowerCase().trim() || "seudominio.com";
 }
 
 function buildPublicUrl(domain: string, hostHeader: string): string {
@@ -203,7 +195,7 @@ export async function POST(request: Request) {
 
   const headerStore = await headers();
   const hostHeader = (headerStore.get("host") ?? "").toLowerCase();
-  const rootDomain = resolveRootDomain(hostHeader);
+  const rootDomain = resolveRootDomain();
   const domain = `${preferredSubdomain}.${rootDomain}`;
 
   const { data: existingSite } = await admin

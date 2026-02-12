@@ -6,15 +6,13 @@ import { isReservedSubdomain } from "@/lib/tenant/host";
 
 const SUBDOMAIN_REGEX = /^[a-z0-9-]{3,30}$/;
 
-function resolveRootDomain(hostHeader: string): string {
+function resolveRootDomain(): string {
   const configured =
     process.env.PLATFORM_ROOT_DOMAIN ??
     process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ??
     "";
 
-  if (configured) return configured.toLowerCase().trim();
-  if (hostHeader.includes("localtest.me")) return "localtest.me";
-  return "localtest.me";
+  return configured.toLowerCase().trim() || "seudominio.com";
 }
 
 export async function GET(request: Request) {
@@ -40,7 +38,7 @@ export async function GET(request: Request) {
 
   const headerStore = await headers();
   const hostHeader = (headerStore.get("host") ?? "").toLowerCase();
-  const rootDomain = resolveRootDomain(hostHeader);
+  const rootDomain = resolveRootDomain();
   const domain = `${subdomain}.${rootDomain}`;
 
   const { data: existingSite } = await admin

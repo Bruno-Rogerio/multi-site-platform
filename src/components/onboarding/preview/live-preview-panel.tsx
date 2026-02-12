@@ -199,7 +199,7 @@ export function LivePreviewPanel() {
               </div>
               <div className="flex-1 rounded bg-white/5 px-2 py-0.5">
                 <span className="text-[10px] text-[var(--platform-text)]/40 font-mono">
-                  {state.preferredSubdomain || "seusite"}.bsph.com.br
+                  {state.preferredSubdomain || "seusite"}.{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
                 </span>
               </div>
             </div>

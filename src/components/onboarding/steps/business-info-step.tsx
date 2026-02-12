@@ -183,7 +183,7 @@ export function BusinessInfoStep() {
                 className="flex-1 bg-transparent px-4 py-3 text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:outline-none"
               />
               <span className="px-4 text-sm text-[var(--platform-text)]/50 bg-white/[0.02] border-l border-white/10 py-3">
-                .bsph.com.br
+                .{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
               </span>
             </div>
 
@@ -236,7 +236,7 @@ export function BusinessInfoStep() {
             >
               <p className="text-xs text-[var(--platform-text)]/60">Seu site estará disponível em:</p>
               <p className="mt-1 font-mono text-sm text-[#22D3EE]">
-                https://{preferredSubdomain}.bsph.com.br
+                https://{preferredSubdomain}.{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
               </p>
             </motion.div>
           )}

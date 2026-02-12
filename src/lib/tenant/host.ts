@@ -2,7 +2,6 @@ const HOST_PORT_REGEX = /:\d+$/;
 const TENANT_SLUG_REGEX = /^[a-z0-9-]+$/;
 
 const DEFAULT_PLATFORM_DOMAIN = "seudominio.com";
-const LOCALTEST_DOMAIN = "localtest.me";
 const RESERVED_SUBDOMAINS = new Set([
   "www",
   "app",
@@ -45,8 +44,7 @@ function getPlatformRootDomain(): string {
 }
 
 function getSupportedRootDomains(): string[] {
-  const rootDomains = [getPlatformRootDomain(), LOCALTEST_DOMAIN];
-  return Array.from(new Set(rootDomains.filter(Boolean)));
+  return [getPlatformRootDomain()].filter(Boolean);
 }
 
 export function normalizeHost(rawHost: string | null): string {

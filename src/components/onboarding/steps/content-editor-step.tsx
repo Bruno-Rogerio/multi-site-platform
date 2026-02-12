@@ -508,7 +508,7 @@ function SeoContentEditor() {
         </p>
         <div className="rounded-lg border border-white/10 bg-white p-3">
           <p className="text-[11px] text-green-700 font-mono truncate">
-            {state.preferredSubdomain || "seusite"}.bsph.com.br
+            {state.preferredSubdomain || "seusite"}.{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
           </p>
           <p className="text-sm text-blue-700 font-medium truncate mt-0.5">
             {content.seoTitle || content.heroTitle || "Título do seu site"}

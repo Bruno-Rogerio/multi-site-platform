@@ -170,8 +170,10 @@ export async function POST(request: Request) {
     );
   }
 
+  const bypassPayment = process.env.BYPASS_PAYMENT === "true";
+
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY ?? "";
-  if (!stripeSecretKey) {
+  if (!bypassPayment && !stripeSecretKey) {
     return NextResponse.json(
       { error: "STRIPE_SECRET_KEY ausente para iniciar checkout." },
       { status: 500 },
@@ -180,7 +182,7 @@ export async function POST(request: Request) {
 
   const { data: site, error: siteError } = await supabaseAdmin
     .from("sites")
-    .select("id,domain,name")
+    .select("id,domain,name,theme_settings")
     .eq("id", payload.siteId)
     .maybeSingle();
 
@@ -213,6 +215,42 @@ export async function POST(request: Request) {
 
   const monthlyAmount = toMonthlyAmount(addonsSelected);
 
+  // --- BYPASS: skip Stripe, activate site directly ---
+  if (bypassPayment) {
+    // Remove onboardingDraft flag to activate the site
+    const currentSettings = (site.theme_settings as Record<string, unknown>) ?? {};
+    const { onboardingDraft: _, ...activeSettings } = currentSettings;
+
+    await supabaseAdmin
+      .from("sites")
+      .update({ theme_settings: activeSettings })
+      .eq("id", site.id);
+
+    // Create billing profile as active (no Stripe)
+    await supabaseAdmin.from("billing_profiles").upsert(
+      {
+        user_id: createdUser.user.id,
+        site_id: site.id,
+        full_name: fullName,
+        document,
+        document_type: document.length === 11 ? "cpf" : "cnpj",
+        email,
+        stripe_customer_id: "bypass_dev",
+        billing_status: "active",
+        monthly_amount: monthlyAmount,
+      },
+      { onConflict: "user_id" },
+    );
+
+    return NextResponse.json({
+      ok: true,
+      bypass: true,
+      siteDomain: site.domain,
+      monthlyAmount,
+    });
+  }
+
+  // --- Normal Stripe checkout flow ---
   let customerId = "";
   let checkoutUrl = "";
   try {

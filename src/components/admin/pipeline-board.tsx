@@ -121,7 +121,7 @@ export function PipelineBoard({ drafts }: { drafts: DraftRow[] }) {
                       </p>
                       {subdomain && (
                         <p className="mt-0.5 font-mono text-[11px] text-[#22D3EE]">
-                          {subdomain}.bsph.com.br
+                          {subdomain}.{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
                         </p>
                       )}
                       <div className="mt-2 flex items-center justify-between">
