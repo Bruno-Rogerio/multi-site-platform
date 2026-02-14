@@ -28,6 +28,7 @@ export default async function ClientEditorPage() {
       <SectionsEditor
         sites={scopedSites}
         defaultSiteId={profile.site_id ?? scopedSites[0]?.id ?? null}
+        role="client"
       />
     </div>
   );

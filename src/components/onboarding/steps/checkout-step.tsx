@@ -64,6 +64,7 @@ export function CheckoutStep() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           creationMode: deriveCreationMode(),
+          siteStyle: state.paletteId,
           paletteId: state.paletteId,
           customColors: state.customColors,
           headerStyle: "default",
@@ -78,6 +79,9 @@ export function CheckoutStep() {
           businessHighlights: state.businessHighlights,
           targetAudience: state.targetAudience,
           preferredSubdomain: state.preferredSubdomain,
+          content: state.content,
+          ctaConfig: state.ctaConfig,
+          selectedCtaTypes: state.selectedCtaTypes,
         }),
       });
 

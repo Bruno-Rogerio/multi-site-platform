@@ -16,6 +16,7 @@ type SiteOption = {
 type SectionsEditorProps = {
   sites: SiteOption[];
   defaultSiteId: string | null;
+  role?: "platform" | "client";
 };
 
 type LoadState = "idle" | "loading" | "saving";
@@ -57,7 +58,8 @@ function buildSectionSnapshots(sections: Section[]): SectionSnapshots {
   return Object.fromEntries(sections.map((section) => [section.id, serializeSection(section)]));
 }
 
-export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
+export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: SectionsEditorProps) {
+  const isClient = role === "client";
   const [selectedSiteId, setSelectedSiteId] = useState(defaultSiteId ?? "");
   const [sections, setSections] = useState<Section[]>([]);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
@@ -289,26 +291,28 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
             Ajuste Hero, Services e CTA em tempo real para cada tenant.
           </p>
         </div>
-        <div className="w-full max-w-sm">
-          <label
-            className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60"
-            htmlFor="site-picker"
-          >
-            Site
-          </label>
-          <select
-            id="site-picker"
-            value={selectedSiteId}
-            onChange={(event) => setSelectedSiteId(event.target.value)}
-            className="mt-1 w-full rounded-xl border border-white/15 bg-[#12182B] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
-          >
-            {sortedSites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.name} - {site.domain}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!isClient && (
+          <div className="w-full max-w-sm">
+            <label
+              className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60"
+              htmlFor="site-picker"
+            >
+              Site
+            </label>
+            <select
+              id="site-picker"
+              value={selectedSiteId}
+              onChange={(event) => setSelectedSiteId(event.target.value)}
+              className="mt-1 w-full rounded-xl border border-white/15 bg-[#12182B] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+            >
+              {sortedSites.map((site) => (
+                <option key={site.id} value={site.id}>
+                  {site.name} - {site.domain}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="mt-4 flex items-center gap-3">
@@ -382,39 +386,41 @@ export function SectionsEditor({ sites, defaultSiteId }: SectionsEditorProps) {
                 </button>
               </div>
 
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
-                    Variant
-                  </label>
-                  <input
-                    value={section.variant ?? "default"}
-                    onChange={(event) =>
-                      updateSection(section.id, (current) => ({
-                        ...current,
-                        variant: event.target.value,
-                      }))
-                    }
-                    className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
-                  />
+              {!isClient && (
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
+                      Variant
+                    </label>
+                    <input
+                      value={section.variant ?? "default"}
+                      onChange={(event) =>
+                        updateSection(section.id, (current) => ({
+                          ...current,
+                          variant: event.target.value,
+                        }))
+                      }
+                      className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
+                      Order
+                    </label>
+                    <input
+                      type="number"
+                      value={section.order}
+                      onChange={(event) =>
+                        updateSection(section.id, (current) => ({
+                          ...current,
+                          order: Number(event.target.value || "0"),
+                        }))
+                      }
+                      className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
-                    Order
-                  </label>
-                  <input
-                    type="number"
-                    value={section.order}
-                    onChange={(event) =>
-                      updateSection(section.id, (current) => ({
-                        ...current,
-                        order: Number(event.target.value || "0"),
-                      }))
-                    }
-                    className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
-                  />
-                </div>
-              </div>
+              )}
 
               {section.type === "hero" ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">

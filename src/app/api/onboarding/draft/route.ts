@@ -2,6 +2,8 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { buildCtaUrl } from "@/lib/onboarding/cta-types";
+import type { CtaTypeId } from "@/lib/onboarding/types";
 import { isReservedSubdomain } from "@/lib/tenant/host";
 
 const SUBDOMAIN_REGEX = /^[a-z0-9-]{3,30}$/;
@@ -28,6 +30,9 @@ type OnboardingDraftPayload = {
   businessHighlights: string;
   targetAudience: string;
   preferredSubdomain: string;
+  content?: Record<string, string>;
+  ctaConfig?: Partial<Record<CtaTypeId, { label: string; url: string }>>;
+  selectedCtaTypes?: CtaTypeId[];
 };
 
 function normalizeSubdomain(input: string): string {
@@ -282,6 +287,24 @@ export async function POST(request: Request) {
   const audience = payload.targetAudience?.trim() || "voce";
   const segment = payload.businessSegment?.trim() || "atendimento profissional";
   const city = payload.businessCity?.trim();
+  const content = payload.content ?? {};
+  const ctaConfig = payload.ctaConfig ?? {};
+  const selectedCtaTypes = payload.selectedCtaTypes ?? [];
+
+  // Resolve CTA button link from user's channel config
+  function resolveCtaHref(): string {
+    // 1. Use explicit ctaButtonUrl from content editor
+    if (content.ctaButtonUrl?.trim()) return content.ctaButtonUrl.trim();
+    // 2. Use primary CTA channel config
+    const primaryType = selectedCtaTypes[0];
+    if (primaryType && ctaConfig[primaryType]?.url) {
+      return buildCtaUrl(primaryType, ctaConfig[primaryType].url);
+    }
+    // 3. Fallback
+    return "#cta";
+  }
+
+  const ctaHref = resolveCtaHref();
 
   const sectionInserts = [
     {
@@ -290,13 +313,13 @@ export async function POST(request: Request) {
       variant: mapHeroVariant(payload.heroStyle),
       order: 1,
       content: {
-        eyebrow: city ? `${segment} em ${city}` : segment,
-        title: `${businessName}: cuidado profissional para ${audience}`,
-        subtitle:
+        eyebrow: content.heroEyebrow?.trim() || (city ? `${segment} em ${city}` : segment),
+        title: content.heroTitle?.trim() || `${businessName}: cuidado profissional para ${audience}`,
+        subtitle: content.heroSubtitle?.trim() ||
           payload.businessHighlights?.trim() ||
           "Atendimento personalizado com foco em resultado e acolhimento.",
-        ctaLabel: "Agendar conversa",
-        ctaHref: "#cta",
+        ctaLabel: content.heroCta?.trim() || "Agendar conversa",
+        ctaHref,
       },
     },
     {
@@ -305,8 +328,8 @@ export async function POST(request: Request) {
       variant: mapServicesVariant(payload.servicesStyle),
       order: 2,
       content: {
-        title: "Como posso ajudar",
-        items: toItems(payload.businessHighlights ?? ""),
+        title: content.servicesTitle?.trim() || "Como posso ajudar",
+        items: toItems(content.servicesItems?.trim() || payload.businessHighlights || ""),
       },
     },
     {
@@ -315,10 +338,12 @@ export async function POST(request: Request) {
       variant: mapCtaVariant(payload.ctaStyle),
       order: 3,
       content: {
-        title: "Vamos conversar?",
-        description: "Me chame no WhatsApp para entender seu momento e definir proximos passos.",
-        buttonLabel: "Falar no WhatsApp",
-        buttonHref: "https://wa.me/5511999999999",
+        title: content.ctaTitle?.trim() || "Vamos conversar?",
+        description: content.ctaDescription?.trim() || "Me chame para entender seu momento e definir proximos passos.",
+        buttonLabel: content.ctaButtonLabel?.trim() || "Entrar em contato",
+        buttonHref: ctaHref,
+        secondaryLabel: content.ctaSecondaryLabel?.trim() || "",
+        secondaryHref: content.ctaSecondaryUrl?.trim() || "",
       },
     },
   ];
