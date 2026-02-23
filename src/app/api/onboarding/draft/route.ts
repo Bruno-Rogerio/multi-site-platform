@@ -415,31 +415,6 @@ export async function POST(request: Request) {
     },
   ];
 
-  // Log diagnostic info for debugging
-  const diagnosticSections = sectionInserts.map((s) => ({
-    type: s.type,
-    variant: s.variant,
-    contentKeys: Object.keys(s.content),
-  }));
-  console.log("[draft] payload variants:", {
-    heroStyle: payload.heroStyle,
-    servicesStyle: payload.servicesStyle,
-    ctaStyle: payload.ctaStyle,
-    paletteId: payload.paletteId,
-    fontFamily: payload.fontFamily,
-    buttonStyle: payload.buttonStyle,
-  });
-  console.log("[draft] resolved theme:", {
-    primaryColor: themeSettings.primaryColor,
-    accentColor: themeSettings.accentColor,
-    backgroundColor: themeSettings.backgroundColor,
-    textColor: themeSettings.textColor,
-    fontFamily: themeSettings.fontFamily,
-    buttonStyle: themeSettings.buttonStyle,
-  });
-  console.log("[draft] sections to insert:", JSON.stringify(diagnosticSections));
-  console.log("[draft] hero content:", JSON.stringify(sectionInserts[0]?.content));
-
   const { error: sectionsError } = await admin.from("sections").insert(sectionInserts);
   if (sectionsError) {
     return NextResponse.json(
@@ -453,20 +428,5 @@ export async function POST(request: Request) {
     siteId: site.id,
     domain,
     draftUrl: buildPublicUrl(domain, hostHeader),
-    _debug: {
-      sectionsCreated: diagnosticSections,
-      theme: {
-        primaryColor: themeSettings.primaryColor,
-        backgroundColor: themeSettings.backgroundColor,
-        fontFamily: themeSettings.fontFamily,
-        buttonStyle: themeSettings.buttonStyle,
-        paletteId: themeSettings.paletteId,
-      },
-      heroContent: {
-        title: sectionInserts[0]?.content?.title,
-        eyebrow: sectionInserts[0]?.content?.eyebrow,
-        ctaLabel: sectionInserts[0]?.content?.ctaLabel,
-      },
-    },
   });
 }

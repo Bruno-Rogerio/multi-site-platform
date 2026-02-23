@@ -94,20 +94,6 @@ export function CheckoutStep() {
           selectedCtaTypes: state.selectedCtaTypes,
         };
 
-      const contentObj = draftPayload.content as Record<string, string>;
-      console.log("[checkout] draft payload:", JSON.stringify({
-        heroStyle: draftPayload.heroStyle,
-        servicesStyle: draftPayload.servicesStyle,
-        ctaStyle: draftPayload.ctaStyle,
-        paletteId: draftPayload.paletteId,
-        fontFamily: draftPayload.fontFamily,
-        buttonStyle: draftPayload.buttonStyle,
-        contentKeys: Object.keys(contentObj),
-        heroTitle: contentObj.heroTitle,
-        heroCtaLabel: contentObj.heroCtaLabel,
-        servicesItems: contentObj.servicesItems?.substring(0, 100),
-      }));
-
       const draftResponse = await fetch("/api/onboarding/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -115,7 +101,6 @@ export function CheckoutStep() {
       });
 
       const draftData = await draftResponse.json();
-      console.log("[checkout] draft response:", JSON.stringify(draftData));
 
       if (!draftResponse.ok) {
         throw new Error(draftData.error || "Erro ao criar site");
