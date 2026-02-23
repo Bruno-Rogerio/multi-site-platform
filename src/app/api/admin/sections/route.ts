@@ -123,22 +123,30 @@ export async function GET(request: Request) {
     return homePage.error ?? NextResponse.json({ sections: [] });
   }
 
-  const { data, error } = await homePage.supabase
-    .from("sections")
-    .select("id,type,variant,order,content")
-    .eq("page_id", homePage.pageId)
-    .order("order", { ascending: true });
+  const [sectionsResult, siteResult] = await Promise.all([
+    homePage.supabase
+      .from("sections")
+      .select("id,type,variant,order,content")
+      .eq("page_id", homePage.pageId)
+      .order("order", { ascending: true }),
+    homePage.supabase
+      .from("sites")
+      .select("theme_settings")
+      .eq("id", siteId)
+      .maybeSingle(),
+  ]);
 
-  if (error) {
+  if (sectionsResult.error) {
     return NextResponse.json(
-      { error: "Could not load sections.", details: error.message },
+      { error: "Could not load sections.", details: sectionsResult.error.message },
       { status: 400 },
     );
   }
 
   return NextResponse.json({
     siteId,
-    sections: (data as SectionRow[] | null)?.map((section) => ({
+    themeSettings: siteResult.data?.theme_settings ?? null,
+    sections: (sectionsResult.data as SectionRow[] | null)?.map((section) => ({
       id: section.id,
       type: section.type,
       variant: section.variant ?? "default",

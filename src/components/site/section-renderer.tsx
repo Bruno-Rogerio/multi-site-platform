@@ -604,7 +604,14 @@ export function SectionRenderer({
     const subtitle = asString(section.content.subtitle);
     const whatsappUrl = asString(section.content.whatsappUrl);
     const whatsappLabel = asString(section.content.whatsappLabel, "Falar no WhatsApp");
+    const secondaryUrl = asString(section.content.secondaryUrl);
+    const secondaryLabel = asString(section.content.secondaryLabel);
     const submitLabel = asString(section.content.submitLabel, "Enviar");
+
+    const socialLinks = [
+      whatsappUrl ? { url: whatsappUrl, label: whatsappLabel } : null,
+      secondaryUrl && secondaryLabel ? { url: secondaryUrl, label: secondaryLabel } : null,
+    ].filter((link): link is { url: string; label: string } => link !== null);
 
     return (
       <section
@@ -614,15 +621,20 @@ export function SectionRenderer({
         <div className="mb-6 md:mb-0">
           <h2 className="text-2xl font-semibold">{title}</h2>
           {subtitle && <p className="mt-3 text-sm opacity-80">{subtitle}</p>}
-          {whatsappUrl && (
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noreferrer"
-              className={`mt-4 inline-flex bg-[var(--site-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
-            >
-              {whatsappLabel}
-            </a>
+          {socialLinks.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-3">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.url}
+                  href={link.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`inline-flex bg-[var(--site-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
           )}
         </div>
         <ContactForm

@@ -62,6 +62,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   const isClient = role === "client";
   const [selectedSiteId, setSelectedSiteId] = useState(defaultSiteId ?? "");
   const [sections, setSections] = useState<Section[]>([]);
+  const [siteTheme, setSiteTheme] = useState<Record<string, string> | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [syncedSectionsSnapshot, setSyncedSectionsSnapshot] = useState<SectionSnapshots>({});
   const [state, setState] = useState<LoadState>("idle");
@@ -98,7 +99,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     });
 
     const payload = (await response.json().catch(() => null)) as
-      | { sections?: Section[]; error?: string; details?: string }
+      | { sections?: Section[]; themeSettings?: Record<string, string>; error?: string; details?: string }
       | null;
 
     if (!response.ok) {
@@ -112,6 +113,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
 
     const loadedSections = sortSections(payload?.sections ?? []);
     setSections(loadedSections);
+    setSiteTheme(payload?.themeSettings ?? null);
     setSyncedSectionsSnapshot(buildSectionSnapshots(loadedSections));
     setState("idle");
   }
@@ -425,27 +427,31 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
               {section.type === "hero" ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   {[
-                    ["eyebrow", "Eyebrow"],
-                    ["title", "Título"],
-                    ["subtitle", "Subtítulo"],
-                    ["ctaLabel", "CTA Label"],
-                    ["ctaHref", "CTA Link"],
-                    ["imageUrl", "Imagem (URL)"],
-                  ].map(([key, label]) => (
+                    { key: "eyebrow", label: "Eyebrow", placeholder: "Ex: Psicóloga em São Paulo" },
+                    { key: "title", label: "Título", placeholder: "Título principal do hero" },
+                    { key: "subtitle", label: "Subtítulo", placeholder: "Descrição curta do seu negócio" },
+                    { key: "ctaLabel", label: "Texto do botão", placeholder: "Ex: Agendar conversa" },
+                    { key: "ctaHref", label: "Link do botão", placeholder: "#contact ou https://wa.me/55...", help: "Use #contact para rolar até Contato, ou cole um link externo (WhatsApp, Instagram, etc.)" },
+                    { key: "imageUrl", label: "Imagem (URL)", placeholder: "https://..." },
+                  ].map(({ key, label, placeholder, help }) => (
                     <div key={key}>
                       <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
                         {label}
                       </label>
                       <input
                         value={asString(section.content[key])}
+                        placeholder={placeholder}
                         onChange={(event) =>
                           updateSection(section.id, (current) => ({
                             ...current,
                             content: { ...current.content, [key]: event.target.value },
                           }))
                         }
-                        className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+                        className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
                       />
+                      {help && (
+                        <p className="mt-1 text-[11px] text-[var(--platform-text)]/45">{help}</p>
+                      )}
                     </div>
                   ))}
                   <div className="md:col-span-2">
@@ -567,26 +573,32 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
               {section.type === "cta" ? (
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   {[
-                    ["title", "Título"],
-                    ["description", "Descrição"],
-                    ["buttonLabel", "Botão"],
-                    ["buttonHref", "Link do botão"],
-                    ["imageUrl", "Imagem (URL)"],
-                  ].map(([key, label]) => (
+                    { key: "title", label: "Título", placeholder: "Ex: Vamos conversar?" },
+                    { key: "description", label: "Descrição", placeholder: "Texto de apoio do CTA" },
+                    { key: "buttonLabel", label: "Texto do botão", placeholder: "Ex: Entrar em contato" },
+                    { key: "buttonHref", label: "Link do botão", placeholder: "https://wa.me/5511999999999 ou #contact", help: "Insira o link de destino: WhatsApp, Instagram, email ou âncora (#contact)" },
+                    { key: "secondaryLabel", label: "Botão secundário (texto)", placeholder: "Opcional" },
+                    { key: "secondaryHref", label: "Botão secundário (link)", placeholder: "https://instagram.com/..." },
+                    { key: "imageUrl", label: "Imagem (URL)", placeholder: "https://..." },
+                  ].map(({ key, label, placeholder, help }) => (
                     <div key={key}>
                       <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
                         {label}
                       </label>
                       <input
                         value={asString(section.content[key])}
+                        placeholder={placeholder}
                         onChange={(event) =>
                           updateSection(section.id, (current) => ({
                             ...current,
                             content: { ...current.content, [key]: event.target.value },
                           }))
                         }
-                        className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+                        className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
                       />
+                      {help && (
+                        <p className="mt-1 text-[11px] text-[var(--platform-text)]/45">{help}</p>
+                      )}
                     </div>
                   ))}
                   <div className="md:col-span-2">
@@ -619,6 +631,78 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                   </div>
                 </div>
               ) : null}
+
+              {section.type === "about" ? (
+                <div className="mt-4 grid gap-3">
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
+                      Título
+                    </label>
+                    <input
+                      value={asString(section.content.title)}
+                      placeholder="Ex: Sobre mim"
+                      onChange={(event) =>
+                        updateSection(section.id, (current) => ({
+                          ...current,
+                          content: { ...current.content, title: event.target.value },
+                        }))
+                      }
+                      className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
+                      Texto
+                    </label>
+                    <textarea
+                      rows={5}
+                      value={asString(section.content.body)}
+                      placeholder="Descreva seu negócio, sua história ou diferenciais..."
+                      onChange={(event) =>
+                        updateSection(section.id, (current) => ({
+                          ...current,
+                          content: { ...current.content, body: event.target.value },
+                        }))
+                      }
+                      className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              {section.type === "contact" ? (
+                <div className="mt-4 grid gap-3 md:grid-cols-2">
+                  {[
+                    { key: "title", label: "Título", placeholder: "Ex: Contato" },
+                    { key: "subtitle", label: "Subtítulo", placeholder: "Ex: Entre em contato comigo" },
+                    { key: "whatsappUrl", label: "Link WhatsApp", placeholder: "https://wa.me/5511999999999", help: "Cole o link completo do WhatsApp com DDI+DDD+número" },
+                    { key: "whatsappLabel", label: "Texto do botão WhatsApp", placeholder: "Falar no WhatsApp" },
+                    { key: "secondaryUrl", label: "Link secundário", placeholder: "https://instagram.com/...", help: "Instagram, email (mailto:) ou outro canal" },
+                    { key: "secondaryLabel", label: "Texto do link secundário", placeholder: "Ex: Me siga no Instagram" },
+                    { key: "submitLabel", label: "Texto do botão do formulário", placeholder: "Enviar" },
+                  ].map(({ key, label, placeholder, help }) => (
+                    <div key={key}>
+                      <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
+                        {label}
+                      </label>
+                      <input
+                        value={asString(section.content[key])}
+                        placeholder={placeholder}
+                        onChange={(event) =>
+                          updateSection(section.id, (current) => ({
+                            ...current,
+                            content: { ...current.content, [key]: event.target.value },
+                          }))
+                        }
+                        className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
+                      />
+                      {help && (
+                        <p className="mt-1 text-[11px] text-[var(--platform-text)]/45">{help}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </article>
           ))}
         </div>
@@ -629,6 +713,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
           sections={sections}
           hasUnsavedChanges={hasUnsavedChanges}
           activeSectionId={activeSectionId}
+          themeSettings={siteTheme}
         />
       </div>
     </section>

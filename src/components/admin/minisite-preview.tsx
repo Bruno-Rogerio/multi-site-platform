@@ -5,12 +5,20 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Section } from "@/lib/tenant/types";
 
+type SiteTheme = {
+  primaryColor?: string;
+  accentColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+} | null;
+
 type MiniSitePreviewProps = {
   siteName: string;
   siteDomain: string;
   sections: Section[];
   hasUnsavedChanges: boolean;
   activeSectionId: string | null;
+  themeSettings?: SiteTheme;
 };
 
 function asString(value: unknown, fallback = ""): string {
@@ -31,7 +39,17 @@ export function MiniSitePreview({
   sections,
   hasUnsavedChanges,
   activeSectionId,
+  themeSettings,
 }: MiniSitePreviewProps) {
+  const hasSiteTheme = themeSettings?.primaryColor;
+  const siteColors = hasSiteTheme
+    ? {
+        "--preview-primary": themeSettings.primaryColor,
+        "--preview-accent": themeSettings.accentColor ?? themeSettings.primaryColor,
+        "--preview-bg": themeSettings.backgroundColor ?? "#0B1020",
+        "--preview-text": themeSettings.textColor ?? "#EAF0FF",
+      }
+    : {};
   const [previewViewport, setPreviewViewport] = useState<"desktop" | "mobile">("desktop");
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const orderedSections = [...sections].sort((a, b) => a.order - b.order);
@@ -100,10 +118,11 @@ export function MiniSitePreview({
 
         <div className="p-4">
           <div
+            style={siteColors as React.CSSProperties}
             className={`mx-auto overflow-hidden border transition-all ${
               isMobilePreview
-                ? "max-w-[310px] rounded-[2rem] border-white/15 bg-[#070B19]"
-                : "w-full rounded-2xl border-white/15 bg-[#0D1428] shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
+                ? "max-w-[310px] rounded-[2rem] border-white/15"
+                : "w-full rounded-2xl border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
             }`}
           >
             {isMobilePreview ? (
@@ -121,16 +140,46 @@ export function MiniSitePreview({
               </div>
             )}
 
+            {/* Mini header */}
+            <div
+              className="flex items-center justify-between border-b px-3 py-2"
+              style={{
+                backgroundColor: hasSiteTheme ? `${themeSettings.backgroundColor}ee` : "#0B1020ee",
+                borderColor: hasSiteTheme ? `${themeSettings.textColor}18` : "rgba(255,255,255,0.1)",
+              }}
+            >
+              <span
+                className="text-[10px] font-bold"
+                style={{ color: hasSiteTheme ? themeSettings.textColor : undefined }}
+              >
+                {siteName}
+              </span>
+              <span
+                className="rounded px-2 py-0.5 text-[8px] font-semibold text-white"
+                style={{ backgroundColor: hasSiteTheme ? themeSettings.primaryColor : "#3B82F6" }}
+              >
+                CTA
+              </span>
+            </div>
+
             <div
               className={`space-y-4 overflow-y-auto px-4 py-4 ${
                 isMobilePreview ? "max-h-[58vh]" : "h-[330px]"
               }`}
+              style={{
+                backgroundColor: hasSiteTheme ? themeSettings.backgroundColor : "#0D1428",
+                color: hasSiteTheme ? themeSettings.textColor : undefined,
+              }}
             >
               {orderedSections.map((section) => {
                 const sectionContainerClassName =
                   activeSectionId === section.id
                     ? "ring-2 ring-[#22D3EE] ring-offset-2 ring-offset-[#0B1020]"
                     : "";
+
+                const surfaceBorder = hasSiteTheme
+                  ? `${themeSettings.textColor}18`
+                  : "rgba(255,255,255,0.1)";
 
                 if (section.type === "hero") {
                   return (
@@ -139,15 +188,19 @@ export function MiniSitePreview({
                       ref={(element) => {
                         sectionRefs.current[section.id] = element;
                       }}
-                      className={`rounded-xl border border-white/10 bg-white/[0.02] p-4 ${sectionContainerClassName}`}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
                     >
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
+                      <p
+                        className="text-[10px] font-semibold uppercase tracking-[0.2em]"
+                        style={{ color: hasSiteTheme ? themeSettings.accentColor : "#22D3EE" }}
+                      >
                         {asString(section.content.eyebrow)}
                       </p>
-                      <h3 className="mt-2 text-lg font-semibold text-[var(--platform-text)]">
+                      <h3 className="mt-2 text-lg font-semibold">
                         {asString(section.content.title, siteName)}
                       </h3>
-                      <p className="mt-2 text-xs text-[var(--platform-text)]/75">
+                      <p className="mt-2 text-xs opacity-75">
                         {asString(section.content.subtitle)}
                       </p>
                       {asString(section.content.imageUrl) && (
@@ -156,7 +209,8 @@ export function MiniSitePreview({
                           alt={asString(section.content.title, siteName)}
                           width={1280}
                           height={720}
-                          className="mt-3 aspect-[16/9] h-auto w-full rounded-lg border border-white/15 object-cover"
+                          className="mt-3 aspect-[16/9] h-auto w-full rounded-lg object-cover"
+                          style={{ border: `1px solid ${surfaceBorder}` }}
                         />
                       )}
                     </section>
@@ -171,9 +225,10 @@ export function MiniSitePreview({
                       ref={(element) => {
                         sectionRefs.current[section.id] = element;
                       }}
-                      className={`rounded-xl border border-white/10 bg-white/[0.02] p-4 ${sectionContainerClassName}`}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
                     >
-                      <h3 className="text-sm font-semibold text-[var(--platform-text)]">
+                      <h3 className="text-sm font-semibold">
                         {asString(section.content.title, "Serviços")}
                       </h3>
                       {asString(section.content.imageUrl) && (
@@ -182,12 +237,13 @@ export function MiniSitePreview({
                           alt={asString(section.content.title, "Serviços")}
                           width={960}
                           height={720}
-                          className="mt-3 aspect-[4/3] h-auto w-full rounded-lg border border-white/15 object-cover"
+                          className="mt-3 aspect-[4/3] h-auto w-full rounded-lg object-cover"
+                          style={{ border: `1px solid ${surfaceBorder}` }}
                         />
                       )}
                       <ul className="mt-2 space-y-1">
                         {items.map((item) => (
-                          <li key={item} className="text-xs text-[var(--platform-text)]/80">
+                          <li key={item} className="text-xs opacity-80">
                             - {item}
                           </li>
                         ))}
@@ -203,7 +259,12 @@ export function MiniSitePreview({
                       ref={(element) => {
                         sectionRefs.current[section.id] = element;
                       }}
-                      className={`rounded-xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] p-4 text-white ${sectionContainerClassName}`}
+                      className={`rounded-xl p-4 text-white ${sectionContainerClassName}`}
+                      style={{
+                        background: hasSiteTheme
+                          ? `linear-gradient(135deg, ${themeSettings.primaryColor}, ${themeSettings.accentColor})`
+                          : "linear-gradient(135deg, #3B82F6, #7C5CFF, #22D3EE)",
+                      }}
                     >
                       <h3 className="text-sm font-semibold">
                         {asString(section.content.title, "Vamos conversar?")}
@@ -227,18 +288,79 @@ export function MiniSitePreview({
                   );
                 }
 
+                if (section.type === "about") {
+                  return (
+                    <section
+                      key={section.id}
+                      ref={(element) => {
+                        sectionRefs.current[section.id] = element;
+                      }}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
+                    >
+                      <h3 className="text-sm font-semibold">
+                        {asString(section.content.title, "Sobre")}
+                      </h3>
+                      <p className="mt-2 text-xs opacity-80 line-clamp-3">
+                        {asString(section.content.body)}
+                      </p>
+                    </section>
+                  );
+                }
+
+                if (section.type === "contact") {
+                  return (
+                    <section
+                      key={section.id}
+                      ref={(element) => {
+                        sectionRefs.current[section.id] = element;
+                      }}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
+                    >
+                      <h3 className="text-sm font-semibold">
+                        {asString(section.content.title, "Contato")}
+                      </h3>
+                      <p className="mt-1 text-xs opacity-70">
+                        {asString(section.content.subtitle)}
+                      </p>
+                      {asString(section.content.whatsappUrl) && (
+                        <span
+                          className="mt-2 inline-block rounded px-2 py-0.5 text-[9px] font-semibold text-white"
+                          style={{ backgroundColor: hasSiteTheme ? themeSettings.accentColor : "#22D3EE" }}
+                        >
+                          {asString(section.content.whatsappLabel, "WhatsApp")}
+                        </span>
+                      )}
+                    </section>
+                  );
+                }
+
                 return (
                   <section
                     key={section.id}
                     ref={(element) => {
                       sectionRefs.current[section.id] = element;
                     }}
-                    className={`rounded-xl border border-white/10 bg-white/[0.02] p-4 ${sectionContainerClassName}`}
+                    className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                    style={{ border: `1px solid ${surfaceBorder}` }}
                   >
-                    <p className="text-xs text-[var(--platform-text)]/80">Seção {section.type}</p>
+                    <p className="text-xs opacity-80">Seção {section.type}</p>
                   </section>
                 );
               })}
+            </div>
+
+            {/* Mini footer */}
+            <div
+              className="flex items-center justify-between px-3 py-2 text-[8px] opacity-60"
+              style={{
+                borderTop: `1px solid ${hasSiteTheme ? `${themeSettings.textColor}18` : "rgba(255,255,255,0.1)"}`,
+                color: hasSiteTheme ? themeSettings.textColor : undefined,
+              }}
+            >
+              <span>{siteName}</span>
+              <span>Powered by BuildSphere</span>
             </div>
           </div>
 

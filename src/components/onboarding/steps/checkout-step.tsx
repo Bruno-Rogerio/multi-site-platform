@@ -72,6 +72,7 @@ export function CheckoutStep() {
           servicesStyle: state.servicesVariant,
           ctaStyle: state.ctaVariant,
           motionStyle: state.motionStyle,
+          buttonStyle: state.buttonStyle,
           addonsSelected: state.addonsSelected,
           businessName: state.businessName,
           businessSegment: state.businessSegment,

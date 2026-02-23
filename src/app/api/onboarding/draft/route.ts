@@ -23,6 +23,7 @@ type OnboardingDraftPayload = {
   servicesStyle: string;
   ctaStyle: string;
   motionStyle?: string;
+  buttonStyle?: string;
   addonsSelected: string[];
   businessName: string;
   businessSegment: string;
@@ -237,6 +238,7 @@ export async function POST(request: Request) {
     paletteId: payload.paletteId ?? "buildsphere",
     headerStyle: payload.headerStyle,
     motionStyle: payload.motionStyle ?? "motion-reveal",
+    buttonStyle: payload.buttonStyle ?? "rounded",
     creationMode: payload.creationMode ?? "template",
     addons: payload.addonsSelected ?? [],
     onboardingDraft: true,
@@ -300,11 +302,19 @@ export async function POST(request: Request) {
     if (primaryType && ctaConfig[primaryType]?.url) {
       return buildCtaUrl(primaryType, ctaConfig[primaryType].url);
     }
-    // 3. Fallback
-    return "#cta";
+    // 3. Fallback — anchor to contact section
+    return "#contact";
   }
 
   const ctaHref = resolveCtaHref();
+  const heroCtaLabel = content.heroCta?.trim() || "Agendar conversa";
+
+  // Save header CTA label in theme so SiteShell can use it
+  (themeSettings as Record<string, unknown>).headerCtaLabel = heroCtaLabel;
+  await admin
+    .from("sites")
+    .update({ theme_settings: themeSettings })
+    .eq("id", site.id);
 
   const sectionInserts = [
     {
@@ -318,7 +328,7 @@ export async function POST(request: Request) {
         subtitle: content.heroSubtitle?.trim() ||
           payload.businessHighlights?.trim() ||
           "Atendimento personalizado com foco em resultado e acolhimento.",
-        ctaLabel: content.heroCta?.trim() || "Agendar conversa",
+        ctaLabel: heroCtaLabel,
         ctaHref,
       },
     },
@@ -344,6 +354,34 @@ export async function POST(request: Request) {
         buttonHref: ctaHref,
         secondaryLabel: content.ctaSecondaryLabel?.trim() || "",
         secondaryHref: content.ctaSecondaryUrl?.trim() || "",
+      },
+    },
+    {
+      page_id: page.id,
+      type: "about",
+      variant: "default",
+      order: 4,
+      content: {
+        title: content.aboutTitle?.trim() || `Sobre ${businessName}`,
+        body:
+          content.aboutBody?.trim() ||
+          `${businessName} — ${segment}${city ? ` em ${city}` : ""}. Atendimento personalizado com foco em resultado e acolhimento.`,
+      },
+    },
+    {
+      page_id: page.id,
+      type: "contact",
+      variant: "default",
+      order: 5,
+      content: {
+        title: content.contactTitle?.trim() || "Contato",
+        subtitle:
+          content.contactSubtitle?.trim() || "Entre em contato comigo",
+        whatsappUrl: ctaHref.startsWith("https://wa.me/") ? ctaHref : "",
+        whatsappLabel: content.ctaButtonLabel?.trim() || "Falar no WhatsApp",
+        secondaryUrl: content.ctaSecondaryUrl?.trim() || "",
+        secondaryLabel: content.ctaSecondaryLabel?.trim() || "",
+        submitLabel: "Enviar",
       },
     },
   ];

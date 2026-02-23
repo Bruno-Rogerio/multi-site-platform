@@ -84,16 +84,13 @@ export function SiteShell({ site, children }: SiteShellProps) {
                 className="h-10 w-10 rounded-lg border border-[var(--site-border)] object-cover"
               />
             ) : null}
-            <div>
-              <p className="text-lg font-bold">{site.name}</p>
-              <p className="text-xs opacity-70">{site.plan === "pro" ? "Plano Pro" : "Plano Landing"}</p>
-            </div>
+            <p className="text-lg font-bold">{site.name}</p>
           </div>
           <a
-            href="#cta"
+            href="#contact"
             className={`bg-[var(--site-primary)] px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110 ${buttonStyleClasses[site.themeSettings.buttonStyle]}`}
           >
-            Agendar
+            {site.themeSettings.headerCtaLabel || "Entrar em contato"}
           </a>
         </div>
       </header>

@@ -18,6 +18,7 @@ export type ThemeSettings = {
   fontFamily: string;
   buttonStyle: ButtonStyle;
   logoUrl?: string;
+  headerCtaLabel?: string;
 };
 
 export type Section = {
