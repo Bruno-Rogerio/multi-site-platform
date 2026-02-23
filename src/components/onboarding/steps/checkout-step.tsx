@@ -59,6 +59,15 @@ export function CheckoutStep() {
 
     try {
       // First, create the draft site
+      // Merge serviceCards titles into content.servicesItems for the API
+      const mergedContent = {
+        ...state.content,
+        servicesItems: state.serviceCards
+          .map((c) => c.title)
+          .filter((t) => t && t.trim())
+          .join("\n"),
+      };
+
       const draftResponse = await fetch("/api/onboarding/draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -67,6 +76,7 @@ export function CheckoutStep() {
           siteStyle: state.paletteId,
           paletteId: state.paletteId,
           customColors: state.customColors,
+          fontFamily: state.fontFamily,
           headerStyle: "default",
           heroStyle: state.heroVariant,
           servicesStyle: state.servicesVariant,
@@ -80,7 +90,9 @@ export function CheckoutStep() {
           businessHighlights: state.businessHighlights,
           targetAudience: state.targetAudience,
           preferredSubdomain: state.preferredSubdomain,
-          content: state.content,
+          content: mergedContent,
+          heroImage: state.heroImage,
+          logoUrl: state.logoUrl,
           ctaConfig: state.ctaConfig,
           selectedCtaTypes: state.selectedCtaTypes,
         }),

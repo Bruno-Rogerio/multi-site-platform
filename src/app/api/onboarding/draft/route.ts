@@ -18,6 +18,7 @@ type OnboardingDraftPayload = {
     background?: string;
     text?: string;
   };
+  fontFamily?: string;
   headerStyle: string;
   heroStyle: string;
   servicesStyle: string;
@@ -32,6 +33,8 @@ type OnboardingDraftPayload = {
   targetAudience: string;
   preferredSubdomain: string;
   content?: Record<string, string>;
+  heroImage?: string;
+  logoUrl?: string;
   ctaConfig?: Partial<Record<CtaTypeId, { label: string; url: string }>>;
   selectedCtaTypes?: CtaTypeId[];
 };
@@ -221,14 +224,16 @@ export async function POST(request: Request) {
       );
     }
 
-    // It's a previous draft — reuse it
-    return NextResponse.json({
-      ok: true,
-      siteId: existingSite.id,
-      domain,
-      draftUrl: buildPublicUrl(domain, hostHeader),
-      reused: true,
-    });
+    // It's a previous draft — delete old sections/pages and recreate below
+    const { data: oldPages } = await admin
+      .from("pages")
+      .select("id")
+      .eq("site_id", existingSite.id);
+    if (oldPages && oldPages.length > 0) {
+      const pageIds = oldPages.map((p: { id: string }) => p.id);
+      await admin.from("sections").delete().in("page_id", pageIds);
+      await admin.from("pages").delete().eq("site_id", existingSite.id);
+    }
   }
 
   const themeSettings = {
@@ -236,9 +241,11 @@ export async function POST(request: Request) {
     ...resolvePalette(payload),
     siteStyle: payload.siteStyle,
     paletteId: payload.paletteId ?? "buildsphere",
+    fontFamily: payload.fontFamily ?? "Sora, sans-serif",
     headerStyle: payload.headerStyle,
     motionStyle: payload.motionStyle ?? "motion-reveal",
     buttonStyle: payload.buttonStyle ?? "rounded",
+    logoUrl: payload.logoUrl ?? "",
     creationMode: payload.creationMode ?? "template",
     addons: payload.addonsSelected ?? [],
     onboardingDraft: true,
@@ -251,22 +258,35 @@ export async function POST(request: Request) {
     themeSettings.textColor = minimal.textColor;
   }
 
-  const { data: site, error: siteError } = await admin
-    .from("sites")
-    .insert({
-      name: businessName,
-      domain,
-      plan: "landing",
-      theme_settings: themeSettings,
-    })
-    .select("id,name,domain")
-    .single();
+  let site: { id: string; name: string; domain: string };
 
-  if (siteError || !site) {
-    return NextResponse.json(
-      { error: "Falha ao criar rascunho do site.", details: siteError?.message },
-      { status: 500 },
-    );
+  if (existingSite) {
+    // Update existing draft
+    await admin
+      .from("sites")
+      .update({ name: businessName, theme_settings: themeSettings })
+      .eq("id", existingSite.id);
+    site = { id: existingSite.id, name: businessName, domain };
+  } else {
+    // Create new site
+    const { data: newSite, error: siteError } = await admin
+      .from("sites")
+      .insert({
+        name: businessName,
+        domain,
+        plan: "landing",
+        theme_settings: themeSettings,
+      })
+      .select("id,name,domain")
+      .single();
+
+    if (siteError || !newSite) {
+      return NextResponse.json(
+        { error: "Falha ao criar rascunho do site.", details: siteError?.message },
+        { status: 500 },
+      );
+    }
+    site = newSite;
   }
 
   const { data: page, error: pageError } = await admin
@@ -293,21 +313,29 @@ export async function POST(request: Request) {
   const ctaConfig = payload.ctaConfig ?? {};
   const selectedCtaTypes = payload.selectedCtaTypes ?? [];
 
+  // Build WhatsApp URL from content.whatsapp if provided
+  const whatsappNumber = content.whatsapp?.trim().replace(/\D/g, "");
+  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}` : "";
+
   // Resolve CTA button link from user's channel config
   function resolveCtaHref(): string {
-    // 1. Use explicit ctaButtonUrl from content editor
+    // 1. Use explicit ctaButtonUrl/heroCtaUrl from content editor
     if (content.ctaButtonUrl?.trim()) return content.ctaButtonUrl.trim();
-    // 2. Use primary CTA channel config
+    if (content.heroCtaUrl?.trim()) return content.heroCtaUrl.trim();
+    // 2. Use WhatsApp from content
+    if (whatsappUrl) return whatsappUrl;
+    // 3. Use primary CTA channel config
     const primaryType = selectedCtaTypes[0];
     if (primaryType && ctaConfig[primaryType]?.url) {
       return buildCtaUrl(primaryType, ctaConfig[primaryType].url);
     }
-    // 3. Fallback — anchor to contact section
+    // 4. Fallback — anchor to contact section
     return "#contact";
   }
 
   const ctaHref = resolveCtaHref();
-  const heroCtaLabel = content.heroCta?.trim() || "Agendar conversa";
+  const heroCtaLabel = content.heroCtaLabel?.trim() || content.heroCta?.trim() || "Agendar conversa";
+  const heroImageUrl = payload.heroImage?.trim() || "";
 
   // Save header CTA label in theme so SiteShell can use it
   (themeSettings as Record<string, unknown>).headerCtaLabel = heroCtaLabel;
@@ -330,6 +358,7 @@ export async function POST(request: Request) {
           "Atendimento personalizado com foco em resultado e acolhimento.",
         ctaLabel: heroCtaLabel,
         ctaHref,
+        imageUrl: heroImageUrl,
       },
     },
     {
@@ -377,10 +406,10 @@ export async function POST(request: Request) {
         title: content.contactTitle?.trim() || "Contato",
         subtitle:
           content.contactSubtitle?.trim() || "Entre em contato comigo",
-        whatsappUrl: ctaHref.startsWith("https://wa.me/") ? ctaHref : "",
+        whatsappUrl: whatsappUrl || (ctaHref.startsWith("https://wa.me/") ? ctaHref : ""),
         whatsappLabel: content.ctaButtonLabel?.trim() || "Falar no WhatsApp",
-        secondaryUrl: content.ctaSecondaryUrl?.trim() || "",
-        secondaryLabel: content.ctaSecondaryLabel?.trim() || "",
+        secondaryUrl: content.email?.trim() ? `mailto:${content.email.trim()}` : (content.ctaSecondaryUrl?.trim() || ""),
+        secondaryLabel: content.email?.trim() ? "Enviar email" : (content.ctaSecondaryLabel?.trim() || ""),
         submitLabel: "Enviar",
       },
     },
