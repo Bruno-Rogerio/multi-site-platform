@@ -68,10 +68,7 @@ export function CheckoutStep() {
           .join("\n"),
       };
 
-      const draftResponse = await fetch("/api/onboarding/draft", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const draftPayload = {
           creationMode: deriveCreationMode(),
           siteStyle: state.paletteId,
           paletteId: state.paletteId,
@@ -95,15 +92,36 @@ export function CheckoutStep() {
           logoUrl: state.logoUrl,
           ctaConfig: state.ctaConfig,
           selectedCtaTypes: state.selectedCtaTypes,
-        }),
+        };
+
+      const contentObj = draftPayload.content as Record<string, string>;
+      console.log("[checkout] draft payload:", JSON.stringify({
+        heroStyle: draftPayload.heroStyle,
+        servicesStyle: draftPayload.servicesStyle,
+        ctaStyle: draftPayload.ctaStyle,
+        paletteId: draftPayload.paletteId,
+        fontFamily: draftPayload.fontFamily,
+        buttonStyle: draftPayload.buttonStyle,
+        contentKeys: Object.keys(contentObj),
+        heroTitle: contentObj.heroTitle,
+        heroCtaLabel: contentObj.heroCtaLabel,
+        servicesItems: contentObj.servicesItems?.substring(0, 100),
+      }));
+
+      const draftResponse = await fetch("/api/onboarding/draft", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draftPayload),
       });
 
+      const draftData = await draftResponse.json();
+      console.log("[checkout] draft response:", JSON.stringify(draftData));
+
       if (!draftResponse.ok) {
-        const data = await draftResponse.json();
-        throw new Error(data.error || "Erro ao criar site");
+        throw new Error(draftData.error || "Erro ao criar site");
       }
 
-      const { siteId } = await draftResponse.json();
+      const { siteId } = draftData;
 
       // Then, start the checkout flow
       const checkoutResponse = await fetch("/api/onboarding/register-checkout", {
