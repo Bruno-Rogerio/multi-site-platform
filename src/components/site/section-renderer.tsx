@@ -1,9 +1,8 @@
 import Image from "next/image";
+import * as LucideIcons from "lucide-react";
 
 import type { Site } from "@/lib/tenant/types";
 import type { Section } from "@/lib/tenant/types";
-
-import { ContactForm } from "./contact-form";
 
 type SectionRendererProps = {
   section: Section;
@@ -21,6 +20,50 @@ function asStringArray(value: unknown): string[] {
   }
 
   return value.filter((item): item is string => typeof item === "string");
+}
+
+type ServiceCard = { title: string; description?: string; iconName?: string };
+
+function asCards(value: unknown): ServiceCard[] {
+  if (!Array.isArray(value)) return [];
+  const result: ServiceCard[] = [];
+  for (const item of value) {
+    if (!item || typeof item !== "object") continue;
+    const rec = item as Record<string, unknown>;
+    const title = typeof rec.title === "string" ? rec.title : "";
+    if (!title) continue;
+    result.push({
+      title,
+      description: typeof rec.description === "string" ? rec.description : "",
+      iconName: typeof rec.iconName === "string" ? rec.iconName : "",
+    });
+  }
+  return result;
+}
+
+type SocialLink = { type: string; url: string; label: string; icon: string };
+
+function asSocialLinks(value: unknown): SocialLink[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+      const rec = item as Record<string, unknown>;
+      const url = typeof rec.url === "string" ? rec.url : "";
+      if (!url) return null;
+      return {
+        type: typeof rec.type === "string" ? rec.type : "",
+        url,
+        label: typeof rec.label === "string" ? rec.label : "",
+        icon: typeof rec.icon === "string" ? rec.icon : "",
+      };
+    })
+    .filter((l): l is SocialLink => l !== null);
+}
+
+function getIcon(iconName: string) {
+  if (!iconName) return null;
+  return (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[iconName] ?? null;
 }
 
 type Testimonial = { quote: string; author: string };
@@ -263,32 +306,62 @@ export function SectionRenderer({
   // ─── SERVICES ───────────────────────────────────────────
   if (section.type === "services") {
     const title = asString(section.content.title, "Serviços");
+    const cards = asCards(section.content.cards);
     const items = asStringArray(section.content.items);
     const imageUrl = asString(section.content.imageUrl);
+
+    // Render a single card (icon + title + description)
+    function renderCard(card: ServiceCard, index: number, centered = true) {
+      const Icon = getIcon(card.iconName || "");
+      return (
+        <div
+          key={`${card.title}-${index}`}
+          className={`rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] px-5 py-5 shadow-sm ${centered ? "text-center" : ""}`}
+        >
+          {Icon && (
+            <div
+              className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl ${centered ? "mx-auto" : ""}`}
+              style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
+            >
+              <Icon size={20} className="text-[var(--site-primary)]" />
+            </div>
+          )}
+          <h3 className="text-sm font-semibold">{card.title}</h3>
+          {card.description && (
+            <p className="mt-1 text-xs opacity-70">{card.description}</p>
+          )}
+        </div>
+      );
+    }
+
+    // If we have rich cards, use them; otherwise fall back to items as simple cards
+    const effectiveCards: ServiceCard[] = cards.length > 0
+      ? cards
+      : items.map((t) => ({ title: t, description: "", iconName: "" }));
 
     if (variant === "minimal" || variant === "minimal-list") {
       return (
         <section id="services" className={`rounded-3xl p-6 ${surfaceClassName}`}>
           <h2 className="text-2xl font-semibold">{title}</h2>
           {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={960}
-              height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
-            />
+            <Image src={imageUrl} alt={title} width={960} height={720}
+              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
           )}
           <ul className="mt-4 space-y-3">
-            {items.map((item, index) => (
-              <li
-                key={`${item}-${index}`}
-                className="flex items-center gap-3 rounded-xl border border-[var(--site-border)] px-4 py-3 text-sm"
-              >
-                <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
-                <span className="font-medium">{item}</span>
-              </li>
-            ))}
+            {effectiveCards.map((card, index) => {
+              const Icon = getIcon(card.iconName || "");
+              return (
+                <li key={`${card.title}-${index}`}
+                  className="flex items-center gap-3 rounded-xl border border-[var(--site-border)] px-4 py-3 text-sm">
+                  {Icon ? (
+                    <Icon size={16} className="shrink-0 text-[var(--site-primary)]" />
+                  ) : (
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
+                  )}
+                  <span className="font-medium">{card.title}</span>
+                </li>
+              );
+            })}
           </ul>
         </section>
       );
@@ -299,25 +372,28 @@ export function SectionRenderer({
         <section id="services" className={`rounded-3xl p-6 ${surfaceClassName}`}>
           <h2 className="text-2xl font-semibold">{title}</h2>
           {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={960}
-              height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
-            />
+            <Image src={imageUrl} alt={title} width={960} height={720}
+              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
           )}
           <div className="mt-4 columns-2 gap-3 space-y-3">
-            {items.map((item, index) => (
-              <div
-                key={`${item}-${index}`}
-                className={`break-inside-avoid rounded-2xl border border-[var(--site-border)] bg-[var(--site-background)] px-4 text-sm font-medium ${
-                  index % 3 === 0 ? "py-6" : index % 3 === 1 ? "py-4" : "py-5"
-                }`}
-              >
-                {item}
-              </div>
-            ))}
+            {effectiveCards.map((card, index) => {
+              const Icon = getIcon(card.iconName || "");
+              return (
+                <div key={`${card.title}-${index}`}
+                  className={`break-inside-avoid rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] px-4 text-sm shadow-sm ${
+                    index % 3 === 0 ? "py-6" : index % 3 === 1 ? "py-4" : "py-5"
+                  }`}>
+                  {Icon && (
+                    <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg"
+                      style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}>
+                      <Icon size={16} className="text-[var(--site-primary)]" />
+                    </div>
+                  )}
+                  <h3 className="font-semibold">{card.title}</h3>
+                  {card.description && <p className="mt-1 text-xs opacity-70">{card.description}</p>}
+                </div>
+              );
+            })}
           </div>
         </section>
       );
@@ -326,27 +402,14 @@ export function SectionRenderer({
     if (variant === "columns") {
       return (
         <section id="services" className={`rounded-3xl p-6 ${surfaceClassName}`}>
-          <h2 className="text-2xl font-semibold">{title}</h2>
+          <h2 className="text-2xl font-semibold text-center">{title}</h2>
           {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={960}
-              height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
-            />
+            <Image src={imageUrl} alt={title} width={960} height={720}
+              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
           )}
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-            {items.map((item, index) => (
-              <li
-                key={`${item}-${index}`}
-                className="rounded-2xl border border-[var(--site-border)] px-5 py-5 text-center text-sm font-medium"
-                style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 4%, var(--site-background))" }}
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {effectiveCards.map((card, index) => renderCard(card, index))}
+          </div>
         </section>
       );
     }
@@ -356,23 +419,27 @@ export function SectionRenderer({
         <section id="services" className={`rounded-3xl p-6 ${surfaceClassName}`}>
           <h2 className="text-2xl font-semibold">{title}</h2>
           {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={960}
-              height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
-            />
+            <Image src={imageUrl} alt={title} width={960} height={720}
+              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
           )}
           <ol className="mt-4 space-y-3">
-            {items.map((item, index) => (
-              <li key={`${item}-${index}`} className="flex items-start gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white">
-                  {index + 1}
-                </span>
-                <span className="pt-1 text-sm font-medium">{item}</span>
-              </li>
-            ))}
+            {effectiveCards.map((card, index) => {
+              const Icon = getIcon(card.iconName || "");
+              return (
+                <li key={`${card.title}-${index}`} className="flex items-start gap-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white">
+                    {index + 1}
+                  </span>
+                  <div className="pt-0.5">
+                    <div className="flex items-center gap-2">
+                      {Icon && <Icon size={14} className="text-[var(--site-primary)]" />}
+                      <span className="text-sm font-medium">{card.title}</span>
+                    </div>
+                    {card.description && <p className="mt-0.5 text-xs opacity-70">{card.description}</p>}
+                  </div>
+                </li>
+              );
+            })}
           </ol>
         </section>
       );
@@ -383,24 +450,12 @@ export function SectionRenderer({
       <section id="services" className={`rounded-3xl p-6 ${surfaceClassName}`}>
         <h2 className="text-2xl font-semibold">{title}</h2>
         {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={title}
-            width={960}
-            height={720}
-            className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
-          />
+          <Image src={imageUrl} alt={title} width={960} height={720}
+            className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
         )}
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-          {items.map((item, index) => (
-            <li
-              key={`${item}-${index}`}
-              className="rounded-2xl border border-[var(--site-border)] bg-[var(--site-background)] px-4 py-4 text-sm font-medium"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {effectiveCards.map((card, index) => renderCard(card, index))}
+        </div>
       </section>
     );
   }
@@ -628,46 +683,54 @@ export function SectionRenderer({
   if (section.type === "contact") {
     const title = asString(section.content.title, "Contato");
     const subtitle = asString(section.content.subtitle);
-    const whatsappUrl = asString(section.content.whatsappUrl);
-    const whatsappLabel = asString(section.content.whatsappLabel, "Falar no WhatsApp");
-    const secondaryUrl = asString(section.content.secondaryUrl);
-    const secondaryLabel = asString(section.content.secondaryLabel);
-    const submitLabel = asString(section.content.submitLabel, "Enviar");
 
-    const socialLinks = [
-      whatsappUrl ? { url: whatsappUrl, label: whatsappLabel } : null,
-      secondaryUrl && secondaryLabel ? { url: secondaryUrl, label: secondaryLabel } : null,
-    ].filter((link): link is { url: string; label: string } => link !== null);
+    // New: array of social links with icons
+    const socialLinks = asSocialLinks(section.content.socialLinks);
+
+    // Backward compat: build from legacy fields if socialLinks is empty
+    const legacyLinks: SocialLink[] = [];
+    if (socialLinks.length === 0) {
+      const whatsappUrl = asString(section.content.whatsappUrl);
+      const whatsappLabel = asString(section.content.whatsappLabel, "Falar no WhatsApp");
+      const secondaryUrl = asString(section.content.secondaryUrl);
+      const secondaryLabel = asString(section.content.secondaryLabel);
+      if (whatsappUrl) legacyLinks.push({ type: "whatsapp", url: whatsappUrl, label: whatsappLabel, icon: "MessageCircle" });
+      if (secondaryUrl && secondaryLabel) legacyLinks.push({ type: "email", url: secondaryUrl, label: secondaryLabel, icon: "Mail" });
+    }
+
+    const allLinks = socialLinks.length > 0 ? socialLinks : legacyLinks;
 
     return (
       <section
         id="contact"
-        className={`rounded-3xl p-6 md:grid md:grid-cols-2 md:gap-6 ${surfaceClassName}`}
+        className={`rounded-3xl p-6 text-center ${surfaceClassName}`}
       >
-        <div className="mb-6 md:mb-0">
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {subtitle && <p className="mt-3 text-sm opacity-80">{subtitle}</p>}
-          {socialLinks.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-3">
-              {socialLinks.map((link) => (
+        <h2 className="text-2xl font-semibold">{title}</h2>
+        {subtitle && <p className="mt-3 text-sm opacity-80">{subtitle}</p>}
+        {allLinks.length > 0 && (
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-5">
+            {allLinks.map((link) => {
+              const Icon = getIcon(link.icon);
+              return (
                 <a
                   key={link.url}
                   href={link.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`inline-flex bg-[var(--site-accent)] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
+                  target={link.url.startsWith("#") ? undefined : "_blank"}
+                  rel={link.url.startsWith("#") ? undefined : "noreferrer"}
+                  className="group flex flex-col items-center gap-2 transition"
                 >
-                  {link.label}
+                  <span
+                    className="flex h-12 w-12 items-center justify-center rounded-xl transition group-hover:brightness-110"
+                    style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
+                  >
+                    {Icon && <Icon size={22} className="text-[var(--site-primary)]" />}
+                  </span>
+                  <span className="text-xs font-medium opacity-80">{link.label}</span>
                 </a>
-              ))}
-            </div>
-          )}
-        </div>
-        <ContactForm
-          siteId={site.id}
-          submitLabel={submitLabel}
-          buttonStyleClassName={buttonStyleClassName}
-        />
+              );
+            })}
+          </div>
+        )}
       </section>
     );
   }

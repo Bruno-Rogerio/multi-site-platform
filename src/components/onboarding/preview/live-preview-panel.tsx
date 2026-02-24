@@ -8,6 +8,7 @@ import { PreviewHeader } from "./preview-header";
 import { PreviewHero } from "./preview-hero";
 import { PreviewServices } from "./preview-services";
 import { PreviewCta } from "./preview-cta";
+import { PreviewAbout } from "./preview-about";
 import { PreviewContact } from "./preview-contact";
 import { PreviewFloatingCta } from "./preview-floating-cta";
 import { getPaletteById, getPaletteStyleVars } from "@/lib/onboarding/palettes";
@@ -236,6 +237,11 @@ export function LivePreviewPanel() {
               {enabledSections.includes("services") && (
                 <motion.div variants={itemVariants}>
                   <PreviewServices deviceMode={deviceMode} />
+                </motion.div>
+              )}
+              {enabledSections.includes("about") && (
+                <motion.div variants={itemVariants}>
+                  <PreviewAbout deviceMode={deviceMode} />
                 </motion.div>
               )}
               {enabledSections.includes("cta") && (

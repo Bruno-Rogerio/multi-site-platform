@@ -5,7 +5,7 @@ import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { ImageUpload } from "../builders/image-upload";
 import { getTemplateBySlug } from "@/lib/onboarding/templates";
-import { LayoutGrid, List } from "lucide-react";
+import { LayoutGrid, List, MessageCircle, Instagram, Mail, Linkedin, Facebook } from "lucide-react";
 
 export function TemplateContentEditor() {
   const { state, dispatch } = useWizard();
@@ -252,45 +252,113 @@ export function TemplateContentEditor() {
           </div>
         </div>
 
-        {/* Contact section */}
+        {/* Social links & contact */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Contato</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">Seus canais de contato (WhatsApp + Email)</p>
+          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Redes sociais e contato</h3>
+          <p className="text-xs text-[var(--platform-text)]/50">Preencha apenas os canais que você usa. Aparecem como ícones na seção de contato.</p>
 
-          <div className="mt-4 space-y-4">
+          <div className="mt-4 space-y-3">
+            {/* WhatsApp */}
             <div>
-              <label className="text-xs font-medium text-[var(--platform-text)]/60">WhatsApp</label>
-              <input
-                type="text"
-                value={content.whatsapp || ""}
-                onChange={(e) => handleContentChange("whatsapp", e.target.value)}
-                placeholder="Ex: 11999999999"
-                className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
-              />
+              <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--platform-text)]/60">
+                <MessageCircle size={12} /> WhatsApp
+              </label>
+              <div className="mt-1 flex">
+                <span className="flex items-center rounded-l-lg border border-r-0 border-white/10 bg-white/[0.06] px-3 text-xs text-[var(--platform-text)]/40">
+                  wa.me/
+                </span>
+                <input
+                  type="text"
+                  value={content.social_whatsapp || ""}
+                  onChange={(e) => handleContentChange("social_whatsapp", e.target.value)}
+                  placeholder="5511999999999"
+                  className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
             </div>
 
+            {/* Instagram */}
             <div>
-              <label className="text-xs font-medium text-[var(--platform-text)]/60">Email</label>
+              <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--platform-text)]/60">
+                <Instagram size={12} /> Instagram
+              </label>
+              <div className="mt-1 flex">
+                <span className="flex items-center rounded-l-lg border border-r-0 border-white/10 bg-white/[0.06] px-3 text-xs text-[var(--platform-text)]/40">
+                  instagram.com/
+                </span>
+                <input
+                  type="text"
+                  value={content.social_instagram || ""}
+                  onChange={(e) => handleContentChange("social_instagram", e.target.value)}
+                  placeholder="seuperfil"
+                  className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--platform-text)]/60">
+                <Mail size={12} /> E-mail
+              </label>
               <input
                 type="email"
-                value={content.email || ""}
-                onChange={(e) => handleContentChange("email", e.target.value)}
-                placeholder="Ex: contato@exemplo.com"
+                value={content.social_email || ""}
+                onChange={(e) => handleContentChange("social_email", e.target.value)}
+                placeholder="contato@exemplo.com"
                 className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
               />
             </div>
 
-            {/* Logo upload */}
-            <div className="border-t border-white/10 pt-4">
-              <ImageUpload
-                label="Logo do seu negócio"
-                value={state.logoUrl}
-                onChange={(url) => dispatch({ type: "SET_IMAGE", key: "logoUrl", url })}
-                slot="logoUrl"
-                aspectRatio="1/1"
-                description="Formato quadrado, PNG transparente recomendado"
-              />
+            {/* LinkedIn */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--platform-text)]/60">
+                <Linkedin size={12} /> LinkedIn
+              </label>
+              <div className="mt-1 flex">
+                <span className="flex items-center rounded-l-lg border border-r-0 border-white/10 bg-white/[0.06] px-3 text-xs text-[var(--platform-text)]/40">
+                  linkedin.com/
+                </span>
+                <input
+                  type="text"
+                  value={content.social_linkedin || ""}
+                  onChange={(e) => handleContentChange("social_linkedin", e.target.value)}
+                  placeholder="in/seuperfil"
+                  className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
             </div>
+
+            {/* Facebook */}
+            <div>
+              <label className="flex items-center gap-1.5 text-xs font-medium text-[var(--platform-text)]/60">
+                <Facebook size={12} /> Facebook
+              </label>
+              <div className="mt-1 flex">
+                <span className="flex items-center rounded-l-lg border border-r-0 border-white/10 bg-white/[0.06] px-3 text-xs text-[var(--platform-text)]/40">
+                  facebook.com/
+                </span>
+                <input
+                  type="text"
+                  value={content.social_facebook || ""}
+                  onChange={(e) => handleContentChange("social_facebook", e.target.value)}
+                  placeholder="suapagina"
+                  className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Logo + Footer */}
+          <div className="mt-4 space-y-4 border-t border-white/10 pt-4">
+            <ImageUpload
+              label="Logo do seu negócio"
+              value={state.logoUrl}
+              onChange={(url) => dispatch({ type: "SET_IMAGE", key: "logoUrl", url })}
+              slot="logoUrl"
+              aspectRatio="1/1"
+              description="Formato quadrado, PNG transparente recomendado"
+            />
 
             <div>
               <label className="text-xs font-medium text-[var(--platform-text)]/60">Texto do rodapé</label>

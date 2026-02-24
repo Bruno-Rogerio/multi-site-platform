@@ -86,19 +86,11 @@ export function SiteShell({ site, children }: SiteShellProps) {
             ) : null}
             <p className="text-lg font-bold">{site.name}</p>
           </div>
-          <div className="flex items-center gap-6">
-            <nav className="hidden items-center gap-5 md:flex">
-              <a href="#services" className="text-sm opacity-70 transition hover:opacity-100">Serviços</a>
-              <a href="#about" className="text-sm opacity-70 transition hover:opacity-100">Sobre</a>
-              <a href="#contact" className="text-sm opacity-70 transition hover:opacity-100">Contato</a>
-            </nav>
-            <a
-              href="#contact"
-              className={`bg-[var(--site-primary)] px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110 ${buttonStyleClasses[site.themeSettings.buttonStyle]}`}
-            >
-              {site.themeSettings.headerCtaLabel || "Entrar em contato"}
-            </a>
-          </div>
+          <nav className="hidden items-center gap-5 md:flex">
+            <a href="#services" className="text-sm opacity-70 transition hover:opacity-100">Serviços</a>
+            <a href="#about" className="text-sm opacity-70 transition hover:opacity-100">Sobre</a>
+            <a href="#contact" className="text-sm opacity-70 transition hover:opacity-100">Contato</a>
+          </nav>
         </div>
       </header>
 

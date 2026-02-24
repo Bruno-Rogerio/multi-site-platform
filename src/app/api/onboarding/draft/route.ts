@@ -313,16 +313,45 @@ export async function POST(request: Request) {
   const ctaConfig = payload.ctaConfig ?? {};
   const selectedCtaTypes = payload.selectedCtaTypes ?? [];
 
-  // Build WhatsApp URL from content.whatsapp if provided
-  const whatsappNumber = content.whatsapp?.trim().replace(/\D/g, "");
-  const whatsappUrl = whatsappNumber ? `https://wa.me/${whatsappNumber}` : "";
+  // Build WhatsApp URL from social_whatsapp or legacy content.whatsapp
+  const socialWhatsapp = content.social_whatsapp?.trim().replace(/\D/g, "") || content.whatsapp?.trim().replace(/\D/g, "");
+  const whatsappUrl = socialWhatsapp ? `https://wa.me/${socialWhatsapp}` : "";
+
+  // Parse service cards if sent as JSON
+  type ServiceCard = { title: string; description: string; iconName: string };
+  let serviceCards: ServiceCard[] | null = null;
+  if (content.serviceCardsJson) {
+    try {
+      serviceCards = JSON.parse(content.serviceCardsJson);
+    } catch { /* ignore parse error */ }
+  }
+
+  // Build social links array for contact section
+  const socialLinks: { type: string; url: string; label: string; icon: string }[] = [];
+  if (socialWhatsapp) {
+    socialLinks.push({ type: "whatsapp", url: `https://wa.me/${socialWhatsapp}`, label: "WhatsApp", icon: "MessageCircle" });
+  }
+  if (content.social_instagram?.trim()) {
+    const handle = content.social_instagram.trim().replace(/^@/, "");
+    socialLinks.push({ type: "instagram", url: `https://instagram.com/${handle}`, label: "Instagram", icon: "Instagram" });
+  }
+  if (content.social_email?.trim() || content.email?.trim()) {
+    const email = content.social_email?.trim() || content.email?.trim();
+    socialLinks.push({ type: "email", url: `mailto:${email}`, label: "E-mail", icon: "Mail" });
+  }
+  if (content.social_linkedin?.trim()) {
+    socialLinks.push({ type: "linkedin", url: `https://linkedin.com/${content.social_linkedin.trim()}`, label: "LinkedIn", icon: "Linkedin" });
+  }
+  if (content.social_facebook?.trim()) {
+    socialLinks.push({ type: "facebook", url: `https://facebook.com/${content.social_facebook.trim()}`, label: "Facebook", icon: "Facebook" });
+  }
 
   // Resolve CTA button link from user's channel config
   function resolveCtaHref(): string {
     // 1. Use explicit ctaButtonUrl/heroCtaUrl from content editor
     if (content.ctaButtonUrl?.trim()) return content.ctaButtonUrl.trim();
     if (content.heroCtaUrl?.trim()) return content.heroCtaUrl.trim();
-    // 2. Use WhatsApp from content
+    // 2. Use WhatsApp from social links or legacy field
     if (whatsappUrl) return whatsappUrl;
     // 3. Use primary CTA channel config
     const primaryType = selectedCtaTypes[0];
@@ -368,7 +397,10 @@ export async function POST(request: Request) {
       order: 2,
       content: {
         title: content.servicesTitle?.trim() || "Como posso ajudar",
-        items: toItems(content.servicesItems?.trim() || payload.businessHighlights || ""),
+        items: serviceCards
+          ? serviceCards.map((c) => c.title).filter(Boolean)
+          : toItems(content.servicesItems?.trim() || payload.businessHighlights || ""),
+        cards: serviceCards || toItems(content.servicesItems?.trim() || payload.businessHighlights || "").map((t) => ({ title: t, description: "", iconName: "" })),
       },
     },
     {
@@ -381,8 +413,8 @@ export async function POST(request: Request) {
         description: content.ctaDescription?.trim() || "Me chame para entender seu momento e definir proximos passos.",
         buttonLabel: content.ctaButtonLabel?.trim() || "Entrar em contato",
         buttonHref: ctaHref,
-        secondaryLabel: content.ctaSecondaryLabel?.trim() || "",
-        secondaryHref: content.ctaSecondaryUrl?.trim() || "",
+        secondaryLabel: content.ctaSecondaryLabel?.trim() || "Saiba mais",
+        secondaryHref: content.ctaSecondaryUrl?.trim() || "#contact",
       },
     },
     {
@@ -405,12 +437,13 @@ export async function POST(request: Request) {
       content: {
         title: content.contactTitle?.trim() || "Contato",
         subtitle:
-          content.contactSubtitle?.trim() || "Entre em contato comigo",
+          content.contactSubtitle?.trim() || "Entre em contato pelos canais abaixo",
+        socialLinks,
+        // Backward compat fields
         whatsappUrl: whatsappUrl || (ctaHref.startsWith("https://wa.me/") ? ctaHref : ""),
         whatsappLabel: content.ctaButtonLabel?.trim() || "Falar no WhatsApp",
         secondaryUrl: content.email?.trim() ? `mailto:${content.email.trim()}` : (content.ctaSecondaryUrl?.trim() || ""),
         secondaryLabel: content.email?.trim() ? "Enviar email" : (content.ctaSecondaryLabel?.trim() || ""),
-        submitLabel: "Enviar",
       },
     },
   ];

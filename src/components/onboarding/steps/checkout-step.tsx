@@ -66,6 +66,13 @@ export function CheckoutStep() {
           .map((c) => c.title)
           .filter((t) => t && t.trim())
           .join("\n"),
+        serviceCardsJson: JSON.stringify(
+          state.serviceCards.map((c) => ({
+            title: c.title || "",
+            description: c.description || "",
+            iconName: c.iconName || c.icon || "",
+          }))
+        ),
       };
 
       const draftPayload = {
