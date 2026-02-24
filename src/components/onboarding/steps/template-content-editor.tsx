@@ -401,7 +401,51 @@ export function TemplateContentEditor() {
           </div>
         </div>
 
-        {/* ─── 6. Contato (checkboxes) ───────────────────── */}
+        {/* ─── 6. Sobre ─────────────────────────────────── */}
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Sobre você</h3>
+          <p className="text-xs text-[var(--platform-text)]/50">
+            Conte um pouco sobre você e seu negócio — esta seção transmite confiança
+          </p>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <ImageUpload
+              label="Sua foto ou imagem"
+              value={content.aboutImage || ""}
+              onChange={(url) => handleContentChange("aboutImage", url)}
+              slot="aboutImage"
+              variant="compact"
+              aspectRatio="3/4"
+              description="Foto profissional ou imagem representativa"
+            />
+
+            <div className="space-y-3">
+              <div>
+                <label className={labelClass}>Título da seção</label>
+                <input
+                  type="text"
+                  value={content.aboutTitle || ""}
+                  onChange={(e) => handleContentChange("aboutTitle", e.target.value)}
+                  placeholder={`Sobre ${state.businessName || "você"}`}
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <label className={labelClass}>Texto sobre você</label>
+                <textarea
+                  value={content.aboutBody || ""}
+                  onChange={(e) => handleContentChange("aboutBody", e.target.value)}
+                  placeholder="Conte sua história, sua experiência e o que te motiva..."
+                  rows={5}
+                  className={`${inputClass} resize-none`}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── 7. Contato (checkboxes) ───────────────────── */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
           <h3 className="text-sm font-semibold text-[var(--platform-text)]">Seção de Contato</h3>
           <p className="text-xs text-[var(--platform-text)]/50">

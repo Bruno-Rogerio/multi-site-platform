@@ -151,6 +151,15 @@ export function SectionRenderer({
     if (variant === "centered") {
       return (
         <section id="hero" className={`rounded-3xl p-8 text-center shadow-sm ${surfaceClassName}`}>
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1280}
+              height={720}
+              className="mx-auto mb-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
+            />
+          )}
           {eyebrow && (
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
               {eyebrow}
@@ -158,15 +167,6 @@ export function SectionRenderer({
           )}
           <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
           {subtitle && <p className="mx-auto mt-4 max-w-2xl text-base opacity-80">{subtitle}</p>}
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
-            />
-          )}
           <a
             href={ctaHref}
             style={{ color: "#fff" }}
@@ -181,22 +181,22 @@ export function SectionRenderer({
     if (variant === "minimal") {
       return (
         <section id="hero" className="rounded-3xl p-8">
-          {eyebrow && (
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
-              {eyebrow}
-            </p>
-          )}
-          <h1 className="max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
-          {subtitle && <p className="mt-4 max-w-2xl text-base opacity-70">{subtitle}</p>}
           {imageUrl && (
             <Image
               src={imageUrl}
               alt={title}
               width={1280}
               height={720}
-              className="mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
+              className="mx-auto mb-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
             />
           )}
+          {eyebrow && (
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
+              {eyebrow}
+            </p>
+          )}
+          <h1 className="max-w-3xl border-l-4 border-[var(--site-primary)] pl-4 text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
+          {subtitle && <p className="mt-4 max-w-2xl text-base opacity-70">{subtitle}</p>}
           <a
             href={ctaHref}
             className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--site-primary)] underline underline-offset-4 decoration-[var(--site-primary)]/40 transition hover:decoration-[var(--site-primary)]"
@@ -248,6 +248,15 @@ export function SectionRenderer({
     if (variant === "centered-gradient") {
       return (
         <section id="hero" className="rounded-3xl bg-[linear-gradient(135deg,var(--site-primary),var(--site-accent))] p-8 text-center text-white shadow-sm">
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1280}
+              height={720}
+              className="mx-auto mb-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-white/20 object-cover"
+            />
+          )}
           {eyebrow && (
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
               {eyebrow}
@@ -255,15 +264,6 @@ export function SectionRenderer({
           )}
           <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
           {subtitle && <p className="mx-auto mt-4 max-w-2xl text-base text-white/85">{subtitle}</p>}
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-white/20 object-cover"
-            />
-          )}
           <a
             href={ctaHref}
             className={`mt-6 inline-flex bg-white px-5 py-3 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
@@ -277,7 +277,21 @@ export function SectionRenderer({
 
     // default hero
     return (
-      <section id="hero" className={`rounded-3xl p-8 shadow-sm ${surfaceClassName}`}>
+      <section id="hero" className={`relative overflow-hidden rounded-3xl p-8 shadow-sm ${surfaceClassName}`}>
+        {/* Decorative gradient blob */}
+        <div
+          className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-[0.07] blur-3xl"
+          style={{ background: "radial-gradient(circle, var(--site-primary), transparent)" }}
+        />
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt={title}
+            width={1280}
+            height={720}
+            className="mx-auto mb-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
+          />
+        )}
         {eyebrow && (
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
             {eyebrow}
@@ -285,15 +299,6 @@ export function SectionRenderer({
         )}
         <h1 className="text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
         {subtitle && <p className="mt-4 max-w-2xl text-base opacity-80">{subtitle}</p>}
-        {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={title}
-            width={1280}
-            height={720}
-            className="mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
-          />
-        )}
         <a
           href={ctaHref}
           style={{ color: "#fff" }}
@@ -309,11 +314,36 @@ export function SectionRenderer({
   if (section.type === "about") {
     const title = asString(section.content.title, "Sobre");
     const body = asString(section.content.body);
+    const aboutImageUrl = asString(section.content.imageUrl);
 
     return (
-      <section id="about" className={`rounded-3xl p-6 ${surfaceClassName}`}>
-        <h2 className="text-2xl font-semibold">{title}</h2>
-        {body && <p className="mt-4 whitespace-pre-line leading-7 opacity-85">{body}</p>}
+      <section id="about" className={`rounded-3xl p-6 md:p-8 ${surfaceClassName}`}>
+        {aboutImageUrl ? (
+          <div className="grid gap-8 md:grid-cols-[320px_1fr] items-start">
+            <div className="overflow-hidden rounded-2xl border border-[var(--site-border)]">
+              <Image
+                src={aboutImageUrl}
+                alt={title}
+                width={360}
+                height={480}
+                className="aspect-[3/4] h-auto w-full object-cover"
+              />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">{title}</h2>
+              {body && (
+                <p className="mt-4 whitespace-pre-line text-base leading-relaxed opacity-85">
+                  {body}
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <>
+            <h2 className="text-2xl font-semibold">{title}</h2>
+            {body && <p className="mt-4 whitespace-pre-line leading-7 opacity-85">{body}</p>}
+          </>
+        )}
       </section>
     );
   }
@@ -331,19 +361,19 @@ export function SectionRenderer({
       return (
         <div
           key={`${card.title}-${index}`}
-          className={`rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] overflow-hidden shadow-sm ${centered && !card.imageUrl ? "text-center" : ""}`}
+          className={`rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] overflow-hidden shadow-sm transition-all duration-200 hover:shadow-md hover:border-[var(--site-primary)]/30 ${centered ? "text-center" : ""}`}
         >
           {card.imageUrl && (
             <Image src={card.imageUrl} alt={card.title} width={400} height={300}
               className="aspect-[4/3] h-auto w-full object-cover" />
           )}
-          <div className={`px-5 py-5 ${centered && !card.imageUrl ? "text-center" : ""}`}>
-            {Icon && !card.imageUrl && (
+          <div className={`px-6 py-6 ${centered ? "text-center" : ""}`}>
+            {Icon && (
               <div
-                className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl ${centered ? "mx-auto" : ""}`}
+                className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl ${centered ? "mx-auto" : ""}`}
                 style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
               >
-                <Icon size={20} className="text-[var(--site-primary)]" />
+                <Icon size={22} className="text-[var(--site-primary)]" />
               </div>
             )}
             <h3 className="text-sm font-semibold">{card.title}</h3>
@@ -373,13 +403,18 @@ export function SectionRenderer({
               const Icon = getIcon(card.iconName || "");
               return (
                 <li key={`${card.title}-${index}`}
-                  className="flex items-center gap-3 rounded-xl border border-[var(--site-border)] px-4 py-3 text-sm">
+                  className="flex items-start gap-3 rounded-xl border border-[var(--site-border)] px-4 py-3 text-sm">
                   {Icon ? (
-                    <Icon size={16} className="shrink-0 text-[var(--site-primary)]" />
+                    <Icon size={16} className="mt-0.5 shrink-0 text-[var(--site-primary)]" />
                   ) : (
-                    <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
                   )}
-                  <span className="font-medium">{card.title}</span>
+                  <div>
+                    <span className="font-medium">{card.title}</span>
+                    {card.description && (
+                      <p className="mt-0.5 text-xs opacity-70">{card.description}</p>
+                    )}
+                  </div>
                 </li>
               );
             })}
@@ -399,19 +434,25 @@ export function SectionRenderer({
           <div className="mt-4 columns-2 gap-3 space-y-3">
             {effectiveCards.map((card, index) => {
               const Icon = getIcon(card.iconName || "");
+              const isTall = index % 3 === 0;
               return (
                 <div key={`${card.title}-${index}`}
-                  className={`break-inside-avoid rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] px-4 text-sm shadow-sm ${
-                    index % 3 === 0 ? "py-6" : index % 3 === 1 ? "py-4" : "py-5"
-                  }`}>
-                  {Icon && (
-                    <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}>
-                      <Icon size={16} className="text-[var(--site-primary)]" />
+                  className={`break-inside-avoid overflow-hidden rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] text-sm shadow-sm`}>
+                  {card.imageUrl && (
+                    <div className={isTall ? "h-40" : "h-24"}>
+                      <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
                     </div>
                   )}
-                  <h3 className="font-semibold">{card.title}</h3>
-                  {card.description && <p className="mt-1 text-xs opacity-70">{card.description}</p>}
+                  <div className={`px-4 ${isTall ? "py-6" : index % 3 === 1 ? "py-4" : "py-5"}`}>
+                    {Icon && (
+                      <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}>
+                        <Icon size={16} className="text-[var(--site-primary)]" />
+                      </div>
+                    )}
+                    <h3 className="font-semibold">{card.title}</h3>
+                    {card.description && <p className="mt-1 text-xs opacity-70">{card.description}</p>}
+                  </div>
                 </div>
               );
             })}
@@ -428,8 +469,39 @@ export function SectionRenderer({
             <Image src={imageUrl} alt={title} width={960} height={720}
               className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
           )}
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {effectiveCards.map((card, index) => renderCard(card, index))}
+          <div className="mt-6 space-y-4">
+            {effectiveCards.map((card, index) => {
+              const Icon = getIcon(card.iconName || "");
+              const isReversed = index % 2 === 1;
+              return (
+                <div
+                  key={`${card.title}-${index}`}
+                  className={`flex items-center gap-5 overflow-hidden rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] p-5 shadow-sm transition-all duration-200 hover:shadow-md ${
+                    isReversed ? "flex-row-reverse" : ""
+                  }`}
+                >
+                  <div className="flex shrink-0 flex-col items-center gap-2">
+                    {card.imageUrl ? (
+                      <Image src={card.imageUrl} alt={card.title} width={120} height={90}
+                        className="h-20 w-28 rounded-xl object-cover border border-[var(--site-border)]" />
+                    ) : Icon ? (
+                      <div
+                        className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                        style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
+                      >
+                        <Icon size={26} className="text-[var(--site-primary)]" />
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className={`flex-1 ${isReversed ? "text-right" : ""}`}>
+                    <h3 className="text-sm font-semibold">{card.title}</h3>
+                    {card.description && (
+                      <p className="mt-1 text-xs opacity-70">{card.description}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       );
@@ -443,12 +515,17 @@ export function SectionRenderer({
             <Image src={imageUrl} alt={title} width={960} height={720}
               className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
           )}
-          <ol className="mt-4 space-y-3">
+          <ol className="mt-4 relative">
+            {/* Vertical connecting line */}
+            <div
+              className="absolute left-[13px] top-4 bottom-4 w-0.5"
+              style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 20%, transparent)" }}
+            />
             {effectiveCards.map((card, index) => {
               const Icon = getIcon(card.iconName || "");
               return (
-                <li key={`${card.title}-${index}`} className="flex items-start gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white">
+                <li key={`${card.title}-${index}`} className="relative flex items-start gap-3 pb-4 last:pb-0">
+                  <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white" style={{ color: "#fff" }}>
                     {index + 1}
                   </span>
                   <div className="pt-0.5">
@@ -474,7 +551,7 @@ export function SectionRenderer({
           <Image src={imageUrl} alt={title} width={960} height={720}
             className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
         )}
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {effectiveCards.map((card, index) => renderCard(card, index))}
         </div>
       </section>
@@ -527,7 +604,14 @@ export function SectionRenderer({
 
     if (variant === "centered") {
       return (
-        <section id="cta" className={`rounded-3xl p-6 text-center ${surfaceClassName}`}>
+        <section
+          id="cta"
+          className="rounded-3xl p-6 text-center"
+          style={{
+            backgroundColor: "color-mix(in srgb, var(--site-primary) 4%, var(--site-background))",
+            border: "1px solid color-mix(in srgb, var(--site-primary) 10%, transparent)",
+          }}
+        >
           <h2 className="text-2xl font-semibold">{title}</h2>
           {description && <p className="mx-auto mt-3 max-w-xl text-sm opacity-80">{description}</p>}
           {imageUrl && (
@@ -646,25 +730,25 @@ export function SectionRenderer({
       );
     }
 
-    // default cta
+    // default cta (centered with subtle glow — distinct from banner)
     return (
       <section
         id="cta"
-        className="rounded-3xl p-6"
+        className="rounded-3xl p-6 text-center"
         style={{
-          backgroundColor: "color-mix(in srgb, var(--site-primary) 8%, var(--site-background))",
-          border: "1px solid color-mix(in srgb, var(--site-primary) 15%, transparent)",
+          backgroundColor: "color-mix(in srgb, var(--site-primary) 5%, var(--site-background))",
+          boxShadow: "inset 0 0 0 1px color-mix(in srgb, var(--site-primary) 20%, transparent)",
         }}
       >
         <h2 className="text-2xl font-semibold">{title}</h2>
-        {description && <p className="mt-3 text-sm opacity-80">{description}</p>}
+        {description && <p className="mx-auto mt-3 max-w-xl text-sm opacity-80">{description}</p>}
         {imageUrl && (
           <Image
             src={imageUrl}
             alt={title}
             width={1280}
             height={720}
-            className="mt-4 aspect-[16/9] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
+            className="mx-auto mt-4 aspect-[16/9] h-auto w-full max-w-2xl rounded-2xl border border-[var(--site-border)] object-cover"
           />
         )}
         <a

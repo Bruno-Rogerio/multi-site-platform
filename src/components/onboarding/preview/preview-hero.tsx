@@ -126,6 +126,11 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
             <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
           </div>
         )}
+        {eyebrow && (
+          <p className="text-[7px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--preview-accent)" }}>
+            {eyebrow}
+          </p>
+        )}
         <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}>
           {title}
         </h1>
@@ -206,6 +211,16 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
   // Default fallback (centered)
   return (
     <section className="px-3 py-6 text-center" style={{ fontFamily: fontFamily || "Inter" }}>
+      {heroImage && (
+        <div className="mx-auto mb-3 h-20 w-full max-w-[70%] overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
+          <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+        </div>
+      )}
+      {eyebrow && (
+        <p className="text-[7px] font-semibold uppercase tracking-wider mb-1" style={{ color: "var(--preview-accent)" }}>
+          {eyebrow}
+        </p>
+      )}
       <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-base"}`} style={{ color: "var(--preview-text)" }}>
         {title}
       </h1>

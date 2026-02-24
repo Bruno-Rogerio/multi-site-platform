@@ -152,7 +152,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
             </div>
           )}
           <div className={`p-2 ${isTall ? "pb-4" : ""}`}>
-            {Icon && !card.imageUrl && (
+            {Icon && (
               <div className={`mb-1.5 inline-flex items-center justify-center rounded ${isTall ? "h-7 w-7" : "h-5 w-5"}`} style={{ backgroundColor: `var(--preview-primary)20` }}>
                 <Icon size={isTall ? 14 : 10} style={{ color: "var(--preview-primary)" }} />
               </div>
@@ -229,7 +229,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                 </div>
               )}
               <div className="p-2">
-                {Icon && !card.imageUrl && (
+                {Icon && (
                   <div className="mb-1.5 inline-flex h-5 w-5 items-center justify-center rounded" style={{ backgroundColor: `var(--preview-primary)25` }}>
                     <Icon size={10} style={{ color: "var(--preview-primary)" }} />
                   </div>

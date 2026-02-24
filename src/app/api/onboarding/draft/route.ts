@@ -440,6 +440,7 @@ export async function POST(request: Request) {
         body:
           content.aboutBody?.trim() ||
           `${businessName} — ${segment}${city ? ` em ${city}` : ""}. Atendimento personalizado com foco em resultado e acolhimento.`,
+        imageUrl: content.aboutImage?.trim() || "",
       },
     },
     {
