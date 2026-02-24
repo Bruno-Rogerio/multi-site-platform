@@ -71,8 +71,10 @@ export function CheckoutStep() {
             title: c.title || "",
             description: c.description || "",
             iconName: c.iconName || c.icon || "",
+            imageUrl: c.imageUrl || "",
           }))
         ),
+        contactSelectedLinks: JSON.stringify(state.contactSelectedLinks),
       };
 
       const draftPayload = {

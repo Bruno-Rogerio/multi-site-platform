@@ -70,6 +70,7 @@ export type WizardState = {
 
   // Content editing
   content: Record<string, string>;
+  contactSelectedLinks: string[];
 
   // Images
   heroImage: string;
@@ -140,4 +141,5 @@ export type WizardAction =
   | { type: "SET_CHECKOUT_STATE"; state: WizardState["checkoutState"]; message?: string; url?: string }
   | { type: "TOGGLE_SECTION_PREMIUM"; sectionId: "premium-paleta" | "premium-tipografia" | "premium-variantes" | "premium-canais" | "premium-cards" }
   | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl"; url: string }
+  | { type: "SET_CONTACT_SELECTED_LINKS"; links: string[] }
   | { type: "RESET_WIZARD" };

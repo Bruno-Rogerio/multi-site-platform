@@ -64,6 +64,7 @@ const initialState: WizardState = {
 
   // Content
   content: { ...DEFAULT_CONTENT },
+  contactSelectedLinks: [],
 
   // Images
   heroImage: "",
@@ -353,6 +354,9 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_IMAGE":
       return { ...state, [action.key]: action.url };
+
+    case "SET_CONTACT_SELECTED_LINKS":
+      return { ...state, contactSelectedLinks: action.links };
 
     case "RESET_WIZARD":
       return initialState;

@@ -10,9 +10,15 @@ interface PreviewContactProps {
 
 export function PreviewContact({ deviceMode }: PreviewContactProps) {
   const { state } = useWizard();
-  const { content, fontFamily, selectedCtaTypes, businessName } = state;
+  const { content, fontFamily, selectedCtaTypes, contactSelectedLinks, businessName } = state;
 
-  const activeCtaTypes = ctaTypes.filter((cta) => selectedCtaTypes.includes(cta.id));
+  const activeCtaTypes = ctaTypes.filter((cta) => {
+    // If contactSelectedLinks is set, use only those; otherwise fall back to selectedCtaTypes
+    if (contactSelectedLinks.length > 0) {
+      return contactSelectedLinks.includes(cta.id);
+    }
+    return selectedCtaTypes.includes(cta.id);
+  });
 
   return (
     <footer

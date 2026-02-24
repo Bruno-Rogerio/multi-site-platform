@@ -22,7 +22,7 @@ function asStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string");
 }
 
-type ServiceCard = { title: string; description?: string; iconName?: string };
+type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string };
 
 function asCards(value: unknown): ServiceCard[] {
   if (!Array.isArray(value)) return [];
@@ -36,6 +36,7 @@ function asCards(value: unknown): ServiceCard[] {
       title,
       description: typeof rec.description === "string" ? rec.description : "",
       iconName: typeof rec.iconName === "string" ? rec.iconName : "",
+      imageUrl: typeof rec.imageUrl === "string" ? rec.imageUrl : "",
     });
   }
   return result;
@@ -121,6 +122,7 @@ export function SectionRenderer({
             {subtitle && <p className="mt-4 text-base opacity-80">{subtitle}</p>}
             <a
               href={ctaHref}
+              style={{ color: "#fff" }}
               className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
             >
               {ctaLabel}
@@ -167,6 +169,7 @@ export function SectionRenderer({
           )}
           <a
             href={ctaHref}
+            style={{ color: "#fff" }}
             className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
           >
             {ctaLabel}
@@ -185,6 +188,15 @@ export function SectionRenderer({
           )}
           <h1 className="max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
           {subtitle && <p className="mt-4 max-w-2xl text-base opacity-70">{subtitle}</p>}
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1280}
+              height={720}
+              className="mt-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
+            />
+          )}
           <a
             href={ctaHref}
             className="mt-6 inline-flex items-center gap-1 text-sm font-semibold text-[var(--site-primary)] underline underline-offset-4 decoration-[var(--site-primary)]/40 transition hover:decoration-[var(--site-primary)]"
@@ -224,6 +236,7 @@ export function SectionRenderer({
           {subtitle && <p className="mt-4 text-base opacity-80">{subtitle}</p>}
           <a
             href={ctaHref}
+            style={{ color: "#fff" }}
             className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
           >
             {ctaLabel}
@@ -253,7 +266,8 @@ export function SectionRenderer({
           )}
           <a
             href={ctaHref}
-            className={`mt-6 inline-flex bg-white px-5 py-3 text-sm font-semibold text-[var(--site-primary)] transition hover:bg-white/90 ${buttonStyleClassName}`}
+            className={`mt-6 inline-flex bg-white px-5 py-3 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
+            style={{ color: "var(--site-primary)" }}
           >
             {ctaLabel}
           </a>
@@ -282,6 +296,7 @@ export function SectionRenderer({
         )}
         <a
           href={ctaHref}
+          style={{ color: "#fff" }}
           className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
         >
           {ctaLabel}
@@ -316,20 +331,26 @@ export function SectionRenderer({
       return (
         <div
           key={`${card.title}-${index}`}
-          className={`rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] px-5 py-5 shadow-sm ${centered ? "text-center" : ""}`}
+          className={`rounded-2xl border border-[var(--site-border)] bg-[var(--site-surface)] overflow-hidden shadow-sm ${centered && !card.imageUrl ? "text-center" : ""}`}
         >
-          {Icon && (
-            <div
-              className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl ${centered ? "mx-auto" : ""}`}
-              style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
-            >
-              <Icon size={20} className="text-[var(--site-primary)]" />
-            </div>
+          {card.imageUrl && (
+            <Image src={card.imageUrl} alt={card.title} width={400} height={300}
+              className="aspect-[4/3] h-auto w-full object-cover" />
           )}
-          <h3 className="text-sm font-semibold">{card.title}</h3>
-          {card.description && (
-            <p className="mt-1 text-xs opacity-70">{card.description}</p>
-          )}
+          <div className={`px-5 py-5 ${centered && !card.imageUrl ? "text-center" : ""}`}>
+            {Icon && !card.imageUrl && (
+              <div
+                className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl ${centered ? "mx-auto" : ""}`}
+                style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
+              >
+                <Icon size={20} className="text-[var(--site-primary)]" />
+              </div>
+            )}
+            <h3 className="text-sm font-semibold">{card.title}</h3>
+            {card.description && (
+              <p className="mt-1 text-xs opacity-70">{card.description}</p>
+            )}
+          </div>
         </div>
       );
     }
@@ -496,6 +517,7 @@ export function SectionRenderer({
             target={buttonHref.startsWith("http") ? "_blank" : undefined}
             rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
             className={`mt-5 inline-flex bg-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+            style={{ color: "#fff" }}
           >
             {buttonLabel}
           </a>
@@ -522,6 +544,7 @@ export function SectionRenderer({
             target={buttonHref.startsWith("http") ? "_blank" : undefined}
             rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
             className={`mt-5 inline-flex bg-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
+            style={{ color: "#fff" }}
           >
             {buttonLabel}
           </a>
@@ -547,7 +570,8 @@ export function SectionRenderer({
             href={buttonHref}
             target={buttonHref.startsWith("http") ? "_blank" : undefined}
             rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-            className={`mt-5 inline-flex bg-white px-5 py-2.5 text-sm font-semibold text-[var(--site-primary)] transition hover:bg-white/90 ${buttonStyleClassName}`}
+            className={`mt-5 inline-flex bg-white px-5 py-2.5 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
+            style={{ color: "var(--site-primary)" }}
           >
             {buttonLabel}
           </a>
@@ -573,7 +597,8 @@ export function SectionRenderer({
             href={buttonHref}
             target={buttonHref.startsWith("http") ? "_blank" : undefined}
             rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-            className={`mt-5 inline-flex bg-white px-5 py-2.5 text-sm font-semibold text-[var(--site-primary)] transition hover:bg-white/90 ${buttonStyleClassName}`}
+            className={`mt-5 inline-flex bg-white px-5 py-2.5 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
+            style={{ color: "var(--site-primary)" }}
           >
             {buttonLabel}
           </a>
@@ -601,6 +626,7 @@ export function SectionRenderer({
               target={buttonHref.startsWith("http") ? "_blank" : undefined}
               rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
               className={`inline-flex bg-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
+              style={{ color: "#fff" }}
             >
               {buttonLabel}
             </a>
@@ -609,7 +635,8 @@ export function SectionRenderer({
                 href={secondaryHref}
                 target={secondaryHref.startsWith("http") ? "_blank" : undefined}
                 rel={secondaryHref.startsWith("http") ? "noreferrer" : undefined}
-                className={`inline-flex border border-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-[var(--site-primary)] transition hover:bg-[var(--site-primary)]/10 ${buttonStyleClassName}`}
+                className={`inline-flex border border-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--site-primary)]/10 ${buttonStyleClassName}`}
+                style={{ color: "var(--site-primary)" }}
               >
                 {secondaryLabel}
               </a>
@@ -645,6 +672,7 @@ export function SectionRenderer({
           target={buttonHref.startsWith("http") ? "_blank" : undefined}
           rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
           className={`mt-5 inline-flex bg-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
+          style={{ color: "#fff" }}
         >
           {buttonLabel}
         </a>

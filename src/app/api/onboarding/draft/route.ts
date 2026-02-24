@@ -318,12 +318,23 @@ export async function POST(request: Request) {
   const whatsappUrl = socialWhatsapp ? `https://wa.me/${socialWhatsapp}` : "";
 
   // Parse service cards if sent as JSON
-  type ServiceCard = { title: string; description: string; iconName: string };
+  type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string };
   let serviceCards: ServiceCard[] | null = null;
   if (content.serviceCardsJson) {
     try {
       serviceCards = JSON.parse(content.serviceCardsJson);
     } catch { /* ignore parse error */ }
+  }
+
+  // Parse contact selected links (max 2 channels user chose for contact section)
+  let contactSelectedLinks: string[] | null = null;
+  if (content.contactSelectedLinks) {
+    try {
+      const parsed = JSON.parse(content.contactSelectedLinks);
+      if (Array.isArray(parsed)) {
+        contactSelectedLinks = parsed.filter((item: unknown): item is string => typeof item === "string");
+      }
+    } catch { /* ignore */ }
   }
 
   // Build social links array for contact section
@@ -400,7 +411,9 @@ export async function POST(request: Request) {
         items: serviceCards
           ? serviceCards.map((c) => c.title).filter(Boolean)
           : toItems(content.servicesItems?.trim() || payload.businessHighlights || ""),
-        cards: serviceCards || toItems(content.servicesItems?.trim() || payload.businessHighlights || "").map((t) => ({ title: t, description: "", iconName: "" })),
+        cards: serviceCards
+          ? serviceCards.map((c) => ({ title: c.title, description: c.description || "", iconName: c.iconName || "", imageUrl: c.imageUrl || "" })).filter((c) => c.title)
+          : toItems(content.servicesItems?.trim() || payload.businessHighlights || "").map((t) => ({ title: t, description: "", iconName: "", imageUrl: "" })),
       },
     },
     {
@@ -438,7 +451,9 @@ export async function POST(request: Request) {
         title: content.contactTitle?.trim() || "Contato",
         subtitle:
           content.contactSubtitle?.trim() || "Entre em contato pelos canais abaixo",
-        socialLinks,
+        socialLinks: contactSelectedLinks && contactSelectedLinks.length > 0
+          ? socialLinks.filter((link: { type: string }) => contactSelectedLinks.includes(link.type))
+          : socialLinks,
         // Backward compat fields
         whatsappUrl: whatsappUrl || (ctaHref.startsWith("https://wa.me/") ? ctaHref : ""),
         whatsappLabel: content.ctaButtonLabel?.trim() || "Falar no WhatsApp",
