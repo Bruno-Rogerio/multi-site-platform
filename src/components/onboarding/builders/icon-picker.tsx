@@ -11,7 +11,8 @@ const EDITOR_ICONS = [
 function getIcon(name: string) {
   const key = name as keyof typeof LucideIcons;
   const comp = LucideIcons[key];
-  if (comp && typeof comp === "function" && key !== "createLucideIcon") {
+  // lucide-react exports icons as forwardRef objects (typeof === "object"), not plain functions
+  if (comp && key !== "createLucideIcon") {
     return comp as React.ComponentType<{ size?: number; className?: string }>;
   }
   return null;
