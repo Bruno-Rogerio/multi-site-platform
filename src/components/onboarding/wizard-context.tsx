@@ -39,7 +39,6 @@ const initialState: WizardState = {
   // Section builder
   heroVariant: "centered",
   servicesVariant: "default",
-  servicesDisplayMode: "grid",
   ctaVariant: "banner",
   motionStyle: "motion-fade",
   enabledSections: ["hero", "services", "about", "cta", "contact"],
@@ -167,9 +166,6 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_SERVICES_VARIANT":
       return { ...state, servicesVariant: action.variant };
-
-    case "SET_SERVICES_DISPLAY":
-      return { ...state, servicesDisplayMode: action.mode };
 
     case "SET_CTA_VARIANT":
       return { ...state, ctaVariant: action.variant };

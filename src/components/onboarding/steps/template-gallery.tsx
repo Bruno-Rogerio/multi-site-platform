@@ -103,7 +103,7 @@ export function TemplateGallery() {
       dispatch({ type: "SET_SERVICES_VARIANT", variant: template.servicesVariant });
       dispatch({ type: "SET_CTA_VARIANT", variant: template.ctaVariant });
       dispatch({ type: "SET_FONT", family: template.fontFamily });
-      dispatch({ type: "SET_BUTTON_STYLE", style: template.buttonStyle as "rounded" | "pill" | "square" | "soft" });
+      dispatch({ type: "SET_BUTTON_STYLE", style: template.buttonStyle });
       dispatch({ type: "SET_MOTION_STYLE", style: template.motionStyle });
     }
   }

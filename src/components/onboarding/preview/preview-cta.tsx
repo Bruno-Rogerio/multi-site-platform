@@ -15,101 +15,37 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
       ? "9999px"
       : buttonStyle === "square"
       ? "0px"
-      : buttonStyle === "soft"
-      ? "12px"
       : "6px";
 
   const title = content.ctaTitle || "Vamos conversar?";
   const description = content.ctaDescription || "";
   const buttonLabel = content.ctaButtonLabel || "Entrar em contato";
-  const buttonUrl = content.ctaButtonUrl || "";
   const secondaryLabel = content.ctaSecondaryLabel || "Saiba mais";
-  const secondaryUrl = content.ctaSecondaryUrl || "";
 
-  function CtaButton({ label, url, variant }: { label: string; url?: string; variant?: "outline" }) {
-    if (variant === "outline") {
-      return (
-        <span
-          className="px-3 py-1.5 text-[7px] font-semibold cursor-default"
-          style={{
-            color: "var(--preview-primary)",
-            border: `1px solid var(--preview-primary)`,
-            borderRadius: buttonRadius,
-          }}
-          title={url || undefined}
-        >
-          {label}
-        </span>
-      );
-    }
-    return (
-      <span
-        className="px-3 py-1.5 text-[7px] font-semibold text-white cursor-default"
-        style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
-        title={url || undefined}
-      >
-        {label}
-      </span>
-    );
-  }
-
-  // Variant: Banner
+  // ── banner: flex row, text left, button right (matches published) ──
   if (ctaVariant === "banner") {
     return (
       <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
         <div
-          className="p-3 flex items-center justify-between gap-2"
+          className="flex items-center justify-between gap-2 p-3"
           style={{
+            backgroundColor: "var(--preview-primary)08",
             borderRadius: "var(--preview-radius)",
-            backgroundColor: `var(--preview-primary)10`,
-            border: `1px solid var(--preview-primary)20`,
           }}
         >
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
               {title}
             </h2>
             {description && (
-              <p className="text-[7px] mt-0.5" style={{ color: "var(--preview-muted)" }}>
-                {description}
-              </p>
-            )}
-          </div>
-          <CtaButton label={buttonLabel} url={buttonUrl} />
-        </div>
-      </section>
-    );
-  }
-
-  // Variant: Banner Gradient (solid gradient background)
-  if (ctaVariant === "banner-gradient") {
-    return (
-      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
-        <div
-          className="p-3 flex items-center justify-between gap-2"
-          style={{
-            borderRadius: "var(--preview-radius)",
-            background: `linear-gradient(135deg, var(--preview-primary), var(--preview-accent))`,
-          }}
-        >
-          <div className="flex-1">
-            <h2 className="text-[10px] font-bold text-white">
-              {title}
-            </h2>
-            {description && (
-              <p className="text-[7px] mt-0.5 text-white/70">
+              <p className="text-[7px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>
                 {description}
               </p>
             )}
           </div>
           <span
-            className="px-3 py-1.5 text-[7px] font-semibold cursor-default shrink-0"
-            style={{
-              backgroundColor: "white",
-              color: "var(--preview-primary)",
-              borderRadius: buttonRadius,
-            }}
-            title={buttonUrl || undefined}
+            className="px-2 py-1 text-[7px] font-semibold text-white cursor-default shrink-0"
+            style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
           >
             {buttonLabel}
           </span>
@@ -118,52 +54,55 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
     );
   }
 
-  // Variant: Centered
+  // ── centered: centered text with subtle border lines (matches published) ──
   if (ctaVariant === "centered") {
     return (
-      <section className="px-3 py-4 text-center" style={{ fontFamily: fontFamily || "Inter" }}>
+      <section
+        className="px-3 py-4 text-center"
+        style={{
+          fontFamily: fontFamily || "Inter",
+          borderTop: "2px solid var(--preview-primary)15",
+          borderBottom: "2px solid var(--preview-primary)15",
+        }}
+      >
         <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
           {title}
         </h2>
         {description && (
-          <p className="text-[7px] mt-1 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
+          <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
             {description}
           </p>
         )}
-        <div className="mt-2">
-          <CtaButton label={buttonLabel} url={buttonUrl} />
-        </div>
+        <span
+          className="mt-2 inline-block px-2 py-1 text-[7px] font-semibold text-white cursor-default"
+          style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
+        >
+          {buttonLabel}
+        </span>
       </section>
     );
   }
 
-  // Variant: Centered Gradient (solid gradient background, white text)
-  if (ctaVariant === "centered-gradient") {
+  // ── banner-gradient: gradient bg, flex layout (matches published) ──
+  if (ctaVariant === "banner-gradient") {
     return (
-      <section
-        className="px-3 py-6 text-center"
-        style={{
-          fontFamily: fontFamily || "Inter",
-          background: `linear-gradient(135deg, var(--preview-primary), var(--preview-accent))`,
-        }}
-      >
-        <h2 className="text-[10px] font-bold text-white">
-          {title}
-        </h2>
-        {description && (
-          <p className="text-[7px] mt-1 mx-auto max-w-[80%] text-white/70">
-            {description}
-          </p>
-        )}
-        <div className="mt-2">
+      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+        <div
+          className="flex items-center justify-between gap-2 p-3"
+          style={{
+            background: "linear-gradient(135deg, var(--preview-primary), var(--preview-accent))",
+            borderRadius: "var(--preview-radius)",
+          }}
+        >
+          <div className="flex-1 min-w-0">
+            <h2 className="text-[10px] font-bold text-white">{title}</h2>
+            {description && (
+              <p className="text-[7px] mt-0.5 text-white/70 line-clamp-1">{description}</p>
+            )}
+          </div>
           <span
-            className="px-3 py-1.5 text-[7px] font-semibold cursor-default"
-            style={{
-              backgroundColor: "white",
-              color: "var(--preview-primary)",
-              borderRadius: buttonRadius,
-            }}
-            title={buttonUrl || undefined}
+            className="px-2 py-1 text-[7px] font-semibold cursor-default shrink-0"
+            style={{ backgroundColor: "white", color: "var(--preview-primary)", borderRadius: buttonRadius }}
           >
             {buttonLabel}
           </span>
@@ -172,7 +111,35 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
     );
   }
 
-  // Variant: Double (two action buttons)
+  // ── centered-gradient: gradient bg, centered, dot pattern (matches published) ──
+  if (ctaVariant === "centered-gradient") {
+    return (
+      <section
+        className="relative overflow-hidden px-3 py-5 text-center"
+        style={{
+          fontFamily: fontFamily || "Inter",
+          background: "linear-gradient(135deg, var(--preview-primary), var(--preview-accent))",
+        }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.04]"
+          style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "8px 8px" }}
+        />
+        <h2 className="relative text-[10px] font-bold text-white">{title}</h2>
+        {description && (
+          <p className="relative text-[7px] mt-0.5 mx-auto max-w-[80%] text-white/70">{description}</p>
+        )}
+        <span
+          className="relative mt-2 inline-block px-2 py-1 text-[7px] font-semibold cursor-default"
+          style={{ backgroundColor: "white", color: "var(--preview-primary)", borderRadius: buttonRadius }}
+        >
+          {buttonLabel}
+        </span>
+      </section>
+    );
+  }
+
+  // ── double: two buttons centered (matches published) ──
   if (ctaVariant === "double") {
     return (
       <section className="px-3 py-4 text-center" style={{ fontFamily: fontFamily || "Inter" }}>
@@ -180,36 +147,60 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           {title}
         </h2>
         {description && (
-          <p className="text-[7px] mt-1 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
+          <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
             {description}
           </p>
         )}
         <div className="mt-2 flex justify-center gap-2">
-          <CtaButton label={buttonLabel} url={buttonUrl} />
-          <CtaButton label={secondaryLabel} url={secondaryUrl} variant="outline" />
+          <span
+            className="px-2 py-1 text-[7px] font-semibold text-white cursor-default"
+            style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
+          >
+            {buttonLabel}
+          </span>
+          <span
+            className="px-2 py-1 text-[7px] font-semibold cursor-default"
+            style={{
+              color: "var(--preview-primary)",
+              border: "1.5px solid var(--preview-primary)",
+              borderRadius: buttonRadius,
+            }}
+          >
+            {secondaryLabel}
+          </span>
         </div>
       </section>
     );
   }
 
-  // Default fallback (banner style)
+  // ── default: minimal/clean with border lines, outline button (matches published) ──
   return (
-    <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
-      <div
-        className="p-3"
+    <section
+      className="px-3 py-4 text-center"
+      style={{
+        fontFamily: fontFamily || "Inter",
+        borderTop: "1px solid var(--preview-text)15",
+        borderBottom: "1px solid var(--preview-text)15",
+      }}
+    >
+      <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
+        {title}
+      </h2>
+      {description && (
+        <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
+          {description}
+        </p>
+      )}
+      <span
+        className="mt-2 inline-block px-2 py-1 text-[7px] font-semibold cursor-default"
         style={{
-          borderRadius: "var(--preview-radius)",
-          backgroundColor: `var(--preview-primary)10`,
-          border: `1px solid var(--preview-primary)20`,
+          color: "var(--preview-primary)",
+          border: "1.5px solid var(--preview-primary)",
+          borderRadius: buttonRadius,
         }}
       >
-        <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-          {title}
-        </h2>
-        <div className="mt-2">
-          <CtaButton label={buttonLabel} url={buttonUrl} />
-        </div>
-      </div>
+        {buttonLabel}
+      </span>
     </section>
   );
 }

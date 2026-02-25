@@ -17,20 +17,15 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
   const aboutImage = content.aboutImage || "";
 
   return (
-    <section
-      className="px-3 py-4"
-      style={{ fontFamily: fontFamily || "Inter" }}
-    >
+    <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
       {aboutImage ? (
-        <div
-          className={`flex gap-2 ${deviceMode === "mobile" ? "flex-col" : ""}`}
-        >
+        <div className={`flex gap-2 ${deviceMode === "mobile" ? "flex-col" : ""}`}>
           <div
             className="shrink-0 overflow-hidden"
             style={{
               borderRadius: "var(--preview-radius)",
               width: deviceMode === "mobile" ? "100%" : "40%",
-              border: `1px solid var(--preview-text)18`,
+              border: "1px solid var(--preview-text)18",
             }}
           >
             <img
@@ -45,10 +40,7 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h2
-              className="text-[10px] font-bold"
-              style={{ color: "var(--preview-text)" }}
-            >
+            <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
               {title}
             </h2>
             <p
@@ -61,10 +53,7 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
         </div>
       ) : (
         <>
-          <h2
-            className="text-[10px] font-bold"
-            style={{ color: "var(--preview-text)" }}
-          >
+          <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
             {title}
           </h2>
           <p

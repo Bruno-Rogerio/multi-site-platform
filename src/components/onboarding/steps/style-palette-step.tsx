@@ -25,11 +25,10 @@ const fontOptions: FontOption[] = [
   { family: "Lora", label: "Lora", style: "Tradicional e confiável", premium: true },
 ];
 
-const buttonStyles: { id: "rounded" | "pill" | "square" | "soft"; label: string; preview: string }[] = [
+const buttonStyles: { id: "rounded" | "pill" | "square"; label: string; preview: string }[] = [
   { id: "rounded", label: "Arredondado", preview: "rounded-lg" },
   { id: "pill", label: "Pill", preview: "rounded-full" },
   { id: "square", label: "Quadrado", preview: "rounded-none" },
-  { id: "soft", label: "Suave (soft)", preview: "rounded-xl" },
 ];
 
 function PaletteCard({

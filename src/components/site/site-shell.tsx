@@ -8,7 +8,10 @@ type SiteShellProps = {
   children: ReactNode;
 };
 
-export const buttonStyleClasses: Record<Site["themeSettings"]["buttonStyle"], string> = {
+export const buttonStyleClasses: Record<
+  Site["themeSettings"]["buttonStyle"],
+  string
+> = {
   rounded: "rounded-lg",
   pill: "rounded-full",
   square: "rounded-none",
@@ -47,7 +50,8 @@ function resolveReadableText(textHex: string, backgroundHex: string) {
 
   const dark = "#0B1020";
   const light = "#EAF0FF";
-  return contrastRatio(dark, backgroundHex) >= contrastRatio(light, backgroundHex)
+  return contrastRatio(dark, backgroundHex) >=
+    contrastRatio(light, backgroundHex)
     ? dark
     : light;
 }
@@ -65,18 +69,26 @@ export function SiteShell({ site, children }: SiteShellProps) {
     "--site-accent": site.themeSettings.accentColor,
     "--site-background": site.themeSettings.backgroundColor,
     "--site-text": readableText,
-    "--site-surface": isDarkText ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.06)",
-    "--site-border": isDarkText ? "rgba(11,16,32,0.14)" : "rgba(234,240,255,0.16)",
+    "--site-surface": isDarkText
+      ? "rgba(255,255,255,0.9)"
+      : "rgba(255,255,255,0.06)",
+    "--site-border": isDarkText
+      ? "rgba(11,16,32,0.14)"
+      : "rgba(234,240,255,0.16)",
     "--site-radius": site.themeSettings["--site-radius"] ?? "24px",
     "--site-spacing": site.themeSettings["--site-spacing"] ?? "16px",
-    "--site-shadow": site.themeSettings["--site-shadow"] ?? "0 2px 8px rgba(0,0,0,0.1)",
+    "--site-shadow":
+      site.themeSettings["--site-shadow"] ?? "0 2px 8px rgba(0,0,0,0.1)",
     fontFamily: site.themeSettings.fontFamily,
   } as CSSProperties;
 
   return (
-    <div style={style} className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)]">
+    <div
+      style={style}
+      className="min-h-screen bg-[var(--site-background)] text-[var(--site-text)]"
+    >
       <header className="sticky top-0 z-20 border-b border-[var(--site-border)] bg-[var(--site-background)]/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 py-4">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             {logoUrl ? (
               <Image
@@ -90,17 +102,34 @@ export function SiteShell({ site, children }: SiteShellProps) {
             <p className="text-lg font-bold">{site.name}</p>
           </div>
           <nav className="hidden items-center gap-5 md:flex">
-            <a href="#services" className="text-sm opacity-70 transition hover:opacity-100">Serviços</a>
-            <a href="#about" className="text-sm opacity-70 transition hover:opacity-100">Sobre</a>
-            <a href="#contact" className="text-sm opacity-70 transition hover:opacity-100">Contato</a>
+            <a
+              href="#services"
+              className="text-sm opacity-70 transition hover:opacity-100"
+            >
+              Serviços
+            </a>
+            <a
+              href="#about"
+              className="text-sm opacity-70 transition hover:opacity-100"
+            >
+              Sobre
+            </a>
+            <a
+              href="#contact"
+              className="text-sm opacity-70 transition hover:opacity-100"
+            >
+              Contato
+            </a>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl space-y-5 px-5 py-8">{children}</main>
+      <main className="w-full">
+        {children}
+      </main>
 
       <footer className="border-t border-[var(--site-border)] py-6">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-5 text-xs opacity-70">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 text-xs opacity-70">
           <span className="flex items-center gap-2">
             {logoUrl ? (
               <Image
@@ -113,7 +142,7 @@ export function SiteShell({ site, children }: SiteShellProps) {
             ) : null}
             <span>{site.name}</span>
           </span>
-          <span>Powered by Multi Site Platform</span>
+          <span>Powered by BuildSphere</span>
         </div>
       </footer>
     </div>

@@ -151,19 +151,6 @@ function ServicesContentEditor() {
         />
       </div>
 
-      <div>
-        <label className="text-xs font-medium text-[var(--platform-text)]/60">
-          Subtítulo da seção
-        </label>
-        <input
-          type="text"
-          value={content.servicesSubtitle || ""}
-          onChange={(e) => handleChange("servicesSubtitle", e.target.value)}
-          placeholder="Ex: O que posso fazer por você"
-          className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
-        />
-      </div>
-
       <div className="border-t border-white/10 pt-4">
         <p className="text-xs font-medium text-[var(--platform-text)]/60 mb-3">
           Textos dos cards

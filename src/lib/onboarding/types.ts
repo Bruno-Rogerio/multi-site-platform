@@ -42,12 +42,11 @@ export type WizardState = {
   paletteId: string;
   customColors: { primary: string; accent: string; background: string; text: string };
   fontFamily: string;
-  buttonStyle: "rounded" | "pill" | "square" | "soft";
+  buttonStyle: "rounded" | "pill" | "square";
 
   // Section builder
   heroVariant: string;
   servicesVariant: string;
-  servicesDisplayMode: "grid" | "list";
   ctaVariant: string;
   motionStyle: string;
   enabledSections: string[];
@@ -111,10 +110,9 @@ export type WizardAction =
   | { type: "SET_PALETTE"; id: string }
   | { type: "SET_CUSTOM_COLOR"; key: string; value: string }
   | { type: "SET_FONT"; family: string }
-  | { type: "SET_BUTTON_STYLE"; style: "rounded" | "pill" | "square" | "soft" }
+  | { type: "SET_BUTTON_STYLE"; style: "rounded" | "pill" | "square" }
   | { type: "SET_HERO_VARIANT"; variant: string }
   | { type: "SET_SERVICES_VARIANT"; variant: string }
-  | { type: "SET_SERVICES_DISPLAY"; mode: "grid" | "list" }
   | { type: "SET_CTA_VARIANT"; variant: string }
   | { type: "SET_MOTION_STYLE"; style: string }
   | { type: "ADD_SECTION"; sectionType: string }

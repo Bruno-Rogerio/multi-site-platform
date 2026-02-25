@@ -15,14 +15,11 @@ function asString(value: unknown, fallback = ""): string {
 }
 
 function asStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
+  if (!Array.isArray(value)) return [];
   return value.filter((item): item is string => typeof item === "string");
 }
 
-type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string };
+type ServiceCard = { title: string; description?: string; iconName?: string };
 
 function asCards(value: unknown): ServiceCard[] {
   if (!Array.isArray(value)) return [];
@@ -36,7 +33,6 @@ function asCards(value: unknown): ServiceCard[] {
       title,
       description: typeof rec.description === "string" ? rec.description : "",
       iconName: typeof rec.iconName === "string" ? rec.iconName : "",
-      imageUrl: typeof rec.imageUrl === "string" ? rec.imageUrl : "",
     });
   }
   return result;
@@ -70,27 +66,19 @@ function getIcon(iconName: string) {
 type Testimonial = { quote: string; author: string };
 
 function asTestimonials(value: unknown): Testimonial[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
+  if (!Array.isArray(value)) return [];
   return value
     .map((item) => {
-      if (!item || typeof item !== "object") {
-        return null;
-      }
-
+      if (!item || typeof item !== "object") return null;
       const quote = asString((item as Record<string, unknown>).quote);
       const author = asString((item as Record<string, unknown>).author);
-
-      if (!quote || !author) {
-        return null;
-      }
-
+      if (!quote || !author) return null;
       return { quote, author };
     })
     .filter((item): item is Testimonial => item !== null);
 }
+
+const containerClass = "mx-auto w-full max-w-6xl px-6";
 
 export function SectionRenderer({
   section,
@@ -98,10 +86,7 @@ export function SectionRenderer({
   buttonStyleClassName,
 }: SectionRendererProps) {
   const variant = section.variant ?? "default";
-  const surfaceClassName = "border border-[var(--site-border)] bg-[var(--site-surface)]";
-  const sectionRadius = "var(--site-radius, 24px)";
-  const cardRadius = "calc(var(--site-radius, 24px) * 0.67)";
-  const sectionShadow = "var(--site-shadow, 0 2px 8px rgba(0,0,0,0.1))";
+  const cardRadius = "calc(var(--site-radius, 12px) * 0.67)";
 
   // ─── HERO ───────────────────────────────────────────────
   if (section.type === "hero") {
@@ -114,99 +99,109 @@ export function SectionRenderer({
 
     if (variant === "split") {
       return (
-        <section id="hero" className={`grid gap-5 p-8 md:grid-cols-2 md:items-center ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          <div>
-            {eyebrow && (
-              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
-                {eyebrow}
-              </p>
-            )}
-            <h1 className="text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
-            {subtitle && <p className="mt-4 text-base opacity-80">{subtitle}</p>}
-            <a
-              href={ctaHref}
-              style={{ color: "#fff" }}
-              className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-            >
-              {ctaLabel}
-            </a>
-          </div>
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="aspect-[16/9] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover"
-            />
-          ) : (
-            <div
-              className="flex aspect-[16/9] items-center justify-center rounded-2xl border border-dashed"
-              style={{ borderColor: "var(--site-primary)", opacity: 0.25, backgroundColor: "color-mix(in srgb, var(--site-primary) 8%, transparent)" }}
-            >
-              <span className="text-xs opacity-60">Imagem</span>
+        <section id="hero" className="w-full">
+          <div className="mx-auto grid w-full max-w-7xl gap-8 px-6 py-16 md:grid-cols-2 md:items-center md:py-24">
+            <div>
+              {eyebrow && (
+                <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
+                  {eyebrow}
+                </p>
+              )}
+              <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+              {subtitle && <p className="mt-5 max-w-lg text-lg leading-relaxed opacity-70">{subtitle}</p>}
+              <a
+                href={ctaHref}
+                className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+                style={{ color: "#fff" }}
+              >
+                {ctaLabel}
+              </a>
             </div>
-          )}
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={title}
+                width={1280}
+                height={960}
+                className="aspect-[4/3] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
+              />
+            ) : (
+              <div
+                className="flex aspect-[4/3] items-center justify-center"
+                style={{ borderRadius: cardRadius, border: "1px dashed var(--site-border)", backgroundColor: "color-mix(in srgb, var(--site-primary) 5%, transparent)" }}
+              >
+                <span className="text-sm opacity-30">Sua imagem aqui</span>
+              </div>
+            )}
+          </div>
         </section>
       );
     }
 
     if (variant === "centered") {
       return (
-        <section id="hero" className={`p-8 text-center ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mb-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-[var(--site-border)] object-cover"
-            />
-          )}
-          {eyebrow && (
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
-              {eyebrow}
-            </p>
-          )}
-          <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
-          {subtitle && <p className="mx-auto mt-4 max-w-2xl text-base opacity-80">{subtitle}</p>}
-          <a
-            href={ctaHref}
-            style={{ color: "#fff" }}
-            className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-          >
-            {ctaLabel}
-          </a>
+        <section id="hero" className="w-full py-16 md:py-24">
+          <div className="mx-auto max-w-4xl px-6 text-center">
+            {imageUrl && (
+              <Image
+                src={imageUrl}
+                alt={title}
+                width={1280}
+                height={720}
+                className="mx-auto mb-8 aspect-[16/9] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
+              />
+            )}
+            {eyebrow && (
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
+                {eyebrow}
+              </p>
+            )}
+            <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+            {subtitle && <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed opacity-70">{subtitle}</p>}
+            <a
+              href={ctaHref}
+              className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+              style={{ color: "#fff" }}
+            >
+              {ctaLabel}
+            </a>
+          </div>
         </section>
       );
     }
 
     if (variant === "minimal") {
       return (
-        <section id="hero" className="py-12 px-8" style={{ borderRadius: sectionRadius }}>
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mb-8 aspect-[16/9] h-auto w-full max-w-3xl object-cover"
-              style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
-            />
-          )}
-          {eyebrow && (
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
-              {eyebrow}
-            </p>
-          )}
-          <h1 className="max-w-4xl border-l-[6px] border-[var(--site-primary)] pl-5 text-4xl font-bold leading-tight md:text-6xl">{title}</h1>
-          {subtitle && <p className="mt-5 max-w-2xl text-lg opacity-70">{subtitle}</p>}
-          <a
-            href={ctaHref}
-            className="mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--site-primary)] underline underline-offset-4 decoration-2 decoration-[var(--site-primary)]/40 transition hover:decoration-[var(--site-primary)]"
-          >
-            {ctaLabel} <span aria-hidden="true">&rarr;</span>
-          </a>
+        <section id="hero" className="w-full py-16 md:py-24">
+          <div className="mx-auto max-w-7xl px-6">
+            {imageUrl && (
+              <Image
+                src={imageUrl}
+                alt={title}
+                width={1280}
+                height={540}
+                className="mb-10 aspect-[21/9] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
+              />
+            )}
+            {eyebrow && (
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
+                {eyebrow}
+              </p>
+            )}
+            <h1 className="max-w-4xl border-l-[6px] border-[var(--site-primary)] pl-6 text-4xl font-bold leading-[1.1] md:text-6xl lg:text-7xl">
+              {title}
+            </h1>
+            {subtitle && <p className="mt-6 max-w-2xl text-lg leading-relaxed opacity-60">{subtitle}</p>}
+            <a
+              href={ctaHref}
+              className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--site-primary)] underline underline-offset-4 decoration-2 decoration-[var(--site-primary)]/40 transition hover:decoration-[var(--site-primary)]"
+            >
+              {ctaLabel} <span aria-hidden="true">&rarr;</span>
+            </a>
+          </div>
         </section>
       );
     }
@@ -215,107 +210,118 @@ export function SectionRenderer({
       return (
         <section
           id="hero"
-          className="relative mx-auto max-w-2xl overflow-hidden p-10 text-center"
-          style={{
-            borderRadius: sectionRadius,
-            background: "radial-gradient(ellipse at top, color-mix(in srgb, var(--site-primary) 8%, var(--site-background)), var(--site-background))",
-            border: "1px solid color-mix(in srgb, var(--site-primary) 18%, transparent)",
-            boxShadow: "0 8px 40px color-mix(in srgb, var(--site-primary) 15%, transparent)",
-          }}
+          className="w-full py-16 md:py-24"
+          style={{ background: "radial-gradient(ellipse at top, color-mix(in srgb, var(--site-primary) 6%, var(--site-background)), var(--site-background))" }}
         >
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mb-6 aspect-[16/9] h-auto w-full object-cover"
-              style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
-            />
-          )}
-          {eyebrow && (
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
-              {eyebrow}
-            </p>
-          )}
-          <h1 className="text-3xl font-bold leading-tight md:text-4xl">{title}</h1>
-          {subtitle && <p className="mt-4 text-base opacity-80">{subtitle}</p>}
-          <a
-            href={ctaHref}
-            style={{ color: "#fff" }}
-            className={`mt-6 inline-flex bg-[var(--site-primary)] px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+          <div
+            className="relative mx-auto max-w-4xl overflow-hidden p-8 text-center md:p-12"
+            style={{
+              borderRadius: "var(--site-radius, 24px)",
+              border: "1px solid color-mix(in srgb, var(--site-primary) 18%, transparent)",
+              boxShadow: "0 8px 40px color-mix(in srgb, var(--site-primary) 12%, transparent)",
+              backgroundColor: "color-mix(in srgb, var(--site-surface) 80%, transparent)",
+            }}
           >
-            {ctaLabel}
-          </a>
+            {imageUrl && (
+              <Image
+                src={imageUrl}
+                alt={title}
+                width={1280}
+                height={720}
+                className="mx-auto mb-8 aspect-[16/9] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
+              />
+            )}
+            {eyebrow && (
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
+                {eyebrow}
+              </p>
+            )}
+            <h1 className="text-3xl font-bold leading-[1.1] md:text-5xl">{title}</h1>
+            {subtitle && <p className="mt-4 text-base leading-relaxed opacity-70">{subtitle}</p>}
+            <a
+              href={ctaHref}
+              className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+              style={{ color: "#fff" }}
+            >
+              {ctaLabel}
+            </a>
+          </div>
         </section>
       );
     }
 
     if (variant === "centered-gradient") {
       return (
-        <section id="hero" className="bg-[linear-gradient(135deg,var(--site-primary),var(--site-accent))] p-8 text-center text-white" style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mb-5 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-white/20 object-cover"
-            />
-          )}
-          {eyebrow && (
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
-              {eyebrow}
-            </p>
-          )}
-          <h1 className="mx-auto max-w-3xl text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
-          {subtitle && <p className="mx-auto mt-4 max-w-2xl text-base text-white/85">{subtitle}</p>}
-          <a
-            href={ctaHref}
-            className={`mt-6 inline-flex bg-white px-5 py-3 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
-            style={{ color: "var(--site-primary)" }}
-          >
-            {ctaLabel}
-          </a>
+        <section
+          id="hero"
+          className="w-full bg-[linear-gradient(135deg,var(--site-primary),var(--site-accent))] py-16 text-white md:py-24"
+        >
+          <div className="mx-auto max-w-4xl px-6 text-center">
+            {imageUrl && (
+              <Image
+                src={imageUrl}
+                alt={title}
+                width={1280}
+                height={720}
+                className="mx-auto mb-8 aspect-[16/9] h-auto w-full max-w-3xl rounded-2xl border border-white/20 object-cover"
+              />
+            )}
+            {eyebrow && (
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+                {eyebrow}
+              </p>
+            )}
+            <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+            {subtitle && <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80">{subtitle}</p>}
+            <a
+              href={ctaHref}
+              className={`mt-8 inline-flex bg-white px-6 py-3.5 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
+              style={{ color: "var(--site-primary)" }}
+            >
+              {ctaLabel}
+            </a>
+          </div>
         </section>
       );
     }
 
     // default hero
     return (
-      <section id="hero" className={`relative overflow-hidden p-8 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-        {/* Decorative gradient blob */}
+      <section id="hero" className="relative w-full overflow-hidden py-16 md:py-24">
         <div
-          className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-[0.07] blur-3xl"
+          className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full opacity-[0.06] blur-3xl"
           style={{ background: "radial-gradient(circle, var(--site-primary), transparent)" }}
         />
-        {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={title}
-            width={1280}
-            height={720}
-            className="mx-auto mb-5 aspect-[16/9] h-auto w-full max-w-3xl object-cover"
-            style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
-          />
-        )}
-        {eyebrow && (
-          <>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
-              {eyebrow}
-            </p>
-            <div className="mb-4 h-0.5 w-12" style={{ backgroundColor: "var(--site-accent)" }} />
-          </>
-        )}
-        <h1 className="text-3xl font-bold leading-tight md:text-5xl">{title}</h1>
-        {subtitle && <p className="mt-4 max-w-2xl text-base opacity-80">{subtitle}</p>}
-        <a
-          href={ctaHref}
-          style={{ color: "#fff" }}
-          className={`mt-6 inline-flex bg-[var(--site-primary)] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-        >
-          {ctaLabel}
-        </a>
+        <div className="relative mx-auto max-w-7xl px-6">
+          {imageUrl && (
+            <Image
+              src={imageUrl}
+              alt={title}
+              width={1280}
+              height={720}
+              className="mb-8 aspect-[16/9] h-auto w-full max-w-3xl object-cover"
+              style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
+            />
+          )}
+          {eyebrow && (
+            <>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
+                {eyebrow}
+              </p>
+              <div className="mb-4 h-0.5 w-12" style={{ backgroundColor: "var(--site-accent)" }} />
+            </>
+          )}
+          <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+          {subtitle && <p className="mt-5 max-w-2xl text-lg leading-relaxed opacity-70">{subtitle}</p>}
+          <a
+            href={ctaHref}
+            className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+            style={{ color: "#fff" }}
+          >
+            {ctaLabel}
+          </a>
+        </div>
       </section>
     );
   }
@@ -327,33 +333,35 @@ export function SectionRenderer({
     const aboutImageUrl = asString(section.content.imageUrl);
 
     return (
-      <section id="about" className={`p-6 md:p-8 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-        {aboutImageUrl ? (
-          <div className="grid gap-8 md:grid-cols-[320px_1fr] items-start">
-            <div className="overflow-hidden border border-[var(--site-border)]" style={{ borderRadius: cardRadius }}>
-              <Image
-                src={aboutImageUrl}
-                alt={title}
-                width={360}
-                height={480}
-                className="aspect-[3/4] h-auto w-full object-cover"
-              />
+      <section id="about" className="w-full py-16 md:py-20">
+        <div className={containerClass}>
+          {aboutImageUrl ? (
+            <div className="grid gap-10 items-start md:grid-cols-[360px_1fr]">
+              <div className="overflow-hidden" style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}>
+                <Image
+                  src={aboutImageUrl}
+                  alt={title}
+                  width={360}
+                  height={480}
+                  className="aspect-[3/4] h-auto w-full object-cover"
+                />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold">{title}</h2>
+                {body && (
+                  <p className="mt-5 whitespace-pre-line text-base leading-relaxed opacity-80">
+                    {body}
+                  </p>
+                )}
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold">{title}</h2>
-              {body && (
-                <p className="mt-4 whitespace-pre-line text-base leading-relaxed opacity-85">
-                  {body}
-                </p>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            <h2 className="text-2xl font-semibold">{title}</h2>
-            {body && <p className="mt-4 whitespace-pre-line leading-7 opacity-85">{body}</p>}
-          </>
-        )}
+          ) : (
+            <>
+              <h2 className="text-3xl font-bold">{title}</h2>
+              {body && <p className="mt-5 max-w-3xl whitespace-pre-line text-base leading-relaxed opacity-80">{body}</p>}
+            </>
+          )}
+        </div>
       </section>
     );
   }
@@ -365,110 +373,82 @@ export function SectionRenderer({
     const items = asStringArray(section.content.items);
     const imageUrl = asString(section.content.imageUrl);
 
-    // Render a single card (icon + title + description)
-    function renderCard(card: ServiceCard, index: number, centered = true) {
-      const Icon = getIcon(card.iconName || "");
-      return (
-        <div
-          key={`${card.title}-${index}`}
-          className={`border border-[var(--site-border)] bg-[var(--site-surface)] overflow-hidden transition-all duration-200 hover:shadow-md hover:border-[var(--site-primary)]/30 ${centered ? "text-center" : ""}`}
-          style={{ borderRadius: cardRadius, boxShadow: sectionShadow }}
-        >
-          {card.imageUrl && (
-            <Image src={card.imageUrl} alt={card.title} width={400} height={300}
-              className="aspect-[4/3] h-auto w-full object-cover" />
-          )}
-          <div className={`px-6 py-6 ${centered ? "text-center" : ""}`}>
-            {Icon && (
-              <div
-                className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl ${centered ? "mx-auto" : ""}`}
-                style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
-              >
-                <Icon size={22} className="text-[var(--site-primary)]" />
-              </div>
-            )}
-            <h3 className="text-sm font-semibold">{card.title}</h3>
-            {card.description && (
-              <p className="mt-1 text-xs opacity-70">{card.description}</p>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    // If we have rich cards, use them; otherwise fall back to items as simple cards
     const effectiveCards: ServiceCard[] = cards.length > 0
       ? cards
       : items.map((t) => ({ title: t, description: "", iconName: "" }));
 
     if (variant === "minimal" || variant === "minimal-list") {
       return (
-        <section id="services" className={`p-6 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {imageUrl && (
-            <Image src={imageUrl} alt={title} width={960} height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
-          )}
-          <ul className="mt-4 space-y-3">
-            {effectiveCards.map((card, index) => {
-              const Icon = getIcon(card.iconName || "");
-              return (
-                <li key={`${card.title}-${index}`}
-                  className="flex items-start gap-3 border-b border-[var(--site-border)] px-4 py-3.5 text-sm transition last:border-b-0 hover:bg-[var(--site-primary)]/5"
-                  style={{ borderRadius: cardRadius }}>
-                  {Icon ? (
-                    <Icon size={18} className="mt-0.5 shrink-0 text-[var(--site-primary)]" />
-                  ) : (
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
-                  )}
-                  <div>
-                    <span className="font-medium">{card.title}</span>
-                    {card.description && (
-                      <p className="mt-0.5 text-xs opacity-70">{card.description}</p>
+        <section id="services" className="w-full py-16 md:py-20">
+          <div className={containerClass}>
+            <h2 className="text-3xl font-bold">{title}</h2>
+            {imageUrl && (
+              <Image src={imageUrl} alt={title} width={1200} height={600}
+                className="mt-6 aspect-[2/1] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }} />
+            )}
+            <ul className="mt-6 divide-y divide-[var(--site-border)]">
+              {effectiveCards.map((card, index) => {
+                const Icon = getIcon(card.iconName || "");
+                return (
+                  <li key={`${card.title}-${index}`}
+                    className="flex items-start gap-4 px-4 py-5 text-sm transition hover:bg-[var(--site-primary)]/5"
+                    style={{ borderRadius: cardRadius }}>
+                    {Icon ? (
+                      <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 10%, transparent)" }}>
+                        <Icon size={18} className="text-[var(--site-primary)]" />
+                      </div>
+                    ) : (
+                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
                     )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                    <div>
+                      <span className="text-base font-medium">{card.title}</span>
+                      {card.description && (
+                        <p className="mt-1 text-sm opacity-60">{card.description}</p>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </section>
       );
     }
 
     if (variant === "masonry") {
       return (
-        <section id="services" className={`p-6 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {imageUrl && (
-            <Image src={imageUrl} alt={title} width={960} height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
-          )}
-          <div className="mt-4 columns-2 gap-4 space-y-4">
-            {effectiveCards.map((card, index) => {
-              const Icon = getIcon(card.iconName || "");
-              const isTall = index % 3 === 0;
-              return (
-                <div key={`${card.title}-${index}`}
-                  className="break-inside-avoid overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] text-sm transition-transform duration-200 hover:scale-[1.01]"
-                  style={{ borderRadius: cardRadius, boxShadow: sectionShadow }}>
-                  {card.imageUrl && (
-                    <div className={isTall ? "h-40" : "h-24"}>
-                      <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+        <section id="services" className="w-full py-16 md:py-20">
+          <div className={containerClass}>
+            <h2 className="text-3xl font-bold">{title}</h2>
+            {imageUrl && (
+              <Image src={imageUrl} alt={title} width={1200} height={600}
+                className="mt-6 aspect-[2/1] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }} />
+            )}
+            <div className="mt-6 columns-1 gap-5 space-y-5 sm:columns-2">
+              {effectiveCards.map((card, index) => {
+                const Icon = getIcon(card.iconName || "");
+                const isTall = index % 3 === 0;
+                return (
+                  <div key={`${card.title}-${index}`}
+                    className="break-inside-avoid overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] transition-all duration-200 hover:shadow-lg hover:border-[var(--site-primary)]/20"
+                    style={{ borderRadius: cardRadius }}>
+                    <div className={`px-5 ${isTall ? "py-8" : "py-5"}`}>
+                      {Icon && (
+                        <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl"
+                          style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 10%, transparent)" }}>
+                          <Icon size={20} className="text-[var(--site-primary)]" />
+                        </div>
+                      )}
+                      <h3 className="text-base font-semibold">{card.title}</h3>
+                      {card.description && <p className="mt-2 text-sm leading-relaxed opacity-60">{card.description}</p>}
                     </div>
-                  )}
-                  <div className={`px-4 ${isTall ? "py-6" : index % 3 === 1 ? "py-4" : "py-5"}`}>
-                    {Icon && (
-                      <div className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-lg"
-                        style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}>
-                        <Icon size={16} className="text-[var(--site-primary)]" />
-                      </div>
-                    )}
-                    <h3 className="font-semibold">{card.title}</h3>
-                    {card.description && <p className="mt-1 text-xs opacity-70">{card.description}</p>}
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </section>
       );
@@ -476,46 +456,44 @@ export function SectionRenderer({
 
     if (variant === "columns") {
       return (
-        <section id="services" className={`p-6 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          <h2 className="text-2xl font-semibold text-center">{title}</h2>
-          {imageUrl && (
-            <Image src={imageUrl} alt={title} width={960} height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
-          )}
-          <div className="mt-6 space-y-4">
-            {effectiveCards.map((card, index) => {
-              const Icon = getIcon(card.iconName || "");
-              const isReversed = index % 2 === 1;
-              return (
-                <div
-                  key={`${card.title}-${index}`}
-                  className={`flex items-center gap-5 overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] p-5 transition-all duration-200 hover:shadow-md ${
-                    isReversed ? "flex-row-reverse" : ""
-                  }`}
-                  style={{ borderRadius: cardRadius, boxShadow: sectionShadow }}
-                >
-                  <div className="flex shrink-0 flex-col items-center gap-2">
-                    {card.imageUrl ? (
-                      <Image src={card.imageUrl} alt={card.title} width={120} height={90}
-                        className="h-20 w-28 rounded-xl object-cover border border-[var(--site-border)]" />
-                    ) : Icon ? (
+        <section id="services" className="w-full py-16 md:py-20">
+          <div className={containerClass}>
+            <h2 className="text-3xl font-bold text-center">{title}</h2>
+            {imageUrl && (
+              <Image src={imageUrl} alt={title} width={1200} height={600}
+                className="mt-6 aspect-[2/1] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }} />
+            )}
+            <div className="mt-8 space-y-5">
+              {effectiveCards.map((card, index) => {
+                const Icon = getIcon(card.iconName || "");
+                const isReversed = index % 2 === 1;
+                return (
+                  <div
+                    key={`${card.title}-${index}`}
+                    className={`flex items-center gap-6 overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] p-6 transition-all duration-200 hover:shadow-lg hover:border-[var(--site-primary)]/20 ${
+                      isReversed ? "flex-row-reverse" : ""
+                    }`}
+                    style={{ borderRadius: cardRadius }}
+                  >
+                    {Icon && (
                       <div
-                        className="flex h-14 w-14 items-center justify-center rounded-2xl"
-                        style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
+                        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl"
+                        style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 10%, transparent)" }}
                       >
-                        <Icon size={26} className="text-[var(--site-primary)]" />
+                        <Icon size={28} className="text-[var(--site-primary)]" />
                       </div>
-                    ) : null}
-                  </div>
-                  <div className={`flex-1 ${isReversed ? "text-right" : ""}`}>
-                    <h3 className="text-sm font-semibold">{card.title}</h3>
-                    {card.description && (
-                      <p className="mt-1 text-xs opacity-70">{card.description}</p>
                     )}
+                    <div className={`flex-1 ${isReversed ? "text-right" : ""}`}>
+                      <h3 className="text-base font-semibold">{card.title}</h3>
+                      {card.description && (
+                        <p className="mt-1 text-sm leading-relaxed opacity-60">{card.description}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </section>
       );
@@ -523,50 +501,77 @@ export function SectionRenderer({
 
     if (variant === "steps") {
       return (
-        <section id="services" className={`p-6 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {imageUrl && (
-            <Image src={imageUrl} alt={title} width={960} height={720}
-              className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
-          )}
-          <ol className="mt-4 relative">
-            {/* Vertical connecting line */}
-            <div
-              className="absolute left-[13px] top-4 bottom-4 w-0.5"
-              style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 20%, transparent)" }}
-            />
-            {effectiveCards.map((card, index) => {
-              const Icon = getIcon(card.iconName || "");
-              return (
-                <li key={`${card.title}-${index}`} className="relative flex items-start gap-3 pb-4 last:pb-0">
-                  <span className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white" style={{ color: "#fff" }}>
-                    {index + 1}
-                  </span>
-                  <div className="pt-0.5">
-                    <div className="flex items-center gap-2">
-                      {Icon && <Icon size={14} className="text-[var(--site-primary)]" />}
-                      <span className="text-sm font-medium">{card.title}</span>
+        <section id="services" className="w-full py-16 md:py-20">
+          <div className={containerClass}>
+            <h2 className="text-3xl font-bold">{title}</h2>
+            {imageUrl && (
+              <Image src={imageUrl} alt={title} width={1200} height={600}
+                className="mt-6 aspect-[2/1] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }} />
+            )}
+            <ol className="mt-8 relative ml-1">
+              <div
+                className="absolute left-[15px] top-5 bottom-5 w-0.5"
+                style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 20%, transparent)" }}
+              />
+              {effectiveCards.map((card, index) => {
+                const Icon = getIcon(card.iconName || "");
+                return (
+                  <li key={`${card.title}-${index}`} className="relative flex items-start gap-4 pb-6 last:pb-0">
+                    <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white" style={{ color: "#fff" }}>
+                      {index + 1}
+                    </span>
+                    <div className="pt-1">
+                      <div className="flex items-center gap-2">
+                        {Icon && <Icon size={16} className="text-[var(--site-primary)]" />}
+                        <span className="text-base font-semibold">{card.title}</span>
+                      </div>
+                      {card.description && <p className="mt-1 text-sm leading-relaxed opacity-60">{card.description}</p>}
                     </div>
-                    {card.description && <p className="mt-0.5 text-xs opacity-70">{card.description}</p>}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
         </section>
       );
     }
 
     // default services (grid)
     return (
-      <section id="services" className={`p-6 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-        <h2 className="text-2xl font-semibold">{title}</h2>
-        {imageUrl && (
-          <Image src={imageUrl} alt={title} width={960} height={720}
-            className="mt-4 aspect-[4/3] h-auto w-full rounded-2xl border border-[var(--site-border)] object-cover" />
-        )}
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          {effectiveCards.map((card, index) => renderCard(card, index))}
+      <section id="services" className="w-full py-16 md:py-20">
+        <div className={containerClass}>
+          <h2 className="text-3xl font-bold">{title}</h2>
+          {imageUrl && (
+            <Image src={imageUrl} alt={title} width={1200} height={600}
+              className="mt-6 aspect-[2/1] h-auto w-full object-cover"
+              style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }} />
+          )}
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
+            {effectiveCards.map((card, index) => {
+              const Icon = getIcon(card.iconName || "");
+              return (
+                <div
+                  key={`${card.title}-${index}`}
+                  className="overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] p-6 text-center transition-all duration-200 hover:shadow-lg hover:border-[var(--site-primary)]/20"
+                  style={{ borderRadius: cardRadius }}
+                >
+                  {Icon && (
+                    <div
+                      className="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 10%, transparent)" }}
+                    >
+                      <Icon size={22} className="text-[var(--site-primary)]" />
+                    </div>
+                  )}
+                  <h3 className="text-base font-semibold">{card.title}</h3>
+                  {card.description && (
+                    <p className="mt-2 text-sm leading-relaxed opacity-60">{card.description}</p>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
     );
@@ -580,41 +585,27 @@ export function SectionRenderer({
     const buttonHref = asString(section.content.buttonHref, "#contact");
     const secondaryLabel = asString(section.content.secondaryLabel);
     const secondaryHref = asString(section.content.secondaryHref);
-    const imageUrl = asString(section.content.imageUrl);
+    const linkTarget = (href: string) => href.startsWith("http") ? "_blank" : undefined;
+    const linkRel = (href: string) => href.startsWith("http") ? "noreferrer" : undefined;
 
     if (variant === "banner") {
       return (
-        <section
-          id="cta"
-          className="p-6"
-          style={{
-            borderRadius: sectionRadius,
-            backgroundColor: "color-mix(in srgb, var(--site-primary) 8%, var(--site-background))",
-            border: "1px solid color-mix(in srgb, var(--site-primary) 15%, transparent)",
-            boxShadow: sectionShadow,
-          }}
-        >
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {description && <p className="mt-3 text-sm opacity-80">{description}</p>}
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mt-4 aspect-[16/9] h-auto w-full object-cover"
-              style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
-            />
-          )}
-          <a
-            href={buttonHref}
-            target={buttonHref.startsWith("http") ? "_blank" : undefined}
-            rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-            className={`mt-5 inline-flex bg-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-            style={{ color: "#fff" }}
-          >
-            {buttonLabel}
-          </a>
+        <section id="cta" className="w-full" style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 6%, var(--site-background))" }}>
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-12 md:flex-row md:items-center md:justify-between md:py-16">
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+              {description && <p className="mt-3 max-w-xl text-base opacity-70">{description}</p>}
+            </div>
+            <a
+              href={buttonHref}
+              target={linkTarget(buttonHref)}
+              rel={linkRel(buttonHref)}
+              className={`inline-flex shrink-0 bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+              style={{ color: "#fff" }}
+            >
+              {buttonLabel}
+            </a>
+          </div>
         </section>
       );
     }
@@ -623,165 +614,122 @@ export function SectionRenderer({
       return (
         <section
           id="cta"
-          className="p-6 text-center"
-          style={{
-            borderRadius: sectionRadius,
-            backgroundColor: "color-mix(in srgb, var(--site-primary) 4%, var(--site-background))",
-            border: "2px solid color-mix(in srgb, var(--site-primary) 12%, transparent)",
-          }}
+          className="w-full py-12 md:py-16"
+          style={{ borderTop: "2px solid color-mix(in srgb, var(--site-primary) 12%, transparent)", borderBottom: "2px solid color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
         >
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {description && <p className="mx-auto mt-3 max-w-xl text-sm opacity-80">{description}</p>}
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mt-4 aspect-[16/9] h-auto w-full max-w-2xl rounded-2xl border border-[var(--site-border)] object-cover"
-            />
-          )}
-          <a
-            href={buttonHref}
-            target={buttonHref.startsWith("http") ? "_blank" : undefined}
-            rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-            className={`mt-5 inline-flex bg-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
-            style={{ color: "#fff" }}
-          >
-            {buttonLabel}
-          </a>
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+            {description && <p className="mx-auto mt-3 max-w-xl text-base opacity-70">{description}</p>}
+            <a
+              href={buttonHref}
+              target={linkTarget(buttonHref)}
+              rel={linkRel(buttonHref)}
+              className={`mt-6 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+              style={{ color: "#fff" }}
+            >
+              {buttonLabel}
+            </a>
+          </div>
         </section>
       );
     }
 
     if (variant === "banner-gradient") {
       return (
-        <section id="cta" className="bg-[linear-gradient(135deg,var(--site-primary),var(--site-accent))] p-6 text-white" style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {description && <p className="mt-3 text-sm text-white/90">{description}</p>}
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mt-4 aspect-[16/9] h-auto w-full rounded-2xl border border-white/25 object-cover"
-            />
-          )}
-          <a
-            href={buttonHref}
-            target={buttonHref.startsWith("http") ? "_blank" : undefined}
-            rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-            className={`mt-5 inline-flex bg-white px-5 py-2.5 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
-            style={{ color: "var(--site-primary)" }}
-          >
-            {buttonLabel}
-          </a>
+        <section id="cta" className="w-full bg-[linear-gradient(135deg,var(--site-primary),var(--site-accent))] text-white">
+          <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-12 md:flex-row md:items-center md:justify-between md:py-16">
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+              {description && <p className="mt-3 max-w-xl text-base text-white/80">{description}</p>}
+            </div>
+            <a
+              href={buttonHref}
+              target={linkTarget(buttonHref)}
+              rel={linkRel(buttonHref)}
+              className={`inline-flex shrink-0 bg-white px-6 py-3.5 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
+              style={{ color: "var(--site-primary)" }}
+            >
+              {buttonLabel}
+            </a>
+          </div>
         </section>
       );
     }
 
     if (variant === "centered-gradient") {
       return (
-        <section id="cta" className="relative overflow-hidden bg-[linear-gradient(135deg,var(--site-primary),var(--site-accent))] p-6 text-center text-white" style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          {/* Dots pattern overlay */}
+        <section id="cta" className="relative w-full overflow-hidden bg-[linear-gradient(135deg,var(--site-primary),var(--site-accent))] text-white">
           <div className="pointer-events-none absolute inset-0 opacity-[0.04]" style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
-          <h2 className="relative text-2xl font-semibold">{title}</h2>
-          {description && <p className="relative mx-auto mt-3 max-w-xl text-sm text-white/85">{description}</p>}
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mt-4 aspect-[16/9] h-auto w-full max-w-2xl rounded-2xl border border-white/20 object-cover"
-            />
-          )}
-          <a
-            href={buttonHref}
-            target={buttonHref.startsWith("http") ? "_blank" : undefined}
-            rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-            className={`mt-5 inline-flex bg-white px-5 py-2.5 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
-            style={{ color: "var(--site-primary)" }}
-          >
-            {buttonLabel}
-          </a>
+          <div className="relative mx-auto max-w-3xl px-6 py-12 text-center md:py-16">
+            <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+            {description && <p className="mx-auto mt-3 max-w-xl text-base text-white/80">{description}</p>}
+            <a
+              href={buttonHref}
+              target={linkTarget(buttonHref)}
+              rel={linkRel(buttonHref)}
+              className={`mt-6 inline-flex bg-white px-6 py-3.5 text-sm font-semibold transition hover:bg-white/90 ${buttonStyleClassName}`}
+              style={{ color: "var(--site-primary)" }}
+            >
+              {buttonLabel}
+            </a>
+          </div>
         </section>
       );
     }
 
     if (variant === "double") {
       return (
-        <section id="cta" className={`p-6 text-center ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-          <h2 className="text-2xl font-semibold">{title}</h2>
-          {description && <p className="mx-auto mt-3 max-w-xl text-sm opacity-80">{description}</p>}
-          {imageUrl && (
-            <Image
-              src={imageUrl}
-              alt={title}
-              width={1280}
-              height={720}
-              className="mx-auto mt-4 aspect-[16/9] h-auto w-full max-w-2xl object-cover"
-              style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
-            />
-          )}
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={buttonHref}
-              target={buttonHref.startsWith("http") ? "_blank" : undefined}
-              rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-              className={`inline-flex bg-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-105 ${buttonStyleClassName}`}
-              style={{ color: "#fff" }}
-            >
-              {buttonLabel}
-            </a>
-            {secondaryLabel && secondaryHref && (
+        <section id="cta" className="w-full py-12 md:py-16">
+          <div className="mx-auto max-w-3xl px-6 text-center">
+            <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+            {description && <p className="mx-auto mt-3 max-w-xl text-base opacity-70">{description}</p>}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
               <a
-                href={secondaryHref}
-                target={secondaryHref.startsWith("http") ? "_blank" : undefined}
-                rel={secondaryHref.startsWith("http") ? "noreferrer" : undefined}
-                className={`inline-flex border border-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--site-primary)]/10 ${buttonStyleClassName}`}
-                style={{ color: "var(--site-primary)" }}
+                href={buttonHref}
+                target={linkTarget(buttonHref)}
+                rel={linkRel(buttonHref)}
+                className={`inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
+                style={{ color: "#fff" }}
               >
-                {secondaryLabel}
+                {buttonLabel}
               </a>
-            )}
+              {secondaryLabel && secondaryHref && (
+                <a
+                  href={secondaryHref}
+                  target={linkTarget(secondaryHref)}
+                  rel={linkRel(secondaryHref)}
+                  className={`inline-flex border-2 border-[var(--site-primary)] px-6 py-3 text-sm font-semibold transition hover:bg-[var(--site-primary)]/10 ${buttonStyleClassName}`}
+                  style={{ color: "var(--site-primary)" }}
+                >
+                  {secondaryLabel}
+                </a>
+              )}
+            </div>
           </div>
         </section>
       );
     }
 
-    // default cta — minimal/clean: transparent bg, divider lines, outline button
+    // default cta
     return (
       <section
         id="cta"
-        className="py-10 text-center"
-        style={{
-          borderTop: "1px solid var(--site-border)",
-          borderBottom: "1px solid var(--site-border)",
-        }}
+        className="w-full py-12 md:py-16"
+        style={{ borderTop: "1px solid var(--site-border)", borderBottom: "1px solid var(--site-border)" }}
       >
-        <h2 className="text-2xl font-semibold">{title}</h2>
-        {description && <p className="mx-auto mt-3 max-w-xl text-sm opacity-80">{description}</p>}
-        {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt={title}
-            width={1280}
-            height={720}
-            className="mx-auto mt-4 aspect-[16/9] h-auto w-full max-w-2xl object-cover"
-            style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }}
-          />
-        )}
-        <a
-          href={buttonHref}
-          target={buttonHref.startsWith("http") ? "_blank" : undefined}
-          rel={buttonHref.startsWith("http") ? "noreferrer" : undefined}
-          className={`mt-5 inline-flex border-2 border-[var(--site-primary)] px-6 py-2.5 text-sm font-semibold transition hover:bg-[var(--site-primary)] hover:text-white ${buttonStyleClassName}`}
-          style={{ color: "var(--site-primary)" }}
-        >
-          {buttonLabel}
-        </a>
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+          {description && <p className="mx-auto mt-3 max-w-xl text-base opacity-70">{description}</p>}
+          <a
+            href={buttonHref}
+            target={linkTarget(buttonHref)}
+            rel={linkRel(buttonHref)}
+            className={`mt-6 inline-flex border-2 border-[var(--site-primary)] px-6 py-3 text-sm font-semibold transition hover:bg-[var(--site-primary)] hover:text-white ${buttonStyleClassName}`}
+            style={{ color: "var(--site-primary)" }}
+          >
+            {buttonLabel}
+          </a>
+        </div>
       </section>
     );
   }
@@ -792,23 +740,25 @@ export function SectionRenderer({
     const testimonials = asTestimonials(section.content.items);
 
     return (
-      <section className={`p-6 ${surfaceClassName}`} style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}>
-        <h2 className="text-2xl font-semibold">{title}</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {testimonials.map((testimonial) => (
-            <article
-              key={`${testimonial.author}-${testimonial.quote}`}
-              className="border border-[var(--site-border)] p-4"
-              style={{ borderRadius: cardRadius }}
-            >
-              <p className="text-sm leading-6 opacity-85">
-                &ldquo;{testimonial.quote}&rdquo;
-              </p>
-              <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-[var(--site-accent)]">
-                {testimonial.author}
-              </p>
-            </article>
-          ))}
+      <section className="w-full py-16 md:py-20">
+        <div className={containerClass}>
+          <h2 className="text-3xl font-bold">{title}</h2>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
+            {testimonials.map((testimonial) => (
+              <article
+                key={`${testimonial.author}-${testimonial.quote}`}
+                className="border border-[var(--site-border)] bg-[var(--site-surface)] p-6"
+                style={{ borderRadius: cardRadius }}
+              >
+                <p className="text-base leading-relaxed opacity-80">
+                  &ldquo;{testimonial.quote}&rdquo;
+                </p>
+                <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-[var(--site-accent)]">
+                  {testimonial.author}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
     );
@@ -818,11 +768,7 @@ export function SectionRenderer({
   if (section.type === "contact") {
     const title = asString(section.content.title, "Contato");
     const subtitle = asString(section.content.subtitle);
-
-    // New: array of social links with icons
     const socialLinks = asSocialLinks(section.content.socialLinks);
-
-    // Backward compat: build from legacy fields if socialLinks is empty
     const legacyLinks: SocialLink[] = [];
     if (socialLinks.length === 0) {
       const whatsappUrl = asString(section.content.whatsappUrl);
@@ -832,41 +778,38 @@ export function SectionRenderer({
       if (whatsappUrl) legacyLinks.push({ type: "whatsapp", url: whatsappUrl, label: whatsappLabel, icon: "MessageCircle" });
       if (secondaryUrl && secondaryLabel) legacyLinks.push({ type: "email", url: secondaryUrl, label: secondaryLabel, icon: "Mail" });
     }
-
     const allLinks = socialLinks.length > 0 ? socialLinks : legacyLinks;
 
     return (
-      <section
-        id="contact"
-        className={`p-6 text-center ${surfaceClassName}`}
-        style={{ borderRadius: sectionRadius, boxShadow: sectionShadow }}
-      >
-        <h2 className="text-2xl font-semibold">{title}</h2>
-        {subtitle && <p className="mt-3 text-sm opacity-80">{subtitle}</p>}
-        {allLinks.length > 0 && (
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-5">
-            {allLinks.map((link) => {
-              const Icon = getIcon(link.icon);
-              return (
-                <a
-                  key={link.url}
-                  href={link.url}
-                  target={link.url.startsWith("#") ? undefined : "_blank"}
-                  rel={link.url.startsWith("#") ? undefined : "noreferrer"}
-                  className="group flex flex-col items-center gap-2 transition"
-                >
-                  <span
-                    className="flex h-12 w-12 items-center justify-center rounded-xl transition group-hover:brightness-110"
-                    style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
+      <section id="contact" className="w-full py-16 md:py-20">
+        <div className={`${containerClass} text-center`}>
+          <h2 className="text-3xl font-bold">{title}</h2>
+          {subtitle && <p className="mt-3 text-base opacity-70">{subtitle}</p>}
+          {allLinks.length > 0 && (
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
+              {allLinks.map((link) => {
+                const Icon = getIcon(link.icon);
+                return (
+                  <a
+                    key={link.url}
+                    href={link.url}
+                    target={link.url.startsWith("#") ? undefined : "_blank"}
+                    rel={link.url.startsWith("#") ? undefined : "noreferrer"}
+                    className="group flex flex-col items-center gap-3 transition"
                   >
-                    {Icon && <Icon size={22} className="text-[var(--site-primary)]" />}
-                  </span>
-                  <span className="text-xs font-medium opacity-80">{link.label}</span>
-                </a>
-              );
-            })}
-          </div>
-        )}
+                    <span
+                      className="flex h-14 w-14 items-center justify-center rounded-xl transition group-hover:scale-105 group-hover:brightness-110"
+                      style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 12%, transparent)" }}
+                    >
+                      {Icon && <Icon size={24} className="text-[var(--site-primary)]" />}
+                    </span>
+                    <span className="text-sm font-medium opacity-70">{link.label}</span>
+                  </a>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </section>
     );
   }
