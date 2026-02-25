@@ -85,10 +85,45 @@ const getMotionVariants = (style: string): MotionVariants => {
   }
 };
 
+// ── Mini divisor para o preview ──
+function PreviewDivider({ style }: { style: string }) {
+  if (!style || style === "none") return null;
+
+  if (style === "wave") {
+    return (
+      <div className="w-full overflow-hidden" style={{ height: "10px", marginTop: "-1px" }}>
+        <svg viewBox="0 0 100 10" preserveAspectRatio="none" className="w-full h-full">
+          <path d="M0,5 C25,0 75,10 100,5 L100,10 L0,10 Z" fill="var(--preview-primary)" opacity="0.06" />
+        </svg>
+      </div>
+    );
+  }
+  if (style === "diagonal") {
+    return (
+      <div className="w-full" style={{ height: "8px", background: "var(--preview-primary)", opacity: 0.04, clipPath: "polygon(0 0, 100% 40%, 100% 100%, 0 100%)" }} />
+    );
+  }
+  if (style === "curve") {
+    return (
+      <div className="w-full overflow-hidden" style={{ height: "10px", marginTop: "-1px" }}>
+        <svg viewBox="0 0 100 10" preserveAspectRatio="none" className="w-full h-full">
+          <ellipse cx="50" cy="0" rx="60" ry="10" fill="var(--preview-primary)" opacity="0.05" />
+        </svg>
+      </div>
+    );
+  }
+  if (style === "line") {
+    return (
+      <div className="mx-3 h-px" style={{ background: "linear-gradient(to right, transparent, var(--preview-primary)30, transparent)" }} />
+    );
+  }
+  return null;
+}
+
 export function LivePreviewPanel() {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const { state } = useWizard();
-  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, enabledSections } = state;
+  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections } = state;
 
   const palette = paletteId ? getPaletteById(paletteId) : null;
   const { container: containerVariants, item: itemVariants } = getMotionVariants(motionStyle);
@@ -235,24 +270,36 @@ export function LivePreviewPanel() {
                 </motion.div>
               )}
               {enabledSections.includes("services") && (
-                <motion.div variants={itemVariants}>
-                  <PreviewServices deviceMode={deviceMode} />
-                </motion.div>
+                <>
+                  <PreviewDivider style={dividerStyle} />
+                  <motion.div variants={itemVariants}>
+                    <PreviewServices deviceMode={deviceMode} />
+                  </motion.div>
+                </>
               )}
               {enabledSections.includes("about") && (
-                <motion.div variants={itemVariants}>
-                  <PreviewAbout deviceMode={deviceMode} />
-                </motion.div>
+                <>
+                  <PreviewDivider style={dividerStyle} />
+                  <motion.div variants={itemVariants}>
+                    <PreviewAbout deviceMode={deviceMode} />
+                  </motion.div>
+                </>
               )}
               {enabledSections.includes("cta") && (
-                <motion.div variants={itemVariants}>
-                  <PreviewCta deviceMode={deviceMode} />
-                </motion.div>
+                <>
+                  <PreviewDivider style={dividerStyle} />
+                  <motion.div variants={itemVariants}>
+                    <PreviewCta deviceMode={deviceMode} />
+                  </motion.div>
+                </>
               )}
               {enabledSections.includes("contact") && (
-                <motion.div variants={itemVariants}>
-                  <PreviewContact deviceMode={deviceMode} />
-                </motion.div>
+                <>
+                  <PreviewDivider style={dividerStyle} />
+                  <motion.div variants={itemVariants}>
+                    <PreviewContact deviceMode={deviceMode} />
+                  </motion.div>
+                </>
               )}
               <div className="flex-1" />
               {floatingCtaEnabled && <PreviewFloatingCta />}

@@ -206,7 +206,65 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
     );
   }
 
-  // ── default (grid): 2-column grid with icon cards (matches published) ──
+  // ── default: se há imagens usa layout horizontal (ícone+texto | imagem), senão grid ──
+  const hasAnyImage = cards.some((c) => c.imageUrl);
+
+  if (hasAnyImage) {
+    return (
+      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+        <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
+          {title}
+        </h2>
+        <div className="space-y-2">
+          {cards.map((card, index) => {
+            const Icon = getIcon(card);
+            const isReversed = index % 2 === 1;
+            return (
+              <div
+                key={index}
+                className={`flex items-center gap-2 overflow-hidden border ${isReversed ? "flex-row-reverse" : ""}`}
+                style={{
+                  borderColor: "var(--preview-text)12",
+                  backgroundColor: "var(--preview-text)04",
+                  borderRadius: "var(--preview-radius)",
+                }}
+              >
+                <div className="flex-1 p-2">
+                  {Icon && (
+                    <div className="mb-1 inline-flex h-4 w-4 items-center justify-center rounded"
+                      style={{ backgroundColor: "var(--preview-primary)15" }}>
+                      <Icon size={8} style={{ color: "var(--preview-primary)" }} />
+                    </div>
+                  )}
+                  <h3 className="text-[8px] font-semibold leading-tight" style={{ color: "var(--preview-text)" }}>
+                    {card.title || `Serviço ${index + 1}`}
+                  </h3>
+                  {card.description && (
+                    <p className="text-[6px] mt-0.5 line-clamp-2" style={{ color: "var(--preview-muted)" }}>
+                      {card.description}
+                    </p>
+                  )}
+                </div>
+                {card.imageUrl ? (
+                  <div className="h-12 w-14 shrink-0 overflow-hidden"
+                    style={{ borderRadius: "var(--preview-radius)" }}>
+                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="h-12 w-14 shrink-0 flex items-center justify-center"
+                    style={{ backgroundColor: "var(--preview-primary)08", borderRadius: "var(--preview-radius)" }}>
+                    <span className="text-[5px]" style={{ color: "var(--preview-primary)" }}>Img</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
+
+  // grid simples quando não há imagens
   return (
     <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
       <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>

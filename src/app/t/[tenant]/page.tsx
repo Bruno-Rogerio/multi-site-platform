@@ -4,6 +4,8 @@ import { SectionRenderer } from "@/components/site/section-renderer";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
 import { SiteShell, buttonStyleClasses } from "@/components/site/site-shell";
 import { getSiteByTenantSubdomain } from "@/lib/tenant/service";
+import { AnimatedSection } from "@/components/site/animated-section";
+import { SectionDivider } from "@/components/site/section-divider";
 
 type TenantPageProps = {
   params: Promise<{ tenant: string }>;
@@ -34,16 +36,22 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
   }
 
   const buttonStyleClassName = buttonStyleClasses[site.themeSettings.buttonStyle];
+  const motionStyle = site.themeSettings.motionStyle ?? "motion-fade";
+  const dividerStyle = site.themeSettings.dividerStyle ?? "none";
 
   return (
     <SiteShell site={site}>
-      {sectionsToRender.map((section) => (
-        <SectionRenderer
-          key={section.id}
-          section={section}
-          site={site}
-          buttonStyleClassName={buttonStyleClassName}
-        />
+      {sectionsToRender.map((section, index) => (
+        <div key={section.id}>
+          {index > 0 && <SectionDivider style={dividerStyle} />}
+          <AnimatedSection animationStyle={motionStyle}>
+            <SectionRenderer
+              section={section}
+              site={site}
+              buttonStyleClassName={buttonStyleClassName}
+            />
+          </AnimatedSection>
+        </div>
       ))}
     </SiteShell>
   );

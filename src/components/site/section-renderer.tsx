@@ -19,7 +19,7 @@ function asStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string");
 }
 
-type ServiceCard = { title: string; description?: string; iconName?: string };
+type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string };
 
 function asCards(value: unknown): ServiceCard[] {
   if (!Array.isArray(value)) return [];
@@ -33,6 +33,7 @@ function asCards(value: unknown): ServiceCard[] {
       title,
       description: typeof rec.description === "string" ? rec.description : "",
       iconName: typeof rec.iconName === "string" ? rec.iconName : "",
+      imageUrl: typeof rec.imageUrl === "string" ? rec.imageUrl : "",
     });
   }
   return result;
@@ -537,7 +538,72 @@ export function SectionRenderer({
       );
     }
 
-    // default services (grid)
+    // default services — layout horizontal (ícone+texto | imagem) se houver imagens, senão grid
+    const hasAnyImage = effectiveCards.some((c) => c.imageUrl);
+
+    if (hasAnyImage) {
+      return (
+        <section id="services" className="w-full py-16 md:py-20">
+          <div className={containerClass}>
+            <h2 className="text-3xl font-bold">{title}</h2>
+            {imageUrl && (
+              <Image src={imageUrl} alt={title} width={1200} height={600}
+                className="mt-6 aspect-[2/1] h-auto w-full object-cover"
+                style={{ borderRadius: cardRadius, border: "1px solid var(--site-border)" }} />
+            )}
+            <div className="mt-8 space-y-6">
+              {effectiveCards.map((card, index) => {
+                const Icon = getIcon(card.iconName || "");
+                const isReversed = index % 2 === 1;
+                return (
+                  <div
+                    key={`${card.title}-${index}`}
+                    className={`flex items-center gap-8 overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] transition-all duration-200 hover:shadow-lg hover:border-[var(--site-primary)]/20 ${isReversed ? "flex-row-reverse" : ""}`}
+                    style={{ borderRadius: cardRadius }}
+                  >
+                    <div className="flex-1 p-6 md:p-8">
+                      {Icon && (
+                        <div
+                          className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl"
+                          style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 10%, transparent)" }}
+                        >
+                          <Icon size={22} className="text-[var(--site-primary)]" />
+                        </div>
+                      )}
+                      <h3 className="text-xl font-semibold">{card.title}</h3>
+                      {card.description && (
+                        <p className="mt-3 text-base leading-relaxed opacity-60">{card.description}</p>
+                      )}
+                    </div>
+                    {card.imageUrl ? (
+                      <Image
+                        src={card.imageUrl}
+                        alt={card.title}
+                        width={480}
+                        height={360}
+                        className="h-48 w-48 shrink-0 object-cover md:h-56 md:w-64"
+                        style={{ borderRadius: isReversed ? `${cardRadius} 0 0 ${cardRadius}` : `0 ${cardRadius} ${cardRadius} 0` }}
+                      />
+                    ) : (
+                      <div
+                        className="hidden h-48 w-48 shrink-0 items-center justify-center md:flex md:h-56 md:w-64"
+                        style={{
+                          backgroundColor: "color-mix(in srgb, var(--site-primary) 5%, transparent)",
+                          borderRadius: isReversed ? `${cardRadius} 0 0 ${cardRadius}` : `0 ${cardRadius} ${cardRadius} 0`,
+                        }}
+                      >
+                        <span className="text-sm opacity-30">Imagem</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section id="services" className="w-full py-16 md:py-20">
         <div className={containerClass}>

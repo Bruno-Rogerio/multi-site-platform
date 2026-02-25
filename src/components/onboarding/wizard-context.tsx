@@ -41,6 +41,8 @@ const initialState: WizardState = {
   servicesVariant: "default",
   ctaVariant: "banner",
   motionStyle: "motion-fade",
+  headerStyle: "blur" as const,
+  dividerStyle: "wave" as const,
   enabledSections: ["hero", "services", "about", "cta", "contact"],
   sectionColors: {},
 
@@ -112,6 +114,8 @@ const FREE_VARIANTES_DEFAULTS = {
   servicesVariant: "default",
   ctaVariant: "banner",
   motionStyle: "motion-fade",
+  headerStyle: "blur" as const,
+  dividerStyle: "wave" as const,
 } as const;
 
 const FREE_CANAIS_DEFAULTS = {
@@ -172,6 +176,12 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_MOTION_STYLE":
       return { ...state, motionStyle: action.style };
+
+    case "SET_HEADER_STYLE":
+      return { ...state, headerStyle: action.style };
+
+    case "SET_DIVIDER_STYLE":
+      return { ...state, dividerStyle: action.style };
 
     case "ADD_SECTION":
       return {

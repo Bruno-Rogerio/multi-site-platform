@@ -180,6 +180,38 @@ function ServicesContentEditor() {
                 rows={2}
                 className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
               />
+              {/* imagem do card */}
+              <div className="flex items-center gap-2">
+                {card.imageUrl ? (
+                  <div className="relative h-10 w-16 shrink-0 overflow-hidden rounded-md border border-white/10">
+                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => handleServiceChange(index, "imageUrl", "")}
+                      className="absolute inset-0 flex items-center justify-center bg-black/50 text-[10px] text-white opacity-0 hover:opacity-100 transition"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                ) : null}
+                <label className="cursor-pointer rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] text-[var(--platform-text)]/60 hover:bg-white/[0.08] transition">
+                  {card.imageUrl ? "Trocar imagem" : "+ Imagem do serviço"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = (ev) => {
+                        handleServiceChange(index, "imageUrl", ev.target?.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </label>
+              </div>
             </div>
           ))}
         </div>

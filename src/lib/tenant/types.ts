@@ -22,6 +22,9 @@ export type ThemeSettings = {
   "--site-radius"?: string;
   "--site-spacing"?: string;
   "--site-shadow"?: string;
+  headerStyle?: "blur" | "solid" | "minimal";
+  dividerStyle?: "wave" | "diagonal" | "curve" | "line" | "none";
+  motionStyle?: string;
 };
 
 export type Section = {

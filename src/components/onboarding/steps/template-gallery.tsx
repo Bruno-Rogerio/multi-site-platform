@@ -105,6 +105,8 @@ export function TemplateGallery() {
       dispatch({ type: "SET_FONT", family: template.fontFamily });
       dispatch({ type: "SET_BUTTON_STYLE", style: template.buttonStyle });
       dispatch({ type: "SET_MOTION_STYLE", style: template.motionStyle });
+      dispatch({ type: "SET_HEADER_STYLE", style: template.headerStyle });
+      dispatch({ type: "SET_DIVIDER_STYLE", style: template.dividerStyle });
     }
   }
 

@@ -49,6 +49,8 @@ export type WizardState = {
   servicesVariant: string;
   ctaVariant: string;
   motionStyle: string;
+  headerStyle: "blur" | "solid" | "minimal";
+  dividerStyle: "wave" | "diagonal" | "curve" | "line" | "none";
   enabledSections: string[];
   sectionColors: Record<string, SectionColorOverride>;
 
@@ -115,6 +117,8 @@ export type WizardAction =
   | { type: "SET_SERVICES_VARIANT"; variant: string }
   | { type: "SET_CTA_VARIANT"; variant: string }
   | { type: "SET_MOTION_STYLE"; style: string }
+  | { type: "SET_HEADER_STYLE"; style: "blur" | "solid" | "minimal" }
+  | { type: "SET_DIVIDER_STYLE"; style: "wave" | "diagonal" | "curve" | "line" | "none" }
   | { type: "ADD_SECTION"; sectionType: string }
   | { type: "REMOVE_SECTION"; sectionType: string }
   | { type: "SET_SECTION_COLOR"; sectionType: string; colors: SectionColorOverride }

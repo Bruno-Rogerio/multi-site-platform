@@ -24,6 +24,9 @@ export const palettePresets: PalettePreset[] = [
   { id: "mint-cloud", name: "Mint Cloud", primary: "#0D9488", accent: "#14B8A6", background: "#F0FDFA", text: "#134E4A", borderRadius: "16px", spacing: "spacious", shadowIntensity: "subtle" },
   { id: "rose-luxe", name: "Rose Luxe", primary: "#E11D48", accent: "#FB7185", background: "#1F1022", text: "#FFE4E6", borderRadius: "8px", spacing: "normal", shadowIntensity: "medium" },
   { id: "ocean-deep", name: "Ocean Deep", primary: "#0EA5E9", accent: "#06B6D4", background: "#082F49", text: "#E0F2FE", borderRadius: "12px", spacing: "normal", shadowIntensity: "medium" },
+  { id: "editorial-dark", name: "Editorial Dark", primary: "#F0E6D3", accent: "#FF4444", background: "#0C0C0C", text: "#F0F0F0", borderRadius: "0px", spacing: "compact", shadowIntensity: "none" },
+  { id: "corporate-navy", name: "Corporate Navy", primary: "#1B2A4A", accent: "#B8962E", background: "#FAFAFA", text: "#1B2A4A", borderRadius: "0px", spacing: "compact", shadowIntensity: "strong" },
+  { id: "dark-tech", name: "Dark Tech", primary: "#00E5FF", accent: "#7C3AED", background: "#0D1117", text: "#E6EDF3", borderRadius: "4px", spacing: "compact", shadowIntensity: "medium" },
 ];
 
 export function getPaletteById(id: string): PalettePreset | undefined {
