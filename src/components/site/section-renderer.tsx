@@ -393,22 +393,31 @@ export function SectionRenderer({
                 const Icon = getIcon(card.iconName || "");
                 return (
                   <li key={`${card.title}-${index}`}
-                    className="flex items-start gap-4 px-4 py-5 text-sm transition hover:bg-[var(--site-primary)]/5"
+                    className="flex items-center gap-4 px-4 py-5 text-sm transition hover:bg-[var(--site-primary)]/5"
                     style={{ borderRadius: cardRadius }}>
                     {Icon ? (
-                      <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
                         style={{ backgroundColor: "color-mix(in srgb, var(--site-primary) 10%, transparent)" }}>
                         <Icon size={18} className="text-[var(--site-primary)]" />
                       </div>
                     ) : (
-                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
+                      <span className="h-2 w-2 shrink-0 rounded-full bg-[var(--site-accent)]" />
                     )}
-                    <div>
+                    <div className="flex-1">
                       <span className="text-base font-medium">{card.title}</span>
                       {card.description && (
                         <p className="mt-1 text-sm opacity-60">{card.description}</p>
                       )}
                     </div>
+                    {card.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.imageUrl}
+                        alt={card.title}
+                        className="h-16 w-20 shrink-0 object-cover"
+                        style={{ borderRadius: cardRadius }}
+                      />
+                    )}
                   </li>
                 );
               })}
@@ -436,6 +445,15 @@ export function SectionRenderer({
                   <div key={`${card.title}-${index}`}
                     className="break-inside-avoid overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] transition-all duration-200 hover:shadow-lg hover:border-[var(--site-primary)]/20"
                     style={{ borderRadius: cardRadius }}>
+                    {card.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.imageUrl}
+                        alt={card.title}
+                        className="w-full object-cover"
+                        style={{ height: isTall ? "160px" : "120px" }}
+                      />
+                    )}
                     <div className={`px-5 ${isTall ? "py-8" : "py-5"}`}>
                       {Icon && (
                         <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl"
@@ -491,6 +509,15 @@ export function SectionRenderer({
                         <p className="mt-1 text-sm leading-relaxed opacity-60">{card.description}</p>
                       )}
                     </div>
+                    {card.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.imageUrl}
+                        alt={card.title}
+                        className="h-20 w-24 shrink-0 object-cover"
+                        style={{ borderRadius: cardRadius }}
+                      />
+                    )}
                   </div>
                 );
               })}
@@ -518,17 +545,26 @@ export function SectionRenderer({
               {effectiveCards.map((card, index) => {
                 const Icon = getIcon(card.iconName || "");
                 return (
-                  <li key={`${card.title}-${index}`} className="relative flex items-start gap-4 pb-6 last:pb-0">
+                  <li key={`${card.title}-${index}`} className="relative flex items-center gap-4 pb-6 last:pb-0">
                     <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white" style={{ color: "#fff" }}>
                       {index + 1}
                     </span>
-                    <div className="pt-1">
+                    <div className="flex-1 pt-1">
                       <div className="flex items-center gap-2">
                         {Icon && <Icon size={16} className="text-[var(--site-primary)]" />}
                         <span className="text-base font-semibold">{card.title}</span>
                       </div>
                       {card.description && <p className="mt-1 text-sm leading-relaxed opacity-60">{card.description}</p>}
                     </div>
+                    {card.imageUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={card.imageUrl}
+                        alt={card.title}
+                        className="h-20 w-24 shrink-0 object-cover"
+                        style={{ borderRadius: cardRadius }}
+                      />
+                    )}
                   </li>
                 );
               })}

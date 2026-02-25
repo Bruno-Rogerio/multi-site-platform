@@ -32,25 +32,30 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           {cards.map((card, index) => {
             const Icon = getIcon(card);
             return (
-              <div key={index} className="flex items-start gap-2 py-2">
+              <div key={index} className="flex items-center gap-2 py-2">
                 {Icon ? (
-                  <div className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded"
+                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
                     style={{ backgroundColor: "var(--preview-primary)15" }}>
                     <Icon size={9} style={{ color: "var(--preview-primary)" }} />
                   </div>
                 ) : (
-                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--preview-accent)" }} />
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--preview-accent)" }} />
                 )}
-                <div>
+                <div className="flex-1 min-w-0">
                   <span className="text-[8px] font-medium" style={{ color: "var(--preview-text)" }}>
                     {card.title || `Serviço ${index + 1}`}
                   </span>
                   {card.description && (
-                    <p className="text-[6px] mt-0.5" style={{ color: "var(--preview-muted)" }}>
+                    <p className="text-[6px] mt-0.5 truncate" style={{ color: "var(--preview-muted)" }}>
                       {card.description}
                     </p>
                   )}
                 </div>
+                {card.imageUrl && (
+                  <div className="h-7 w-9 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
+                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                  </div>
+                )}
               </div>
             );
           })}
@@ -73,7 +78,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-2 p-2 border ${isReversed ? "flex-row-reverse" : ""}`}
+                className={`flex items-center gap-2 p-2 border overflow-hidden ${isReversed ? "flex-row-reverse" : ""}`}
                 style={{
                   borderColor: "var(--preview-text)12",
                   backgroundColor: "var(--preview-text)04",
@@ -86,16 +91,21 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                     <Icon size={14} style={{ color: "var(--preview-primary)" }} />
                   </div>
                 )}
-                <div className={`flex-1 ${isReversed ? "text-right" : ""}`}>
+                <div className={`flex-1 min-w-0 ${isReversed ? "text-right" : ""}`}>
                   <h3 className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}>
                     {card.title || `Serviço ${index + 1}`}
                   </h3>
                   {card.description && (
-                    <p className="text-[6px] mt-0.5" style={{ color: "var(--preview-muted)" }}>
+                    <p className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>
                       {card.description}
                     </p>
                   )}
                 </div>
+                {card.imageUrl && (
+                  <div className="h-9 w-12 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
+                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                  </div>
+                )}
               </div>
             );
           })}
@@ -117,14 +127,14 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
             {cards.map((card, index) => {
               const Icon = getIcon(card);
               return (
-                <div key={index} className="relative flex items-start gap-2">
+                <div key={index} className="relative flex items-center gap-2">
                   <span
                     className="relative z-10 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[6px] font-bold text-white"
                     style={{ backgroundColor: "var(--preview-primary)" }}
                   >
                     {index + 1}
                   </span>
-                  <div className="pt-0.5">
+                  <div className="flex-1 min-w-0 pt-0.5">
                     <div className="flex items-center gap-1">
                       {Icon && <Icon size={9} style={{ color: "var(--preview-primary)" }} />}
                       <span className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}>
@@ -132,11 +142,16 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                       </span>
                     </div>
                     {card.description && (
-                      <p className="text-[6px] mt-0.5" style={{ color: "var(--preview-muted)" }}>
+                      <p className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>
                         {card.description}
                       </p>
                     )}
                   </div>
+                  {card.imageUrl && (
+                    <div className="h-8 w-10 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
+                      <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -163,6 +178,11 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
             borderRadius: "var(--preview-radius)",
           }}
         >
+          {card.imageUrl && (
+            <div className="w-full overflow-hidden" style={{ height: isTall ? "36px" : "28px" }}>
+              <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+            </div>
+          )}
           <div className={`p-2 ${isTall ? "pb-3" : ""}`}>
             {Icon && (
               <div className={`mb-1 inline-flex items-center justify-center rounded ${isTall ? "h-5 w-5" : "h-4 w-4"}`}

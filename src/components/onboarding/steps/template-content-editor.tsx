@@ -291,10 +291,15 @@ export function TemplateContentEditor() {
             <div className="space-y-3">
               {serviceCards.slice(0, 4).map((card, i) => (
                 <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
-                  <IconPickerInline
-                    selectedIcon={card.iconName || card.icon || ""}
-                    onSelect={(icon) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { iconName: icon, icon } })}
-                  />
+                  <div>
+                    <p className="text-[10px] font-medium text-[var(--platform-text)]/50 mb-1.5">
+                      Ícone do serviço — clique para selecionar
+                    </p>
+                    <IconPickerInline
+                      selectedIcon={card.iconName || card.icon || ""}
+                      onSelect={(icon) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { iconName: icon, icon } })}
+                    />
+                  </div>
                   <input
                     type="text"
                     value={card.title}
