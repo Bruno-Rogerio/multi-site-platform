@@ -21,6 +21,7 @@ type OnboardingDraftPayload = {
   };
   fontFamily?: string;
   headerStyle: string;
+  dividerStyle?: string;
   heroStyle: string;
   servicesStyle: string;
   ctaStyle: string;
@@ -148,6 +149,12 @@ function paletteById(paletteId: string | undefined) {
       return { primaryColor: "#15803D", accentColor: "#22C55E", backgroundColor: "#0F172A", textColor: "#ECFDF5" };
     case "mono-pro":
       return { primaryColor: "#111827", accentColor: "#52525B", backgroundColor: "#FAFAFA", textColor: "#09090B" };
+    case "editorial-dark":
+      return { primaryColor: "#F0E6D3", accentColor: "#FF4444", backgroundColor: "#0C0C0C", textColor: "#F0F0F0" };
+    case "corporate-navy":
+      return { primaryColor: "#1B2A4A", accentColor: "#B8962E", backgroundColor: "#FAFAFA", textColor: "#1B2A4A" };
+    case "dark-tech":
+      return { primaryColor: "#00E5FF", accentColor: "#7C3AED", backgroundColor: "#0D1117", textColor: "#E6EDF3" };
     case "buildsphere":
     default:
       return { primaryColor: "#3B82F6", accentColor: "#22D3EE", backgroundColor: "#0B1020", textColor: "#EAF0FF" };
@@ -244,6 +251,7 @@ export async function POST(request: Request) {
     paletteId: payload.paletteId ?? "buildsphere",
     fontFamily: payload.fontFamily ?? "Sora, sans-serif",
     headerStyle: payload.headerStyle,
+    dividerStyle: payload.dividerStyle ?? "none",
     motionStyle: payload.motionStyle ?? "motion-reveal",
     buttonStyle: payload.buttonStyle ?? "rounded",
     logoUrl: payload.logoUrl ?? "",

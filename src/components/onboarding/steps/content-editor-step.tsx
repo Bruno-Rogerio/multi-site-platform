@@ -6,6 +6,7 @@ import { Type, Sparkles, MessageSquare, Phone, Search } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { ImageUpload } from "../builders/image-upload";
+import { IconPickerInline } from "../builders/icon-picker";
 
 type SectionTab = "hero" | "services" | "cta" | "contact" | "seo";
 
@@ -171,6 +172,14 @@ function ServicesContentEditor() {
                   onChange={(e) => handleServiceChange(index, "title", e.target.value)}
                   placeholder="Título"
                   className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
+              {/* icon picker */}
+              <div>
+                <p className="mb-1 text-[10px] text-[var(--platform-text)]/40">Ícone do card</p>
+                <IconPickerInline
+                  selectedIcon={card.iconName || card.icon || ""}
+                  onSelect={(iconName) => handleServiceChange(index, "iconName", iconName)}
                 />
               </div>
               <textarea

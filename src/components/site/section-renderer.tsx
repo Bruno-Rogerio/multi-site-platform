@@ -576,11 +576,10 @@ export function SectionRenderer({
                       )}
                     </div>
                     {card.imageUrl ? (
-                      <Image
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={card.imageUrl}
                         alt={card.title}
-                        width={480}
-                        height={360}
                         className="h-48 w-48 shrink-0 object-cover md:h-56 md:w-64"
                         style={{ borderRadius: isReversed ? `${cardRadius} 0 0 ${cardRadius}` : `0 ${cardRadius} ${cardRadius} 0` }}
                       />
