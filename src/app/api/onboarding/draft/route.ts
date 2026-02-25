@@ -5,6 +5,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { buildCtaUrl } from "@/lib/onboarding/cta-types";
 import type { CtaTypeId } from "@/lib/onboarding/types";
 import { isReservedSubdomain } from "@/lib/tenant/host";
+import { getPaletteById, spacingMap, shadowMap } from "@/lib/onboarding/palettes";
 
 const SUBDOMAIN_REGEX = /^[a-z0-9-]{3,30}$/;
 
@@ -249,6 +250,17 @@ export async function POST(request: Request) {
     creationMode: payload.creationMode ?? "template",
     addons: payload.addonsSelected ?? [],
     onboardingDraft: true,
+    // Palette style params → CSS vars for site rendering
+    ...(() => {
+      const pid = payload.paletteId ?? "buildsphere";
+      const pal = getPaletteById(pid);
+      if (!pal) return {};
+      return {
+        "--site-radius": pal.borderRadius,
+        "--site-spacing": spacingMap[pal.spacing] ?? "16px",
+        "--site-shadow": shadowMap[pal.shadowIntensity] ?? "none",
+      };
+    })(),
   };
 
   // Keep "minimal clean" visually clean even when user picks a strong palette.

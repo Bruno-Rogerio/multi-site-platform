@@ -19,6 +19,9 @@ export type ThemeSettings = {
   buttonStyle: ButtonStyle;
   logoUrl?: string;
   headerCtaLabel?: string;
+  "--site-radius"?: string;
+  "--site-spacing"?: string;
+  "--site-shadow"?: string;
 };
 
 export type Section = {

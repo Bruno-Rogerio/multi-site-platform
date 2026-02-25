@@ -38,8 +38,8 @@ export function isDarkBackground(hex: string): boolean {
   return luminance < 0.5;
 }
 
-const spacingMap = { compact: "8px", normal: "16px", spacious: "24px" };
-const shadowMap = {
+export const spacingMap: Record<string, string> = { compact: "8px", normal: "16px", spacious: "24px" };
+export const shadowMap: Record<string, string> = {
   none: "none",
   subtle: "0 2px 8px rgba(0,0,0,0.1)",
   medium: "0 4px 16px rgba(0,0,0,0.15)",
@@ -51,5 +51,13 @@ export function getPaletteStyleVars(palette: PalettePreset): Record<string, stri
     "--preview-radius": palette.borderRadius,
     "--preview-spacing": spacingMap[palette.spacing],
     "--preview-shadow": shadowMap[palette.shadowIntensity],
+  };
+}
+
+export function getSiteStyleVars(palette: PalettePreset): Record<string, string> {
+  return {
+    "--site-radius": palette.borderRadius,
+    "--site-spacing": spacingMap[palette.spacing],
+    "--site-shadow": shadowMap[palette.shadowIntensity],
   };
 }

@@ -1,4 +1,4 @@
-export type MediaSlot = "hero" | "services" | "cta" | "logo";
+export type MediaSlot = "hero" | "services" | "cta" | "about" | "logo";
 
 export type MediaPreset = {
   minWidth: number;
@@ -21,6 +21,11 @@ export const mediaPresets: Record<MediaSlot, MediaPreset> = {
     minWidth: 1200,
     minHeight: 675,
     recommendedText: "CTA: recomendado 1200x675 (16:9)",
+  },
+  about: {
+    minWidth: 800,
+    minHeight: 1000,
+    recommendedText: "Sobre: recomendado 800x1000 (3:4)",
   },
   logo: {
     minWidth: 320,

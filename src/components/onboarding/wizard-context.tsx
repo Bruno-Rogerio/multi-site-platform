@@ -42,7 +42,7 @@ const initialState: WizardState = {
   servicesDisplayMode: "grid",
   ctaVariant: "banner",
   motionStyle: "motion-fade",
-  enabledSections: ["hero", "services", "cta", "contact"],
+  enabledSections: ["hero", "services", "about", "cta", "contact"],
   sectionColors: {},
 
   // Service cards

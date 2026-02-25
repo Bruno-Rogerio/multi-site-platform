@@ -67,6 +67,9 @@ export function SiteShell({ site, children }: SiteShellProps) {
     "--site-text": readableText,
     "--site-surface": isDarkText ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.06)",
     "--site-border": isDarkText ? "rgba(11,16,32,0.14)" : "rgba(234,240,255,0.16)",
+    "--site-radius": site.themeSettings["--site-radius"] ?? "24px",
+    "--site-spacing": site.themeSettings["--site-spacing"] ?? "16px",
+    "--site-shadow": site.themeSettings["--site-shadow"] ?? "0 2px 8px rgba(0,0,0,0.1)",
     fontFamily: site.themeSettings.fontFamily,
   } as CSSProperties;
 
