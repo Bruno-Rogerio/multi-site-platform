@@ -1,17 +1,48 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { ImageUpload } from "../builders/image-upload";
 import { IconPickerInline } from "../builders/icon-picker";
 import { LinkDestinationSelect } from "../builders/link-destination-select";
 import { getTemplateBySlug } from "@/lib/onboarding/templates";
-import { MessageCircle, Instagram, Mail, Linkedin, Facebook, Check } from "lucide-react";
+import { MessageCircle, Instagram, Mail, Linkedin, Facebook, Check, Plus, Trash2 } from "lucide-react";
+
+type Testimonial = { quote: string; author: string };
 
 export function TemplateContentEditor() {
   const { state, dispatch } = useWizard();
   const { selectedTemplateSlug, content, serviceCards } = state;
+
+  // Local testimonials state — synced to content.testimonialsJson
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
+    try {
+      const parsed = JSON.parse(content.testimonialsJson || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  function updateTestimonials(newList: Testimonial[]) {
+    setTestimonials(newList);
+    dispatch({ type: "UPDATE_CONTENT", key: "testimonialsJson", value: JSON.stringify(newList) });
+  }
+
+  function addTestimonial() {
+    if (testimonials.length >= 3) return;
+    updateTestimonials([...testimonials, { quote: "", author: "" }]);
+  }
+
+  function removeTestimonial(index: number) {
+    updateTestimonials(testimonials.filter((_, i) => i !== index));
+  }
+
+  function updateTestimonialField(index: number, field: keyof Testimonial, value: string) {
+    const next = testimonials.map((t, i) => (i === index ? { ...t, [field]: value } : t));
+    updateTestimonials(next);
+  }
 
   const template = selectedTemplateSlug ? getTemplateBySlug(selectedTemplateSlug) : null;
 
@@ -508,7 +539,67 @@ export function TemplateContentEditor() {
           )}
         </div>
 
-        {/* ─── 7. SEO ────────────────────────────────────── */}
+        {/* ─── 7. Depoimentos ───────────────────────────── */}
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--platform-text)]">Depoimentos</h3>
+              <p className="text-xs text-[var(--platform-text)]/50">Adicione até 3 depoimentos de clientes</p>
+            </div>
+            {testimonials.length < 3 && (
+              <button
+                type="button"
+                onClick={addTestimonial}
+                className="flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1.5 text-xs text-[var(--platform-text)]/60 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE]"
+              >
+                <Plus size={12} /> Adicionar
+              </button>
+            )}
+          </div>
+
+          {testimonials.length === 0 ? (
+            <button
+              type="button"
+              onClick={addTestimonial}
+              className="mt-4 w-full rounded-lg border border-dashed border-white/10 py-4 text-xs text-[var(--platform-text)]/30 transition hover:border-[#22D3EE]/20 hover:text-[#22D3EE]/50"
+            >
+              + Adicionar primeiro depoimento
+            </button>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {testimonials.map((t, i) => (
+                <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-medium text-[var(--platform-text)]/50">Depoimento {i + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeTestimonial(i)}
+                      className="text-[var(--platform-text)]/30 transition hover:text-red-400"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                  <textarea
+                    value={t.quote}
+                    onChange={(e) => updateTestimonialField(i, "quote", e.target.value)}
+                    placeholder="O que o cliente disse sobre você..."
+                    rows={2}
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
+                  />
+                  <input
+                    type="text"
+                    value={t.author}
+                    onChange={(e) => updateTestimonialField(i, "author", e.target.value)}
+                    placeholder="Nome do cliente"
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* ─── 8. SEO ────────────────────────────────────── */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
           <h3 className="text-sm font-semibold text-[var(--platform-text)]">SEO</h3>
           <p className="text-xs text-[var(--platform-text)]/50">Ajude seu site a aparecer no Google</p>

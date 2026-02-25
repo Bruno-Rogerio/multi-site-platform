@@ -59,6 +59,7 @@ function resolveReadableText(textHex: string, backgroundHex: string) {
 export function SiteShell({ site, children }: SiteShellProps) {
   const logoUrl = site.themeSettings.logoUrl?.trim() ?? "";
   const headerStyle = site.themeSettings.headerStyle ?? "blur";
+  const footerText = site.themeSettings.footerText?.trim() || "";
   const readableText = resolveReadableText(
     site.themeSettings.textColor,
     site.themeSettings.backgroundColor,
@@ -166,7 +167,7 @@ export function SiteShell({ site, children }: SiteShellProps) {
       </main>
 
       <footer className="border-t border-[var(--site-border)] py-6">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 text-xs opacity-70">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-1 px-6 text-xs opacity-70 sm:flex-row sm:justify-between">
           <span className="flex items-center gap-2">
             {logoUrl ? (
               <Image
@@ -177,7 +178,7 @@ export function SiteShell({ site, children }: SiteShellProps) {
                 className="h-6 w-6 rounded-md border border-[var(--site-border)] object-cover"
               />
             ) : null}
-            <span>{site.name}</span>
+            <span>{footerText || site.name}</span>
           </span>
           <span>Powered by BuildSphere</span>
         </div>

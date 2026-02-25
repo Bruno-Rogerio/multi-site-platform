@@ -25,6 +25,10 @@ export type ThemeSettings = {
   headerStyle?: "blur" | "solid" | "minimal";
   dividerStyle?: "wave" | "diagonal" | "curve" | "line" | "none";
   motionStyle?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  footerText?: string;
+  whatsappUrl?: string;
 };
 
 export type Section = {

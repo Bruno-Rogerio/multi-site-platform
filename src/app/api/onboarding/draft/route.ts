@@ -346,6 +346,26 @@ export async function POST(request: Request) {
     } catch { /* ignore parse error */ }
   }
 
+  // Parse testimonials if sent as JSON
+  type TestimonialItem = { quote: string; author: string };
+  let testimonials: TestimonialItem[] | null = null;
+  if (content.testimonialsJson) {
+    try {
+      const parsed = JSON.parse(content.testimonialsJson);
+      if (Array.isArray(parsed)) {
+        testimonials = parsed
+          .filter(
+            (item): item is TestimonialItem =>
+              typeof item?.quote === "string" &&
+              item.quote.trim().length > 0 &&
+              typeof item?.author === "string" &&
+              item.author.trim().length > 0,
+          )
+          .slice(0, 4);
+      }
+    } catch { /* ignore parse error */ }
+  }
+
   // Parse contact selected links (max 2 channels user chose for contact section)
   let contactSelectedLinks: string[] | null = null;
   if (content.contactSelectedLinks) {
@@ -397,8 +417,12 @@ export async function POST(request: Request) {
   const heroCtaLabel = content.heroCtaLabel?.trim() || content.heroCta?.trim() || "Agendar conversa";
   const heroImageUrl = payload.heroImage?.trim() || "";
 
-  // Save header CTA label in theme so SiteShell can use it
+  // Patch theme with fields that depend on content/whatsappUrl (declared after themeSettings)
   (themeSettings as Record<string, unknown>).headerCtaLabel = heroCtaLabel;
+  (themeSettings as Record<string, unknown>).seoTitle = content.seoTitle?.trim() || "";
+  (themeSettings as Record<string, unknown>).seoDescription = content.seoDescription?.trim() || "";
+  (themeSettings as Record<string, unknown>).footerText = content.footerText?.trim() || "";
+  (themeSettings as Record<string, unknown>).whatsappUrl = whatsappUrl;
   await admin
     .from("sites")
     .update({ theme_settings: themeSettings })
@@ -463,11 +487,23 @@ export async function POST(request: Request) {
         imageUrl: content.aboutImage?.trim() || "",
       },
     },
+    ...(testimonials && testimonials.length > 0
+      ? [{
+          page_id: page.id,
+          type: "testimonials" as const,
+          variant: "default",
+          order: 5,
+          content: {
+            title: "Depoimentos",
+            items: testimonials,
+          },
+        }]
+      : []),
     {
       page_id: page.id,
       type: "contact",
       variant: "default",
-      order: 5,
+      order: testimonials && testimonials.length > 0 ? 6 : 5,
       content: {
         title: content.contactTitle?.trim() || "Contato",
         subtitle:

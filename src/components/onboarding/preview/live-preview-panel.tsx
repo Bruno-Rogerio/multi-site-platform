@@ -11,6 +11,7 @@ import { PreviewCta } from "./preview-cta";
 import { PreviewAbout } from "./preview-about";
 import { PreviewContact } from "./preview-contact";
 import { PreviewFloatingCta } from "./preview-floating-cta";
+import { PreviewTestimonials } from "./preview-testimonials";
 import { getPaletteById, getPaletteStyleVars } from "@/lib/onboarding/palettes";
 
 type DeviceMode = "desktop" | "mobile";
@@ -123,7 +124,15 @@ function PreviewDivider({ style }: { style: string }) {
 export function LivePreviewPanel() {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const { state } = useWizard();
-  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections } = state;
+  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content } = state;
+  const hasTestimonials = (() => {
+    try {
+      const parsed = JSON.parse(content.testimonialsJson || "[]");
+      return Array.isArray(parsed) && parsed.some((t) => t?.quote?.trim() && t?.author?.trim());
+    } catch {
+      return false;
+    }
+  })();
 
   const palette = paletteId ? getPaletteById(paletteId) : null;
   const { container: containerVariants, item: itemVariants } = getMotionVariants(motionStyle);
@@ -282,6 +291,14 @@ export function LivePreviewPanel() {
                   <PreviewDivider style={dividerStyle} />
                   <motion.div variants={itemVariants}>
                     <PreviewAbout deviceMode={deviceMode} />
+                  </motion.div>
+                </>
+              )}
+              {hasTestimonials && (
+                <>
+                  <PreviewDivider style={dividerStyle} />
+                  <motion.div variants={itemVariants}>
+                    <PreviewTestimonials deviceMode={deviceMode} />
                   </motion.div>
                 </>
               )}
