@@ -31,6 +31,11 @@ export type ThemeSettings = {
   whatsappUrl?: string;
   floatingLinks?: Array<{ type: string; url: string; icon: string; label: string }>;
   floatingButtonsEnabled?: boolean;
+  // Draft / preview fields
+  onboardingDraft?: boolean;
+  previewExpiresAt?: string;
+  selectedPlan?: string;
+  ownerEmail?: string;
 };
 
 export type Section = {

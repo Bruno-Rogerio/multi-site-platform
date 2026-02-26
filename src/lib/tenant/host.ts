@@ -11,6 +11,8 @@ const RESERVED_SUBDOMAINS = new Set([
   "static",
   "cdn",
   "login",
+  "publicar",
+  "preview",
 ]);
 
 export function isReservedSubdomain(subdomain: string): boolean {

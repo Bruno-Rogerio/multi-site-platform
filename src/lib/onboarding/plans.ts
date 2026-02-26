@@ -128,8 +128,7 @@ export function getStepsForPlan(plan: OnboardingPlan | null): StepDefinition[] {
       { id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" },
       { id: "template-gallery", label: "Template", subtitle: "Escolha o layout" },
       { id: "template-content", label: "Conteúdo", subtitle: "Personalize textos" },
-      { id: "business-info", label: "Negócio", subtitle: "Dados e subdomínio" },
-      { id: "checkout", label: "Finalizar", subtitle: "Cadastro e pagamento" },
+      { id: "finalizar", label: "Finalizar", subtitle: "Criar demonstração" },
     ];
   }
 
@@ -139,7 +138,6 @@ export function getStepsForPlan(plan: OnboardingPlan | null): StepDefinition[] {
     { id: "style-palette", label: "Visual", subtitle: "Estilo, cores e fontes" },
     { id: "section-builder", label: "Construção", subtitle: "Seções, ícones e CTAs" },
     { id: "content-editor", label: "Conteúdo", subtitle: "Textos e descrições" },
-    { id: "business-info", label: "Negócio", subtitle: "Dados e subdomínio" },
-    { id: "checkout", label: "Finalizar", subtitle: "Cadastro e pagamento" },
+    { id: "finalizar", label: "Finalizar", subtitle: "Criar demonstração" },
   ];
 }

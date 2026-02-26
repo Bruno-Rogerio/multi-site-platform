@@ -8,6 +8,7 @@ import { getSiteByTenantSubdomain } from "@/lib/tenant/service";
 import { AnimatedSection } from "@/components/site/animated-section";
 import { SectionDivider } from "@/components/site/section-divider";
 import { FloatingContactButtons } from "@/components/site/floating-contact-buttons";
+import { PreviewBanner } from "@/components/site/preview-banner";
 
 type TenantPageProps = {
   params: Promise<{ tenant: string }>;
@@ -58,8 +59,14 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
   const motionStyle = site.themeSettings.motionStyle ?? "motion-fade";
   const dividerStyle = site.themeSettings.dividerStyle ?? "none";
 
+  const isPreview = site.themeSettings.onboardingDraft === true;
+  const previewExpiresAt = site.themeSettings.previewExpiresAt ?? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString();
+
   return (
     <SiteShell site={site}>
+      {isPreview && (
+        <PreviewBanner expiresAt={previewExpiresAt} siteId={site.id} />
+      )}
       {sectionsToRender.map((section, index) => (
         <div key={section.id}>
           {index > 0 && <SectionDivider style={dividerStyle} />}

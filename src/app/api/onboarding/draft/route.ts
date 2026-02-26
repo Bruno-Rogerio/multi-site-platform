@@ -30,10 +30,12 @@ type OnboardingDraftPayload = {
   addonsSelected: string[];
   businessName: string;
   businessSegment: string;
-  businessCity: string;
-  businessHighlights: string;
-  targetAudience: string;
-  preferredSubdomain: string;
+  businessCity?: string;
+  businessHighlights?: string;
+  targetAudience?: string;
+  preferredSubdomain?: string;
+  selectedPlan?: string;
+  ownerEmail?: string;
   content?: Record<string, string>;
   heroImage?: string;
   logoUrl?: string;
@@ -193,11 +195,27 @@ export async function POST(request: Request) {
   }
 
   const businessName = payload.businessName?.trim();
-  const preferredSubdomain = normalizeSubdomain(payload.preferredSubdomain ?? "");
 
   if (!businessName) {
     return NextResponse.json({ error: "Nome do negocio e obrigatorio." }, { status: 400 });
   }
+
+  // Auto-generate subdomain from business name if not provided
+  function autoSubdomain(name: string): string {
+    const base = name
+      .toLowerCase()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 20);
+    const suffix = Math.floor(1000 + Math.random() * 9000);
+    return `${base || "site"}-${suffix}`;
+  }
+
+  const rawSubdomain = payload.preferredSubdomain?.trim() || "";
+  const preferredSubdomain = rawSubdomain
+    ? normalizeSubdomain(rawSubdomain)
+    : autoSubdomain(businessName);
 
   if (!SUBDOMAIN_REGEX.test(preferredSubdomain)) {
     return NextResponse.json(
@@ -258,6 +276,9 @@ export async function POST(request: Request) {
     creationMode: payload.creationMode ?? "template",
     addons: payload.addonsSelected ?? [],
     onboardingDraft: true,
+    previewExpiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+    selectedPlan: payload.selectedPlan ?? "",
+    ownerEmail: payload.ownerEmail ?? "",
     // Palette style params → CSS vars for site rendering
     ...(() => {
       const pid = payload.paletteId ?? "buildsphere";

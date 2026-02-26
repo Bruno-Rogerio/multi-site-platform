@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
 
-const PLATFORM_ONLY_PREFIXES = ["/admin", "/login"];
+const PLATFORM_ONLY_PREFIXES = ["/admin", "/login", "/publicar", "/quero-comecar"];
 
 function isPlatformOnlyPath(pathname: string): boolean {
   return PLATFORM_ONLY_PREFIXES.some(

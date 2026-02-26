@@ -14,8 +14,7 @@ import { TemplateContentEditor } from "./steps/template-content-editor";
 import { StylePaletteStep } from "./steps/style-palette-step";
 import { SectionBuilderStep } from "./steps/section-builder-step";
 import { ContentEditorStep } from "./steps/content-editor-step";
-import { BusinessInfoStep } from "./steps/business-info-step";
-import { CheckoutStep } from "./steps/checkout-step";
+import { FinalizeStep } from "./steps/finalize-step";
 
 // Preview
 import { LivePreviewPanel } from "./preview/live-preview-panel";
@@ -42,17 +41,15 @@ function WizardContent() {
         return SectionBuilderStep;
       case "content-editor":
         return ContentEditorStep;
-      case "business-info":
-        return BusinessInfoStep;
-      case "checkout":
-        return CheckoutStep;
+      case "finalizar":
+        return FinalizeStep;
       default:
         return PlanSelection;
     }
   }, [currentStepId]);
 
-  // Show preview for all steps except lead capture and plan selection
-  const showPreview = currentStepId !== "plan-selection" && currentStepId !== "lead-capture";
+  // Show preview for all steps except lead capture, plan selection, and finalizar
+  const showPreview = currentStepId !== "plan-selection" && currentStepId !== "lead-capture" && currentStepId !== "finalizar";
 
   return (
     <div className="min-h-screen">
