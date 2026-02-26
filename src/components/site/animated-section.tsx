@@ -41,7 +41,7 @@ function getVariants(style: string): Variants {
 
 export function AnimatedSection({ children, animationStyle = "motion-fade" }: AnimatedSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-8% 0px" });
+  const isInView = useInView(ref, { once: true, amount: 0.08 });
   const variants = getVariants(animationStyle);
 
   return (

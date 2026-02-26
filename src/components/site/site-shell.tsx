@@ -125,10 +125,10 @@ export function SiteShell({ site, children }: SiteShellProps) {
       return (
         <header className="sticky top-0 z-20" style={{ backgroundColor: "var(--site-primary)", color: "#fff" }}>
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
+            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
               {logoImg}
               <p className="text-lg font-bold">{site.name}</p>
-            </div>
+            </a>
             <div className="flex items-center gap-3">
               <nav className="hidden items-center gap-5 md:flex">
                 {navLinks.map((link) => (
@@ -150,10 +150,10 @@ export function SiteShell({ site, children }: SiteShellProps) {
         <header className="sticky top-0 z-20 border-b border-[var(--site-border)] bg-[var(--site-background)]">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-center px-6 py-4 gap-1">
             <div className="flex w-full items-center justify-between md:justify-center md:gap-3">
-              <div className="flex items-center gap-3">
+              <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
                 {logoImg}
                 <p className="text-lg font-bold">{site.name}</p>
-              </div>
+              </a>
               <MobileNav links={navLinks} />
             </div>
             <nav className="hidden items-center gap-6 md:flex">
@@ -172,10 +172,10 @@ export function SiteShell({ site, children }: SiteShellProps) {
     return (
       <header className="sticky top-0 z-20 border-b border-[var(--site-border)] bg-[var(--site-background)]/90 backdrop-blur">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
+          <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
             {logoImg}
             <p className="text-lg font-bold">{site.name}</p>
-          </div>
+          </a>
           <div className="flex items-center gap-3">
             {desktopNav}
             <MobileNav links={navLinks} />

@@ -24,6 +24,8 @@ export function TemplateContentEditor() {
       return [];
     }
   });
+  const [testimonialPage, setTestimonialPage] = useState(0);
+  const TESTIMONIALS_PER_PAGE = 3;
 
   function updateTestimonials(newList: Testimonial[]) {
     setTestimonials(newList);
@@ -31,12 +33,17 @@ export function TemplateContentEditor() {
   }
 
   function addTestimonial() {
-    if (testimonials.length >= 3) return;
+    if (testimonials.length >= 10) return;
+    const newIndex = testimonials.length;
     updateTestimonials([...testimonials, { quote: "", author: "" }]);
+    setTestimonialPage(Math.floor(newIndex / TESTIMONIALS_PER_PAGE));
   }
 
   function removeTestimonial(index: number) {
-    updateTestimonials(testimonials.filter((_, i) => i !== index));
+    const next = testimonials.filter((_, i) => i !== index);
+    updateTestimonials(next);
+    const newPageCount = Math.max(1, Math.ceil(next.length / TESTIMONIALS_PER_PAGE));
+    if (testimonialPage >= newPageCount) setTestimonialPage(newPageCount - 1);
   }
 
   function updateTestimonialField(index: number, field: keyof Testimonial, value: string) {
@@ -613,7 +620,7 @@ export function TemplateContentEditor() {
             <select
               value={content.testimonialsVariant || "grid"}
               onChange={(e) => handleContentChange("testimonialsVariant", e.target.value)}
-              className={`${inputClass} cursor-pointer`}
+              className="mt-1 w-full rounded-lg border border-white/10 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] focus:border-[#22D3EE] focus:outline-none cursor-pointer"
             >
               <option value="grid">Grade (2 colunas)</option>
               <option value="carousel">Carrossel (um por vez)</option>
@@ -630,36 +637,73 @@ export function TemplateContentEditor() {
               + Adicionar primeiro depoimento
             </button>
           ) : (
-            <div className="mt-4 space-y-3">
-              {testimonials.map((t, i) => (
-                <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-medium text-[var(--platform-text)]/50">Depoimento {i + 1}</span>
-                    <button
-                      type="button"
-                      onClick={() => removeTestimonial(i)}
-                      className="text-[var(--platform-text)]/30 transition hover:text-red-400"
-                    >
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
-                  <textarea
-                    value={t.quote}
-                    onChange={(e) => updateTestimonialField(i, "quote", e.target.value)}
-                    placeholder="O que o cliente disse sobre você..."
-                    rows={2}
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
-                  />
-                  <input
-                    type="text"
-                    value={t.author}
-                    onChange={(e) => updateTestimonialField(i, "author", e.target.value)}
-                    placeholder="Nome do cliente"
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
-                  />
+            <>
+              {/* Pagination controls — only when > 1 page */}
+              {Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) > 1 && (
+                <div className="mt-3 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setTestimonialPage((p) => Math.max(0, p - 1))}
+                    disabled={testimonialPage === 0}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-base text-[var(--platform-text)]/50 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE] disabled:cursor-not-allowed disabled:opacity-20"
+                  >
+                    ‹
+                  </button>
+                  <span className="text-[10px] text-[var(--platform-text)]/40">
+                    Página {testimonialPage + 1} de {Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setTestimonialPage((p) =>
+                        Math.min(Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) - 1, p + 1),
+                      )
+                    }
+                    disabled={testimonialPage >= Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) - 1}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-base text-[var(--platform-text)]/50 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE] disabled:cursor-not-allowed disabled:opacity-20"
+                  >
+                    ›
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+              <div className="mt-3 space-y-3">
+                {testimonials
+                  .slice(testimonialPage * TESTIMONIALS_PER_PAGE, (testimonialPage + 1) * TESTIMONIALS_PER_PAGE)
+                  .map((t, localIdx) => {
+                    const globalIdx = testimonialPage * TESTIMONIALS_PER_PAGE + localIdx;
+                    return (
+                      <div key={globalIdx} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-medium text-[var(--platform-text)]/50">
+                            Depoimento {globalIdx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeTestimonial(globalIdx)}
+                            className="text-[var(--platform-text)]/30 transition hover:text-red-400"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                        <textarea
+                          value={t.quote}
+                          onChange={(e) => updateTestimonialField(globalIdx, "quote", e.target.value)}
+                          placeholder="O que o cliente disse sobre você..."
+                          rows={2}
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
+                        />
+                        <input
+                          type="text"
+                          value={t.author}
+                          onChange={(e) => updateTestimonialField(globalIdx, "author", e.target.value)}
+                          placeholder="Nome do cliente"
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                        />
+                      </div>
+                    );
+                  })}
+              </div>
+            </>
           )}
         </div>
 

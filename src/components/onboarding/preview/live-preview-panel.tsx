@@ -13,6 +13,7 @@ import { PreviewContact } from "./preview-contact";
 import { PreviewFloatingCta } from "./preview-floating-cta";
 import { PreviewTestimonials } from "./preview-testimonials";
 import { getPaletteById, getPaletteStyleVars } from "@/lib/onboarding/palettes";
+import * as LucideIcons from "lucide-react";
 
 type DeviceMode = "desktop" | "mobile";
 
@@ -339,23 +340,30 @@ export function LivePreviewPanel() {
               {/* Basic plan: floating contact buttons */}
               {!floatingCtaEnabled && basicFloatingLinks.length > 0 && (
                 <div className="sticky bottom-2 ml-auto mr-2 w-fit z-20 flex flex-col gap-1.5 items-end">
-                  {basicFloatingLinks.map((link) => (
-                    <div
-                      key={link.type}
-                      className="flex h-8 w-8 items-center justify-center rounded-full shadow-md"
-                      style={{
-                        backgroundColor: link.type === "whatsapp" ? "#25D366" : "var(--preview-primary)",
-                      }}
-                      title={link.label}
-                    >
-                      <span className="text-white text-[8px] font-bold">
-                        {link.icon === "MessageCircle" ? "W" :
-                         link.icon === "Mail" ? "E" :
-                         link.icon === "Instagram" ? "I" :
-                         link.label[0]}
-                      </span>
-                    </div>
-                  ))}
+                  {basicFloatingLinks.map((link) => {
+                    const Icon = (
+                      LucideIcons as unknown as Record<
+                        string,
+                        React.ComponentType<{ size?: number; className?: string }>
+                      >
+                    )[link.icon];
+                    return (
+                      <div
+                        key={link.type}
+                        className="flex h-8 w-8 items-center justify-center rounded-full shadow-md"
+                        style={{
+                          backgroundColor: link.type === "whatsapp" ? "#25D366" : "var(--preview-primary)",
+                        }}
+                        title={link.label}
+                      >
+                        {Icon ? (
+                          <Icon size={14} className="text-white" />
+                        ) : (
+                          <span className="text-white text-[8px] font-bold">{link.label[0]}</span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </motion.div>
