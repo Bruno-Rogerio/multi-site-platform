@@ -423,6 +423,16 @@ export async function POST(request: Request) {
   (themeSettings as Record<string, unknown>).seoDescription = content.seoDescription?.trim() || "";
   (themeSettings as Record<string, unknown>).footerText = content.footerText?.trim() || "";
   (themeSettings as Record<string, unknown>).whatsappUrl = whatsappUrl;
+
+  // Floating contact buttons — built from contactSelectedLinks (max 2 channels user chose)
+  const floatingLinksData =
+    contactSelectedLinks && contactSelectedLinks.length > 0
+      ? socialLinks.filter((l: { type: string }) => contactSelectedLinks.includes(l.type))
+      : whatsappUrl
+      ? [{ type: "whatsapp", url: whatsappUrl, icon: "MessageCircle", label: "WhatsApp" }]
+      : [];
+  (themeSettings as Record<string, unknown>).floatingLinks = floatingLinksData;
+  (themeSettings as Record<string, unknown>).floatingButtonsEnabled = content.floatingButtonsEnabled !== "false";
   await admin
     .from("sites")
     .update({ theme_settings: themeSettings })
@@ -491,7 +501,7 @@ export async function POST(request: Request) {
       ? [{
           page_id: page.id,
           type: "testimonials" as const,
-          variant: "default",
+          variant: content.testimonialsVariant?.trim() || "grid",
           order: 5,
           content: {
             title: "Depoimentos",

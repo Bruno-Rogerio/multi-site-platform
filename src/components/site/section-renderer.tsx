@@ -840,14 +840,83 @@ export function SectionRenderer({
     const title = asString(section.content.title, "Depoimentos");
     const testimonials = asTestimonials(section.content.items);
 
+    // ── carousel: CSS scroll-snap horizontal ──
+    if (variant === "carousel") {
+      return (
+        <section id="testimonials" className="w-full py-16 md:py-20 overflow-hidden">
+          <div className={containerClass}>
+            <h2 className="text-3xl font-bold mb-8">{title}</h2>
+          </div>
+          <div
+            className="flex snap-x snap-mandatory overflow-x-auto gap-5 px-6 pb-4 scrollbar-none"
+            style={{ scrollbarWidth: "none" }}
+          >
+            {testimonials.map((testimonial, i) => (
+              <article
+                key={`${testimonial.author}-${i}`}
+                className="shrink-0 snap-center border border-[var(--site-border)] bg-[var(--site-surface)] p-8 w-[min(360px,85vw)]"
+                style={{ borderRadius: cardRadius }}
+              >
+                <p className="text-[2rem] leading-none text-[var(--site-accent)] mb-4 font-serif">&ldquo;</p>
+                <p className="text-base leading-relaxed opacity-80">{testimonial.quote}</p>
+                <p className="mt-6 text-sm font-semibold uppercase tracking-wide text-[var(--site-accent)]">
+                  — {testimonial.author}
+                </p>
+              </article>
+            ))}
+            {/* invisible spacer so last card aligns properly */}
+            <div className="shrink-0 w-6" />
+          </div>
+          {/* Dots indicator */}
+          <div className="mt-4 flex justify-center gap-2">
+            {testimonials.map((_, i) => (
+              <div
+                key={i}
+                className="h-1.5 w-1.5 rounded-full"
+                style={{ backgroundColor: i === 0 ? "var(--site-primary)" : "var(--site-border)" }}
+              />
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    // ── quotes: citações grandes em destaque ──
+    if (variant === "quotes") {
+      return (
+        <section id="testimonials" className="w-full py-16 md:py-20">
+          <div className={containerClass}>
+            <h2 className="text-3xl font-bold text-center mb-12">{title}</h2>
+            <div className="space-y-12">
+              {testimonials.map((testimonial, i) => (
+                <div
+                  key={`${testimonial.author}-${i}`}
+                  className={`flex flex-col items-center text-center max-w-2xl mx-auto ${
+                    i > 0 ? "border-t border-[var(--site-border)] pt-12" : ""
+                  }`}
+                >
+                  <p className="text-[3rem] leading-none text-[var(--site-accent)] font-serif mb-2">&ldquo;</p>
+                  <p className="text-xl md:text-2xl leading-relaxed opacity-85 italic">{testimonial.quote}</p>
+                  <p className="mt-6 text-sm font-semibold uppercase tracking-widest text-[var(--site-accent)]">
+                    {testimonial.author}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── grid (default): 2 colunas ──
     return (
-      <section className="w-full py-16 md:py-20">
+      <section id="testimonials" className="w-full py-16 md:py-20">
         <div className={containerClass}>
           <h2 className="text-3xl font-bold">{title}</h2>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            {testimonials.map((testimonial) => (
+            {testimonials.map((testimonial, i) => (
               <article
-                key={`${testimonial.author}-${testimonial.quote}`}
+                key={`${testimonial.author}-${i}`}
                 className="border border-[var(--site-border)] bg-[var(--site-surface)] p-6"
                 style={{ borderRadius: cardRadius }}
               >

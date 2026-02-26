@@ -38,44 +38,44 @@ const getMotionVariants = (style: string): MotionVariants => {
       return {
         container: {
           hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
+          visible: { opacity: 1, transition: { staggerChildren: 0.14 } },
         },
         item: {
-          hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { duration: 0.5 } },
+          hidden: { opacity: 0, y: 6 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
         },
       };
     case "motion-reveal":
       return {
         container: {
           hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+          visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
         },
         item: {
-          hidden: { opacity: 0, y: 10 },
-          visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+          hidden: { opacity: 0, y: 18 },
+          visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
         },
       };
     case "motion-parallax":
       return {
         container: {
           hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { staggerChildren: 0.15 } },
+          visible: { opacity: 1, transition: { staggerChildren: 0.16 } },
         },
         item: {
-          hidden: { opacity: 0, y: 20, scale: 0.98 },
-          visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] } },
+          hidden: { opacity: 0, y: 28, scale: 0.95 },
+          visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.65, ease: [0.25, 0.1, 0.25, 1] } },
         },
       };
     case "motion-vivid":
       return {
         container: {
           hidden: { opacity: 0 },
-          visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+          visible: { opacity: 1, transition: { staggerChildren: 0.09 } },
         },
         item: {
-          hidden: { opacity: 0, x: -10, scale: 0.95 },
-          visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.3, type: "spring", stiffness: 300 } },
+          hidden: { opacity: 0, x: -16, scale: 0.91 },
+          visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.35, type: "spring", stiffness: 220, damping: 18 } },
         },
       };
     default:

@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 
 import type { Site } from "@/lib/tenant/types";
+import { MobileNav } from "./mobile-nav";
 
 type SiteShellProps = {
   site: Site;
@@ -60,6 +61,20 @@ export function SiteShell({ site, children }: SiteShellProps) {
   const logoUrl = site.themeSettings.logoUrl?.trim() ?? "";
   const headerStyle = site.themeSettings.headerStyle ?? "blur";
   const footerText = site.themeSettings.footerText?.trim() || "";
+
+  // Build nav links — add testimonials only if that section exists with content
+  const hasTestimonials = site.homePage.sections.some(
+    (s) =>
+      s.type === "testimonials" &&
+      Array.isArray(s.content.items) &&
+      (s.content.items as unknown[]).length > 0,
+  );
+  const navLinks = [
+    { href: "#services", label: "Serviços" },
+    { href: "#about", label: "Sobre" },
+    ...(hasTestimonials ? [{ href: "#testimonials", label: "Depoimentos" }] : []),
+    { href: "#contact", label: "Contato" },
+  ];
   const readableText = resolveReadableText(
     site.themeSettings.textColor,
     site.themeSettings.backgroundColor,
@@ -94,11 +109,13 @@ export function SiteShell({ site, children }: SiteShellProps) {
     />
   ) : null;
 
-  const navLinks = (
+  const desktopNav = (
     <nav className="hidden items-center gap-5 md:flex">
-      <a href="#services" className="text-sm opacity-70 transition hover:opacity-100">Serviços</a>
-      <a href="#about" className="text-sm opacity-70 transition hover:opacity-100">Sobre</a>
-      <a href="#contact" className="text-sm opacity-70 transition hover:opacity-100">Contato</a>
+      {navLinks.map((link) => (
+        <a key={link.href} href={link.href} className="text-sm opacity-70 transition hover:opacity-100">
+          {link.label}
+        </a>
+      ))}
     </nav>
   );
 
@@ -106,17 +123,22 @@ export function SiteShell({ site, children }: SiteShellProps) {
     // ── solid: bg na cor primária, texto branco ──
     if (headerStyle === "solid") {
       return (
-        <header className="sticky top-0 z-20" style={{ backgroundColor: "var(--site-primary)" }}>
+        <header className="sticky top-0 z-20" style={{ backgroundColor: "var(--site-primary)", color: "#fff" }}>
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               {logoImg}
-              <p className="text-lg font-bold text-white">{site.name}</p>
+              <p className="text-lg font-bold">{site.name}</p>
             </div>
-            <nav className="hidden items-center gap-5 md:flex">
-              <a href="#services" className="text-sm text-white/70 transition hover:text-white">Serviços</a>
-              <a href="#about" className="text-sm text-white/70 transition hover:text-white">Sobre</a>
-              <a href="#contact" className="text-sm text-white/70 transition hover:text-white">Contato</a>
-            </nav>
+            <div className="flex items-center gap-3">
+              <nav className="hidden items-center gap-5 md:flex">
+                {navLinks.map((link) => (
+                  <a key={link.href} href={link.href} className="text-sm opacity-70 transition hover:opacity-100">
+                    {link.label}
+                  </a>
+                ))}
+              </nav>
+              <MobileNav links={navLinks} />
+            </div>
           </div>
         </header>
       );
@@ -127,14 +149,19 @@ export function SiteShell({ site, children }: SiteShellProps) {
       return (
         <header className="sticky top-0 z-20 border-b border-[var(--site-border)] bg-[var(--site-background)]">
           <div className="mx-auto flex w-full max-w-7xl flex-col items-center px-6 py-4 gap-1">
-            <div className="flex items-center gap-3">
-              {logoImg}
-              <p className="text-lg font-bold">{site.name}</p>
+            <div className="flex w-full items-center justify-between md:justify-center md:gap-3">
+              <div className="flex items-center gap-3">
+                {logoImg}
+                <p className="text-lg font-bold">{site.name}</p>
+              </div>
+              <MobileNav links={navLinks} />
             </div>
-            <nav className="flex items-center gap-6">
-              <a href="#services" className="text-sm opacity-60 transition hover:opacity-100">Serviços</a>
-              <a href="#about" className="text-sm opacity-60 transition hover:opacity-100">Sobre</a>
-              <a href="#contact" className="text-sm opacity-60 transition hover:opacity-100">Contato</a>
+            <nav className="hidden items-center gap-6 md:flex">
+              {navLinks.map((link) => (
+                <a key={link.href} href={link.href} className="text-sm opacity-60 transition hover:opacity-100">
+                  {link.label}
+                </a>
+              ))}
             </nav>
           </div>
         </header>
@@ -149,7 +176,10 @@ export function SiteShell({ site, children }: SiteShellProps) {
             {logoImg}
             <p className="text-lg font-bold">{site.name}</p>
           </div>
-          {navLinks}
+          <div className="flex items-center gap-3">
+            {desktopNav}
+            <MobileNav links={navLinks} />
+          </div>
         </div>
       </header>
     );

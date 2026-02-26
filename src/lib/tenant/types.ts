@@ -29,6 +29,8 @@ export type ThemeSettings = {
   seoDescription?: string;
   footerText?: string;
   whatsappUrl?: string;
+  floatingLinks?: Array<{ type: string; url: string; icon: string; label: string }>;
+  floatingButtonsEnabled?: boolean;
 };
 
 export type Section = {

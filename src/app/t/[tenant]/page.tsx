@@ -7,7 +7,7 @@ import { SiteShell, buttonStyleClasses } from "@/components/site/site-shell";
 import { getSiteByTenantSubdomain } from "@/lib/tenant/service";
 import { AnimatedSection } from "@/components/site/animated-section";
 import { SectionDivider } from "@/components/site/section-divider";
-import { FloatingWhatsApp } from "@/components/site/floating-whatsapp";
+import { FloatingContactButtons } from "@/components/site/floating-contact-buttons";
 
 type TenantPageProps = {
   params: Promise<{ tenant: string }>;
@@ -72,9 +72,11 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
           </AnimatedSection>
         </div>
       ))}
-      {site.themeSettings.whatsappUrl && (
-        <FloatingWhatsApp url={site.themeSettings.whatsappUrl} />
-      )}
+      {site.themeSettings.floatingButtonsEnabled !== false &&
+        site.themeSettings.floatingLinks &&
+        site.themeSettings.floatingLinks.length > 0 && (
+          <FloatingContactButtons links={site.themeSettings.floatingLinks} />
+        )}
     </SiteShell>
   );
 }

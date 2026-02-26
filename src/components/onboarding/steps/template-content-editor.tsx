@@ -322,15 +322,25 @@ export function TemplateContentEditor() {
             <div className="space-y-3">
               {serviceCards.slice(0, 4).map((card, i) => (
                 <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
-                  <div>
-                    <p className="text-[10px] font-medium text-[var(--platform-text)]/50 mb-1.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-medium text-[var(--platform-text)]/50">
                       Ícone do serviço — clique para selecionar
                     </p>
-                    <IconPickerInline
-                      selectedIcon={card.iconName || card.icon || ""}
-                      onSelect={(icon) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { iconName: icon, icon } })}
-                    />
+                    {serviceCards.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => dispatch({ type: "REMOVE_SERVICE_CARD", index: i })}
+                        className="text-[var(--platform-text)]/30 transition hover:text-red-400"
+                        title="Remover serviço"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    )}
                   </div>
+                  <IconPickerInline
+                    selectedIcon={card.iconName || card.icon || ""}
+                    onSelect={(icon) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { iconName: icon, icon } })}
+                  />
                   <input
                     type="text"
                     value={card.title}
@@ -355,6 +365,15 @@ export function TemplateContentEditor() {
                   />
                 </div>
               ))}
+              {serviceCards.length < 4 && (
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: "ADD_SERVICE_CARD" })}
+                  className="w-full rounded-lg border border-dashed border-white/10 py-2.5 text-xs text-[var(--platform-text)]/30 transition hover:border-[#22D3EE]/20 hover:text-[#22D3EE]/50"
+                >
+                  + Adicionar serviço
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -537,6 +556,37 @@ export function TemplateContentEditor() {
           {state.contactSelectedLinks.length >= 2 && (
             <p className="mt-2 text-[10px] text-[#22D3EE]/70">Máximo de 2 canais selecionados</p>
           )}
+
+          {/* Floating buttons toggle */}
+          {registeredLinks.length > 0 && (
+            <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 px-3 py-2.5 transition hover:bg-white/[0.03]">
+              <div
+                className={`relative h-5 w-9 rounded-full transition ${
+                  content.floatingButtonsEnabled !== "false" ? "bg-[#22D3EE]" : "bg-white/10"
+                }`}
+              >
+                <div
+                  className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                    content.floatingButtonsEnabled !== "false" ? "translate-x-4" : "translate-x-0.5"
+                  }`}
+                />
+              </div>
+              <input
+                type="checkbox"
+                className="hidden"
+                checked={content.floatingButtonsEnabled !== "false"}
+                onChange={(e) =>
+                  handleContentChange("floatingButtonsEnabled", e.target.checked ? "true" : "false")
+                }
+              />
+              <div>
+                <p className="text-xs font-medium text-[var(--platform-text)]">Botões flutuantes de contato</p>
+                <p className="text-[10px] text-[var(--platform-text)]/40">
+                  Aparecem fixos no canto da tela em todos os dispositivos
+                </p>
+              </div>
+            </label>
+          )}
         </div>
 
         {/* ─── 7. Depoimentos ───────────────────────────── */}
@@ -555,6 +605,20 @@ export function TemplateContentEditor() {
                 <Plus size={12} /> Adicionar
               </button>
             )}
+          </div>
+
+          {/* Variant selector */}
+          <div className="mt-3">
+            <label className={labelClass}>Estilo de exibição</label>
+            <select
+              value={content.testimonialsVariant || "grid"}
+              onChange={(e) => handleContentChange("testimonialsVariant", e.target.value)}
+              className={`${inputClass} cursor-pointer`}
+            >
+              <option value="grid">Grade (2 colunas)</option>
+              <option value="carousel">Carrossel (um por vez)</option>
+              <option value="quotes">Destaque (citações grandes)</option>
+            </select>
           </div>
 
           {testimonials.length === 0 ? (
