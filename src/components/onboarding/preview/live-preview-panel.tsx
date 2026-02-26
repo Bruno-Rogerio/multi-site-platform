@@ -12,7 +12,7 @@ import { PreviewAbout } from "./preview-about";
 import { PreviewContact } from "./preview-contact";
 import { PreviewFloatingCta } from "./preview-floating-cta";
 import { PreviewTestimonials } from "./preview-testimonials";
-import { getPaletteById, getPaletteStyleVars } from "@/lib/onboarding/palettes";
+import { getPaletteById, getPaletteStyleVars, getContrastTextColor } from "@/lib/onboarding/palettes";
 import * as LucideIcons from "lucide-react";
 
 type DeviceMode = "desktop" | "mobile";
@@ -173,31 +173,37 @@ export function LivePreviewPanel() {
   const previewStyles = useMemo(() => {
     // Color vars — use custom colors when paletteId is "custom", otherwise use palette
     let colorVars: Record<string, string>;
+    let primaryHex: string;
     if (paletteId === "custom") {
+      primaryHex = customColors.primary;
       colorVars = {
         "--preview-bg": customColors.background,
         "--preview-text": customColors.text,
-        "--preview-primary": customColors.primary,
+        "--preview-primary": primaryHex,
         "--preview-accent": customColors.accent,
         "--preview-muted": `${customColors.text}99`,
       };
     } else if (palette) {
+      primaryHex = palette.primary;
       colorVars = {
         "--preview-bg": palette.background,
         "--preview-text": palette.text,
-        "--preview-primary": palette.primary,
+        "--preview-primary": primaryHex,
         "--preview-accent": palette.accent,
         "--preview-muted": `${palette.text}99`,
       };
     } else {
+      primaryHex = "#3B82F6";
       colorVars = {
         "--preview-bg": "#0B1020",
         "--preview-text": "#EAF0FF",
-        "--preview-primary": "#3B82F6",
+        "--preview-primary": primaryHex,
         "--preview-accent": "#22D3EE",
         "--preview-muted": "rgba(234, 240, 255, 0.6)",
       };
     }
+    // Auto-contrast text for elements with primary as background (buttons, solid header)
+    colorVars["--preview-button-text"] = getContrastTextColor(primaryHex);
 
     // Style vars derived from palette
     const styleVars = palette ? getPaletteStyleVars(palette) : {

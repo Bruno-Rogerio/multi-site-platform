@@ -81,11 +81,15 @@ export function SiteShell({ site, children }: SiteShellProps) {
   );
   const isDarkText = luminance(readableText) < 0.4;
 
+  // Compute auto-contrast text for elements using primary as background (buttons, solid header)
+  const solidHeaderText = luminance(site.themeSettings.primaryColor) > 0.35 ? "#0B1020" : "#FFFFFF";
+
   const style = {
     "--site-primary": site.themeSettings.primaryColor,
     "--site-accent": site.themeSettings.accentColor,
     "--site-background": site.themeSettings.backgroundColor,
     "--site-text": readableText,
+    "--site-button-text": solidHeaderText,
     "--site-surface": isDarkText
       ? "rgba(255,255,255,0.9)"
       : "rgba(255,255,255,0.06)",
@@ -123,7 +127,7 @@ export function SiteShell({ site, children }: SiteShellProps) {
     // ── solid: bg na cor primária, texto branco ──
     if (headerStyle === "solid") {
       return (
-        <header className="sticky top-0 z-20" style={{ backgroundColor: "var(--site-primary)", color: "#fff" }}>
+        <header className="sticky top-0 z-20" style={{ backgroundColor: "var(--site-primary)", color: "var(--site-button-text)" }}>
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
             <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
               {logoImg}

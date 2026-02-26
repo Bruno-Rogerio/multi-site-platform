@@ -49,6 +49,19 @@ export const shadowMap: Record<string, string> = {
   strong: "0 8px 32px rgba(0,0,0,0.25)",
 };
 
+/**
+ * Returns "#0B1020" (dark) when the given hex color is light enough that white text
+ * would be unreadable on it, or "#FFFFFF" when the color is dark enough for white text.
+ * Threshold: luminance > 0.35 → use dark text.
+ */
+export function getContrastTextColor(hex: string): "#0B1020" | "#FFFFFF" {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const lum = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return lum > 0.35 ? "#0B1020" : "#FFFFFF";
+}
+
 export function getPaletteStyleVars(palette: PalettePreset): Record<string, string> {
   return {
     "--preview-radius": palette.borderRadius,

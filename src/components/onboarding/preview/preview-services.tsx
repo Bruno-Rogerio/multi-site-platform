@@ -129,8 +129,8 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
               return (
                 <div key={index} className="relative flex items-center gap-2">
                   <span
-                    className="relative z-10 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[6px] font-bold text-white"
-                    style={{ backgroundColor: "var(--preview-primary)" }}
+                    className="relative z-10 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[6px] font-bold"
+                    style={{ backgroundColor: "var(--preview-primary)", color: "var(--preview-button-text)" }}
                   >
                     {index + 1}
                   </span>

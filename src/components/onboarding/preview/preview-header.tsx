@@ -56,30 +56,34 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
     </div>
   );
 
-  // ── solid: bg opaco na cor primária, texto branco ──
+  // ── solid: bg opaco na cor primária, texto auto-contrastado ──
   if (headerStyle === "solid") {
     return (
       <header
         className="sticky top-0 z-10 px-3 py-2"
-        style={{ backgroundColor: "var(--preview-primary)", fontFamily: fontFamily || "Inter" }}
+        style={{
+          backgroundColor: "var(--preview-primary)",
+          color: "var(--preview-button-text)",
+          fontFamily: fontFamily || "Inter",
+        }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 min-w-0">
             {logoUrl && (
               <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded-sm object-cover shrink-0" />
             )}
-            <div className="text-xs font-bold truncate leading-tight text-white">
+            <div className="text-xs font-bold truncate leading-tight">
               {businessName || "Seu Negócio"}
             </div>
           </div>
           {deviceMode === "desktop" ? (
             <nav className="flex items-center gap-3">
               {navItems.map((item) => (
-                <span key={item} className="text-[8px] text-white/70">{item}</span>
+                <span key={item} className="text-[8px]" style={{ opacity: 0.7 }}>{item}</span>
               ))}
             </nav>
           ) : (
-            <Menu size={14} className="text-white" />
+            <Menu size={14} />
           )}
         </div>
       </header>

@@ -114,7 +114,7 @@ export function SectionRenderer({
               <a
                 href={ctaHref}
                 className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-                style={{ color: "#fff" }}
+                style={{ color: "var(--site-button-text)" }}
               >
                 {ctaLabel}
               </a>
@@ -165,7 +165,7 @@ export function SectionRenderer({
             <a
               href={ctaHref}
               className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-              style={{ color: "#fff" }}
+              style={{ color: "var(--site-button-text)" }}
             >
               {ctaLabel}
             </a>
@@ -244,7 +244,7 @@ export function SectionRenderer({
             <a
               href={ctaHref}
               className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-              style={{ color: "#fff" }}
+              style={{ color: "var(--site-button-text)" }}
             >
               {ctaLabel}
             </a>
@@ -319,7 +319,7 @@ export function SectionRenderer({
           <a
             href={ctaHref}
             className={`mt-8 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-            style={{ color: "#fff" }}
+            style={{ color: "var(--site-button-text)" }}
           >
             {ctaLabel}
           </a>
@@ -547,7 +547,7 @@ export function SectionRenderer({
                 const Icon = getIcon(card.iconName || "");
                 return (
                   <li key={`${card.title}-${index}`} className="relative flex items-center gap-4 pb-6 last:pb-0">
-                    <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold text-white" style={{ color: "#fff" }}>
+                    <span className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--site-primary)] text-xs font-bold" style={{ color: "var(--site-button-text)" }}>
                       {index + 1}
                     </span>
                     <div className="flex-1 pt-1">
@@ -703,7 +703,7 @@ export function SectionRenderer({
               target={linkTarget(buttonHref)}
               rel={linkRel(buttonHref)}
               className={`inline-flex shrink-0 bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-              style={{ color: "#fff" }}
+              style={{ color: "var(--site-button-text)" }}
             >
               {buttonLabel}
             </a>
@@ -727,7 +727,7 @@ export function SectionRenderer({
               target={linkTarget(buttonHref)}
               rel={linkRel(buttonHref)}
               className={`mt-6 inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-              style={{ color: "#fff" }}
+              style={{ color: "var(--site-button-text)" }}
             >
               {buttonLabel}
             </a>
@@ -791,7 +791,7 @@ export function SectionRenderer({
                 target={linkTarget(buttonHref)}
                 rel={linkRel(buttonHref)}
                 className={`inline-flex bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold text-white transition hover:brightness-110 ${buttonStyleClassName}`}
-                style={{ color: "#fff" }}
+                style={{ color: "var(--site-button-text)" }}
               >
                 {buttonLabel}
               </a>
