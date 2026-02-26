@@ -1,18 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, Sparkles } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { templatePresets, getTemplateBySlug, type TemplatePreset } from "@/lib/onboarding/templates";
+import { getTemplateForBusinessType } from "@/lib/onboarding/business-types";
 
 function TemplateCard({
   template,
   isSelected,
+  isRecommended,
   onSelect,
 }: {
   template: TemplatePreset;
   isSelected: boolean;
+  isRecommended: boolean;
   onSelect: () => void;
 }) {
   const { previewColors } = template;
@@ -25,9 +28,18 @@ function TemplateCard({
       className={`relative overflow-hidden rounded-2xl border text-left transition-all ${
         isSelected
           ? "border-[#22D3EE]/50 shadow-[0_0_30px_rgba(34,211,238,0.2)]"
+          : isRecommended
+          ? "border-[#3B82F6]/40 shadow-[0_0_20px_rgba(59,130,246,0.15)]"
           : "border-white/10 hover:border-white/20"
       }`}
     >
+      {/* Recommended badge */}
+      {isRecommended && (
+        <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded-full bg-[#3B82F6] px-2 py-0.5 text-[9px] font-bold text-white shadow">
+          <Sparkles size={9} />
+          Para você
+        </div>
+      )}
       {/* Preview mockup */}
       <div
         className="h-40 p-3"
@@ -92,6 +104,10 @@ export function TemplateGallery() {
   const { state, dispatch } = useWizard();
   const { selectedTemplateSlug } = state;
 
+  const recommendedSlug = state.businessSegment
+    ? getTemplateForBusinessType(state.businessSegment)
+    : null;
+
   function handleSelectTemplate(slug: string) {
     dispatch({ type: "SELECT_TEMPLATE", slug });
 
@@ -133,6 +149,7 @@ export function TemplateGallery() {
             key={template.slug}
             template={template}
             isSelected={selectedTemplateSlug === template.slug}
+            isRecommended={recommendedSlug === template.slug}
             onSelect={() => handleSelectTemplate(template.slug)}
           />
         ))}

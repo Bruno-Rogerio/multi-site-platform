@@ -15,6 +15,7 @@ const ADDON_PRICES: Record<string, number> = {
 
 type RegisterCheckoutPayload = {
   siteId: string;
+  priceId?: string;
   creationMode?: "template" | "builder" | "builder-premium";
   fullName: string;
   document: string;
@@ -82,20 +83,28 @@ async function createStripeCheckoutSession(
   stripeSecretKey: string,
   customerId: string,
   siteDomain: string,
-  monthlyAmount: number,
+  priceIdOrAmount: string | number,
   requestOrigin: string,
 ) {
-  const unitAmount = Math.round(monthlyAmount * 100);
   const params = new URLSearchParams();
   params.set("mode", "subscription");
   params.set("customer", customerId);
   params.set("success_url", `${requestOrigin}/login?checkout=success`);
   params.set("cancel_url", `${requestOrigin}/quero-comecar?checkout=cancelled`);
   params.set("line_items[0][quantity]", "1");
-  params.set("line_items[0][price_data][currency]", "brl");
-  params.set("line_items[0][price_data][unit_amount]", String(unitAmount));
-  params.set("line_items[0][price_data][recurring][interval]", "month");
-  params.set("line_items[0][price_data][product_data][name]", `BuildSphere SaaS - ${siteDomain}`);
+
+  if (typeof priceIdOrAmount === "string") {
+    // Fixed price_id (preferred) — ties to a real Stripe Price object
+    params.set("line_items[0][price]", priceIdOrAmount);
+  } else {
+    // Fallback: dynamic price_data
+    const unitAmount = Math.round(priceIdOrAmount * 100);
+    params.set("line_items[0][price_data][currency]", "brl");
+    params.set("line_items[0][price_data][unit_amount]", String(unitAmount));
+    params.set("line_items[0][price_data][recurring][interval]", "month");
+    params.set("line_items[0][price_data][product_data][name]", `BuildSphere SaaS - ${siteDomain}`);
+  }
+
   params.set("allow_promotion_codes", "true");
   params.set("metadata[site_domain]", siteDomain);
   params.set("metadata[source]", "buildsphere_onboarding");
@@ -245,6 +254,8 @@ export async function POST(request: Request) {
   }
 
   const monthlyAmount = toMonthlyAmount(addonsSelected);
+  // Use fixed price_id when provided, otherwise fallback to dynamic amount
+  const stripePriceOrAmount: string | number = payload.priceId || monthlyAmount;
 
   // --- BYPASS: skip Stripe, activate site directly ---
   if (bypassPayment) {
@@ -294,7 +305,7 @@ export async function POST(request: Request) {
       stripeSecretKey,
       customerId,
       site.domain,
-      monthlyAmount,
+      stripePriceOrAmount,
       requestUrl.origin,
     );
   } catch (error) {

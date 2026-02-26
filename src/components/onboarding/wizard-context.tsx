@@ -87,6 +87,9 @@ const initialState: WizardState = {
   ownerPassword: "",
   ownerPasswordConfirm: "",
 
+  // Lead capture
+  leadId: "",
+
   // UI state
   currentStep: 0,
   previewDevice: "desktop",
@@ -140,6 +143,8 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         businessHighlights: state.businessHighlights,
         targetAudience: state.targetAudience,
         preferredSubdomain: state.preferredSubdomain,
+        ownerEmail: state.ownerEmail,
+        leadId: state.leadId,
         selectedPlan: action.plan,
         currentStep: state.currentStep,
       };
@@ -363,6 +368,9 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_CONTACT_SELECTED_LINKS":
       return { ...state, contactSelectedLinks: action.links };
+
+    case "SET_LEAD_ID":
+      return { ...state, leadId: action.leadId };
 
     case "RESET_WIZARD":
       return initialState;

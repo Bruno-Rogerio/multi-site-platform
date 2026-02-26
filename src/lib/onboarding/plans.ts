@@ -98,15 +98,33 @@ export const planDefinitions: PlanDefinition[] = [
   },
 ];
 
+/* ─── Stripe price IDs per plan ─── */
+
+export const PLAN_PRICE_IDS: Record<OnboardingPlan, string> = {
+  "basico":       "price_1T59HfFFAjgAeuC1RGfeU8wW",
+  "construir":    "price_1T59ICFFAjgAeuC1tJrHJFGB",
+  "premium-full": "price_1T59ImFFAjgAeuC1PHZZu2M7",
+};
+
 /* ─── Step definitions per plan ─── */
+
+const LEAD_CAPTURE_STEP: StepDefinition = {
+  id: "lead-capture",
+  label: "Início",
+  subtitle: "Dados básicos",
+};
 
 export function getStepsForPlan(plan: OnboardingPlan | null): StepDefinition[] {
   if (!plan) {
-    return [{ id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" }];
+    return [
+      LEAD_CAPTURE_STEP,
+      { id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" },
+    ];
   }
 
   if (plan === "basico") {
     return [
+      LEAD_CAPTURE_STEP,
       { id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" },
       { id: "template-gallery", label: "Template", subtitle: "Escolha o layout" },
       { id: "template-content", label: "Conteúdo", subtitle: "Personalize textos" },
@@ -116,6 +134,7 @@ export function getStepsForPlan(plan: OnboardingPlan | null): StepDefinition[] {
   }
 
   return [
+    LEAD_CAPTURE_STEP,
     { id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" },
     { id: "style-palette", label: "Visual", subtitle: "Estilo, cores e fontes" },
     { id: "section-builder", label: "Construção", subtitle: "Seções, ícones e CTAs" },

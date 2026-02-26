@@ -7,6 +7,7 @@ import { StepIndicator } from "./step-indicator";
 import { formatPrice } from "@/lib/onboarding/pricing";
 
 // Steps (will be imported once created)
+import { LeadCaptureStep } from "./steps/lead-capture-step";
 import { PlanSelection } from "./steps/plan-selection";
 import { TemplateGallery } from "./steps/template-gallery";
 import { TemplateContentEditor } from "./steps/template-content-editor";
@@ -27,6 +28,8 @@ function WizardContent() {
 
   const StepComponent = useMemo(() => {
     switch (currentStepId) {
+      case "lead-capture":
+        return LeadCaptureStep;
       case "plan-selection":
         return PlanSelection;
       case "template-gallery":
@@ -48,8 +51,8 @@ function WizardContent() {
     }
   }, [currentStepId]);
 
-  // Show preview for all steps except plan selection
-  const showPreview = currentStepId !== "plan-selection";
+  // Show preview for all steps except lead capture and plan selection
+  const showPreview = currentStepId !== "plan-selection" && currentStepId !== "lead-capture";
 
   return (
     <div className="min-h-screen">

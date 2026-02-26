@@ -93,6 +93,9 @@ export type WizardState = {
   ownerPassword: string;
   ownerPasswordConfirm: string;
 
+  // Lead capture
+  leadId: string;
+
   // UI state
   currentStep: number;
   previewDevice: "desktop" | "mobile";
@@ -144,4 +147,5 @@ export type WizardAction =
   | { type: "TOGGLE_SECTION_PREMIUM"; sectionId: "premium-paleta" | "premium-tipografia" | "premium-variantes" | "premium-canais" | "premium-cards" }
   | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl"; url: string }
   | { type: "SET_CONTACT_SELECTED_LINKS"; links: string[] }
+  | { type: "SET_LEAD_ID"; leadId: string }
   | { type: "RESET_WIZARD" };

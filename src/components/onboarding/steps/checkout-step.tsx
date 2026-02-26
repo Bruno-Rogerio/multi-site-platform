@@ -15,7 +15,7 @@ import {
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { formatPrice } from "@/lib/onboarding/pricing";
-import { getPlanById, ADDON_DEFINITIONS } from "@/lib/onboarding/plans";
+import { getPlanById, ADDON_DEFINITIONS, PLAN_PRICE_IDS } from "@/lib/onboarding/plans";
 import { validateEmail, validatePassword, validateDocument } from "@/lib/onboarding/validation";
 
 export function CheckoutStep() {
@@ -124,6 +124,7 @@ export function CheckoutStep() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           siteId,
+          priceId: selectedPlan ? PLAN_PRICE_IDS[selectedPlan] : undefined,
           creationMode: deriveCreationMode(),
           fullName: ownerName,
           document: ownerDocument,
