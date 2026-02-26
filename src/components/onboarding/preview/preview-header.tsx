@@ -12,11 +12,29 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
   const { businessName, fontFamily, content, logoUrl, headerStyle } = state;
   const slogan = content.slogan || "";
 
+  const hasTestimonials = (() => {
+    try {
+      const parsed = JSON.parse(content.testimonialsJson || "[]");
+      return Array.isArray(parsed) && parsed.some(
+        (t) => typeof t?.quote === "string" && t.quote.trim() && typeof t?.author === "string" && t.author.trim(),
+      );
+    } catch {
+      return false;
+    }
+  })();
+
+  const navItems = [
+    "Serviços",
+    "Sobre",
+    ...(hasTestimonials ? ["Depoimentos"] : []),
+    "Contato",
+  ];
+
   const navLinks = (
     <>
-      <span className="text-[8px]" style={{ color: "var(--preview-muted)" }}>Serviços</span>
-      <span className="text-[8px]" style={{ color: "var(--preview-muted)" }}>Sobre</span>
-      <span className="text-[8px]" style={{ color: "var(--preview-muted)" }}>Contato</span>
+      {navItems.map((item) => (
+        <span key={item} className="text-[8px]" style={{ color: "var(--preview-muted)" }}>{item}</span>
+      ))}
     </>
   );
 
@@ -56,9 +74,9 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
           </div>
           {deviceMode === "desktop" ? (
             <nav className="flex items-center gap-3">
-              <span className="text-[8px] text-white/70">Serviços</span>
-              <span className="text-[8px] text-white/70">Sobre</span>
-              <span className="text-[8px] text-white/70">Contato</span>
+              {navItems.map((item) => (
+                <span key={item} className="text-[8px] text-white/70">{item}</span>
+              ))}
             </nav>
           ) : (
             <Menu size={14} className="text-white" />

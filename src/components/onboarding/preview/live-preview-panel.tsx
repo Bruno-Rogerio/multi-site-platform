@@ -124,7 +124,7 @@ function PreviewDivider({ style }: { style: string }) {
 export function LivePreviewPanel() {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const { state } = useWizard();
-  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content } = state;
+  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content, contactSelectedLinks } = state;
   const hasTestimonials = (() => {
     try {
       const parsed = JSON.parse(content.testimonialsJson || "[]");
@@ -132,6 +132,21 @@ export function LivePreviewPanel() {
     } catch {
       return false;
     }
+  })();
+
+  // Floating buttons for basic plan: based on contactSelectedLinks + toggle
+  const basicFloatingLinks = (() => {
+    if (content.floatingButtonsEnabled === "false") return [];
+    const allLinks: { type: string; icon: string; label: string }[] = [];
+    if (content.social_whatsapp?.trim()) allLinks.push({ type: "whatsapp", icon: "MessageCircle", label: "WhatsApp" });
+    if (content.social_instagram?.trim()) allLinks.push({ type: "instagram", icon: "Instagram", label: "Instagram" });
+    if (content.social_email?.trim()) allLinks.push({ type: "email", icon: "Mail", label: "E-mail" });
+    if (content.social_linkedin?.trim()) allLinks.push({ type: "linkedin", icon: "Linkedin", label: "LinkedIn" });
+    if (content.social_facebook?.trim()) allLinks.push({ type: "facebook", icon: "Facebook", label: "Facebook" });
+    const filtered = contactSelectedLinks.length > 0
+      ? allLinks.filter((l) => contactSelectedLinks.includes(l.type))
+      : allLinks.slice(0, 1);
+    return filtered.slice(0, 2);
   })();
 
   const palette = paletteId ? getPaletteById(paletteId) : null;
@@ -319,7 +334,30 @@ export function LivePreviewPanel() {
                 </>
               )}
               <div className="flex-1" />
+              {/* Premium plan: floating CTA channels */}
               {floatingCtaEnabled && <PreviewFloatingCta />}
+              {/* Basic plan: floating contact buttons */}
+              {!floatingCtaEnabled && basicFloatingLinks.length > 0 && (
+                <div className="sticky bottom-2 ml-auto mr-2 w-fit z-20 flex flex-col gap-1.5 items-end">
+                  {basicFloatingLinks.map((link) => (
+                    <div
+                      key={link.type}
+                      className="flex h-8 w-8 items-center justify-center rounded-full shadow-md"
+                      style={{
+                        backgroundColor: link.type === "whatsapp" ? "#25D366" : "var(--preview-primary)",
+                      }}
+                      title={link.label}
+                    >
+                      <span className="text-white text-[8px] font-bold">
+                        {link.icon === "MessageCircle" ? "W" :
+                         link.icon === "Mail" ? "E" :
+                         link.icon === "Instagram" ? "I" :
+                         link.label[0]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </div>
         </div>

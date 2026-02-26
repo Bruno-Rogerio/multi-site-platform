@@ -594,9 +594,9 @@ export function TemplateContentEditor() {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-sm font-semibold text-[var(--platform-text)]">Depoimentos</h3>
-              <p className="text-xs text-[var(--platform-text)]/50">Adicione até 3 depoimentos de clientes</p>
+              <p className="text-xs text-[var(--platform-text)]/50">Adicione até 10 depoimentos de clientes</p>
             </div>
-            {testimonials.length < 3 && (
+            {testimonials.length < 10 && (
               <button
                 type="button"
                 onClick={addTestimonial}
@@ -617,7 +617,7 @@ export function TemplateContentEditor() {
             >
               <option value="grid">Grade (2 colunas)</option>
               <option value="carousel">Carrossel (um por vez)</option>
-              <option value="quotes">Destaque (citações grandes)</option>
+              <option value="split">Split (nome + citação)</option>
             </select>
           </div>
 
