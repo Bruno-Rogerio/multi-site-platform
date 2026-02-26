@@ -42,7 +42,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
               </p>
             )}
             <span
-              className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold text-white cursor-default"
+              className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"
               style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
             >
               {ctaLabel}
@@ -94,8 +94,8 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
           </p>
         )}
         <span
-          className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold text-white cursor-default"
-          style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
+          className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"
+          style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
         >
           {ctaLabel}
         </span>
@@ -179,8 +179,8 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
             </p>
           )}
           <span
-            className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold text-white cursor-default"
-            style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
+            className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"
+            style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
           >
             {ctaLabel}
           </span>
@@ -259,8 +259,8 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
         </p>
       )}
       <span
-        className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold text-white cursor-default"
-        style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
+        className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"
+        style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
       >
         {ctaLabel}
       </span>

@@ -44,7 +44,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
             )}
           </div>
           <span
-            className="px-2 py-1 text-[7px] font-semibold text-white cursor-default shrink-0"
+            className="px-2 py-1 text-[7px] font-semibold cursor-default shrink-0"
             style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
           >
             {buttonLabel}
@@ -74,8 +74,8 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           </p>
         )}
         <span
-          className="mt-2 inline-block px-2 py-1 text-[7px] font-semibold text-white cursor-default"
-          style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius }}
+          className="mt-2 inline-block px-2 py-1 text-[7px] font-semibold cursor-default"
+          style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
         >
           {buttonLabel}
         </span>
@@ -153,7 +153,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
         )}
         <div className="mt-2 flex justify-center gap-2">
           <span
-            className="px-2 py-1 text-[7px] font-semibold text-white cursor-default"
+            className="px-2 py-1 text-[7px] font-semibold cursor-default"
             style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
           >
             {buttonLabel}
