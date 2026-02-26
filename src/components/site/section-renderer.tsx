@@ -4,6 +4,7 @@ import * as LucideIcons from "lucide-react";
 import type { Site } from "@/lib/tenant/types";
 import type { Section } from "@/lib/tenant/types";
 import { TestimonialsCarousel } from "./testimonials-carousel";
+import { ServiceImageModal } from "./service-image-modal";
 
 type SectionRendererProps = {
   section: Section;
@@ -411,13 +412,13 @@ export function SectionRenderer({
                       )}
                     </div>
                     {card.imageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.imageUrl}
-                        alt={card.title}
-                        className="h-16 w-20 shrink-0 object-cover"
-                        style={{ borderRadius: cardRadius }}
-                      />
+                      <div className="h-16 w-20 shrink-0 overflow-hidden" style={{ borderRadius: cardRadius }}>
+                        <ServiceImageModal
+                          src={card.imageUrl}
+                          alt={card.title}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     )}
                   </li>
                 );
@@ -447,8 +448,7 @@ export function SectionRenderer({
                     className="break-inside-avoid overflow-hidden border border-[var(--site-border)] bg-[var(--site-surface)] transition-all duration-200 hover:shadow-lg hover:border-[var(--site-primary)]/20"
                     style={{ borderRadius: cardRadius }}>
                     {card.imageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <ServiceImageModal
                         src={card.imageUrl}
                         alt={card.title}
                         className="w-full object-cover"
@@ -511,13 +511,13 @@ export function SectionRenderer({
                       )}
                     </div>
                     {card.imageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.imageUrl}
-                        alt={card.title}
-                        className="h-20 w-24 shrink-0 object-cover"
-                        style={{ borderRadius: cardRadius }}
-                      />
+                      <div className="h-20 w-24 shrink-0 overflow-hidden" style={{ borderRadius: cardRadius }}>
+                        <ServiceImageModal
+                          src={card.imageUrl}
+                          alt={card.title}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     )}
                   </div>
                 );
@@ -558,13 +558,13 @@ export function SectionRenderer({
                       {card.description && <p className="mt-1 text-sm leading-relaxed opacity-60">{card.description}</p>}
                     </div>
                     {card.imageUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.imageUrl}
-                        alt={card.title}
-                        className="h-20 w-24 shrink-0 object-cover"
-                        style={{ borderRadius: cardRadius }}
-                      />
+                      <div className="h-20 w-24 shrink-0 overflow-hidden" style={{ borderRadius: cardRadius }}>
+                        <ServiceImageModal
+                          src={card.imageUrl}
+                          alt={card.title}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     )}
                   </li>
                 );
@@ -613,13 +613,16 @@ export function SectionRenderer({
                       )}
                     </div>
                     {card.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={card.imageUrl}
-                        alt={card.title}
-                        className="h-48 w-48 shrink-0 object-cover md:h-56 md:w-64"
+                      <div
+                        className="h-48 w-48 shrink-0 overflow-hidden md:h-56 md:w-64"
                         style={{ borderRadius: isReversed ? `${cardRadius} 0 0 ${cardRadius}` : `0 ${cardRadius} ${cardRadius} 0` }}
-                      />
+                      >
+                        <ServiceImageModal
+                          src={card.imageUrl}
+                          alt={card.title}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     ) : (
                       <div
                         className="hidden h-48 w-48 shrink-0 items-center justify-center md:flex md:h-56 md:w-64"

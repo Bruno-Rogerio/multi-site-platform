@@ -11,7 +11,7 @@ import { IconPickerInline } from "../builders/icon-picker";
 type SectionTab = "hero" | "services" | "cta" | "contact" | "seo";
 
 const tabs: { id: SectionTab; label: string; icon: React.ReactNode }[] = [
-  { id: "hero", label: "Hero", icon: <Sparkles size={14} /> },
+  { id: "hero", label: "Capa", icon: <Sparkles size={14} /> },
   { id: "services", label: "Serviços", icon: <Type size={14} /> },
   { id: "cta", label: "CTA", icon: <MessageSquare size={14} /> },
   { id: "contact", label: "Contato", icon: <Phone size={14} /> },
@@ -30,12 +30,12 @@ function HeroContentEditor() {
     <div className="space-y-4">
       {/* Hero image upload inline */}
       <ImageUpload
-        label="Imagem do Hero"
+        label="Imagem da capa"
         value={heroImage}
         onChange={(url) => dispatch({ type: "SET_IMAGE", key: "heroImage", url })}
         slot="heroImage"
         aspectRatio="16/9"
-        description="Imagem de destaque da página inicial"
+        description="Recomendado: 1920 × 800 px · máx. 5 MB"
       />
 
       <div className="border-t border-white/10 pt-4">
@@ -203,6 +203,7 @@ function ServicesContentEditor() {
                     </button>
                   </div>
                 ) : null}
+                <div>
                 <label className="cursor-pointer rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] text-[var(--platform-text)]/60 hover:bg-white/[0.08] transition">
                   {card.imageUrl ? "Trocar imagem" : "+ Imagem do serviço"}
                   <input
@@ -220,6 +221,10 @@ function ServicesContentEditor() {
                     }}
                   />
                 </label>
+                {!card.imageUrl && (
+                  <p className="text-[10px] text-[var(--platform-text)]/30">800 × 600 px</p>
+                )}
+                </div>
               </div>
             </div>
           ))}
@@ -349,7 +354,7 @@ function ContactContentEditor() {
         onChange={(url) => dispatch({ type: "SET_IMAGE", key: "logoUrl", url })}
         slot="logoUrl"
         aspectRatio="1/1"
-        description="Formato quadrado, PNG transparente recomendado"
+        description="200 × 200 px · quadrado · PNG transparente"
       />
 
       <div className="border-t border-white/10 pt-4">

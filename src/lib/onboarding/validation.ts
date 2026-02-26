@@ -78,6 +78,36 @@ export function detectDocumentType(doc: string): "cpf" | "cnpj" | null {
   return null;
 }
 
+function checkCPF(digits: string): boolean {
+  if (/^(\d)\1+$/.test(digits)) return false; // all same digits
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += parseInt(digits[i]) * (10 - i);
+  let rem = (sum * 10) % 11;
+  if (rem >= 10) rem = 0;
+  if (rem !== parseInt(digits[9])) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += parseInt(digits[i]) * (11 - i);
+  rem = (sum * 10) % 11;
+  if (rem >= 10) rem = 0;
+  return rem === parseInt(digits[10]);
+}
+
+function checkCNPJ(digits: string): boolean {
+  if (/^(\d)\1+$/.test(digits)) return false; // all same digits
+  const w1 = [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  let sum = 0;
+  for (let i = 0; i < 12; i++) sum += parseInt(digits[i]) * w1[i];
+  let rem = sum % 11;
+  const d1 = rem < 2 ? 0 : 11 - rem;
+  if (d1 !== parseInt(digits[12])) return false;
+  const w2 = [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2];
+  sum = 0;
+  for (let i = 0; i < 13; i++) sum += parseInt(digits[i]) * w2[i];
+  rem = sum % 11;
+  const d2 = rem < 2 ? 0 : 11 - rem;
+  return d2 === parseInt(digits[13]);
+}
+
 export function validateDocument(doc: string): { valid: boolean; type: "cpf" | "cnpj" | null; error?: string } {
   const normalized = normalizeDocument(doc);
   const type = detectDocumentType(normalized);
@@ -86,7 +116,11 @@ export function validateDocument(doc: string): { valid: boolean; type: "cpf" | "
     return { valid: false, type: null, error: "CPF deve ter 11 dígitos, CNPJ deve ter 14" };
   }
 
-  // Basic validation (just length for now, could add checksum validation)
+  const isValid = type === "cpf" ? checkCPF(normalized) : checkCNPJ(normalized);
+  if (!isValid) {
+    return { valid: false, type, error: type === "cpf" ? "CPF inválido" : "CNPJ inválido" };
+  }
+
   return { valid: true, type };
 }
 

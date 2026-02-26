@@ -9,6 +9,7 @@ import { AnimatedSection } from "@/components/site/animated-section";
 import { SectionDivider } from "@/components/site/section-divider";
 import { FloatingContactButtons } from "@/components/site/floating-contact-buttons";
 import { PreviewBanner } from "@/components/site/preview-banner";
+import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
 
 type TenantPageProps = {
   params: Promise<{ tenant: string }>;
@@ -47,6 +48,29 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
 
   if (!site) {
     notFound();
+  }
+
+  // Auth gate: draft sites are only visible to the registered owner
+  const isDraft = site.themeSettings.onboardingDraft === true;
+  if (isDraft) {
+    const supabase = await createSupabaseServerAuthClient();
+    const { data: { user } } = supabase
+      ? await supabase.auth.getUser()
+      : { data: { user: null } };
+
+    if (!user) {
+      redirect(`/login?return=/t/${tenant}`);
+    }
+
+    const ownerEmail = site.themeSettings.ownerEmail ?? "";
+    const ownerUserId = site.themeSettings.ownerUserId ?? "";
+    const isOwner =
+      (ownerEmail && user.email?.toLowerCase() === ownerEmail.toLowerCase()) ||
+      (ownerUserId && user.id === ownerUserId);
+
+    if (!isOwner) {
+      redirect("/");
+    }
   }
 
   const sectionsToRender = [...site.homePage.sections].sort((a, b) => a.order - b.order);

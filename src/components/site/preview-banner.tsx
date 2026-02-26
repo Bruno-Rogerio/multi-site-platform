@@ -3,6 +3,14 @@
 import { useEffect, useState } from "react";
 import { Clock, Sparkles, X } from "lucide-react";
 
+function buildPublishUrl(siteId: string): string {
+  const rootDomain =
+    typeof process !== "undefined"
+      ? (process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br")
+      : "bsph.com.br";
+  return `https://${rootDomain}/publicar/${siteId}`;
+}
+
 type PreviewBannerProps = {
   expiresAt: string; // ISO date string
   siteId: string;
@@ -70,7 +78,7 @@ export function PreviewBanner({ expiresAt, siteId }: PreviewBannerProps) {
 
         {/* CTA */}
         <a
-          href={`/publicar/${siteId}`}
+          href={buildPublishUrl(siteId)}
           className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-bold text-[#3B82F6] transition hover:bg-white/90"
         >
           <Sparkles size={11} />

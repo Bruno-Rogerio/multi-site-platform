@@ -36,6 +36,7 @@ type OnboardingDraftPayload = {
   preferredSubdomain?: string;
   selectedPlan?: string;
   ownerEmail?: string;
+  ownerUserId?: string;
   content?: Record<string, string>;
   heroImage?: string;
   logoUrl?: string;
@@ -279,6 +280,7 @@ export async function POST(request: Request) {
     previewExpiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
     selectedPlan: payload.selectedPlan ?? "",
     ownerEmail: payload.ownerEmail ?? "",
+    ownerUserId: payload.ownerUserId ?? "",
     // Palette style params → CSS vars for site rendering
     ...(() => {
       const pid = payload.paletteId ?? "buildsphere";

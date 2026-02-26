@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Eye, X } from "lucide-react";
 import { WizardProvider, useWizard } from "./wizard-context";
 import { StepIndicator } from "./step-indicator";
 import { formatPrice } from "@/lib/onboarding/pricing";
@@ -22,6 +23,7 @@ import { LivePreviewPanel } from "./preview/live-preview-panel";
 function WizardContent() {
   const { state, steps, monthlyTotal } = useWizard();
   const { currentStep, selectedPlan } = state;
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
 
   const currentStepId = steps[currentStep]?.id;
 
@@ -107,8 +109,58 @@ function WizardContent() {
             </div>
           )}
         </div>
-      </div>
 
+        {/* Mobile preview button (shown below xl) */}
+        {showPreview && (
+          <div className="fixed bottom-6 right-4 z-40 xl:hidden">
+            <button
+              onClick={() => setMobilePreviewOpen(true)}
+              className="flex items-center gap-2 rounded-full bg-[#22D3EE] px-4 py-3 text-sm font-bold text-[#0B1020] shadow-lg shadow-[#22D3EE]/30 transition hover:bg-[#06B6D4] active:scale-95"
+            >
+              <Eye size={16} />
+              Ver preview
+            </button>
+          </div>
+        )}
+
+        {/* Mobile preview drawer */}
+        <AnimatePresence>
+          {mobilePreviewOpen && (
+            <>
+              {/* Overlay */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 bg-black/70 xl:hidden"
+                onClick={() => setMobilePreviewOpen(false)}
+              />
+              {/* Drawer */}
+              <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                className="fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] flex-col rounded-t-2xl border-t border-white/10 bg-[#12182B] xl:hidden"
+              >
+                {/* Handle bar */}
+                <div className="flex items-center justify-between px-4 py-3">
+                  <span className="text-sm font-semibold text-[var(--platform-text)]">Preview do site</span>
+                  <button
+                    onClick={() => setMobilePreviewOpen(false)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-[var(--platform-text)]/60 transition hover:bg-white/10 hover:text-[var(--platform-text)]"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4">
+                  <LivePreviewPanel />
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

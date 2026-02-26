@@ -36,6 +36,7 @@ export type ThemeSettings = {
   previewExpiresAt?: string;
   selectedPlan?: string;
   ownerEmail?: string;
+  ownerUserId?: string;
 };
 
 export type Section = {

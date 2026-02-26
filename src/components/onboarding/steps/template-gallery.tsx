@@ -5,7 +5,7 @@ import { Check, Sparkles } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { templatePresets, getTemplateBySlug, type TemplatePreset } from "@/lib/onboarding/templates";
-import { getTemplateForBusinessType } from "@/lib/onboarding/business-types";
+import { getTemplateForBusinessType, getDefaultContentForBusinessType } from "@/lib/onboarding/business-types";
 
 function TemplateCard({
   template,
@@ -123,6 +123,14 @@ export function TemplateGallery() {
       dispatch({ type: "SET_MOTION_STYLE", style: template.motionStyle });
       dispatch({ type: "SET_HEADER_STYLE", style: template.headerStyle });
       dispatch({ type: "SET_DIVIDER_STYLE", style: template.dividerStyle });
+    }
+
+    // Re-apply business type content so it always reflects the business type
+    if (state.businessSegment) {
+      const defaultContent = getDefaultContentForBusinessType(state.businessSegment);
+      for (const [key, value] of Object.entries(defaultContent)) {
+        dispatch({ type: "UPDATE_CONTENT", key, value });
+      }
     }
   }
 

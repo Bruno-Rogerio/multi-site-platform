@@ -222,7 +222,7 @@ export function TemplateContentEditor() {
               onChange={(url) => dispatch({ type: "SET_IMAGE", key: "logoUrl", url })}
               slot="logoUrl"
               variant="avatar"
-              description="PNG transparente recomendado"
+              description="200 × 200 px · quadrado · PNG transparente"
             />
 
             <div>
@@ -240,17 +240,17 @@ export function TemplateContentEditor() {
 
         {/* ─── 3. Hero ───────────────────────────────────── */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Hero</h3>
+          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Capa</h3>
           <p className="text-xs text-[var(--platform-text)]/50">A primeira coisa que seus visitantes vão ver</p>
 
           <div className="mt-4 space-y-4">
             <ImageUpload
-              label="Imagem do Hero"
+              label="Imagem da capa"
               value={state.heroImage}
               onChange={(url) => dispatch({ type: "SET_IMAGE", key: "heroImage", url })}
               slot="heroImage"
               variant="compact"
-              description="Imagem de destaque (opcional)"
+              description="Recomendado: 1920 × 800 px · máx. 5 MB"
             />
 
             <div>

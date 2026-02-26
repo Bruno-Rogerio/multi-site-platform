@@ -39,7 +39,7 @@ export function MobileNav({ links }: MobileNavProps) {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-sm transition hover:bg-[var(--site-text)]/[0.06]"
+              className="block px-4 py-3 text-sm text-[var(--site-text)] transition hover:bg-[var(--site-text)]/[0.06]"
             >
               {link.label}
             </a>
