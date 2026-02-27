@@ -561,6 +561,14 @@ export async function POST(request: Request) {
     );
   }
 
+  // Vincular site ao usuário em user_profiles (criado pelo trigger sem site_id)
+  if (payload.ownerUserId) {
+    await admin
+      .from("user_profiles")
+      .update({ site_id: site.id })
+      .eq("id", payload.ownerUserId);
+  }
+
   return NextResponse.json({
     ok: true,
     siteId: site.id,

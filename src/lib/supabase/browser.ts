@@ -13,7 +13,18 @@ export function createSupabaseBrowserClient() {
   }
 
   if (!browserClient) {
-    browserClient = createBrowserClient(url, anonKey);
+    // Definir cookie no domínio raiz com ponto (ex: .bsph.com.br) para que a
+    // sessão seja compartilhada entre a plataforma e todos os subdomínios.
+    // Em localhost não aplicamos para não quebrar o dev local.
+    const rootDomain = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "";
+    const cookieDomain =
+      rootDomain && !rootDomain.startsWith("localhost")
+        ? `.${rootDomain}`
+        : undefined;
+
+    browserClient = createBrowserClient(url, anonKey, {
+      cookieOptions: cookieDomain ? { domain: cookieDomain } : undefined,
+    });
   }
 
   return browserClient;

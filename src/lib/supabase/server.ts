@@ -33,6 +33,16 @@ export async function createSupabaseServerAuthClient() {
 
   const cookieStore = await cookies();
 
+  // Domínio raiz com ponto para compartilhar sessão com subdomínios (ex: .bsph.com.br)
+  const rootDomain =
+    process.env.PLATFORM_ROOT_DOMAIN ??
+    process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ??
+    "";
+  const cookieDomain =
+    rootDomain && !rootDomain.startsWith("localhost")
+      ? `.${rootDomain}`
+      : undefined;
+
   return createServerClient(url, anonKey, {
     cookies: {
       getAll() {
@@ -41,7 +51,10 @@ export async function createSupabaseServerAuthClient() {
       setAll(cookiesToSet) {
         try {
           cookiesToSet.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
+            cookieStore.set(name, value, {
+              ...options,
+              ...(cookieDomain ? { domain: cookieDomain } : {}),
+            });
           });
         } catch {
           // In Server Components, cookies are read-only. Route handlers can write them.

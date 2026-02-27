@@ -6,7 +6,7 @@ import { getRequestHostClassification } from "@/lib/tenant/request-host";
 import { getCurrentUserProfile } from "@/lib/auth/session";
 
 type Props = {
-  searchParams: Promise<{ checkout?: string }>;
+  searchParams: Promise<{ checkout?: string; return?: string }>;
 };
 
 export default async function LoginPage({ searchParams }: Props) {
@@ -15,12 +15,26 @@ export default async function LoginPage({ searchParams }: Props) {
     redirect("/");
   }
 
+  const params = await searchParams;
+
   const profile = await getCurrentUserProfile();
   if (profile) {
+    // Redirecionar para `return` se for caminho relativo ou URL do próprio domínio
+    const returnTo = params.return ?? "";
+    const rootDomain =
+      process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
+    const isSafePath = returnTo.startsWith("/");
+    const isSafeDomain =
+      returnTo.startsWith(`https://${rootDomain}`) ||
+      returnTo.startsWith(`https://.${rootDomain}`) ||
+      returnTo.match(new RegExp(`^https:\\/\\/[a-z0-9-]+\\.${rootDomain.replace(".", "\\.")}`)) !== null;
+
+    if (isSafePath || isSafeDomain) {
+      redirect(returnTo);
+    }
     redirect("/admin");
   }
 
-  const params = await searchParams;
   const checkoutSuccess = params.checkout === "success";
 
   return (
