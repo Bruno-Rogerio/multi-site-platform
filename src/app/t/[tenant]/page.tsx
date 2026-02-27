@@ -59,7 +59,10 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
       : { data: { user: null } };
 
     if (!user) {
-      redirect(`/login?return=/t/${tenant}`);
+      // Must redirect to the platform domain — a relative /login redirect on a tenant
+      // subdomain gets intercepted by middleware and looped back to the tenant root.
+      const platformOrigin = `https://${process.env.PLATFORM_ROOT_DOMAIN ?? "bsph.com.br"}`;
+      redirect(`${platformOrigin}/login?return=/t/${tenant}`);
     }
 
     const ownerEmail = site.themeSettings.ownerEmail ?? "";

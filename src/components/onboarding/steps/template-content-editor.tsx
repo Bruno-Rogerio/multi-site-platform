@@ -53,9 +53,11 @@ export function TemplateContentEditor() {
 
   const template = selectedTemplateSlug ? getTemplateBySlug(selectedTemplateSlug) : null;
 
-  // Apply template content defaults on mount (visual settings already applied in gallery)
+  // Apply template content defaults only when there is NO business segment set.
+  // When a business segment exists, lead-capture-step already filled the content and
+  // template-gallery re-applies it on template change — do not overwrite with template defaults.
   useEffect(() => {
-    if (template) {
+    if (template && !state.businessSegment) {
       dispatch({ type: "UPDATE_CONTENT", key: "heroEyebrow", value: template.defaultContent.heroEyebrow });
       dispatch({ type: "UPDATE_CONTENT", key: "heroTitle", value: template.defaultContent.heroTitle });
       dispatch({ type: "UPDATE_CONTENT", key: "heroSubtitle", value: template.defaultContent.heroSubtitle });

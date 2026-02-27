@@ -15,7 +15,7 @@ async function sendConfirmationEmail(
   const resendApiKey = process.env.RESEND_API_KEY;
   if (!resendApiKey) return; // silently skip if not configured
 
-  await fetch("https://api.resend.com/emails", {
+  const resendRes = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendApiKey}`,
@@ -24,10 +24,10 @@ async function sendConfirmationEmail(
     body: JSON.stringify({
       from: "BuildSphere <ola@bsph.com.br>",
       to: email,
-      subject: `Seu site para ${businessName} está sendo criado! 🚀`,
+      subject: `Seu site para ${businessName} está sendo criado!`,
       html: `
         <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; color: #1a1a2e;">
-          <h1 style="font-size: 24px; margin-bottom: 8px;">Ótimo começo! 🎉</h1>
+          <h1 style="font-size: 24px; margin-bottom: 8px;">Ótimo começo!</h1>
           <p style="font-size: 16px; line-height: 1.6; color: #444;">
             Guardamos seu lugar. Continue construindo o site de <strong>${businessName}</strong>
             — você está a poucos passos de estar online.
@@ -40,9 +40,15 @@ async function sendConfirmationEmail(
         </div>
       `,
     }),
-  }).catch(() => {
-    // fire-and-forget — never throw
+  }).catch((err: unknown) => {
+    console.error("[Resend] network error sending confirmation email:", err);
+    return null;
   });
+
+  if (resendRes && !resendRes.ok) {
+    const body = await resendRes.json().catch(() => null);
+    console.error("[Resend] API error sending confirmation email:", resendRes.status, body);
+  }
 }
 
 export async function POST(request: Request) {
