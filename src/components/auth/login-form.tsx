@@ -62,20 +62,21 @@ export function LoginForm() {
     }
 
     setIsLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    setIsLoading(false);
 
     if (error) {
-      setIsLoading(false);
-      setStatus({ type: "error", message: "Credenciais invalidas ou acesso nao liberado." });
+      const isRateLimit = error.status === 429 || error.message?.toLowerCase().includes("rate");
+      setStatus({
+        type: "error",
+        message: isRateLimit
+          ? "Muitas tentativas de login. Aguarde alguns minutos e tente novamente."
+          : "Credenciais invalidas ou acesso nao liberado.",
+      });
       return;
     }
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    setIsLoading(false);
-
-    if (!session) {
+    if (!data.session) {
       setStatus({ type: "error", message: "Sessao nao foi persistida. Tente novamente." });
       return;
     }
