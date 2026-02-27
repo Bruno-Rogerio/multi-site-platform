@@ -101,9 +101,9 @@ export const planDefinitions: PlanDefinition[] = [
 /* ─── Stripe price IDs per plan ─── */
 
 export const PLAN_PRICE_IDS: Record<OnboardingPlan, string> = {
-  "basico":       "price_1T59HfFFAjgAeuC1RGfeU8wW",
-  "construir":    "price_1T59ICFFAjgAeuC1tJrHJFGB",
-  "premium-full": "price_1T59ImFFAjgAeuC1PHZZu2M7",
+  "basico":       process.env.NEXT_PUBLIC_STRIPE_PRICE_BASICO       ?? "price_1T59HfFFAjgAeuC1RGfeU8wW",
+  "construir":    process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUIR     ?? "price_1T59ICFFAjgAeuC1tJrHJFGB",
+  "premium-full": process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_FULL ?? "price_1T59ImFFAjgAeuC1PHZZu2M7",
 };
 
 /* ─── Step definitions per plan ─── */
