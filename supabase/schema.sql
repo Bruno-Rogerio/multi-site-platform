@@ -94,9 +94,11 @@ begin
   values (new.id, coalesce(new.email, ''), user_role, user_site_id)
   on conflict (id)
   do update set
-    email = excluded.email,
-    role = excluded.role,
-    site_id = excluded.site_id;
+    email   = excluded.email,
+    role    = excluded.role,
+    -- Only overwrite site_id when metadata explicitly carries one;
+    -- otherwise keep the value already stored in the row.
+    site_id = coalesce(excluded.site_id, user_profiles.site_id);
 
   return new;
 end;

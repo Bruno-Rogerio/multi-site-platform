@@ -563,10 +563,13 @@ export async function POST(request: Request) {
 
   // Vincular site ao usuário em user_profiles (criado pelo trigger sem site_id)
   if (payload.ownerUserId) {
-    await admin
+    const { error: profileUpdateError } = await admin
       .from("user_profiles")
       .update({ site_id: site.id })
       .eq("id", payload.ownerUserId);
+    if (profileUpdateError) {
+      console.error("[draft] Falha ao vincular site ao user_profiles:", profileUpdateError.message);
+    }
   }
 
   return NextResponse.json({
