@@ -75,8 +75,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Servidor indisponível." }, { status: 500 });
   }
 
+  const bypassPayment = process.env.BYPASS_PAYMENT === "true";
+
   const stripeKey = process.env.STRIPE_SECRET_KEY ?? "";
-  if (!stripeKey) {
+  if (!bypassPayment && !stripeKey) {
     return NextResponse.json({ error: "Stripe não configurado." }, { status: 500 });
   }
 
@@ -99,6 +101,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Site sem e-mail do dono. Refaça o cadastro." }, { status: 400 });
   }
 
+  // Validação do documento antes de qualquer chamada ao Stripe
+  const rawDoc = payload.document?.replace(/\D/g, "") ?? "";
+  if (rawDoc) {
+    const docValidation = validateDocument(rawDoc);
+    if (!docValidation.valid) {
+      return NextResponse.json({ error: docValidation.error ?? "CPF ou CNPJ inválido." }, { status: 400 });
+    }
+  }
+  const document = rawDoc || null;
+
   // Get owner name from Supabase user
   let ownerName = ownerEmail.split("@")[0];
   if (ownerUserId) {
@@ -107,6 +119,30 @@ export async function POST(request: Request) {
     if (typeof fullName === "string" && fullName.trim()) {
       ownerName = fullName.trim();
     }
+  }
+
+  // ── BYPASS: ativa o site diretamente sem Stripe (apenas em dev/teste) ──
+  if (bypassPayment) {
+    const { onboardingDraft: _, ...activeSettings } = settings;
+    await admin.from("sites").update({ theme_settings: activeSettings }).eq("id", site.id);
+
+    if (ownerUserId) {
+      await admin.from("billing_profiles").upsert(
+        {
+          user_id: ownerUserId,
+          site_id: site.id,
+          email: ownerEmail,
+          full_name: ownerName,
+          document: document || null,
+          document_type: document ? (document.length === 11 ? "cpf" : "cnpj") : null,
+          stripe_customer_id: "bypass_dev",
+          billing_status: "active",
+        },
+        { onConflict: "user_id" },
+      );
+    }
+
+    return NextResponse.json({ bypass: true });
   }
 
   // Find or create Stripe customer
@@ -153,17 +189,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Validação matemática do documento (se informado)
-  const rawDoc = payload.document?.replace(/\D/g, "") ?? "";
-  if (rawDoc) {
-    const docValidation = validateDocument(rawDoc);
-    if (!docValidation.valid) {
-      return NextResponse.json({ error: docValidation.error ?? "CPF ou CNPJ inválido." }, { status: 400 });
-    }
-  }
-
   // Save billing profile as pending
-  const document = rawDoc || null;
   // Upsert no billing_profiles — conflito em user_id (unique constraint)
   // Se não há ownerUserId, apenas insere (sem upsert)
   if (ownerUserId) {

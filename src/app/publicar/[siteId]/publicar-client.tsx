@@ -52,8 +52,20 @@ export function PublicarClient({ siteId, siteName, siteDomain, ownerEmail, selec
 
       const data = await res.json();
 
-      if (!res.ok || !data.clientSecret) {
+      if (!res.ok) {
         setError(data.error ?? "Erro ao iniciar pagamento. Tente novamente.");
+        setPhase("form");
+        return;
+      }
+
+      // BYPASS_PAYMENT=true — site ativado diretamente (apenas dev/teste)
+      if (data.bypass) {
+        window.location.href = "/login?checkout=success";
+        return;
+      }
+
+      if (!data.clientSecret) {
+        setError("Resposta inesperada do servidor. Tente novamente.");
         setPhase("form");
         return;
       }
