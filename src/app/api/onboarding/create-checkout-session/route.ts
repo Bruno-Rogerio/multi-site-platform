@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
+import { validateDocument } from "@/lib/onboarding/validation";
 
 type CheckoutSessionPayload = {
   siteId: string;
@@ -152,11 +153,35 @@ export async function POST(request: Request) {
     );
   }
 
+  // Validação matemática do documento (se informado)
+  const rawDoc = payload.document?.replace(/\D/g, "") ?? "";
+  if (rawDoc) {
+    const docValidation = validateDocument(rawDoc);
+    if (!docValidation.valid) {
+      return NextResponse.json({ error: docValidation.error ?? "CPF ou CNPJ inválido." }, { status: 400 });
+    }
+  }
+
   // Save billing profile as pending
-  const document = payload.document ? payload.document.replace(/\D/g, "") : null;
-  await admin.from("billing_profiles").upsert(
-    {
-      ...(ownerUserId ? { user_id: ownerUserId } : {}),
+  const document = rawDoc || null;
+  // Upsert no billing_profiles — conflito em user_id (unique constraint)
+  // Se não há ownerUserId, apenas insere (sem upsert)
+  if (ownerUserId) {
+    await admin.from("billing_profiles").upsert(
+      {
+        user_id: ownerUserId,
+        site_id: site.id,
+        email: ownerEmail,
+        full_name: ownerName,
+        document: document || null,
+        document_type: document ? (document.length === 11 ? "cpf" : "cnpj") : null,
+        stripe_customer_id: customerId,
+        billing_status: "checkout_pending",
+      },
+      { onConflict: "user_id" },
+    );
+  } else {
+    await admin.from("billing_profiles").insert({
       site_id: site.id,
       email: ownerEmail,
       full_name: ownerName,
@@ -164,9 +189,8 @@ export async function POST(request: Request) {
       document_type: document ? (document.length === 11 ? "cpf" : "cnpj") : null,
       stripe_customer_id: customerId,
       billing_status: "checkout_pending",
-    },
-    { onConflict: "site_id" },
-  );
+    });
+  }
 
   return NextResponse.json({ clientSecret: sessionData.client_secret });
 }

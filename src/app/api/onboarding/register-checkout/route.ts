@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
+import { validateDocument } from "@/lib/onboarding/validation";
 
 const BASE_MONTHLY_PRICE = 59.9;
 const ADDON_PRICES: Record<string, number> = {
@@ -161,8 +162,11 @@ export async function POST(request: Request) {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Informe um e-mail valido." }, { status: 400 });
   }
-  if (document && !(document.length === 11 || document.length === 14)) {
-    return NextResponse.json({ error: "Informe CPF ou CNPJ valido." }, { status: 400 });
+  if (document) {
+    const docValidation = validateDocument(document);
+    if (!docValidation.valid) {
+      return NextResponse.json({ error: docValidation.error ?? "CPF ou CNPJ inválido." }, { status: 400 });
+    }
   }
   if (!validatePassword(password)) {
     return NextResponse.json(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type NavLink = { href: string; label: string };
 
@@ -10,13 +10,43 @@ interface MobileNavProps {
 
 export function MobileNav({ links }: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+
+  // Fecha ao clicar fora
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (buttonRef.current && !buttonRef.current.closest("[data-mobile-nav]")?.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  // Posiciona o dropdown com fixed para escapar de qualquer overflow/clip do header
+  function handleToggle() {
+    if (!open && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + 6,
+        right: window.innerWidth - rect.right,
+        zIndex: 9999,
+      });
+    }
+    setOpen((v) => !v);
+  }
 
   return (
-    <div className="relative md:hidden">
+    <div className="relative md:hidden" data-mobile-nav="">
       <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-[var(--site-text)]/10"
+        ref={buttonRef}
+        onClick={handleToggle}
+        className="flex h-8 w-8 items-center justify-center rounded-md transition hover:opacity-70"
         aria-label={open ? "Fechar menu" : "Abrir menu"}
+        aria-expanded={open}
       >
         {open ? (
           <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
@@ -31,15 +61,21 @@ export function MobileNav({ links }: MobileNavProps) {
 
       {open && (
         <div
-          className="absolute right-0 top-full z-30 mt-1 min-w-[160px] overflow-hidden rounded-xl border border-[var(--site-border)] bg-[var(--site-background)] shadow-lg"
-          style={{ boxShadow: "var(--site-shadow)" }}
+          style={{
+            ...dropdownStyle,
+            backgroundColor: "var(--site-background)",
+            borderColor: "var(--site-border)",
+            color: "var(--site-text)",
+          }}
+          className="min-w-[180px] rounded-xl border shadow-xl"
         >
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="block px-4 py-3 text-sm text-[var(--site-text)] transition hover:bg-[var(--site-text)]/[0.06]"
+              style={{ color: "var(--site-text)" }}
+              className="block px-4 py-3 text-sm font-medium transition hover:opacity-70 first:rounded-t-xl last:rounded-b-xl"
             >
               {link.label}
             </a>

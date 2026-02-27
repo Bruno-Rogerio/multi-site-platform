@@ -61,54 +61,85 @@ async function handleCheckoutCompleted(session: StripeEvent["data"]["object"]) {
   const admin = createSupabaseAdminClient();
   if (!admin) return;
 
+  // Preferir site_id da metadata (mais confiável que domain)
+  const siteId = session.metadata?.site_id;
   const siteDomain = session.metadata?.site_domain;
-  if (!siteDomain) return;
 
-  // Activate site: remove draft flag from theme_settings
-  const { data: site } = await admin
+  if (!siteId && !siteDomain) {
+    console.error("[Stripe Webhook] metadata sem site_id e site_domain:", session.id);
+    return;
+  }
+
+  // Buscar site
+  const query = admin.from("sites").select("id, theme_settings");
+  const { data: site } = siteId
+    ? await query.eq("id", siteId).maybeSingle()
+    : await query.eq("domain", siteDomain!).maybeSingle();
+
+  if (!site) {
+    console.error("[Stripe Webhook] Site não encontrado para sessão:", session.id);
+    return;
+  }
+
+  const settings = site.theme_settings as Record<string, unknown>;
+
+  // Idempotência: se o site já está ativo, não reprocessar
+  if (!settings.onboardingDraft) {
+    console.log("[Stripe Webhook] Site já ativado, ignorando evento duplicado:", session.id);
+    return;
+  }
+
+  // Remover flag de draft para ativar o site
+  const { onboardingDraft: _, ...activeSettings } = settings;
+
+  const { error: siteUpdateError } = await admin
     .from("sites")
-    .select("id, theme_settings")
-    .eq("domain", siteDomain)
-    .maybeSingle();
-
-  if (!site) return;
-
-  const updatedSettings = { ...(site.theme_settings as Record<string, unknown>) };
-  delete updatedSettings.onboardingDraft;
-
-  await admin
-    .from("sites")
-    .update({ theme_settings: updatedSettings })
+    .update({ theme_settings: activeSettings })
     .eq("id", site.id);
 
-  // Update billing profile status
+  if (siteUpdateError) {
+    console.error("[Stripe Webhook] Erro ao ativar site:", siteUpdateError.message);
+    return;
+  }
+
+  // Atualizar billing_profiles
   if (session.customer) {
-    await admin
+    const { error: billingError } = await admin
       .from("billing_profiles")
       .update({
         billing_status: "active",
         stripe_subscription_id: session.subscription ?? null,
       })
       .eq("stripe_customer_id", session.customer);
+
+    if (billingError) {
+      console.error("[Stripe Webhook] Erro ao atualizar billing_profiles:", billingError.message);
+    }
   }
+
+  console.log("[Stripe Webhook] Site ativado com sucesso:", site.id);
 }
 
 export async function POST(request: Request) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature") ?? "";
 
-  if (STRIPE_WEBHOOK_SECRET) {
-    const valid = await verifyStripeSignature(body, signature, STRIPE_WEBHOOK_SECRET);
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
-    }
+  // STRIPE_WEBHOOK_SECRET é obrigatório em produção
+  if (!STRIPE_WEBHOOK_SECRET) {
+    console.error("[Stripe Webhook] STRIPE_WEBHOOK_SECRET não configurado.");
+    return NextResponse.json({ error: "Webhook secret não configurado." }, { status: 500 });
+  }
+
+  const valid = await verifyStripeSignature(body, signature, STRIPE_WEBHOOK_SECRET);
+  if (!valid) {
+    return NextResponse.json({ error: "Assinatura inválida." }, { status: 400 });
   }
 
   let event: StripeEvent;
   try {
     event = JSON.parse(body);
   } catch {
-    return NextResponse.json({ error: "Invalid JSON." }, { status: 400 });
+    return NextResponse.json({ error: "JSON inválido." }, { status: 400 });
   }
 
   switch (event.type) {
