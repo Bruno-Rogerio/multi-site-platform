@@ -101,8 +101,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Fire-and-forget confirmation email
-  sendConfirmationEmail(email, businessName);
+  // Await so Vercel doesn't kill the function before the Resend call completes
+  await sendConfirmationEmail(email, businessName);
 
   return NextResponse.json({ ok: true, leadId: lead.id });
 }
