@@ -7,6 +7,11 @@ interface PreviewServicesProps {
   deviceMode: "desktop" | "mobile";
 }
 
+/* Shared style helpers for preview */
+const cardBg = "color-mix(in srgb, var(--preview-primary) 10%, transparent)";
+const cardBorder = "1px solid color-mix(in srgb, var(--preview-primary) 22%, transparent)";
+const iconContainerBg = "linear-gradient(135deg, color-mix(in srgb, var(--preview-primary) 22%, transparent), color-mix(in srgb, var(--preview-accent) 18%, transparent))";
+
 export function PreviewServices({ deviceMode }: PreviewServicesProps) {
   const { state, maxServiceCards } = useWizard();
   const { content, serviceCards, fontFamily, servicesVariant } = state;
@@ -21,22 +26,30 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
       : null;
   };
 
-  // ── minimal-list: vertical list with dividers (matches published) ──
+  // ── minimal-list: vertical list with dividers ──
   if (servicesVariant === "minimal-list") {
     return (
-      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+      <section
+        className="relative px-3 py-4 overflow-hidden"
+        style={{
+          fontFamily: fontFamily || "Inter",
+          background: "radial-gradient(ellipse 80% 60% at 0% 100%, color-mix(in srgb, var(--preview-primary) 8%, transparent), transparent)",
+        }}
+      >
         <h2 className="text-[10px] font-bold mb-2" style={{ color: "var(--preview-text)" }}>
           {title}
         </h2>
-        <div className="divide-y" style={{ borderColor: "var(--preview-text)12" }}>
+        <div className="divide-y" style={{ borderColor: "color-mix(in srgb, var(--preview-primary) 18%, transparent)" }}>
           {cards.map((card, index) => {
             const Icon = getIcon(card);
             return (
               <div key={index} className="flex items-center gap-2 py-2">
                 {Icon ? (
-                  <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded"
-                    style={{ backgroundColor: "var(--preview-primary)15" }}>
-                    <Icon size={9} style={{ color: "var(--preview-primary)" }} />
+                  <div
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded"
+                    style={{ background: iconContainerBg }}
+                  >
+                    <Icon size={10} style={{ color: "var(--preview-primary)" }} />
                   </div>
                 ) : (
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--preview-accent)" }} />
@@ -64,10 +77,16 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
     );
   }
 
-  // ── columns: alternating icon + text rows (matches published) ──
+  // ── columns: alternating icon + text rows ──
   if (servicesVariant === "columns") {
     return (
-      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+      <section
+        className="relative px-3 py-4 overflow-hidden"
+        style={{
+          fontFamily: fontFamily || "Inter",
+          background: "radial-gradient(ellipse 70% 50% at 100% 0%, color-mix(in srgb, var(--preview-accent) 7%, transparent), transparent)",
+        }}
+      >
         <h2 className="text-[10px] font-bold text-center mb-3" style={{ color: "var(--preview-text)" }}>
           {title}
         </h2>
@@ -78,16 +97,19 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-2 p-2 border overflow-hidden ${isReversed ? "flex-row-reverse" : ""}`}
+                className={`flex items-center gap-2 p-2 overflow-hidden ${isReversed ? "flex-row-reverse" : ""}`}
                 style={{
-                  borderColor: "var(--preview-text)12",
-                  backgroundColor: "var(--preview-text)04",
+                  border: cardBorder,
+                  backgroundColor: cardBg,
                   borderRadius: "var(--preview-radius)",
+                  backdropFilter: "blur(4px)",
                 }}
               >
                 {Icon && (
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: "var(--preview-primary)15" }}>
+                  <div
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+                    style={{ background: iconContainerBg }}
+                  >
                     <Icon size={14} style={{ color: "var(--preview-primary)" }} />
                   </div>
                 )}
@@ -114,15 +136,25 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
     );
   }
 
-  // ── steps: numbered timeline (matches published) ──
+  // ── steps: numbered timeline ──
   if (servicesVariant === "steps") {
     return (
-      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+      <section
+        className="relative px-3 py-4 overflow-hidden"
+        style={{
+          fontFamily: fontFamily || "Inter",
+          background: "radial-gradient(ellipse 60% 80% at 50% 100%, color-mix(in srgb, var(--preview-primary) 8%, transparent), transparent)",
+        }}
+      >
         <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
           {title}
         </h2>
         <div className="relative ml-0.5">
-          <div className="absolute left-[7px] top-2 bottom-2 w-[1px]" style={{ backgroundColor: "var(--preview-primary)30" }} />
+          {/* Timeline line with gradient */}
+          <div
+            className="absolute left-[7px] top-2 bottom-2 w-[1.5px]"
+            style={{ background: "linear-gradient(to bottom, var(--preview-primary), var(--preview-accent))" }}
+          />
           <div className="space-y-2">
             {cards.map((card, index) => {
               const Icon = getIcon(card);
@@ -130,7 +162,11 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                 <div key={index} className="relative flex items-center gap-2">
                   <span
                     className="relative z-10 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[6px] font-bold"
-                    style={{ backgroundColor: "var(--preview-primary)", color: "var(--preview-button-text)" }}
+                    style={{
+                      background: "linear-gradient(135deg, var(--preview-primary), var(--preview-accent))",
+                      color: "var(--preview-button-text)",
+                      boxShadow: "0 0 0 2px color-mix(in srgb, var(--preview-primary) 25%, transparent)",
+                    }}
                   >
                     {index + 1}
                   </span>
@@ -161,7 +197,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
     );
   }
 
-  // ── masonry: staggered 2-column layout (matches published) ──
+  // ── masonry: staggered 2-column layout ──
   if (servicesVariant === "masonry") {
     const col1 = cards.filter((_, i) => i % 2 === 0);
     const col2 = cards.filter((_, i) => i % 2 === 1);
@@ -171,11 +207,12 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
       return (
         <div
           key={index}
-          className="border overflow-hidden"
+          className="overflow-hidden"
           style={{
-            borderColor: "var(--preview-text)12",
-            backgroundColor: "var(--preview-text)04",
+            border: cardBorder,
+            backgroundColor: cardBg,
             borderRadius: "var(--preview-radius)",
+            backdropFilter: "blur(4px)",
           }}
         >
           {card.imageUrl && (
@@ -185,8 +222,10 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           )}
           <div className={`p-2 ${isTall ? "pb-3" : ""}`}>
             {Icon && (
-              <div className={`mb-1 inline-flex items-center justify-center rounded ${isTall ? "h-5 w-5" : "h-4 w-4"}`}
-                style={{ backgroundColor: "var(--preview-primary)15" }}>
+              <div
+                className={`mb-1 inline-flex items-center justify-center rounded ${isTall ? "h-5 w-5" : "h-4 w-4"}`}
+                style={{ background: iconContainerBg }}
+              >
                 <Icon size={isTall ? 12 : 9} style={{ color: "var(--preview-primary)" }} />
               </div>
             )}
@@ -204,7 +243,13 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
     };
 
     return (
-      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+      <section
+        className="relative px-3 py-4 overflow-hidden"
+        style={{
+          fontFamily: fontFamily || "Inter",
+          background: "radial-gradient(ellipse 80% 55% at 100% 50%, color-mix(in srgb, var(--preview-accent) 7%, transparent), transparent)",
+        }}
+      >
         <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
           {title}
         </h2>
@@ -226,12 +271,18 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
     );
   }
 
-  // ── default: se há imagens usa layout horizontal (ícone+texto | imagem), senão grid ──
+  // ── default: se há imagens usa layout horizontal, senão grid ──
   const hasAnyImage = cards.some((c) => c.imageUrl);
 
   if (hasAnyImage) {
     return (
-      <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+      <section
+        className="relative px-3 py-4 overflow-hidden"
+        style={{
+          fontFamily: fontFamily || "Inter",
+          background: "radial-gradient(ellipse 60% 60% at 100% 50%, color-mix(in srgb, var(--preview-primary) 7%, transparent), transparent)",
+        }}
+      >
         <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
           {title}
         </h2>
@@ -242,17 +293,20 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
             return (
               <div
                 key={index}
-                className={`flex items-center gap-2 overflow-hidden border ${isReversed ? "flex-row-reverse" : ""}`}
+                className={`flex items-center gap-2 overflow-hidden ${isReversed ? "flex-row-reverse" : ""}`}
                 style={{
-                  borderColor: "var(--preview-text)12",
-                  backgroundColor: "var(--preview-text)04",
+                  border: cardBorder,
+                  backgroundColor: cardBg,
                   borderRadius: "var(--preview-radius)",
+                  backdropFilter: "blur(4px)",
                 }}
               >
                 <div className="flex-1 p-2">
                   {Icon && (
-                    <div className="mb-1 inline-flex h-4 w-4 items-center justify-center rounded"
-                      style={{ backgroundColor: "var(--preview-primary)15" }}>
+                    <div
+                      className="mb-1 inline-flex h-4 w-4 items-center justify-center rounded"
+                      style={{ background: iconContainerBg }}
+                    >
                       <Icon size={8} style={{ color: "var(--preview-primary)" }} />
                     </div>
                   )}
@@ -266,13 +320,14 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   )}
                 </div>
                 {card.imageUrl ? (
-                  <div className="h-12 w-14 shrink-0 overflow-hidden"
-                    style={{ borderRadius: "var(--preview-radius)" }}>
+                  <div className="h-12 w-14 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
                     <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
                   </div>
                 ) : (
-                  <div className="h-12 w-14 shrink-0 flex items-center justify-center"
-                    style={{ backgroundColor: "var(--preview-primary)08", borderRadius: "var(--preview-radius)" }}>
+                  <div
+                    className="h-12 w-14 shrink-0 flex items-center justify-center"
+                    style={{ background: iconContainerBg, borderRadius: "var(--preview-radius)" }}
+                  >
                     <span className="text-[5px]" style={{ color: "var(--preview-primary)" }}>Img</span>
                   </div>
                 )}
@@ -286,26 +341,41 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
 
   // grid simples quando não há imagens
   return (
-    <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
-      <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
+    <section
+      className="relative px-3 py-4 overflow-hidden"
+      style={{
+        fontFamily: fontFamily || "Inter",
+        background: "radial-gradient(ellipse 70% 55% at 0% 100%, color-mix(in srgb, var(--preview-primary) 8%, transparent), transparent)",
+      }}
+    >
+      {/* Subtle orb */}
+      <div
+        className="pointer-events-none absolute -right-4 top-0 h-12 w-12 rounded-full opacity-[0.12] blur-xl"
+        style={{ background: "var(--preview-accent)" }}
+      />
+      <h2 className="relative text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
         {title}
       </h2>
-      <div className={`grid gap-2 ${deviceMode === "mobile" ? "grid-cols-1" : "grid-cols-2"}`}>
+      <div className={`relative grid gap-2 ${deviceMode === "mobile" ? "grid-cols-1" : "grid-cols-2"}`}>
         {cards.map((card, index) => {
           const Icon = getIcon(card);
           return (
             <div
               key={index}
-              className="border overflow-hidden p-2 text-center"
+              className="overflow-hidden p-2 text-center"
               style={{
-                borderColor: "var(--preview-text)12",
-                backgroundColor: "var(--preview-text)04",
+                border: cardBorder,
+                backgroundColor: cardBg,
                 borderRadius: "var(--preview-radius)",
+                backdropFilter: "blur(4px)",
+                boxShadow: "0 2px 8px color-mix(in srgb, var(--preview-primary) 8%, transparent)",
               }}
             >
               {Icon && (
-                <div className="mx-auto mb-1 inline-flex h-5 w-5 items-center justify-center rounded"
-                  style={{ backgroundColor: "var(--preview-primary)15" }}>
+                <div
+                  className="mx-auto mb-1 inline-flex h-5 w-5 items-center justify-center rounded"
+                  style={{ background: iconContainerBg }}
+                >
                   <Icon size={10} style={{ color: "var(--preview-primary)" }} />
                 </div>
               )}

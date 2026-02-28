@@ -147,14 +147,14 @@ export function SectionRenderer({
             className="pointer-events-none absolute -bottom-32 right-0 h-80 w-80 rounded-full opacity-[0.14] blur-[100px]"
             style={{ background: "var(--site-accent)" }}
           />
-          <div className="relative mx-auto grid w-full max-w-7xl gap-8 px-6 py-16 md:grid-cols-2 md:items-center md:py-28">
+          <div className="relative mx-auto grid min-h-[60vh] w-full max-w-7xl gap-8 px-6 py-16 md:grid-cols-2 md:items-center md:py-28">
             <div>
               {eyebrow && (
                 <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--site-accent)]">
                   {eyebrow}
                 </p>
               )}
-              <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+              <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
               {subtitle && (
                 <p className="mt-5 max-w-lg text-lg leading-relaxed opacity-70">{subtitle}</p>
               )}
@@ -206,7 +206,7 @@ export function SectionRenderer({
       return (
         <section
           id="hero"
-          className="relative w-full overflow-hidden py-16 md:py-28"
+          className="relative w-full overflow-hidden py-16 md:py-28 min-h-[60vh] flex flex-col items-center justify-center"
           style={{
             background:
               "radial-gradient(ellipse 80% 55% at 50% -10%, color-mix(in srgb, var(--site-primary) 18%, transparent), transparent)",
@@ -246,7 +246,7 @@ export function SectionRenderer({
                 {eyebrow}
               </p>
             )}
-            <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+            <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
             {subtitle && (
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed opacity-70">{subtitle}</p>
             )}
@@ -370,7 +370,7 @@ export function SectionRenderer({
                 {eyebrow}
               </p>
             )}
-            <h1 className="text-3xl font-bold leading-[1.1] md:text-5xl">{title}</h1>
+            <h1 className="text-4xl font-bold leading-[1.05] md:text-5xl lg:text-6xl">{title}</h1>
             {subtitle && (
               <p className="mt-4 text-base leading-relaxed opacity-70">{subtitle}</p>
             )}
@@ -422,7 +422,7 @@ export function SectionRenderer({
                 {eyebrow}
               </p>
             )}
-            <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+            <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
             {subtitle && (
               <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80">
                 {subtitle}
@@ -491,7 +491,7 @@ export function SectionRenderer({
               />
             </>
           )}
-          <h1 className="text-4xl font-bold leading-[1.1] md:text-5xl lg:text-6xl">{title}</h1>
+          <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
           {subtitle && (
             <p className="mt-5 max-w-2xl text-lg leading-relaxed opacity-70">{subtitle}</p>
           )}
@@ -1528,7 +1528,7 @@ export function SectionRenderer({
           <h2 className="text-3xl font-bold">{title}</h2>
           {subtitle && <p className="mt-3 text-base opacity-70">{subtitle}</p>}
           {allLinks.length > 0 && (
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6">
+            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {allLinks.map((link) => {
                 const Icon = getIcon(link.icon);
                 return (
@@ -1537,18 +1537,40 @@ export function SectionRenderer({
                     href={link.url}
                     target={link.url.startsWith("#") ? undefined : "_blank"}
                     rel={link.url.startsWith("#") ? undefined : "noreferrer"}
-                    className="group flex flex-col items-center gap-3 transition-transform duration-200 hover:-translate-y-1"
+                    className="group flex items-center gap-4 p-5 transition-all duration-300 hover:-translate-y-1 hover:brightness-105"
+                    style={{
+                      ...glassCard,
+                      borderRadius: "var(--site-radius, 16px)",
+                    }}
                   >
                     <span
-                      className="flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-200 group-hover:brightness-110 group-hover:shadow-[0_8px_24px_color-mix(in_srgb,var(--site-primary)_25%,transparent)]"
-                      style={{
-                        ...glassCard,
-                        borderRadius: "16px",
-                      }}
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all duration-200 group-hover:shadow-[0_4px_16px_color-mix(in_srgb,var(--site-primary)_30%,transparent)]"
+                      style={{ ...iconGradient, borderRadius: "12px" }}
                     >
-                      {Icon && <Icon size={26} className="text-[var(--site-primary)]" />}
+                      {Icon && <Icon size={22} className="text-[var(--site-primary)]" />}
                     </span>
-                    <span className="text-sm font-medium opacity-70">{link.label}</span>
+                    <div className="flex-1 min-w-0 text-left">
+                      <span className="block text-base font-semibold">{link.label}</span>
+                      <span
+                        className="mt-0.5 block text-xs font-medium"
+                        style={{ color: "var(--site-accent)" }}
+                      >
+                        {link.type === "whatsapp" && "Resposta rápida"}
+                        {link.type === "instagram" && "Siga-nos"}
+                        {link.type === "email" && "Envie uma mensagem"}
+                        {link.type === "phone" && "Ligue agora"}
+                        {link.type === "facebook" && "Curta nossa página"}
+                        {link.type === "website" && "Acesse o site"}
+                        {!["whatsapp","instagram","email","phone","facebook","website"].includes(link.type) && "Entrar em contato"}
+                      </span>
+                    </div>
+                    <span
+                      className="text-lg opacity-40 group-hover:opacity-80 transition-opacity"
+                      style={{ color: "var(--site-primary)" }}
+                      aria-hidden="true"
+                    >
+                      →
+                    </span>
                   </a>
                 );
               })}

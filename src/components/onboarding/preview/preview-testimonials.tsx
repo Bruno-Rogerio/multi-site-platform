@@ -26,6 +26,10 @@ function parseTestimonials(raw: string | undefined): Testimonial[] {
   }
 }
 
+/* Shared style helpers */
+const cardBg = "color-mix(in srgb, var(--preview-primary) 10%, transparent)";
+const cardBorder = "1px solid color-mix(in srgb, var(--preview-primary) 25%, transparent)";
+
 export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
   const { state } = useWizard();
   const { content, fontFamily } = state;
@@ -60,21 +64,34 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
   if (variant === "carousel") {
     const t = testimonials[Math.min(current, testimonials.length - 1)];
     return (
-      <section className="py-4" style={baseStyle}>
+      <section
+        className="relative py-4 overflow-hidden"
+        style={{
+          ...baseStyle,
+          background: "radial-gradient(ellipse 80% 60% at 50% 0%, color-mix(in srgb, var(--preview-accent) 7%, transparent), transparent)",
+        }}
+      >
         <h2 className="text-[10px] font-bold mb-2 px-3" style={{ color: "var(--preview-text)" }}>
           Depoimentos
         </h2>
         <div className="relative px-3">
           {/* Quote card */}
           <div
-            className="border px-4 py-3 text-center"
+            className="px-4 py-3 text-center"
             style={{
-              borderColor: "var(--preview-text)12",
-              backgroundColor: "var(--preview-text)04",
+              border: cardBorder,
+              backgroundColor: cardBg,
               borderRadius: "var(--preview-radius)",
+              backdropFilter: "blur(4px)",
+              boxShadow: "0 2px 10px color-mix(in srgb, var(--preview-primary) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 6%, transparent)",
             }}
           >
-            <p className="text-[14px] leading-none mb-1" style={{ color: "var(--preview-accent)" }}>&ldquo;</p>
+            <p
+              className="text-[14px] leading-none mb-1"
+              style={{ color: "var(--preview-accent)" }}
+            >
+              &ldquo;
+            </p>
             <p className="text-[7px] leading-relaxed" style={{ color: "var(--preview-text)BB" }}>
               {t.quote}
             </p>
@@ -89,7 +106,11 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
                 type="button"
                 onClick={() => setCurrent((i) => (i - 1 + testimonials.length) % testimonials.length)}
                 className="absolute left-0 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[10px]"
-                style={{ backgroundColor: "var(--preview-text)10", color: "var(--preview-text)" }}
+                style={{
+                  backgroundColor: "color-mix(in srgb, var(--preview-primary) 15%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--preview-primary) 25%, transparent)",
+                  color: "var(--preview-text)",
+                }}
               >
                 ‹
               </button>
@@ -97,7 +118,11 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
                 type="button"
                 onClick={() => setCurrent((i) => (i + 1) % testimonials.length)}
                 className="absolute right-0 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full text-[10px]"
-                style={{ backgroundColor: "var(--preview-text)10", color: "var(--preview-text)" }}
+                style={{
+                  backgroundColor: "color-mix(in srgb, var(--preview-primary) 15%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--preview-primary) 25%, transparent)",
+                  color: "var(--preview-text)",
+                }}
               >
                 ›
               </button>
@@ -115,7 +140,7 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
                 className="h-1 rounded-full transition-all duration-200"
                 style={{
                   width: i === current ? "12px" : "4px",
-                  backgroundColor: i === current ? "var(--preview-primary)" : "var(--preview-text)20",
+                  backgroundColor: i === current ? "var(--preview-primary)" : "color-mix(in srgb, var(--preview-primary) 25%, transparent)",
                 }}
               />
             ))}
@@ -128,13 +153,19 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
   // ── split ──
   if (variant === "split" || variant === "quotes") {
     return (
-      <section className="px-3 py-4" style={baseStyle}>
+      <section
+        className="relative px-3 py-4 overflow-hidden"
+        style={{
+          ...baseStyle,
+          background: "radial-gradient(ellipse 50% 60% at 0% 50%, color-mix(in srgb, var(--preview-accent) 6%, transparent), transparent)",
+        }}
+      >
         <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
           Depoimentos
         </h2>
         <div
           className="divide-y"
-          style={{ borderColor: "var(--preview-text)10" }}
+          style={{ borderColor: "color-mix(in srgb, var(--preview-primary) 18%, transparent)" }}
         >
           {testimonials.map((t, i) => (
             <div
@@ -143,7 +174,10 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
             >
               <div className="shrink-0" style={{ width: deviceMode === "mobile" ? "auto" : "56px" }}>
                 <p className="text-[7px] font-semibold" style={{ color: "var(--preview-accent)" }}>{t.author}</p>
-                <div className="mt-0.5 h-[1.5px] w-4" style={{ backgroundColor: "var(--preview-accent)" }} />
+                <div
+                  className="mt-0.5 h-[1.5px] w-4"
+                  style={{ background: "linear-gradient(90deg, var(--preview-accent), transparent)" }}
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[12px] leading-none mb-0.5" style={{ color: "var(--preview-accent)" }}>&ldquo;</p>
@@ -158,27 +192,53 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
 
   // ── grid (default) ──
   return (
-    <section className="px-3 py-4" style={baseStyle}>
-      <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
+    <section
+      className="relative px-3 py-4 overflow-hidden"
+      style={{
+        ...baseStyle,
+        background: "radial-gradient(ellipse 70% 55% at 100% 0%, color-mix(in srgb, var(--preview-accent) 7%, transparent), transparent)",
+      }}
+    >
+      {/* Orb */}
+      <div
+        className="pointer-events-none absolute -left-3 bottom-0 h-12 w-12 rounded-full opacity-[0.10] blur-xl"
+        style={{ background: "var(--preview-primary)" }}
+      />
+      <h2 className="relative text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
         Depoimentos
       </h2>
-      <div className={`grid gap-2 ${deviceMode === "mobile" ? "grid-cols-1" : "grid-cols-2"}`}>
+      <div className={`relative grid gap-2 ${deviceMode === "mobile" ? "grid-cols-1" : "grid-cols-2"}`}>
         {testimonials.map((t, i) => (
           <div
             key={i}
-            className="border p-2"
+            className="p-2"
             style={{
-              borderColor: "var(--preview-text)12",
-              backgroundColor: "var(--preview-text)04",
+              border: cardBorder,
+              backgroundColor: cardBg,
               borderRadius: "var(--preview-radius)",
+              backdropFilter: "blur(4px)",
+              boxShadow: "0 2px 8px color-mix(in srgb, var(--preview-primary) 8%, transparent)",
             }}
           >
+            {/* Decorative quote mark */}
+            <p
+              className="text-[10px] leading-none mb-0.5 opacity-60"
+              style={{ color: "var(--preview-accent)" }}
+            >
+              &ldquo;
+            </p>
             <p className="text-[7px] leading-relaxed italic" style={{ color: "var(--preview-text)BB" }}>
-              &ldquo;{t.quote}&rdquo;
+              {t.quote}
             </p>
-            <p className="mt-1.5 text-[6px] font-semibold uppercase tracking-wide" style={{ color: "var(--preview-accent)" }}>
-              {t.author}
-            </p>
+            <div className="mt-1.5 flex items-center gap-1">
+              <div
+                className="h-[1.5px] w-4 rounded-full"
+                style={{ background: "linear-gradient(90deg, var(--preview-primary), var(--preview-accent))" }}
+              />
+              <p className="text-[6px] font-semibold uppercase tracking-wide" style={{ color: "var(--preview-accent)" }}>
+                {t.author}
+              </p>
+            </div>
           </div>
         ))}
       </div>

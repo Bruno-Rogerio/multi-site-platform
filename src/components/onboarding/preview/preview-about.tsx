@@ -17,15 +17,28 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
   const aboutImage = content.aboutImage || "";
 
   return (
-    <section className="px-3 py-4" style={{ fontFamily: fontFamily || "Inter" }}>
+    <section
+      className="relative px-3 py-4 overflow-hidden"
+      style={{
+        fontFamily: fontFamily || "Inter",
+        background: "radial-gradient(ellipse 55% 70% at 100% 50%, color-mix(in srgb, var(--preview-accent) 7%, transparent), transparent)",
+      }}
+    >
+      {/* Subtle orb */}
+      <div
+        className="pointer-events-none absolute -right-4 top-1/2 h-12 w-12 -translate-y-1/2 rounded-full opacity-[0.12] blur-xl"
+        style={{ background: "var(--preview-primary)" }}
+      />
+
       {aboutImage ? (
-        <div className={`flex gap-2 ${deviceMode === "mobile" ? "flex-col" : ""}`}>
+        <div className={`relative flex gap-2 ${deviceMode === "mobile" ? "flex-col" : ""}`}>
           <div
             className="shrink-0 overflow-hidden"
             style={{
               borderRadius: "var(--preview-radius)",
               width: deviceMode === "mobile" ? "100%" : "40%",
-              border: "1px solid var(--preview-text)18",
+              border: "1px solid color-mix(in srgb, var(--preview-primary) 22%, transparent)",
+              boxShadow: "0 4px 14px color-mix(in srgb, var(--preview-primary) 14%, transparent)",
             }}
           >
             <img
@@ -40,6 +53,11 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
             />
           </div>
           <div className="flex-1 min-w-0">
+            {/* Gradient accent bar */}
+            <div
+              className="mb-1.5 h-[2px] w-7 rounded-full"
+              style={{ background: "linear-gradient(90deg, var(--preview-primary), var(--preview-accent))" }}
+            />
             <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
               {title}
             </h2>
@@ -52,7 +70,20 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
           </div>
         </div>
       ) : (
-        <>
+        <div
+          className="relative p-3"
+          style={{
+            border: "1px solid color-mix(in srgb, var(--preview-primary) 18%, transparent)",
+            borderRadius: "var(--preview-radius)",
+            background: "color-mix(in srgb, var(--preview-primary) 6%, transparent)",
+            backdropFilter: "blur(4px)",
+          }}
+        >
+          {/* Gradient accent bar */}
+          <div
+            className="mb-2 h-[2px] w-7 rounded-full"
+            style={{ background: "linear-gradient(90deg, var(--preview-primary), var(--preview-accent))" }}
+          />
           <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
             {title}
           </h2>
@@ -62,7 +93,7 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
           >
             {body}
           </p>
-        </>
+        </div>
       )}
     </section>
   );
