@@ -15,7 +15,7 @@ import {
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { formatPrice } from "@/lib/onboarding/pricing";
-import { getPlanById, ADDON_DEFINITIONS, PLAN_PRICE_IDS } from "@/lib/onboarding/plans";
+import { getPlanById, PLAN_PRICE_IDS } from "@/lib/onboarding/plans";
 import { validateEmail, validatePassword, validateDocument } from "@/lib/onboarding/validation";
 
 export function CheckoutStep() {
@@ -45,10 +45,9 @@ export function CheckoutStep() {
     dispatch({ type: "SET_CHECKOUT_FIELD", key: field, value });
   }
 
-  function deriveCreationMode(): "template" | "builder" | "builder-premium" {
+  function deriveCreationMode(): "template" | "builder-premium" {
     if (selectedPlan === "basico") return "template";
-    if (selectedPlan === "premium-full") return "builder-premium";
-    return "builder";
+    return "builder-premium";
   }
 
   async function handleSubmit() {
@@ -314,7 +313,7 @@ export function CheckoutStep() {
             {plan && (
               <div className="flex items-center justify-between py-3 border-b border-white/10">
                 <div className="flex items-center gap-2">
-                  {selectedPlan === "premium-full" && (
+                  {selectedPlan === "premium" && (
                     <Sparkles size={14} className="text-[#A78BFA]" />
                   )}
                   <span className="text-sm text-[var(--platform-text)]">{plan.name}</span>
@@ -322,26 +321,6 @@ export function CheckoutStep() {
                 <span className="text-sm font-medium text-[var(--platform-text)]">
                   {plan.price}
                 </span>
-              </div>
-            )}
-
-            {/* Addons */}
-            {addonsSelected.length > 0 && selectedPlan !== "premium-full" && (
-              <div className="py-3 border-b border-white/10 space-y-2">
-                {addonsSelected.map((addonId) => {
-                  const addon = ADDON_DEFINITIONS.find((a) => a.id === addonId);
-                  if (!addon) return null;
-                  return (
-                    <div key={addonId} className="flex items-center justify-between">
-                      <span className="text-xs text-[var(--platform-text)]/70">
-                        + {addon.name}
-                      </span>
-                      <span className="text-xs text-[var(--platform-text)]/70">
-                        {formatPrice(addon.price)}
-                      </span>
-                    </div>
-                  );
-                })}
               </div>
             )}
 

@@ -27,12 +27,8 @@ const PLAN_LABELS: Record<string, { name: string; badge: string }> = {
     name: "Básico",
     badge: "text-blue-300 border-blue-400/30 bg-blue-500/10",
   },
-  construir: {
-    name: "Construir",
-    badge: "text-violet-300 border-violet-400/30 bg-violet-500/10",
-  },
-  "premium-full": {
-    name: "Premium Full",
+  premium: {
+    name: "Premium",
     badge: "text-amber-300 border-amber-400/30 bg-amber-500/10",
   },
 };

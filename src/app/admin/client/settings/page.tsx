@@ -12,8 +12,7 @@ type SiteRow = {
 
 const PLAN_LABELS: Record<string, { name: string; price: string }> = {
   basico: { name: "Básico", price: "R$ 59,90/mês" },
-  construir: { name: "Construir", price: "R$ 79,90/mês" },
-  "premium-full": { name: "Premium Full", price: "R$ 109,80/mês" },
+  premium: { name: "Premium", price: "R$ 109,80/mês" },
 };
 
 export default async function ClientSettingsPage() {

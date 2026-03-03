@@ -3,10 +3,9 @@ import type { OnboardingPlan, StepDefinition } from "./types";
 /* ─── Pricing constants ─── */
 
 export const BASICO_MONTHLY_PRICE = 59.9;
-export const CONSTRUIR_BASE_PRICE = 79.9;
-export const PREMIUM_FULL_TOTAL = 109.8;
+export const PREMIUM_MONTHLY_PRICE = 109.8;
 
-// Legacy alias for backward compatibility
+// Legacy alias
 export const BASE_MONTHLY_PRICE = BASICO_MONTHLY_PRICE;
 
 /* ─── Plan definitions ─── */
@@ -26,26 +25,6 @@ export function getPlanById(id: OnboardingPlan): PlanDefinition | undefined {
   return planDefinitions.find((plan) => plan.id === id);
 }
 
-/* ─── Add-on definitions ─── */
-
-export type AddonDefinition = {
-  id: string;
-  name: string;
-  price: number;
-};
-
-export const ADDON_DEFINITIONS: AddonDefinition[] = [
-  { id: "extra-cta", name: "CTAs extras", price: 9.9 },
-  { id: "floating-cta", name: "CTA flutuante", price: 9.9 },
-  { id: "premium-icons", name: "Ícones premium", price: 9.9 },
-  { id: "extra-cards", name: "Cards extras", price: 9.9 },
-  { id: "extra-sections", name: "Seções extras", price: 9.9 },
-  { id: "about-page", name: "Página Sobre", price: 14.9 },
-  { id: "blog", name: "Blog", price: 29.9 },
-  { id: "premium-buttons", name: "Botões premium", price: 4.9 },
-  { id: "advanced-motion", name: "Animações avançadas", price: 9.9 },
-];
-
 export const planDefinitions: PlanDefinition[] = [
   {
     id: "basico",
@@ -58,41 +37,25 @@ export const planDefinitions: PlanDefinition[] = [
     highlights: [
       "8+ layouts profissionais prontos",
       "Personalize textos e serviços",
-      "Serviços em grid ou lista",
+      "Subdomínio personalizado",
       "Online em menos de 5 minutos",
     ],
   },
   {
-    id: "construir",
-    name: "Construir",
-    tagline: "Liberdade criativa",
-    price: "R$ 79,90",
-    priceNote: "/mês + add-ons",
-    description:
-      "Monte seu site do zero com controle total. Recursos premium disponíveis como extras.",
-    highlights: [
-      "Paleta de cores customizável",
-      "Escolha de fonte e botões",
-      "Pack de ícones básico incluso",
-      "2 canais de contato inclusos",
-      "Expansível com add-ons premium",
-    ],
-  },
-  {
-    id: "premium-full",
-    name: "Premium Full",
+    id: "premium",
+    name: "Premium",
     tagline: "Tudo liberado",
     price: "R$ 109,80",
     priceNote: "/mês",
     description:
-      "Construa livremente com todos os recursos premium desbloqueados. Sem limites.",
+      "Construa livremente com identidade visual completa, múltiplas páginas e todos os recursos desbloqueados.",
     highlights: [
-      "Tudo do Construir incluso",
-      "Ícones premium liberados",
-      "Todos os canais de contato",
-      "Seções e cards ilimitados",
-      "Blog e página Sobre inclusos",
-      "Animações avançadas",
+      "Tudo do plano Básico",
+      "Personalização visual completa",
+      "Múltiplas páginas (FAQ, Depoimentos...)",
+      "Depoimentos ilimitados",
+      "SEO básico configurável",
+      "Sem branding BuildSphere",
     ],
     recommended: true,
   },
@@ -101,9 +64,8 @@ export const planDefinitions: PlanDefinition[] = [
 /* ─── Stripe price IDs per plan ─── */
 
 export const PLAN_PRICE_IDS: Record<OnboardingPlan, string> = {
-  "basico":       process.env.NEXT_PUBLIC_STRIPE_PRICE_BASICO       ?? "price_1T59HfFFAjgAeuC1RGfeU8wW",
-  "construir":    process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUIR     ?? "price_1T59ICFFAjgAeuC1tJrHJFGB",
-  "premium-full": process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_FULL ?? "price_1T59ImFFAjgAeuC1PHZZu2M7",
+  basico:   process.env.NEXT_PUBLIC_STRIPE_PRICE_BASICO        ?? "price_1T59HfFFAjgAeuC1RGfeU8wW",
+  premium:  process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_FULL  ?? "price_1T59ImFFAjgAeuC1PHZZu2M7",
 };
 
 /* ─── Step definitions per plan ─── */
@@ -132,6 +94,7 @@ export function getStepsForPlan(plan: OnboardingPlan | null): StepDefinition[] {
     ];
   }
 
+  // premium
   return [
     LEAD_CAPTURE_STEP,
     { id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" },

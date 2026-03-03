@@ -101,7 +101,7 @@ function WizardContent() {
                   </div>
                   {selectedPlan && (
                     <p className="mt-1 text-xs text-[var(--platform-text)]/40">
-                      Plano {selectedPlan === "basico" ? "Básico" : selectedPlan === "construir" ? "Construir" : "Premium Full"}
+                      Plano {selectedPlan === "basico" ? "Básico" : "Premium"}
                     </p>
                   )}
                 </div>

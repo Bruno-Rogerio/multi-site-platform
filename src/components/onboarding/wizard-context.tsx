@@ -401,7 +401,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => {
     const steps = getStepsForPlan(state.selectedPlan);
-    const monthlyTotal = calculateMonthlyTotal(state.selectedPlan, state.addonsSelected);
+    const monthlyTotal = calculateMonthlyTotal(state.selectedPlan);
 
     return {
       state,
@@ -410,10 +410,10 @@ export function WizardProvider({ children }: { children: ReactNode }) {
       totalSteps: steps.length,
       monthlyTotal,
       isFeatureUnlocked: (featureId: PremiumFeatureId) =>
-        checkFeatureUnlocked(featureId, state.selectedPlan, state.addonsSelected),
-      maxServiceCards: getServiceCardsLimit(state.selectedPlan, state.addonsSelected),
-      maxSections: getSectionsLimit(state.selectedPlan, state.addonsSelected),
-      maxCtaTypes: getCtaTypesLimit(state.selectedPlan, state.addonsSelected),
+        checkFeatureUnlocked(featureId, state.selectedPlan),
+      maxServiceCards: getServiceCardsLimit(state.selectedPlan),
+      maxSections: getSectionsLimit(state.selectedPlan),
+      maxCtaTypes: getCtaTypesLimit(state.selectedPlan),
     };
   }, [state]);
 

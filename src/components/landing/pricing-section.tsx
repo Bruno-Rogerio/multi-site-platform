@@ -35,36 +35,19 @@ const plans: Plan[] = [
     cta: "Começar agora",
   },
   {
-    name: "Construir",
-    price: "R$ 79,90",
-    priceNote: "/mês + add-ons",
-    description:
-      "Monte seu site do zero com controle total sobre cada detalhe. Recursos premium disponíveis como extras.",
-    features: [
-      "Tudo do plano Básico",
-      "Paleta de cores personalizável",
-      "Escolha de tipografia e botões",
-      "Variantes de layout por seção",
-      "2 canais de contato inclusos",
-      "Expansível com add-ons premium",
-    ],
-    extraNote: "Add-ons a partir de R$ 9,90/mês",
-    cta: "Começar a construir",
-  },
-  {
-    name: "Premium Full",
+    name: "Premium",
     badge: "Recomendado",
     price: "R$ 109,80",
     priceNote: "/mês",
     description:
-      "Todos os recursos premium desbloqueados. A experiência completa sem limites.",
+      "Personalização visual completa, múltiplas páginas e todos os recursos desbloqueados.",
     features: [
-      "Tudo do plano Construir",
-      "Todas as paletas e fontes premium",
-      "Variantes e animações exclusivas",
-      "Canais de contato ilimitados",
-      "Cards e seções sem limite",
-      "Ícones premium liberados",
+      "Tudo do plano Básico",
+      "Personalização visual completa",
+      "Múltiplas páginas (FAQ, Depoimentos...)",
+      "Depoimentos ilimitados",
+      "SEO básico configurável",
+      "Sem branding BuildSphere",
       "Prioridade no suporte",
     ],
     cta: "Quero o Premium",
@@ -79,7 +62,7 @@ export function PricingSection() {
   return (
     <div
       ref={ref}
-      className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-2 lg:grid-cols-3"
+      className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2"
     >
       {plans.map((plan, i) => (
         <motion.div

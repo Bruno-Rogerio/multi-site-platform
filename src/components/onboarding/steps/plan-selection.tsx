@@ -1,15 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Sparkles, Zap, Layout } from "lucide-react";
+import { Check, Sparkles, Layout } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { planDefinitions, type PlanDefinition } from "@/lib/onboarding/plans";
 
 const planIcons = {
   basico: Layout,
-  construir: Zap,
-  "premium-full": Sparkles,
+  premium: Sparkles,
 };
 
 function PlanCard({ plan, isSelected, onSelect }: { plan: PlanDefinition; isSelected: boolean; onSelect: () => void }) {
@@ -112,12 +111,12 @@ export function PlanSelection() {
         </h1>
         <p className="mt-2 max-w-xl text-sm text-[var(--platform-text)]/60">
           Escolha o modo que melhor se adapta ao seu momento. Você pode começar com um
-          template pronto ou construir do zero com total liberdade.
+          template pronto ou o Premium com personalização visual completa e múltiplas páginas.
         </p>
       </div>
 
       {/* Plan cards */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         {planDefinitions.map((plan) => (
           <PlanCard
             key={plan.id}

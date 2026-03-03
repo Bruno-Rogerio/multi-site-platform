@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
-import { SectionPremiumToggle } from "../premium-step-toggle";
+// SectionPremiumToggle removed — no longer needed with two-plan model
 import { ImageUpload } from "../builders/image-upload";
 import {
   heroVariants,
@@ -52,7 +52,6 @@ function VariantSelector({
   selectedId,
   onSelect,
   plan,
-  addons,
   featureId,
   onLocked,
 }: {
@@ -61,7 +60,6 @@ function VariantSelector({
   selectedId: string;
   onSelect: (id: string) => void;
   plan: OnboardingPlan | null;
-  addons: string[];
   featureId: string;
   onLocked: () => void;
 }) {
@@ -103,7 +101,7 @@ function VariantSelector({
             className="absolute top-full left-0 right-0 z-10 mt-1 rounded-lg border border-white/10 bg-[#1A2035] p-1 shadow-xl"
           >
             {variants.map((variant) => {
-              const locked = variant.premium && !isFeatureUnlocked(featureId as Parameters<typeof isFeatureUnlocked>[0], plan, addons);
+              const locked = variant.premium && !isFeatureUnlocked(featureId as Parameters<typeof isFeatureUnlocked>[0], plan);
               return (
                 <button
                   key={variant.id}
@@ -167,7 +165,6 @@ function CtaTypeSelector({
   onConfigChange,
   ctaConfig,
   plan,
-  addons,
   onLocked,
 }: {
   selectedTypes: CtaTypeId[];
@@ -175,10 +172,9 @@ function CtaTypeSelector({
   onConfigChange: (id: CtaTypeId, url: string) => void;
   ctaConfig: Partial<Record<CtaTypeId, { label: string; url: string }>>;
   plan: OnboardingPlan | null;
-  addons: string[];
   onLocked: () => void;
 }) {
-  const maxCtas = getCtaTypesLimit(plan, addons);
+  const maxCtas = getCtaTypesLimit(plan);
 
   return (
     <div>
@@ -273,17 +269,15 @@ function IconPicker({
   selectedIcon,
   onSelect,
   plan,
-  addons,
   onLocked,
 }: {
   selectedIcon: string;
   onSelect: (icon: string) => void;
   plan: OnboardingPlan | null;
-  addons: string[];
   onLocked: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const hasPremiumIcons = isFeatureUnlocked("premium-icon-pack", plan, addons);
+  const hasPremiumIcons = isFeatureUnlocked("premium-icon-pack", plan);
 
   const allIcons = hasPremiumIcons
     ? premiumIconPack
@@ -370,14 +364,12 @@ function ServiceCardEditor({
   index,
   card,
   plan,
-  addons,
   dispatch,
   onLocked,
 }: {
   index: number;
   card: { title: string; description: string; iconName: string; icon?: string; imageUrl?: string };
   plan: OnboardingPlan | null;
-  addons: string[];
   dispatch: ReturnType<typeof useWizard>["dispatch"];
   onLocked: () => void;
 }) {
@@ -392,7 +384,6 @@ function ServiceCardEditor({
             dispatch({ type: "UPDATE_SERVICE_CARD", index, data: { icon, iconName: icon } })
           }
           plan={plan}
-          addons={addons}
           onLocked={onLocked}
         />
       </div>
@@ -439,7 +430,6 @@ export function SectionBuilderStep() {
   const { state, dispatch } = useWizard();
   const {
     selectedPlan,
-    addonsSelected,
     heroVariant,
     servicesVariant,
     ctaVariant,
@@ -450,9 +440,9 @@ export function SectionBuilderStep() {
     ctaConfig,
   } = state;
 
-  const plan = selectedPlan || "construir";
-  const maxCards = getServiceCardsLimit(plan, addonsSelected);
-  const maxFloatingCtas = getFloatingCtaSlotsLimit(plan, addonsSelected);
+  const plan = selectedPlan || "premium";
+  const maxCards = getServiceCardsLimit(plan);
+  const maxFloatingCtas = getFloatingCtaSlotsLimit(plan);
   const { hint: variantesHint, showHint: showVariantesHint } = usePremiumHint("Ative o Premium Variantes para desbloquear layouts premium");
   const { hint: canaisHint, showHint: showCanaisHint } = usePremiumHint("Ative o Premium Canais para desbloquear mais canais e botão flutuante");
   const { hint: cardsHint, showHint: showCardsHint } = usePremiumHint("Ative o Premium Cards para desbloquear mais cards e ícones premium");
@@ -484,7 +474,7 @@ export function SectionBuilderStep() {
   }
 
   function handleToggleFloatingCta() {
-    if (floatingCtaEnabled || isFeatureUnlocked("floating-cta", plan, addonsSelected)) {
+    if (floatingCtaEnabled || isFeatureUnlocked("floating-cta", plan)) {
       dispatch({ type: "SET_FLOATING_CTA", enabled: !floatingCtaEnabled });
     } else {
       showCanaisHint();
@@ -538,9 +528,6 @@ export function SectionBuilderStep() {
             </div>
           </div>
 
-          {/* Toggle for variants premium */}
-          <SectionPremiumToggle sectionId="premium-variantes" />
-
           <div className="grid gap-4 sm:grid-cols-2">
             <VariantSelector
               label="Hero"
@@ -548,7 +535,6 @@ export function SectionBuilderStep() {
               selectedId={heroVariant}
               onSelect={(id) => dispatch({ type: "SET_HERO_VARIANT", variant: id })}
               plan={plan}
-              addons={addonsSelected}
               featureId="premium-hero-variants"
               onLocked={showVariantesHint}
             />
@@ -558,7 +544,6 @@ export function SectionBuilderStep() {
               selectedId={servicesVariant}
               onSelect={(id) => dispatch({ type: "SET_SERVICES_VARIANT", variant: id })}
               plan={plan}
-              addons={addonsSelected}
               featureId="premium-services-variants"
               onLocked={showVariantesHint}
             />
@@ -568,7 +553,6 @@ export function SectionBuilderStep() {
               selectedId={ctaVariant}
               onSelect={(id) => dispatch({ type: "SET_CTA_VARIANT", variant: id })}
               plan={plan}
-              addons={addonsSelected}
               featureId="premium-cta-variants"
               onLocked={showVariantesHint}
             />
@@ -578,7 +562,6 @@ export function SectionBuilderStep() {
               selectedId={motionStyle}
               onSelect={(id) => dispatch({ type: "SET_MOTION_STYLE", style: id })}
               plan={plan}
-              addons={addonsSelected}
               featureId="advanced-motion"
               onLocked={showVariantesHint}
             />
@@ -590,16 +573,12 @@ export function SectionBuilderStep() {
           <h3 className="text-sm font-semibold text-[var(--platform-text)] mb-1">Canais de contato</h3>
           <p className="text-xs text-[var(--platform-text)]/50 mb-4">Defina como seus clientes entram em contato</p>
 
-          {/* Toggle for channels premium */}
-          <SectionPremiumToggle sectionId="premium-canais" />
-
           <CtaTypeSelector
             selectedTypes={selectedCtaTypes}
             onToggle={handleToggleCta}
             onConfigChange={handleCtaConfigChange}
             ctaConfig={ctaConfig}
             plan={plan}
-            addons={addonsSelected}
             onLocked={showCanaisHint}
           />
 
@@ -612,11 +591,10 @@ export function SectionBuilderStep() {
                 </p>
                 <p className="text-xs text-[var(--platform-text)]/50">
                   Aparece fixo no canto da tela
-                  {plan === "premium-full" ? " (até 2)" : ""}
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                {!isFeatureUnlocked("floating-cta", plan, addonsSelected) && (
+                {!isFeatureUnlocked("floating-cta", plan) && (
                   <Lock size={12} className="text-[#A78BFA]" />
                 )}
                 <button
@@ -686,9 +664,6 @@ export function SectionBuilderStep() {
 
         {/* Service Cards */}
         <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          {/* Toggle for cards premium */}
-          <SectionPremiumToggle sectionId="premium-cards" />
-
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-sm font-semibold text-[var(--platform-text)]">
@@ -717,7 +692,6 @@ export function SectionBuilderStep() {
                   index={index}
                   card={card}
                   plan={plan}
-                  addons={addonsSelected}
                   dispatch={dispatch}
                   onLocked={showCardsHint}
                 />

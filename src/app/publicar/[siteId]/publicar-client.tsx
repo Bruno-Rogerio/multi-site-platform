@@ -26,7 +26,7 @@ type Props = {
 export function PublicarClient({ siteId, siteName, siteDomain, ownerEmail, selectedPlan }: Props) {
   const plan = selectedPlan as OnboardingPlan;
   const planDef = planDefinitions.find((p) => p.id === plan) ?? planDefinitions[0];
-  const monthlyTotal = calculateMonthlyTotal(plan, []);
+  const monthlyTotal = calculateMonthlyTotal(plan);
   const priceId = PLAN_PRICE_IDS[plan] ?? PLAN_PRICE_IDS["basico"];
 
   const [docValue, setDocValue] = useState("");

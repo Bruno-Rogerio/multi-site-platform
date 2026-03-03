@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Palette, Type, MousePointer2, Lock, Pipette } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
-import { SectionPremiumToggle } from "../premium-step-toggle";
+import { usePremiumHint as _usePremiumHint } from "../premium-step-toggle";
 import { palettePresets, type PalettePreset } from "@/lib/onboarding/palettes";
 import { isFeatureUnlocked } from "@/lib/onboarding/premium-gate";
 
@@ -110,11 +110,11 @@ function usePremiumHint(message: string) {
 
 export function StylePaletteStep() {
   const { state, dispatch } = useWizard();
-  const { paletteId, fontFamily, buttonStyle, selectedPlan, addonsSelected, customColors } = state;
+  const { paletteId, fontFamily, buttonStyle, selectedPlan, customColors } = state;
 
-  const plan = selectedPlan || "construir";
-  const hasCustomColors = isFeatureUnlocked("custom-colors", plan, addonsSelected);
-  const hasPremiumFonts = isFeatureUnlocked("premium-fonts", plan, addonsSelected);
+  const plan = selectedPlan || "premium";
+  const hasCustomColors = isFeatureUnlocked("custom-colors", plan);
+  const hasPremiumFonts = isFeatureUnlocked("premium-fonts", plan);
   const { hint: paletaHint, showHint: showPaletaHint } = usePremiumHint("Ative o Premium Paleta para desbloquear cores personalizadas");
   const { hint: tipoHint, showHint: showTipoHint } = usePremiumHint("Ative o Premium Tipografia para desbloquear esta fonte");
 
@@ -182,9 +182,6 @@ export function StylePaletteStep() {
               </p>
             </div>
           </div>
-
-          {/* Toggle for palette premium */}
-          <SectionPremiumToggle sectionId="premium-paleta" />
 
           <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
             {palettePresets.map((palette) => (
@@ -273,9 +270,6 @@ export function StylePaletteStep() {
               </p>
             </div>
           </div>
-
-          {/* Toggle for typography premium */}
-          <SectionPremiumToggle sectionId="premium-tipografia" />
 
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {fontOptions.map((font) => {
