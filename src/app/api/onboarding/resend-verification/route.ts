@@ -66,7 +66,11 @@ export async function POST(request: Request) {
     );
   }
 
-  await sendVerificationEmail(email, fullName, linkData.properties.action_link);
+  // Build our own URL using hashed_token — bypasses implicit/PKCE project setting
+  const tokenHash = linkData.properties.hashed_token;
+  const verificationUrl = `${platformUrl}/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=magiclink&next=/admin/client`;
+
+  await sendVerificationEmail(email, fullName, verificationUrl);
 
   return NextResponse.json({ ok: true });
 }

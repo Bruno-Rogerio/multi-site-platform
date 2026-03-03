@@ -101,12 +101,14 @@ export async function POST(request: Request) {
     });
   }
 
+  // ── Build our own verification URL using hashed_token ────────────────────
+  // This bypasses the Supabase project's implicit/PKCE setting: the link goes
+  // directly to our /auth/callback which calls verifyOtp() server-side.
+  const tokenHash = linkData.properties.hashed_token;
+  const verificationUrl = `${platformUrl}/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=signup&next=/admin/client`;
+
   // ── Send beautiful verification email via Resend ──────────────────────────
-  await sendVerificationEmail(
-    normalizedEmail,
-    trimmedName,
-    linkData.properties.action_link,
-  );
+  await sendVerificationEmail(normalizedEmail, trimmedName, verificationUrl);
 
   return NextResponse.json({
     ok: true,
