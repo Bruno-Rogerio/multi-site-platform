@@ -4,13 +4,12 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Loader2, Globe, ExternalLink, Clock, CheckCircle2, ChevronRight, Sparkles,
-  Eye, EyeOff, User, Lock,
+  Eye, EyeOff, User, Lock, Mail, RefreshCw,
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { PLAN_PRICE_IDS } from "@/lib/onboarding/plans";
 import { formatPrice } from "@/lib/onboarding/pricing";
 import { validatePassword } from "@/lib/onboarding/validation";
-import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 function resolveRootDomain(): string {
   return process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
@@ -30,7 +29,7 @@ function slugFromName(name: string): string {
     .slice(0, 25);
 }
 
-type Phase = "summary" | "register" | "creating" | "ready";
+type Phase = "summary" | "register" | "creating" | "verify-email" | "ready";
 
 export function FinalizeStep() {
   const { state, dispatch, monthlyTotal } = useWizard();
@@ -55,6 +54,10 @@ export function FinalizeStep() {
   const [showPassword, setShowPassword] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [ownerId, setOwnerId] = useState("");
+
+  // Resend state
+  const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const passwordValidation = validatePassword(regPassword);
   const canRegister =
@@ -83,23 +86,22 @@ export function FinalizeStep() {
       const res = await fetch("/api/onboarding/register-owner", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: ownerEmail, password: regPassword, fullName: fullName.trim() }),
+        body: JSON.stringify({
+          email: ownerEmail,
+          password: regPassword,
+          fullName: fullName.trim(),
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Erro ao criar conta.");
         return;
       }
-      setOwnerId(data.userId ?? "");
+      const userId = data.userId ?? "";
+      setOwnerId(userId);
 
-      // Sign in automatically after registration
-      const supabase = createSupabaseBrowserClient();
-      if (supabase) {
-        await supabase.auth.signInWithPassword({ email: ownerEmail, password: regPassword });
-      }
-
-      // Proceed to create draft
-      await handleCreateDemo(data.userId ?? "");
+      // Create the draft (doesn't require user to be signed in — uses admin client)
+      await handleCreateDemo(userId);
     } catch {
       setError("Falha de conexão. Tente novamente.");
     } finally {
@@ -181,11 +183,133 @@ export function FinalizeStep() {
       setPreviewUrl(url);
 
       dispatch({ type: "SET_DRAFT", siteId: data.siteId, url });
-      setPhase("ready");
+
+      // Email verification required before accessing admin
+      setPhase("verify-email");
     } catch {
       setError("Falha de conexão. Verifique sua internet e tente novamente.");
       setPhase("register");
     }
+  }
+
+  async function handleResendVerification() {
+    if (isResending) return;
+    setIsResending(true);
+    setResendSuccess(false);
+    try {
+      await fetch("/api/onboarding/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: ownerEmail }),
+      });
+      setResendSuccess(true);
+    } catch {
+      // Silent — UI already shows the instruction
+    } finally {
+      setIsResending(false);
+    }
+  }
+
+  // ─── Verify-email phase ──────────────────────────────────────────────────
+  if (phase === "verify-email") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
+        className="mx-auto w-full max-w-lg"
+      >
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#22D3EE]/10">
+            <Mail size={28} className="text-[#22D3EE]" />
+          </div>
+          <h1 className="text-2xl font-bold text-[#EAF0FF]">Confirme seu e-mail</h1>
+          <p className="mt-2 text-sm leading-relaxed text-[#EAF0FF]/60">
+            Enviamos um link de verificação para
+            <br />
+            <strong className="text-[#22D3EE]">{ownerEmail}</strong>
+          </p>
+        </div>
+
+        {/* Preview URL card */}
+        <div className="mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe size={14} className="text-emerald-400" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
+              Sua demonstração está pronta
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <code className="flex-1 truncate rounded-lg bg-[#0B1020]/60 px-3 py-2 text-sm text-[#22D3EE]">
+              {previewUrl}
+            </code>
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex shrink-0 items-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-400"
+            >
+              <ExternalLink size={13} />
+              Abrir
+            </a>
+          </div>
+          <div className="mt-2.5 flex items-center gap-1.5 text-xs text-[#EAF0FF]/40">
+            <Clock size={11} />
+            <span>Demonstração expira em 48 horas após a publicação.</span>
+          </div>
+        </div>
+
+        {/* Verification instructions */}
+        <div className="rounded-2xl border border-[#22D3EE]/20 bg-[#22D3EE]/5 p-5">
+          <p className="text-sm font-semibold text-[#EAF0FF] mb-2">
+            Próximo passo: verificar seu e-mail
+          </p>
+          <ol className="space-y-2 text-sm text-[#EAF0FF]/60 list-decimal list-inside">
+            <li>Abra sua caixa de entrada (ou a pasta de spam)</li>
+            <li>Clique em <strong className="text-[#EAF0FF]/80">"Confirmar e-mail e acessar painel"</strong></li>
+            <li>Você será redirecionado ao seu painel automaticamente</li>
+          </ol>
+
+          <div className="mt-4 border-t border-white/10 pt-4">
+            <p className="text-xs text-[#EAF0FF]/40 mb-2">Não recebeu o e-mail?</p>
+            {resendSuccess ? (
+              <div className="flex items-center gap-2 text-xs text-emerald-400">
+                <CheckCircle2 size={13} />
+                Novo link enviado para {ownerEmail}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => void handleResendVerification()}
+                disabled={isResending}
+                className="flex items-center gap-2 text-xs font-semibold text-[#22D3EE] transition hover:text-[#06B6D4] disabled:opacity-50"
+              >
+                <RefreshCw size={13} className={isResending ? "animate-spin" : ""} />
+                {isResending ? "Enviando..." : "Reenviar e-mail de verificação"}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Publish CTA */}
+        {siteId && (
+          <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+            <p className="mb-2 text-xs text-[#EAF0FF]/50">
+              Pronto para publicar? Você pode ir diretamente ao pagamento:
+            </p>
+            <a
+              href={buildPublishUrl(siteId)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#7C5CFF] px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
+            >
+              <Sparkles size={14} />
+              Publicar agora — {planPrice}/mês
+              <ChevronRight size={14} />
+            </a>
+          </div>
+        )}
+      </motion.div>
+    );
   }
 
   if (phase === "ready") {
@@ -229,8 +353,6 @@ export function FinalizeStep() {
               Abrir
             </a>
           </div>
-
-          {/* Timer info */}
           <div className="mt-3 flex items-center gap-1.5 text-xs text-[#EAF0FF]/40">
             <Clock size={11} />
             <span>Demonstração gratuita — expira em 48 horas. O site mostrará um timer para o visitante.</span>
@@ -458,6 +580,14 @@ function RegisterPhase({
           )}
         </div>
 
+        {/* Verification notice */}
+        <div className="rounded-lg border border-[#22D3EE]/20 bg-[#22D3EE]/5 px-4 py-3">
+          <p className="flex items-center gap-2 text-xs text-[#22D3EE]">
+            <Mail size={13} />
+            Um link de verificação será enviado para <strong>{ownerEmail}</strong>
+          </p>
+        </div>
+
         {error && (
           <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {error}
@@ -502,3 +632,6 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+// Suppress unused import warning for PLAN_PRICE_IDS
+void PLAN_PRICE_IDS;
