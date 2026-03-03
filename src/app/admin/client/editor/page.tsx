@@ -1,3 +1,4 @@
+import { LogoEditor } from "@/components/admin/logo-editor";
 import { SectionsEditor } from "@/components/admin/sections-editor";
 import { requireUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
@@ -16,6 +17,9 @@ export default async function ClientEditorPage() {
     scopedSites = data ?? [];
   }
 
+  const siteId = profile.site_id ?? scopedSites[0]?.id ?? null;
+  const siteName = scopedSites[0]?.name;
+
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
       <div className="mb-6">
@@ -25,9 +29,16 @@ export default async function ClientEditorPage() {
         </p>
       </div>
 
+      {/* Logo — always first, for all plans */}
+      {siteId && (
+        <div className="mb-6">
+          <LogoEditor siteId={siteId} siteName={siteName} />
+        </div>
+      )}
+
       <SectionsEditor
         sites={scopedSites}
-        defaultSiteId={profile.site_id ?? scopedSites[0]?.id ?? null}
+        defaultSiteId={siteId}
         role="client"
       />
     </div>
