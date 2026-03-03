@@ -70,6 +70,8 @@ export default async function ClientSettingsPage() {
           siteName={site.name}
           siteDomain={site.domain}
           siteId={site.id}
+          selectedPlan={selectedPlan}
+          themeSettings={site.theme_settings ?? {}}
         />
       ) : (
         <div className="rounded-xl border border-white/10 bg-[#12182B] p-8 text-center">

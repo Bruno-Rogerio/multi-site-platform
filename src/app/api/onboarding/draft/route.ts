@@ -532,11 +532,29 @@ export async function POST(request: Request) {
           },
         }]
       : []),
+    ...(payload.creationMode === "builder-premium"
+      ? [{
+          page_id: page.id,
+          type: "faq" as const,
+          variant: "accordion",
+          order: testimonials && testimonials.length > 0 ? 6 : 5,
+          content: {
+            title: "Perguntas frequentes",
+            items: [
+              { question: `Como funciona o atendimento de ${businessName}?`, answer: "Atendemos de forma personalizada, com foco nas necessidades de cada cliente. Entre em contato para saber mais." },
+              { question: "Quais são os horários de atendimento?", answer: "Nossos horários são flexíveis para melhor atender você. Fale conosco para combinar o melhor horário." },
+              { question: "Como posso fazer um orçamento?", answer: "Entre em contato pelos canais abaixo. Respondemos rapidamente e sem compromisso." },
+            ],
+          },
+        }]
+      : []),
     {
       page_id: page.id,
       type: "contact",
       variant: "default",
-      order: testimonials && testimonials.length > 0 ? 6 : 5,
+      order: payload.creationMode === "builder-premium"
+        ? (testimonials && testimonials.length > 0 ? 7 : 6)
+        : (testimonials && testimonials.length > 0 ? 6 : 5),
       content: {
         title: content.contactTitle?.trim() || "Contato",
         subtitle:

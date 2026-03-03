@@ -214,7 +214,9 @@ export function SiteShell({ site, children }: SiteShellProps) {
             ) : null}
             <span>{footerText || site.name}</span>
           </span>
-          <span>Powered by BuildSphere</span>
+          {!site.themeSettings.hideBranding && (
+            <span>Powered by BuildSphere</span>
+          )}
         </div>
       </footer>
     </div>

@@ -13,6 +13,7 @@ import { PlanSelection } from "./steps/plan-selection";
 import { TemplateGallery } from "./steps/template-gallery";
 import { TemplateContentEditor } from "./steps/template-content-editor";
 import { StylePaletteStep } from "./steps/style-palette-step";
+import { VisualIdentityStep } from "./steps/visual-identity-step";
 import { SectionBuilderStep } from "./steps/section-builder-step";
 import { ContentEditorStep } from "./steps/content-editor-step";
 import { FinalizeStep } from "./steps/finalize-step";
@@ -39,6 +40,8 @@ function WizardContent() {
         return TemplateContentEditor;
       case "style-palette":
         return StylePaletteStep;
+      case "visual-identity":
+        return VisualIdentityStep;
       case "section-builder":
         return SectionBuilderStep;
       case "content-editor":

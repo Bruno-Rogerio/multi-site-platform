@@ -9,6 +9,7 @@ import {
   type Dispatch,
 } from "react";
 import type { WizardState, WizardAction, StepDefinition, CtaTypeId } from "@/lib/onboarding/types";
+import { generateTheme } from "@/lib/onboarding/theme-generator";
 import { getStepsForPlan } from "@/lib/onboarding/plans";
 import { calculateMonthlyTotal } from "@/lib/onboarding/pricing";
 import {
@@ -29,6 +30,12 @@ const initialState: WizardState = {
 
   // Template flow
   selectedTemplateSlug: null,
+
+  // Visual identity
+  visualPrimaryColor: "#3B82F6",
+  visualTone: "dark",
+  visualPersonality: "clean",
+  visualMotion: "subtle",
 
   // Style & palette
   paletteId: "buildsphere",
@@ -371,6 +378,29 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_LEAD_ID":
       return { ...state, leadId: action.leadId };
+
+    case "SET_VISUAL_IDENTITY": {
+      const theme = generateTheme(action.primaryColor, action.tone, action.personality, action.motion);
+      return {
+        ...state,
+        visualPrimaryColor: action.primaryColor,
+        visualTone: action.tone,
+        visualPersonality: action.personality,
+        visualMotion: action.motion,
+        paletteId: "custom",
+        customColors: {
+          primary: theme.primaryColor,
+          accent: theme.accentColor,
+          background: theme.backgroundColor,
+          text: theme.textColor,
+        },
+        fontFamily: theme.fontFamily,
+        buttonStyle: theme.buttonStyle,
+        motionStyle: theme.motionStyle,
+        headerStyle: theme.headerStyle,
+        dividerStyle: theme.dividerStyle,
+      };
+    }
 
     case "RESET_WIZARD":
       return initialState;

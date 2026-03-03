@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save,
+  Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle,
 } from "lucide-react";
 
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
@@ -66,6 +66,8 @@ const SECTION_META: Record<string, { label: string; Icon: React.ComponentType<{ 
   cta: { label: "Chamada para Ação", Icon: Megaphone },
   about: { label: "Sobre", Icon: User },
   contact: { label: "Contato", Icon: Mail },
+  testimonials: { label: "Depoimentos", Icon: Quote },
+  faq: { label: "Perguntas Frequentes", Icon: HelpCircle },
 };
 
 const INPUT_CLS = "mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]";
@@ -536,6 +538,154 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     );
   }
 
+  function renderTestimonialsFields(section: Section) {
+    const items: Array<{ quote: string; author: string }> = Array.isArray(section.content.items)
+      ? (section.content.items as Array<{ quote: string; author: string }>)
+      : [];
+
+    function updateItem(index: number, key: "quote" | "author", value: string) {
+      const updated = items.map((item, i) => i === index ? { ...item, [key]: value } : item);
+      updateSection(section.id, (cur) => ({ ...cur, content: { ...cur.content, items: updated } }));
+    }
+
+    function addItem() {
+      const updated = [...items, { quote: "", author: "" }];
+      updateSection(section.id, (cur) => ({ ...cur, content: { ...cur.content, items: updated } }));
+    }
+
+    function removeItem(index: number) {
+      const updated = items.filter((_, i) => i !== index);
+      updateSection(section.id, (cur) => ({ ...cur, content: { ...cur.content, items: updated } }));
+    }
+
+    return (
+      <div className="mt-4 space-y-4">
+        <div>
+          <label className={LABEL_CLS}>Título</label>
+          <input
+            value={asString(section.content.title, "Depoimentos")}
+            onChange={(e) => updateContent(section.id, "title", e.target.value)}
+            className={INPUT_CLS}
+          />
+        </div>
+        <div className="space-y-3">
+          {items.map((item, i) => (
+            <div key={i} className="relative rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-2">
+              <textarea
+                value={item.quote}
+                onChange={(e) => updateItem(i, "quote", e.target.value)}
+                placeholder="Depoimento..."
+                rows={2}
+                className={INPUT_CLS + " resize-none"}
+              />
+              <input
+                value={item.author}
+                onChange={(e) => updateItem(i, "author", e.target.value)}
+                placeholder="Nome do cliente"
+                className={INPUT_CLS}
+              />
+              {items.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeItem(i)}
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                >
+                  <Trash2 size={11} />
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addItem}
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-[var(--platform-text)]/70 transition hover:bg-white/[0.08]"
+          >
+            <Plus size={13} /> Adicionar depoimento
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  function renderFaqFields(section: Section) {
+    const items: Array<{ question: string; answer: string }> = Array.isArray(section.content.items)
+      ? (section.content.items as Array<{ question: string; answer: string }>)
+      : [];
+
+    function updateItem(index: number, key: "question" | "answer", value: string) {
+      const updated = items.map((item, i) => i === index ? { ...item, [key]: value } : item);
+      updateSection(section.id, (cur) => ({ ...cur, content: { ...cur.content, items: updated } }));
+    }
+
+    function addItem() {
+      const updated = [...items, { question: "", answer: "" }];
+      updateSection(section.id, (cur) => ({ ...cur, content: { ...cur.content, items: updated } }));
+    }
+
+    function removeItem(index: number) {
+      const updated = items.filter((_, i) => i !== index);
+      updateSection(section.id, (cur) => ({ ...cur, content: { ...cur.content, items: updated } }));
+    }
+
+    return (
+      <div className="mt-4 space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className={LABEL_CLS}>Título</label>
+            <input
+              value={asString(section.content.title, "Perguntas frequentes")}
+              onChange={(e) => updateContent(section.id, "title", e.target.value)}
+              className={INPUT_CLS}
+            />
+          </div>
+          <div>
+            <label className={LABEL_CLS}>Subtítulo (opcional)</label>
+            <input
+              value={asString(section.content.subtitle)}
+              onChange={(e) => updateContent(section.id, "subtitle", e.target.value)}
+              className={INPUT_CLS}
+            />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {items.map((item, i) => (
+            <div key={i} className="relative rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-2">
+              <input
+                value={item.question}
+                onChange={(e) => updateItem(i, "question", e.target.value)}
+                placeholder="Pergunta..."
+                className={INPUT_CLS}
+              />
+              <textarea
+                value={item.answer}
+                onChange={(e) => updateItem(i, "answer", e.target.value)}
+                placeholder="Resposta..."
+                rows={2}
+                className={INPUT_CLS + " resize-none"}
+              />
+              {items.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeItem(i)}
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                >
+                  <Trash2 size={11} />
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={addItem}
+            className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-[var(--platform-text)]/70 transition hover:bg-white/[0.08]"
+          >
+            <Plus size={13} /> Adicionar pergunta
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   /* ─── Render ─── */
 
   if (!hasSites) {
@@ -684,6 +834,8 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                 {section.type === "cta" && renderCtaFields(section)}
                 {section.type === "about" && renderAboutFields(section)}
                 {section.type === "contact" && renderContactFields(section)}
+                {section.type === "testimonials" && renderTestimonialsFields(section)}
+                {section.type === "faq" && renderFaqFields(section)}
               </article>
             );
           })}

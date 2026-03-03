@@ -6,7 +6,8 @@ export type SectionType =
   | "services"
   | "cta"
   | "testimonials"
-  | "contact";
+  | "contact"
+  | "faq";
 
 export type ButtonStyle = "rounded" | "pill" | "square";
 
@@ -31,6 +32,8 @@ export type ThemeSettings = {
   whatsappUrl?: string;
   floatingLinks?: Array<{ type: string; url: string; icon: string; label: string }>;
   floatingButtonsEnabled?: boolean;
+  // Premium features
+  hideBranding?: boolean;
   // Draft / preview fields
   onboardingDraft?: boolean;
   previewExpiresAt?: string;

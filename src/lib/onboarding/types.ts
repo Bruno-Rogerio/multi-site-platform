@@ -38,6 +38,12 @@ export type WizardState = {
   // Template flow (basico)
   selectedTemplateSlug: string | null;
 
+  // Visual identity (premium wizard)
+  visualPrimaryColor: string;
+  visualTone: "dark" | "light" | "neutral";
+  visualPersonality: "clean" | "bold" | "elegant" | "friendly";
+  visualMotion: "none" | "subtle" | "lively";
+
   // Style & palette (builder/premium)
   paletteId: string;
   customColors: { primary: string; accent: string; background: string; text: string };
@@ -145,6 +151,7 @@ export type WizardAction =
   | { type: "SET_DRAFT"; siteId: string; url: string }
   | { type: "SET_CHECKOUT_STATE"; state: WizardState["checkoutState"]; message?: string; url?: string }
   | { type: "TOGGLE_SECTION_PREMIUM"; sectionId: "premium-paleta" | "premium-tipografia" | "premium-variantes" | "premium-canais" | "premium-cards" }
+  | { type: "SET_VISUAL_IDENTITY"; primaryColor: string; tone: "dark" | "light" | "neutral"; personality: "clean" | "bold" | "elegant" | "friendly"; motion: "none" | "subtle" | "lively" }
   | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl"; url: string }
   | { type: "SET_CONTACT_SELECTED_LINKS"; links: string[] }
   | { type: "SET_LEAD_ID"; leadId: string }

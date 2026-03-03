@@ -1,6 +1,6 @@
 "use client";
 
-import { Globe, Mail, Lock, Building2, MessageCircle, Check, AlertCircle } from "lucide-react";
+import { Globe, Mail, Lock, Building2, MessageCircle, Check, AlertCircle, Search, Eye } from "lucide-react";
 import { useState } from "react";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -10,11 +10,15 @@ type Props = {
   siteName: string;
   siteDomain: string;
   siteId: string;
+  selectedPlan?: string;
+  themeSettings?: Record<string, unknown>;
 };
 
 type FieldStatus = { type: "success" | "error"; message: string } | null;
 
-export function ClientSettingsForm({ email, siteName, siteDomain, siteId }: Props) {
+export function ClientSettingsForm({ email, siteName, siteDomain, siteId, selectedPlan = "basico", themeSettings = {} }: Props) {
+  const isPremium = selectedPlan === "premium";
+
   /* ── Password ── */
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,6 +29,17 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId }: Prop
   const [name, setName] = useState(siteName);
   const [nameStatus, setNameStatus] = useState<FieldStatus>(null);
   const [isSavingName, setIsSavingName] = useState(false);
+
+  /* ── SEO ── */
+  const [seoTitle, setSeoTitle] = useState((themeSettings.seoTitle as string) ?? "");
+  const [seoDescription, setSeoDescription] = useState((themeSettings.seoDescription as string) ?? "");
+  const [seoStatus, setSeoStatus] = useState<FieldStatus>(null);
+  const [isSavingSeo, setIsSavingSeo] = useState(false);
+
+  /* ── Branding ── */
+  const [hideBranding, setHideBranding] = useState((themeSettings.hideBranding as boolean) ?? false);
+  const [brandingStatus, setBrandingStatus] = useState<FieldStatus>(null);
+  const [isSavingBranding, setIsSavingBranding] = useState(false);
 
   async function onSavePassword() {
     setPasswordStatus(null);
@@ -75,6 +90,44 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId }: Prop
       return;
     }
     setNameStatus({ type: "success", message: "Nome atualizado com sucesso!" });
+  }
+
+  async function patchTheme(patch: Record<string, unknown>) {
+    // GET current, merge, PATCH
+    const getRes = await fetch("/api/admin/site-theme");
+    const current = getRes.ok ? ((await getRes.json()) as { themeSettings?: Record<string, unknown> }).themeSettings ?? {} : {};
+    const merged = { ...current, ...patch };
+    const res = await fetch("/api/admin/site-theme", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ themeSettings: merged }),
+    });
+    return res;
+  }
+
+  async function onSaveSeo() {
+    setSeoStatus(null);
+    setIsSavingSeo(true);
+    const res = await patchTheme({ seoTitle: seoTitle.trim(), seoDescription: seoDescription.trim() });
+    setIsSavingSeo(false);
+    if (!res.ok) {
+      setSeoStatus({ type: "error", message: "Erro ao salvar SEO." });
+      return;
+    }
+    setSeoStatus({ type: "success", message: "SEO atualizado!" });
+  }
+
+  async function onSaveBranding(value: boolean) {
+    setBrandingStatus(null);
+    setHideBranding(value);
+    setIsSavingBranding(true);
+    const res = await patchTheme({ hideBranding: value });
+    setIsSavingBranding(false);
+    if (!res.ok) {
+      setBrandingStatus({ type: "error", message: "Erro ao salvar." });
+      return;
+    }
+    setBrandingStatus({ type: "success", message: value ? "Branding removido!" : "Branding reativado." });
   }
 
   const whatsappText = encodeURIComponent(
@@ -191,6 +244,101 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId }: Prop
           <StatusHint status={nameStatus} />
         </div>
       </section>
+
+      {/* ── SEO (premium only) ── */}
+      {isPremium && (
+        <section className="rounded-2xl border border-white/10 bg-[#12182B] p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Search size={16} className="text-[var(--platform-text)]/40" />
+            <div>
+              <h2 className="text-sm font-semibold text-[var(--platform-text)]">SEO — Mecanismos de busca</h2>
+              <p className="text-xs text-[var(--platform-text)]/50">Aparece no Google e redes sociais</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="seo-title">
+                Título da página
+              </label>
+              <input
+                id="seo-title"
+                type="text"
+                value={seoTitle}
+                onChange={(e) => setSeoTitle(e.target.value)}
+                maxLength={70}
+                placeholder="Ex: Clínica Dra. Ana — Psicologia em SP"
+                className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+              />
+              <p className="mt-1 text-right text-[10px] text-[var(--platform-text)]/30">{seoTitle.length}/70</p>
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="seo-desc">
+                Descrição
+              </label>
+              <textarea
+                id="seo-desc"
+                value={seoDescription}
+                onChange={(e) => setSeoDescription(e.target.value)}
+                maxLength={160}
+                rows={3}
+                placeholder="Uma frase que resume o que você oferece e para quem."
+                className="mt-1 w-full resize-none rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+              />
+              <p className="mt-1 text-right text-[10px] text-[var(--platform-text)]/30">{seoDescription.length}/160</p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => void onSaveSeo()}
+              disabled={isSavingSeo}
+              className="rounded-xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+            >
+              {isSavingSeo ? "Salvando..." : "Salvar SEO"}
+            </button>
+            <StatusHint status={seoStatus} />
+          </div>
+        </section>
+      )}
+
+      {/* ── Branding (premium only) ── */}
+      {isPremium && (
+        <section className="rounded-2xl border border-white/10 bg-[#12182B] p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Eye size={16} className="text-[var(--platform-text)]/40" />
+            <div>
+              <h2 className="text-sm font-semibold text-[var(--platform-text)]">Branding</h2>
+              <p className="text-xs text-[var(--platform-text)]/50">Rodapé do seu site</p>
+            </div>
+          </div>
+
+          <label className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-white/10 bg-[#0B1020] px-4 py-3">
+            <div>
+              <p className="text-sm font-medium text-[var(--platform-text)]">
+                Remover crédito &quot;Powered by BuildSphere&quot;
+              </p>
+              <p className="text-xs text-[var(--platform-text)]/50 mt-0.5">
+                Oculta o link do rodapé do seu site
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void onSaveBranding(!hideBranding)}
+              disabled={isSavingBranding}
+              className={`relative h-6 w-11 shrink-0 rounded-full transition ${hideBranding ? "bg-[#22D3EE]" : "bg-white/10"}`}
+            >
+              <div className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${hideBranding ? "left-6" : "left-1"}`} />
+            </button>
+          </label>
+          {brandingStatus && (
+            <div className="mt-2">
+              <StatusHint status={brandingStatus} />
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ── Subdomain ── */}
       <section className="rounded-2xl border border-white/10 bg-[#12182B] p-5">

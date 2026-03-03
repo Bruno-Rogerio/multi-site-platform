@@ -4,6 +4,7 @@ import * as LucideIcons from "lucide-react";
 import type { Site } from "@/lib/tenant/types";
 import type { Section } from "@/lib/tenant/types";
 import { TestimonialsCarousel } from "./testimonials-carousel";
+import { FaqSection } from "./faq-section";
 import { ServiceImageModal } from "./service-image-modal";
 import { StaggeredCards } from "./staggered-cards";
 
@@ -1579,6 +1580,16 @@ export function SectionRenderer({
         </div>
       </section>
     );
+  }
+
+  // ─── FAQ ─────────────────────────────────────────────────
+  if (section.type === "faq") {
+    const title = asString(section.content.title, "Perguntas frequentes");
+    const subtitle = asString(section.content.subtitle);
+    const items = Array.isArray(section.content.items)
+      ? (section.content.items as Array<{ question: string; answer: string }>)
+      : [];
+    return <FaqSection title={title} subtitle={subtitle} items={items} />;
   }
 
   return null;
