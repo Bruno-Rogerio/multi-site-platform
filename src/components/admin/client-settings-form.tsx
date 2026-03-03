@@ -36,6 +36,11 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId, select
   const [seoStatus, setSeoStatus] = useState<FieldStatus>(null);
   const [isSavingSeo, setIsSavingSeo] = useState(false);
 
+  /* ── Footer text ── */
+  const [footerText, setFooterText] = useState((themeSettings.footerText as string) ?? "");
+  const [footerStatus, setFooterStatus] = useState<FieldStatus>(null);
+  const [isSavingFooter, setIsSavingFooter] = useState(false);
+
   /* ── Branding ── */
   const [hideBranding, setHideBranding] = useState((themeSettings.hideBranding as boolean) ?? false);
   const [brandingStatus, setBrandingStatus] = useState<FieldStatus>(null);
@@ -115,6 +120,18 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId, select
       return;
     }
     setSeoStatus({ type: "success", message: "SEO atualizado!" });
+  }
+
+  async function onSaveFooter() {
+    setFooterStatus(null);
+    setIsSavingFooter(true);
+    const res = await patchTheme({ footerText: footerText.trim() });
+    setIsSavingFooter(false);
+    if (!res.ok) {
+      setFooterStatus({ type: "error", message: "Erro ao salvar." });
+      return;
+    }
+    setFooterStatus({ type: "success", message: "Texto do rodapé salvo!" });
   }
 
   async function onSaveBranding(value: boolean) {
@@ -242,6 +259,35 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId, select
             {isSavingName ? "Salvando..." : "Salvar nome"}
           </button>
           <StatusHint status={nameStatus} />
+        </div>
+
+        <div className="mt-4 border-t border-white/10 pt-4">
+          <label
+            className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60"
+            htmlFor="footer-text"
+          >
+            Texto do rodapé
+          </label>
+          <input
+            id="footer-text"
+            type="text"
+            value={footerText}
+            onChange={(e) => setFooterText(e.target.value)}
+            maxLength={120}
+            placeholder={`Ex: © 2025 ${siteName}. Todos os direitos reservados.`}
+            className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+          />
+          <div className="mt-3 flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => void onSaveFooter()}
+              disabled={isSavingFooter}
+              className="rounded-xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSavingFooter ? "Salvando..." : "Salvar rodapé"}
+            </button>
+            <StatusHint status={footerStatus} />
+          </div>
         </div>
       </section>
 

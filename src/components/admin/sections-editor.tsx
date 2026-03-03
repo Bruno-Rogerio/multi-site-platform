@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle,
+  Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle, Monitor, X,
 } from "lucide-react";
 
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
@@ -60,6 +60,52 @@ function buildSectionSnapshots(sections: Section[]): SectionSnapshots {
   return Object.fromEntries(sections.map((s) => [s.id, serializeSection(s)]));
 }
 
+/* ─── Social channel definitions ─────────────────────────── */
+
+type SocialLink = { type: string; url: string; label: string; icon: string };
+
+const CHANNEL_DEFS = [
+  { type: "whatsapp",  label: "WhatsApp",  placeholder: "Somente números (ex: 5511999999999)" },
+  { type: "instagram", label: "Instagram", placeholder: "Ex: https://instagram.com/seu_perfil" },
+  { type: "email",     label: "E-mail",    placeholder: "Ex: contato@seusite.com" },
+  { type: "linkedin",  label: "LinkedIn",  placeholder: "Ex: https://linkedin.com/in/seu-perfil" },
+  { type: "facebook",  label: "Facebook",  placeholder: "Ex: https://facebook.com/suapagina" },
+] as const;
+
+const CHANNEL_ICON: Record<string, string> = {
+  whatsapp: "MessageCircle", instagram: "Instagram", email: "Mail", linkedin: "Linkedin", facebook: "Facebook",
+};
+
+function parseSocialLinks(content: Record<string, unknown>): SocialLink[] {
+  if (Array.isArray(content.socialLinks) && (content.socialLinks as unknown[]).length > 0) {
+    return content.socialLinks as SocialLink[];
+  }
+  const links: SocialLink[] = [];
+  const wa = typeof content.whatsappUrl === "string" ? content.whatsappUrl : "";
+  if (wa) links.push({ type: "whatsapp", url: wa, label: "WhatsApp", icon: "MessageCircle" });
+  const sec = typeof content.secondaryUrl === "string" ? content.secondaryUrl : "";
+  if (sec.includes("instagram.com")) links.push({ type: "instagram", url: sec, label: "Instagram", icon: "Instagram" });
+  else if (sec.startsWith("mailto:")) links.push({ type: "email", url: sec.replace("mailto:", ""), label: "E-mail", icon: "Mail" });
+  return links;
+}
+
+function getChannelDisplayValue(links: SocialLink[], type: string): string {
+  const link = links.find((l) => l.type === type);
+  if (!link) return "";
+  if (type === "whatsapp") return link.url.replace("https://wa.me/", "");
+  if (type === "email") return link.url.replace("mailto:", "");
+  return link.url;
+}
+
+function buildChannelUrl(type: string, raw: string): string {
+  const v = raw.trim();
+  if (type === "whatsapp") return `https://wa.me/${v.replace(/\D/g, "")}`;
+  if (type === "email") return v.startsWith("mailto:") ? v : `mailto:${v}`;
+  return v.startsWith("http") ? v : `https://${v}`;
+}
+
+/* ─────────────────────────────────────────────────────────── */
+
 const SECTION_META: Record<string, { label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }> = {
   hero: { label: "Destaque", Icon: Layout },
   services: { label: "Serviços", Icon: Grid3X3 },
@@ -85,6 +131,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   const [state, setState] = useState<LoadState>("idle");
   const [uploadingSectionId, setUploadingSectionId] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusMessage>(null);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
 
   const hasSites = sites.length > 0;
   const canLoad = hasSites && Boolean(selectedSiteId);
@@ -489,49 +536,60 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   }
 
   function renderContactFields(section: Section) {
-    const textFields = [
-      { key: "title", label: "Título", placeholder: "Ex: Contato" },
-      { key: "subtitle", label: "Subtítulo", placeholder: "Ex: Entre em contato comigo" },
-      { key: "whatsappLabel", label: "Texto do botão WhatsApp", placeholder: "Falar no WhatsApp" },
-      { key: "secondaryLabel", label: "Texto do link secundário", placeholder: "Ex: Me siga no Instagram" },
-      { key: "submitLabel", label: "Texto do botão do formulário", placeholder: "Enviar" },
-    ];
+    const links = parseSocialLinks(section.content);
+
+    function updateChannel(type: string, rawValue: string) {
+      const withoutType = links.filter((l) => l.type !== type);
+      const newLinks = rawValue.trim()
+        ? [...withoutType, { type, url: buildChannelUrl(type, rawValue), label: CHANNEL_ICON[type] ?? type, icon: CHANNEL_ICON[type] ?? "Link" }]
+        : withoutType;
+      const waUrl = newLinks.find((l) => l.type === "whatsapp")?.url ?? "";
+      updateSection(section.id, (cur) => ({
+        ...cur,
+        content: { ...cur.content, socialLinks: newLinks, whatsappUrl: waUrl },
+      }));
+    }
+
     return (
       <div className="mt-4 space-y-4">
-        <div className="grid gap-3 md:grid-cols-2">
-          {textFields.map(({ key, label, placeholder }) => (
-            <div key={key}>
-              <label className={LABEL_CLS}>{label}</label>
-              <input
-                value={asString(section.content[key])}
-                placeholder={placeholder}
-                onChange={(e) => updateContent(section.id, key, e.target.value)}
-                className={INPUT_CLS}
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="grid gap-3 md:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className={LABEL_CLS}>Link WhatsApp</label>
-            <div className="mt-1">
-              <AdminLinkSelect
-                value={asString(section.content.whatsappUrl)}
-                onChange={(url) => updateContent(section.id, "whatsappUrl", url)}
-                placeholder="WhatsApp"
-              />
-            </div>
+            <label className={LABEL_CLS}>Título</label>
+            <input
+              value={asString(section.content.title, "Contato")}
+              placeholder="Ex: Contato"
+              onChange={(e) => updateContent(section.id, "title", e.target.value)}
+              className={INPUT_CLS}
+            />
           </div>
           <div>
-            <label className={LABEL_CLS}>Link secundário</label>
-            <div className="mt-1">
-              <AdminLinkSelect
-                value={asString(section.content.secondaryUrl)}
-                onChange={(url) => updateContent(section.id, "secondaryUrl", url)}
-                placeholder="Instagram, email, etc."
-              />
-            </div>
+            <label className={LABEL_CLS}>Subtítulo</label>
+            <input
+              value={asString(section.content.subtitle)}
+              placeholder="Ex: Entre em contato pelos canais abaixo"
+              onChange={(e) => updateContent(section.id, "subtitle", e.target.value)}
+              className={INPUT_CLS}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className={LABEL_CLS}>Canais de contato</label>
+          <p className="mb-2 mt-0.5 text-[11px] text-[var(--platform-text)]/40">
+            Preencha os canais que deseja exibir. Deixe em branco para ocultar.
+          </p>
+          <div className="space-y-2">
+            {CHANNEL_DEFS.map(({ type, label, placeholder }) => (
+              <div key={type} className="flex items-center gap-2">
+                <span className="w-[78px] shrink-0 text-xs text-[var(--platform-text)]/60">{label}</span>
+                <input
+                  value={getChannelDisplayValue(links, type)}
+                  placeholder={placeholder}
+                  onChange={(e) => updateChannel(type, e.target.value)}
+                  className="flex-1 rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -560,6 +618,31 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
 
     return (
       <div className="mt-4 space-y-4">
+        {/* Variant picker */}
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex gap-2">
+            {[
+              { id: "grid", label: "Grade" },
+              { id: "carousel", label: "Carrossel" },
+              { id: "split", label: "Destaque" },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  (section.variant ?? "grid") === id
+                    ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div>
           <label className={LABEL_CLS}>Título</label>
           <input
@@ -850,6 +933,50 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
           themeSettings={siteTheme}
         />
       </div>
+
+      {/* Floating preview button — visible only on <xl screens */}
+      {canLoad && sections.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowMobilePreview(true)}
+          className="fixed bottom-6 right-6 z-30 flex items-center gap-2 rounded-full bg-[linear-gradient(135deg,#3B82F6,#7C5CFF)] px-4 py-3 text-sm font-bold text-white shadow-xl xl:hidden"
+        >
+          <Monitor size={16} />
+          Visualizar
+        </button>
+      )}
+
+      {/* Mobile preview overlay */}
+      {showMobilePreview && (
+        <div
+          className="fixed inset-0 z-40 bg-black/85 xl:hidden"
+          onClick={() => setShowMobilePreview(false)}
+        >
+          <div
+            className="absolute inset-x-0 bottom-0 top-10 overflow-y-auto rounded-t-2xl bg-[#0B1020] p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <p className="text-sm font-semibold text-[var(--platform-text)]">Preview do site</p>
+              <button
+                type="button"
+                onClick={() => setShowMobilePreview(false)}
+                className="rounded-lg p-1.5 text-[var(--platform-text)]/60 hover:bg-white/10"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <MiniSitePreview
+              siteName={selectedSite?.name ?? "Site"}
+              siteDomain={selectedSite?.domain ?? "tenant.local"}
+              sections={sections}
+              hasUnsavedChanges={hasUnsavedChanges}
+              activeSectionId={activeSectionId}
+              themeSettings={siteTheme}
+            />
+          </div>
+        </div>
+      )}
     </section>
   );
 }
