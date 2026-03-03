@@ -79,7 +79,8 @@ export function PreviewBanner({ expiresAt, siteId }: PreviewBannerProps) {
         {/* CTA */}
         <a
           href={buildPublishUrl(siteId)}
-          className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-bold text-[#3B82F6] transition hover:bg-white/90"
+          className="ml-auto flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-bold transition hover:bg-white/90"
+          style={{ color: "#1e3a8a" }}
         >
           <Sparkles size={11} />
           Publicar meu site
