@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const productLinks = [
   { label: "Funcionalidades", href: "#funcionalidades" },
-  { label: "Como funciona", href: "#como-funciona" },
+  { label: "Exemplos de sites", href: "#exemplos" },
   { label: "Preços", href: "#precos" },
   { label: "Plano Premium", href: "/premium" },
   { label: "FAQ", href: "#faq" },

@@ -29,14 +29,16 @@ body {
   font-family: var(--font-sora), sans-serif;
 }
 
-a {
-  color: inherit;
-}
+@layer base {
+  a {
+    color: inherit;
+  }
 
-button,
-input,
-textarea {
-  font: inherit;
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
 }
 
 /* --- Animations --- */
