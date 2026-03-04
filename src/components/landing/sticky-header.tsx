@@ -9,6 +9,7 @@ const navLinks = [
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Preços", href: "#precos" },
+  { label: "Premium", href: "/premium" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -42,15 +43,25 @@ export function StickyHeader({ brandElement }: StickyHeaderProps) {
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="rounded-lg px-3 py-2 text-[13px] font-medium tracking-wide text-[var(--platform-text)]/70 transition hover:bg-white/[0.06] hover:text-white"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.href.startsWith("/") ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-lg px-3 py-2 text-[13px] font-medium tracking-wide text-[var(--platform-text)]/70 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="rounded-lg px-3 py-2 text-[13px] font-medium tracking-wide text-[var(--platform-text)]/70 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  {link.label}
+                </a>
+              )
+            )}
 
             <Link
               href="/login"

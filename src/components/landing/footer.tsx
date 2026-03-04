@@ -4,6 +4,7 @@ const productLinks = [
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Preços", href: "#precos" },
+  { label: "Plano Premium", href: "/premium" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -37,12 +38,21 @@ export function Footer({ brandElement }: FooterProps) {
             <ul className="mt-3 space-y-2">
               {productLinks.map((link) => (
                 <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-[var(--platform-text)]/60 transition hover:text-[#22D3EE]"
-                  >
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("/") ? (
+                    <Link
+                      href={link.href}
+                      className="text-sm text-[var(--platform-text)]/60 transition hover:text-[#22D3EE]"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-sm text-[var(--platform-text)]/60 transition hover:text-[#22D3EE]"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

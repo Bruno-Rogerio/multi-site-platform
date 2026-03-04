@@ -8,6 +8,7 @@ const navLinks = [
   { label: "Funcionalidades", href: "#funcionalidades" },
   { label: "Como funciona", href: "#como-funciona" },
   { label: "Preços", href: "#precos" },
+  { label: "Premium", href: "/premium" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -37,16 +38,27 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           </div>
 
           <nav className="flex flex-1 flex-col items-center justify-center gap-6">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={onClose}
-                className="text-2xl font-semibold text-[var(--platform-text)]/80 transition hover:text-white"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.href.startsWith("/") ? (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={onClose}
+                  className="text-2xl font-semibold text-[var(--platform-text)]/80 transition hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={onClose}
+                  className="text-2xl font-semibold text-[var(--platform-text)]/80 transition hover:text-white"
+                >
+                  {link.label}
+                </a>
+              )
+            )}
 
             <Link
               href="/quero-comecar"
