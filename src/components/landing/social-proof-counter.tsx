@@ -37,6 +37,19 @@ const metrics: Metric[] = [
     numericTarget: 4.9,
     suffix: "/5",
   },
+  {
+    value: "8+",
+    label: "Nichos atendidos",
+    numericTarget: 8,
+    suffix: "+",
+  },
+  {
+    value: "< 24h",
+    label: "Tempo de resposta",
+    prefix: "< ",
+    numericTarget: 24,
+    suffix: "h",
+  },
 ];
 
 function AnimatedCounter({
@@ -90,7 +103,7 @@ export function SocialProofCounter() {
       ref={ref}
       className="mx-auto max-w-7xl border-y border-white/[0.06] px-5 py-10 md:px-8"
     >
-      <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
         {metrics.map((metric) => (
           <div key={metric.label} className="text-center">
             <AnimatedCounter

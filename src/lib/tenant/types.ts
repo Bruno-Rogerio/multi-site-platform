@@ -7,7 +7,10 @@ export type SectionType =
   | "cta"
   | "testimonials"
   | "contact"
-  | "faq";
+  | "faq"
+  | "blog"
+  | "gallery"
+  | "events";
 
 export type ButtonStyle = "rounded" | "pill" | "square";
 

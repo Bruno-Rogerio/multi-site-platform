@@ -43,10 +43,10 @@ const plans: Plan[] = [
       "Personalização visual completa, múltiplas páginas e todos os recursos desbloqueados.",
     features: [
       "Tudo do plano Básico",
-      "Personalização visual completa",
-      "Múltiplas páginas (FAQ, Depoimentos...)",
-      "Depoimentos ilimitados",
-      "SEO básico configurável",
+      "Personalização visual com IA",
+      "FAQ, Depoimentos ilimitados",
+      "Blog, Galeria e Eventos",
+      "SEO configurável",
       "Sem branding BuildSphere",
       "Prioridade no suporte",
     ],
@@ -138,10 +138,10 @@ export function PricingSection() {
               )}
 
               <Link
-                href="/quero-comecar"
+                href={plan.highlighted ? "/quero-comecar?plan=premium" : "/quero-comecar"}
                 className={`mt-8 block w-full rounded-xl py-3.5 text-center text-sm font-semibold transition-all duration-300 ${
                   plan.highlighted
-                    ? "bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] text-white shadow-[0_10px_30px_rgba(59,130,246,0.35)] hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(124,92,255,0.4)]"
+                    ? "bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] text-white shadow-[0_10px_40px_rgba(59,130,246,0.45)] hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(124,92,255,0.5)]"
                     : "border border-white/15 bg-white/[0.04] text-[var(--platform-text)] hover:bg-white/[0.08]"
                 }`}
               >
@@ -153,10 +153,16 @@ export function PricingSection() {
       ))}
 
       {/* Bottom note */}
-      <div className="col-span-full mt-2 text-center">
+      <div className="col-span-full mt-2 space-y-2 text-center">
         <p className="text-xs text-[var(--platform-text)]/45">
-          Sem taxa de setup. Sem fidelidade. Cancele quando quiser.
+          🔒 Pagamento seguro · Sem taxa de setup · Sem fidelidade · Cancele quando quiser
         </p>
+        <Link
+          href="/premium"
+          className="inline-block text-xs font-semibold text-[#22D3EE] transition hover:underline"
+        >
+          Ver comparativo completo de recursos →
+        </Link>
       </div>
     </div>
   );

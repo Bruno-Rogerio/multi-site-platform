@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Shield, Users } from "lucide-react";
 
 export function FinalCta() {
   const ref = useRef<HTMLDivElement>(null);
@@ -25,12 +25,16 @@ export function FinalCta() {
         <div className="pointer-events-none absolute -bottom-20 -right-20 h-60 w-60 rounded-full bg-white/10 blur-3xl" />
 
         <div className="relative z-10">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white">
+            <Users size={13} />
+            Mais de 500 profissionais já usam a BuildSphere
+          </div>
+
           <h2 className="text-3xl font-black text-white md:text-5xl">
             Pronto para ter seu site profissional?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-white/85">
-            Junte-se a centenas de profissionais que já transformaram sua
-            presença online com a BuildSphere.
+            Em menos de 5 minutos você tem um site incrível, sem código e sem complicação.
           </p>
 
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -44,6 +48,17 @@ export function FinalCta() {
                 className="transition-transform duration-300 group-hover:translate-x-1"
               />
             </Link>
+          </div>
+
+          <div className="mt-5 flex items-center justify-center gap-4 text-xs text-white/60">
+            <span className="flex items-center gap-1.5">
+              <Shield size={12} />
+              Pagamento seguro
+            </span>
+            <span>·</span>
+            <span>Sem fidelidade</span>
+            <span>·</span>
+            <span>Cancele quando quiser</span>
           </div>
         </div>
       </motion.div>

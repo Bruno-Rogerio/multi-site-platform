@@ -5,6 +5,9 @@ import type { Site } from "@/lib/tenant/types";
 import type { Section } from "@/lib/tenant/types";
 import { TestimonialsCarousel } from "./testimonials-carousel";
 import { FaqSection } from "./faq-section";
+import { BlogSection } from "./blog-section";
+import { GallerySection } from "./gallery-section";
+import { EventsSection } from "./events-section";
 import { ServiceImageModal } from "./service-image-modal";
 import { StaggeredCards } from "./staggered-cards";
 
@@ -1590,6 +1593,36 @@ export function SectionRenderer({
       ? (section.content.items as Array<{ question: string; answer: string }>)
       : [];
     return <FaqSection title={title} subtitle={subtitle} items={items} />;
+  }
+
+  // ─── BLOG ────────────────────────────────────────────────
+  if (section.type === "blog") {
+    const title = asString(section.content.title, "Blog");
+    const subtitle = asString(section.content.subtitle);
+    const posts = Array.isArray(section.content.posts)
+      ? (section.content.posts as Array<{ title: string; excerpt: string; imageUrl?: string; link?: string }>)
+      : [];
+    return <BlogSection title={title} subtitle={subtitle} posts={posts} />;
+  }
+
+  // ─── GALLERY ─────────────────────────────────────────────
+  if (section.type === "gallery") {
+    const title = asString(section.content.title, "Galeria");
+    const subtitle = asString(section.content.subtitle);
+    const images = Array.isArray(section.content.images)
+      ? (section.content.images as Array<{ url: string; alt: string; caption?: string }>)
+      : [];
+    return <GallerySection title={title} subtitle={subtitle} images={images} variant={section.variant} />;
+  }
+
+  // ─── EVENTS ──────────────────────────────────────────────
+  if (section.type === "events") {
+    const title = asString(section.content.title, "Eventos");
+    const subtitle = asString(section.content.subtitle);
+    const events = Array.isArray(section.content.events)
+      ? (section.content.events as Array<{ title: string; date: string; time?: string; location?: string; description?: string }>)
+      : [];
+    return <EventsSection title={title} subtitle={subtitle} events={events} />;
   }
 
   return null;

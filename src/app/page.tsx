@@ -11,7 +11,9 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { AnimatedSection } from "@/components/landing/animated-section";
 import { FeatureCard, type IconName } from "@/components/landing/feature-card";
 import { ProductMockup } from "@/components/landing/product-mockup";
+import { SiteShowcase } from "@/components/landing/site-showcase";
 import { PricingSection } from "@/components/landing/pricing-section";
+import { TestimonialsStrip } from "@/components/landing/testimonials-strip";
 import { FaqAccordion, type FaqItem } from "@/components/landing/faq-accordion";
 import { FinalCta } from "@/components/landing/final-cta";
 import { Footer } from "@/components/landing/footer";
@@ -144,6 +146,9 @@ export default async function PlatformLandingPage() {
           </div>
         </section>
 
+        {/* ─── Site Showcase ─── */}
+        <SiteShowcase />
+
         {/* ─── Funcionalidades ─── */}
         <section id="funcionalidades" className="py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
@@ -193,6 +198,9 @@ export default async function PlatformLandingPage() {
             <ProductMockup />
           </div>
         </section>
+
+        {/* ─── Depoimentos ─── */}
+        <TestimonialsStrip />
 
         {/* ─── Preços ─── */}
         <section id="precos" className="py-20 md:py-28">

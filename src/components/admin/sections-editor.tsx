@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle, Monitor, X,
+  BookOpen, ImageIcon, CalendarDays,
 } from "lucide-react";
 
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
@@ -114,6 +115,9 @@ const SECTION_META: Record<string, { label: string; Icon: React.ComponentType<{ 
   contact: { label: "Contato", Icon: Mail },
   testimonials: { label: "Depoimentos", Icon: Quote },
   faq: { label: "Perguntas Frequentes", Icon: HelpCircle },
+  blog: { label: "Blog / Artigos", Icon: BookOpen },
+  gallery: { label: "Galeria", Icon: ImageIcon },
+  events: { label: "Eventos", Icon: CalendarDays },
 };
 
 const INPUT_CLS = "mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]";
@@ -769,6 +773,225 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     );
   }
 
+  function renderBlogFields(section: Section) {
+    const posts: Array<{ title: string; excerpt: string; imageUrl?: string; link?: string }> =
+      Array.isArray(section.content.posts)
+        ? (section.content.posts as Array<{ title: string; excerpt: string; imageUrl?: string; link?: string }>)
+        : [];
+
+    function updatePost(index: number, patch: Partial<{ title: string; excerpt: string; imageUrl: string; link: string }>) {
+      const updated = posts.map((p, i) => (i === index ? { ...p, ...patch } : p));
+      updateContent(section.id, "posts", updated);
+    }
+
+    function addPost() {
+      updateContent(section.id, "posts", [...posts, { title: "", excerpt: "", imageUrl: "", link: "" }]);
+    }
+
+    function removePost(index: number) {
+      updateContent(section.id, "posts", posts.filter((_, i) => i !== index));
+    }
+
+    return (
+      <div className="mt-4 space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className={LABEL_CLS}>Título</label>
+            <input value={asString(section.content.title, "Blog")} onChange={(e) => updateContent(section.id, "title", e.target.value)} className={INPUT_CLS} />
+          </div>
+          <div>
+            <label className={LABEL_CLS}>Subtítulo</label>
+            <input value={asString(section.content.subtitle)} placeholder="Opcional" onChange={(e) => updateContent(section.id, "subtitle", e.target.value)} className={INPUT_CLS} />
+          </div>
+        </div>
+        <div className="space-y-4">
+          {posts.map((post, i) => (
+            <div key={i} className="relative rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--platform-text)]/30">Artigo {i + 1}</span>
+                {posts.length > 1 && (
+                  <button type="button" onClick={() => removePost(i)} className="rounded p-1 text-red-400/60 hover:text-red-400">
+                    <Trash2 size={13} />
+                  </button>
+                )}
+              </div>
+              <input value={post.title} placeholder="Título do artigo" onChange={(e) => updatePost(i, { title: e.target.value })} className={INPUT_CLS} />
+              <textarea value={post.excerpt} placeholder="Resumo do artigo..." rows={2} onChange={(e) => updatePost(i, { excerpt: e.target.value })} className={INPUT_CLS + " resize-none"} />
+              <input value={post.link ?? ""} placeholder="Link (opcional)" onChange={(e) => updatePost(i, { link: e.target.value })} className={INPUT_CLS} />
+              <AdminImageUpload
+                label="Imagem de capa"
+                currentUrl={post.imageUrl ?? ""}
+                onFileSelect={async (file) => {
+                  if (!selectedSiteId) return;
+                  setUploadingSectionId(section.id);
+                  const fd = new FormData();
+                  fd.append("siteId", selectedSiteId);
+                  fd.append("sectionType", "blog");
+                  fd.append("slot", `blog-post-${i}`);
+                  fd.append("file", file);
+                  const res = await fetch("/api/admin/upload-asset", { method: "POST", body: fd });
+                  const payload = (await res.json().catch(() => null)) as { url?: string } | null;
+                  setUploadingSectionId(null);
+                  if (payload?.url) updatePost(i, { imageUrl: payload.url });
+                }}
+                onRemove={() => updatePost(i, { imageUrl: "" })}
+                disabled={uploadingSectionId === section.id}
+                aspectRatio="16/9"
+              />
+            </div>
+          ))}
+          <button type="button" onClick={addPost} className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/20 px-3 py-2 text-xs text-[var(--platform-text)]/60 hover:border-[#22D3EE]/40 hover:text-[#22D3EE]">
+            <Plus size={13} /> Adicionar artigo
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  function renderGalleryFields(section: Section) {
+    const images: Array<{ url: string; alt: string; caption?: string }> =
+      Array.isArray(section.content.images)
+        ? (section.content.images as Array<{ url: string; alt: string; caption?: string }>)
+        : [];
+
+    function updateImage(index: number, patch: Partial<{ url: string; alt: string; caption: string }>) {
+      const updated = images.map((img, i) => (i === index ? { ...img, ...patch } : img));
+      updateContent(section.id, "images", updated);
+    }
+
+    function removeImage(index: number) {
+      updateContent(section.id, "images", images.filter((_, i) => i !== index));
+    }
+
+    return (
+      <div className="mt-4 space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className={LABEL_CLS}>Título</label>
+            <input value={asString(section.content.title, "Galeria")} onChange={(e) => updateContent(section.id, "title", e.target.value)} className={INPUT_CLS} />
+          </div>
+          <div>
+            <label className={LABEL_CLS}>Subtítulo</label>
+            <input value={asString(section.content.subtitle)} placeholder="Opcional" onChange={(e) => updateContent(section.id, "subtitle", e.target.value)} className={INPUT_CLS} />
+          </div>
+        </div>
+
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex gap-2">
+            {[{ id: "grid", label: "Grade" }, { id: "masonry", label: "Masonry" }, { id: "carousel", label: "Carrossel" }].map(({ id, label }) => (
+              <button key={id} type="button" onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${(section.variant ?? "grid") === id ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]" : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"}`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {images.map((img, i) => (
+            <div key={i} className="relative rounded-xl border border-white/10 bg-white/[0.02] p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--platform-text)]/30">Imagem {i + 1}</span>
+                {images.length > 1 && (
+                  <button type="button" onClick={() => removeImage(i)} className="rounded p-1 text-red-400/60 hover:text-red-400"><Trash2 size={12} /></button>
+                )}
+              </div>
+              <AdminImageUpload
+                label="Imagem"
+                currentUrl={img.url}
+                onFileSelect={async (file) => {
+                  if (!selectedSiteId) return;
+                  setUploadingSectionId(section.id);
+                  const fd = new FormData();
+                  fd.append("siteId", selectedSiteId);
+                  fd.append("sectionType", "gallery");
+                  fd.append("slot", `gallery-img-${i}`);
+                  fd.append("file", file);
+                  const res = await fetch("/api/admin/upload-asset", { method: "POST", body: fd });
+                  const payload = (await res.json().catch(() => null)) as { url?: string } | null;
+                  setUploadingSectionId(null);
+                  if (payload?.url) updateImage(i, { url: payload.url });
+                }}
+                onRemove={() => updateImage(i, { url: "" })}
+                disabled={uploadingSectionId === section.id}
+                aspectRatio="4/3"
+              />
+              <input value={img.alt} placeholder="Texto alternativo (descrição)" onChange={(e) => updateImage(i, { alt: e.target.value })} className={INPUT_CLS} />
+              <input value={img.caption ?? ""} placeholder="Legenda (opcional)" onChange={(e) => updateImage(i, { caption: e.target.value })} className={INPUT_CLS} />
+            </div>
+          ))}
+          <button type="button"
+            onClick={() => updateContent(section.id, "images", [...images, { url: "", alt: "", caption: "" }])}
+            className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/20 px-3 py-2 text-xs text-[var(--platform-text)]/60 hover:border-[#22D3EE]/40 hover:text-[#22D3EE]">
+            <Plus size={13} /> Adicionar imagem
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  function renderEventsFields(section: Section) {
+    const events: Array<{ title: string; date: string; time?: string; location?: string; description?: string }> =
+      Array.isArray(section.content.events)
+        ? (section.content.events as Array<{ title: string; date: string; time?: string; location?: string; description?: string }>)
+        : [];
+
+    function updateEvent(index: number, patch: Partial<{ title: string; date: string; time: string; location: string; description: string }>) {
+      const updated = events.map((ev, i) => (i === index ? { ...ev, ...patch } : ev));
+      updateContent(section.id, "events", updated);
+    }
+
+    function removeEvent(index: number) {
+      updateContent(section.id, "events", events.filter((_, i) => i !== index));
+    }
+
+    return (
+      <div className="mt-4 space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label className={LABEL_CLS}>Título</label>
+            <input value={asString(section.content.title, "Eventos")} onChange={(e) => updateContent(section.id, "title", e.target.value)} className={INPUT_CLS} />
+          </div>
+          <div>
+            <label className={LABEL_CLS}>Subtítulo</label>
+            <input value={asString(section.content.subtitle)} placeholder="Opcional" onChange={(e) => updateContent(section.id, "subtitle", e.target.value)} className={INPUT_CLS} />
+          </div>
+        </div>
+        <div className="space-y-3">
+          {events.map((ev, i) => (
+            <div key={i} className="relative rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--platform-text)]/30">Evento {i + 1}</span>
+                {events.length > 1 && (
+                  <button type="button" onClick={() => removeEvent(i)} className="rounded p-1 text-red-400/60 hover:text-red-400"><Trash2 size={13} /></button>
+                )}
+              </div>
+              <input value={ev.title} placeholder="Nome do evento" onChange={(e) => updateEvent(i, { title: e.target.value })} className={INPUT_CLS} />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className={LABEL_CLS}>Data</label>
+                  <input type="date" value={ev.date} onChange={(e) => updateEvent(i, { date: e.target.value })} className={INPUT_CLS} />
+                </div>
+                <div>
+                  <label className={LABEL_CLS}>Horário (opcional)</label>
+                  <input type="time" value={ev.time ?? ""} onChange={(e) => updateEvent(i, { time: e.target.value })} className={INPUT_CLS} />
+                </div>
+              </div>
+              <input value={ev.location ?? ""} placeholder="Local (opcional)" onChange={(e) => updateEvent(i, { location: e.target.value })} className={INPUT_CLS} />
+              <textarea value={ev.description ?? ""} placeholder="Descrição (opcional)" rows={2} onChange={(e) => updateEvent(i, { description: e.target.value })} className={INPUT_CLS + " resize-none"} />
+            </div>
+          ))}
+          <button type="button"
+            onClick={() => updateContent(section.id, "events", [...events, { title: "", date: "", time: "", location: "", description: "" }])}
+            className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/20 px-3 py-2 text-xs text-[var(--platform-text)]/60 hover:border-[#22D3EE]/40 hover:text-[#22D3EE]">
+            <Plus size={13} /> Adicionar evento
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   /* ─── Render ─── */
 
   if (!hasSites) {
@@ -919,6 +1142,9 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                 {section.type === "contact" && renderContactFields(section)}
                 {section.type === "testimonials" && renderTestimonialsFields(section)}
                 {section.type === "faq" && renderFaqFields(section)}
+                {section.type === "blog" && renderBlogFields(section)}
+                {section.type === "gallery" && renderGalleryFields(section)}
+                {section.type === "events" && renderEventsFields(section)}
               </article>
             );
           })}

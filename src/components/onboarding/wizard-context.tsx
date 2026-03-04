@@ -426,8 +426,11 @@ type WizardContextValue = {
 
 const WizardContext = createContext<WizardContextValue | null>(null);
 
-export function WizardProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(wizardReducer, initialState);
+export function WizardProvider({ children, initialPlan }: { children: ReactNode; initialPlan?: "basico" | "premium" }) {
+  const [state, dispatch] = useReducer(
+    wizardReducer,
+    initialPlan ? { ...initialState, selectedPlan: initialPlan } : initialState,
+  );
 
   const value = useMemo(() => {
     const steps = getStepsForPlan(state.selectedPlan);

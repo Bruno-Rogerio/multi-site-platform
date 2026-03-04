@@ -7,11 +7,19 @@ import { getRequestHostClassification } from "@/lib/tenant/request-host";
 
 export const dynamic = "force-dynamic";
 
-export default async function QueroComecarPage() {
+export default async function QueroComecarPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const host = await getRequestHostClassification();
   if (host.kind === "tenant") {
     redirect(`/t/${host.tenant}`);
   }
+
+  const params = await searchParams;
+  const planParam = typeof params.plan === "string" ? params.plan : undefined;
+  const initialPlan = planParam === "premium" ? "premium" : planParam === "basico" ? "basico" : undefined;
 
   return (
     <main className="relative min-h-screen bg-[var(--platform-bg)]">
@@ -29,7 +37,7 @@ export default async function QueroComecarPage() {
       </div>
 
       {/* Wizard */}
-      <WizardShell />
+      <WizardShell initialPlan={initialPlan} />
     </main>
   );
 }

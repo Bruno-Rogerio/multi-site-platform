@@ -1,10 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 
+const PROFESSIONS = ["psicólogos", "advogados", "fotógrafos", "nutricionistas", "coaches", "terapeutas"];
+
 export function HeroAnimatedHeadline() {
+  const [profIndex, setProfIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProfIndex((cur) => (cur + 1) % PROFESSIONS.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, []);
   return (
     <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 md:px-8 xl:grid-cols-[1.1fr_0.9fr]">
       {/* Text column */}
@@ -32,15 +43,37 @@ export function HeroAnimatedHeadline() {
           </span>
         </motion.h1>
 
-        <motion.p
-          className="mt-6 max-w-xl text-base leading-relaxed text-[var(--platform-text)]/70 md:text-lg"
+        <motion.div
+          className="mt-5 flex items-center gap-2 text-base text-[var(--platform-text)]/60 md:text-lg"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
         >
-          Crie um site elegante para sua prática profissional. Sem código, sem
-          complicação — configure tudo sozinho e tenha presença online em poucos
-          minutos.
+          <span>Para</span>
+          <span className="relative inline-block min-w-[130px] overflow-hidden" style={{ height: "1.5em" }}>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={profIndex}
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "-100%", opacity: 0 }}
+                transition={{ duration: 0.35, ease: [0.25, 0.4, 0.25, 1] }}
+                className="absolute left-0 top-0 bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] bg-clip-text font-bold text-transparent"
+              >
+                {PROFESSIONS[profIndex]}.
+              </motion.span>
+            </AnimatePresence>
+          </span>
+        </motion.div>
+
+        <motion.p
+          className="mt-4 max-w-xl text-base leading-relaxed text-[var(--platform-text)]/70 md:text-lg"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.45 }}
+        >
+          Crie um site elegante sem código, sem complicação — configure tudo
+          sozinho e tenha presença online em menos de 5 minutos.
         </motion.p>
 
         <motion.div
