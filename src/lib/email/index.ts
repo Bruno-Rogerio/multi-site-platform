@@ -213,3 +213,102 @@ export async function sendWelcomeEmail(
 
   await sendEmail(email, "Bem-vindo(a) à BuildSphere! Seu site está pronto.", html);
 }
+
+/* ── Support Tickets ─────────────────────────────────────────────────────── */
+
+const CATEGORY_LABELS: Record<string, string> = {
+  suporte:     "Suporte técnico",
+  duvida:      "Dúvida",
+  faturamento: "Faturamento",
+  sugestao:    "Sugestão",
+};
+
+/**
+ * Sent to the platform admin when a client opens a new ticket.
+ */
+export async function sendNewTicketEmail(
+  adminEmail: string,
+  ticket: { id: string; subject: string; category: string; businessName: string },
+  panelUrl = "https://bsph.com.br/admin/platform/messages",
+): Promise<void> {
+  const categoryLabel = CATEGORY_LABELS[ticket.category] ?? ticket.category;
+
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 10px;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Novo chamado aberto 🎫
+    </h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#64748b;line-height:1.6;">
+      <strong style="color:#1e293b;">${ticket.businessName}</strong> abriu um novo chamado de suporte.
+    </p>
+
+    ${infoBox("📋", `<strong>Assunto:</strong> ${ticket.subject}<br/><strong>Categoria:</strong> ${categoryLabel}`, "#f8fafc", "#e2e8f0", "#475569")}
+
+    ${ctaButton("Ver chamado no painel", `${panelUrl}?ticket=${ticket.id}`)}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;">
+      Responda dentro do prazo de SLA para manter a qualidade do atendimento.
+    </p>
+  `);
+
+  await sendEmail(adminEmail, `Novo chamado: ${ticket.subject} — BuildSphere`, html);
+}
+
+/**
+ * Sent to the client when the admin replies to their ticket.
+ */
+export async function sendTicketReplyToClientEmail(
+  clientEmail: string,
+  ticket: { id: string; subject: string },
+  preview: string,
+  panelUrl = "https://bsph.com.br/admin/client/messages",
+): Promise<void> {
+  const safePreview = preview.length > 180 ? preview.slice(0, 177) + "…" : preview;
+
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 10px;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Resposta ao seu chamado 💬
+    </h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#64748b;line-height:1.6;">
+      A equipe BuildSphere respondeu ao seu chamado
+      <strong style="color:#1e293b;">&ldquo;${ticket.subject}&rdquo;</strong>.
+    </p>
+
+    ${infoBox("💬", safePreview, "#f0f9ff", "#bae6fd", "#0369a1")}
+
+    ${ctaButton("Ver resposta completa", `${panelUrl}?ticket=${ticket.id}`)}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;">
+      Você pode responder diretamente pelo painel do cliente.
+    </p>
+  `);
+
+  await sendEmail(clientEmail, `Resposta ao chamado: ${ticket.subject} — BuildSphere`, html);
+}
+
+/**
+ * Sent to the platform admin when the client replies to a ticket.
+ */
+export async function sendTicketReplyToAdminEmail(
+  adminEmail: string,
+  ticket: { id: string; subject: string; businessName: string },
+  preview: string,
+  panelUrl = "https://bsph.com.br/admin/platform/messages",
+): Promise<void> {
+  const safePreview = preview.length > 180 ? preview.slice(0, 177) + "…" : preview;
+
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 10px;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Cliente respondeu ao chamado 🔔
+    </h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#64748b;line-height:1.6;">
+      <strong style="color:#1e293b;">${ticket.businessName}</strong> respondeu ao chamado
+      <strong style="color:#1e293b;">&ldquo;${ticket.subject}&rdquo;</strong>.
+    </p>
+
+    ${infoBox("💬", safePreview, "#f8fafc", "#e2e8f0", "#475569")}
+
+    ${ctaButton("Responder no painel", `${panelUrl}?ticket=${ticket.id}`)}
+  `);
+
+  await sendEmail(adminEmail, `Resposta do cliente: ${ticket.subject} — BuildSphere`, html);
+}

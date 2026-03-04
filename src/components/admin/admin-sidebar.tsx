@@ -35,6 +35,7 @@ const platformNav: NavItem[] = [
   { label: "Usuários", href: "/admin/platform/users", icon: Users },
   { label: "Pipeline", href: "/admin/platform/pipeline", icon: Kanban },
   { label: "Branding", href: "/admin/platform/branding", icon: Palette },
+  { label: "Mensagens", href: "/admin/platform/messages", icon: MessageSquare },
 ];
 
 const clientNav: NavItem[] = [
@@ -50,19 +51,23 @@ type AdminSidebarProps = {
   brandName: string;
   logoUrl: string;
   pendingDrafts?: number;
+  openTicketsCount?: number;
 };
 
-export function AdminSidebar({ role, brandName, logoUrl, pendingDrafts }: AdminSidebarProps) {
+export function AdminSidebar({ role, brandName, logoUrl, pendingDrafts, openTicketsCount }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = role === "admin" ? platformNav : clientNav;
 
-  // Add badge for pipeline if there are pending drafts
+  // Add badges: pipeline for pending drafts, messages for open tickets (client)
   const itemsWithBadges = navItems.map((item) => {
     if (item.href === "/admin/platform/pipeline" && pendingDrafts && pendingDrafts > 0) {
       return { ...item, badge: pendingDrafts };
+    }
+    if (item.href === "/admin/client/messages" && openTicketsCount && openTicketsCount > 0) {
+      return { ...item, badge: openTicketsCount };
     }
     return item;
   });

@@ -18,17 +18,27 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   const profile = await requireUserProfile(["admin", "client"]);
   const branding = await getPlatformBrandingSettings();
 
+  const supabase = await createSupabaseServerAuthClient();
+
   // Fetch pending drafts count for sidebar badge (admin only)
   let pendingDrafts = 0;
-  if (profile.role === "admin") {
-    const supabase = await createSupabaseServerAuthClient();
-    if (supabase) {
-      const { count } = await supabase
-        .from("onboarding_drafts")
-        .select("id", { count: "exact", head: true })
-        .in("status", ["draft", "checkout_pending"]);
-      pendingDrafts = count ?? 0;
-    }
+  if (profile.role === "admin" && supabase) {
+    const { count } = await supabase
+      .from("onboarding_drafts")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["draft", "checkout_pending"]);
+    pendingDrafts = count ?? 0;
+  }
+
+  // Fetch open tickets count for client sidebar badge
+  let openTicketsCount = 0;
+  if (profile.role === "client" && profile.site_id && supabase) {
+    const { count } = await supabase
+      .from("support_tickets")
+      .select("*", { count: "exact", head: true })
+      .eq("site_id", profile.site_id)
+      .in("status", ["open", "in_progress"]);
+    openTicketsCount = count ?? 0;
   }
 
   return (
@@ -39,6 +49,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           brandName={branding.brand_name || "BuildSphere"}
           logoUrl={branding.logo_url || ""}
           pendingDrafts={pendingDrafts}
+          openTicketsCount={openTicketsCount}
         />
         <div className="flex flex-1 flex-col overflow-hidden">
           <AdminTopbar email={profile.email} role={profile.role} />
