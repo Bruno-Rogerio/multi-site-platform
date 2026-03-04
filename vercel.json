@@ -2,7 +2,8 @@
   "crons": [
     {
       "path": "/api/cron/sla-check",
-      "schedule": "*/30 * * * *"
+      "schedule": "*/30 * * * *",
+      "maximumDuration": 10
     }
   ]
 }
