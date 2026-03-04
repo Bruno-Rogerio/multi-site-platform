@@ -7,6 +7,7 @@ import {
   sendTicketReplyToClientEmail,
   sendTicketReplyToAdminEmail,
 } from "@/lib/email";
+import { createNotification, createNotificationForMany, getAdminUserIds } from "@/lib/notifications";
 
 type Params = { params: Promise<{ ticketId: string }> };
 
@@ -74,13 +75,14 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ error: msgError?.message ?? "Erro ao enviar mensagem." }, { status: 400 });
   }
 
-  // Email notifications (fire-and-forget)
+  // Email + in-app notifications (fire-and-forget)
   const adminClient = createSupabaseAdminClient();
   if (adminClient) {
     const siteName = (ticket.sites as { name: string } | null)?.name ?? "Cliente";
+    const preview = messageBody.length > 80 ? messageBody.slice(0, 77) + "…" : messageBody;
 
     if (senderRole === "admin") {
-      // Notify the ticket owner (client)
+      // Notify ticket owner (client): email + in-app
       const { data: ownerProfile } = await adminClient
         .from("user_profiles")
         .select("email")
@@ -94,11 +96,19 @@ export async function POST(request: Request, { params }: Params) {
           messageBody,
         ).catch(() => {});
       }
+
+      createNotification(
+        ticket.owner_id as string,
+        "ticket_message",
+        "Nova resposta no seu chamado",
+        `${ticket.subject}: ${preview}`,
+        ticketId,
+      ).catch(() => {});
     } else {
-      // Notify admin(s)
+      // Notify admin(s): email + in-app
       const { data: adminProfiles } = await adminClient
         .from("user_profiles")
-        .select("email")
+        .select("id, email")
         .eq("role", "admin");
 
       if (adminProfiles?.length) {
@@ -109,6 +119,15 @@ export async function POST(request: Request, { params }: Params) {
             messageBody,
           ).catch(() => {});
         });
+
+        const adminIds = adminProfiles.map((ap) => ap.id as string);
+        createNotificationForMany(
+          adminIds,
+          "ticket_message",
+          `${siteName} respondeu`,
+          `${ticket.subject}: ${preview}`,
+          ticketId,
+        ).catch(() => {});
       }
     }
   }

@@ -6,6 +6,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   sendNewTicketEmail,
 } from "@/lib/email";
+import { createNotificationForMany, getAdminUserIds } from "@/lib/notifications";
 
 // ─── GET /api/admin/tickets ──────────────────────────────────────────────────
 export async function GET() {
@@ -128,12 +129,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: msgError.message }, { status: 400 });
   }
 
-  // Notify admin via email (fire-and-forget)
+  // Notify admins: email + in-app (fire-and-forget)
   const adminClient = createSupabaseAdminClient();
   if (adminClient) {
     const { data: adminProfiles } = await adminClient
       .from("user_profiles")
-      .select("email")
+      .select("id, email")
       .eq("role", "admin");
 
     if (adminProfiles?.length) {
@@ -147,6 +148,15 @@ export async function POST(request: Request) {
           }),
         ),
       );
+
+      const adminIds = adminProfiles.map((ap) => ap.id as string);
+      createNotificationForMany(
+        adminIds,
+        "ticket_new",
+        "Novo chamado aberto",
+        `${site.name ?? "Cliente"}: ${subject}`,
+        ticket.id,
+      ).catch(() => {});
     }
   }
 

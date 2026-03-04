@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
+import { createNotification } from "@/lib/notifications";
 
 type Params = { params: Promise<{ ticketId: string }> };
 
@@ -69,6 +70,13 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: "Supabase unavailable." }, { status: 500 });
   }
 
+  // Fetch ticket to get owner + subject for notification
+  const { data: ticket } = await supabase
+    .from("support_tickets")
+    .select("owner_id, subject")
+    .eq("id", ticketId)
+    .maybeSingle();
+
   const updatePayload: Record<string, unknown> = { status: newStatus, updated_at: new Date().toISOString() };
   if (newStatus === "resolved") {
     updatePayload.resolved_at = new Date().toISOString();
@@ -81,6 +89,23 @@ export async function PATCH(request: Request, { params }: Params) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  // Notify client about status change (fire-and-forget)
+  if (ticket?.owner_id) {
+    const STATUS_LABELS: Record<string, string> = {
+      open:           "Aberto",
+      in_progress:    "Em andamento",
+      waiting_client: "Aguardando sua resposta",
+      resolved:       "Resolvido",
+    };
+    createNotification(
+      ticket.owner_id as string,
+      "ticket_status_changed",
+      "Status do chamado atualizado",
+      `"${ticket.subject}" → ${STATUS_LABELS[newStatus] ?? newStatus}`,
+      ticketId,
+    ).catch(() => {});
   }
 
   return NextResponse.json({ ok: true });

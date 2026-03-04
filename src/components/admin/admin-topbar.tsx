@@ -1,12 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Bell, LogOut, Shield, User } from "lucide-react";
+import { LogOut, Shield, User } from "lucide-react";
 import type { AppRole } from "@/lib/auth/session";
+import { NotificationBell } from "@/components/admin/notification-bell";
 
 type AdminTopbarProps = {
   email: string;
   role: AppRole;
+  userId: string;
 };
 
 const breadcrumbLabels: Record<string, string> = {
@@ -15,6 +17,7 @@ const breadcrumbLabels: Record<string, string> = {
   "/admin/platform/users": "Usuários",
   "/admin/platform/pipeline": "Pipeline",
   "/admin/platform/branding": "Branding",
+  "/admin/platform/messages": "Mensagens",
   "/admin/client": "Dashboard",
   "/admin/client/editor": "Editor do site",
   "/admin/client/appearance": "Aparência",
@@ -39,7 +42,7 @@ function getBreadcrumbs(pathname: string): { label: string; href: string }[] {
   return crumbs;
 }
 
-export function AdminTopbar({ email, role }: AdminTopbarProps) {
+export function AdminTopbar({ email, role, userId }: AdminTopbarProps) {
   const pathname = usePathname();
   const breadcrumbs = getBreadcrumbs(pathname);
 
@@ -67,13 +70,8 @@ export function AdminTopbar({ email, role }: AdminTopbarProps) {
 
       {/* Right side */}
       <div className="flex items-center gap-3">
-        {/* Notifications placeholder */}
-        <button
-          className="relative flex h-9 w-9 items-center justify-center rounded-lg text-[var(--platform-text)]/50 transition hover:bg-white/[0.04] hover:text-[var(--platform-text)]"
-          title="Notificações (em breve)"
-        >
-          <Bell size={18} />
-        </button>
+        {/* Notification bell */}
+        <NotificationBell userId={userId} role={role} />
 
         {/* User info */}
         <div className="hidden items-center gap-2 sm:flex">

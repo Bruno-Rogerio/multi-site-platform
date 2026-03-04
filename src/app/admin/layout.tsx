@@ -52,7 +52,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           openTicketsCount={openTicketsCount}
         />
         <div className="flex flex-1 flex-col overflow-hidden">
-          <AdminTopbar email={profile.email} role={profile.role} />
+          <AdminTopbar email={profile.email} role={profile.role} userId={profile.id} />
           <main className="flex-1 overflow-y-auto">
             {children}
           </main>
