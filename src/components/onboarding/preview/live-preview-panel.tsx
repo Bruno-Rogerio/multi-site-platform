@@ -17,6 +17,8 @@ import * as LucideIcons from "lucide-react";
 
 type DeviceMode = "desktop" | "mobile";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 // Map font families to Google Fonts URLs
 const GOOGLE_FONTS_MAP: Record<string, string> = {
   "Inter": "Inter:wght@400;500;600;700",
@@ -128,7 +130,7 @@ export function LivePreviewPanel() {
   const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content, contactSelectedLinks } = state;
   const hasTestimonials = (() => {
     try {
-      const parsed = JSON.parse(content.testimonialsJson || "[]");
+      const parsed = JSON.parse(str(content.testimonialsJson) || "[]");
       return Array.isArray(parsed) && parsed.some((t) => t?.quote?.trim() && t?.author?.trim());
     } catch {
       return false;
@@ -137,13 +139,13 @@ export function LivePreviewPanel() {
 
   // Floating buttons for basic plan: based on contactSelectedLinks + toggle
   const basicFloatingLinks = (() => {
-    if (content.floatingButtonsEnabled === "false") return [];
+    if (str(content.floatingButtonsEnabled) === "false") return [];
     const allLinks: { type: string; icon: string; label: string }[] = [];
-    if (content.social_whatsapp?.trim()) allLinks.push({ type: "whatsapp", icon: "MessageCircle", label: "WhatsApp" });
-    if (content.social_instagram?.trim()) allLinks.push({ type: "instagram", icon: "Instagram", label: "Instagram" });
-    if (content.social_email?.trim()) allLinks.push({ type: "email", icon: "Mail", label: "E-mail" });
-    if (content.social_linkedin?.trim()) allLinks.push({ type: "linkedin", icon: "Linkedin", label: "LinkedIn" });
-    if (content.social_facebook?.trim()) allLinks.push({ type: "facebook", icon: "Facebook", label: "Facebook" });
+    if (str(content.social_whatsapp).trim()) allLinks.push({ type: "whatsapp", icon: "MessageCircle", label: "WhatsApp" });
+    if (str(content.social_instagram).trim()) allLinks.push({ type: "instagram", icon: "Instagram", label: "Instagram" });
+    if (str(content.social_email).trim()) allLinks.push({ type: "email", icon: "Mail", label: "E-mail" });
+    if (str(content.social_linkedin).trim()) allLinks.push({ type: "linkedin", icon: "Linkedin", label: "LinkedIn" });
+    if (str(content.social_facebook).trim()) allLinks.push({ type: "facebook", icon: "Facebook", label: "Facebook" });
     const filtered = contactSelectedLinks.length > 0
       ? allLinks.filter((l) => contactSelectedLinks.includes(l.type))
       : allLinks.slice(0, 1);

@@ -11,7 +11,7 @@ interface ImageUploadProps {
   slot: string;
   aspectRatio?: string;
   description?: string;
-  variant?: "full" | "compact" | "avatar";
+  variant?: "full" | "compact" | "avatar" | "thumbnail";
 }
 
 export function ImageUpload({
@@ -168,6 +168,47 @@ export function ImageUpload({
     );
   }
 
+  // ─── THUMBNAIL variant (inline em listas: blog, galeria, eventos) ──
+  if (variant === "thumbnail") {
+    return (
+      <div>
+        {hiddenInput}
+        <div
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          className={`relative h-20 w-28 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 border-dashed transition-all ${
+            dragOver ? "border-[#22D3EE] bg-[#22D3EE]/10" : "border-white/20 bg-white/[0.03] hover:border-white/30"
+          }`}
+        >
+          {value ? (
+            <>
+              <img src={value} alt={label} className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); handleRemove(); }}
+                className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition hover:opacity-100"
+              >
+                <X size={14} className="text-white" />
+              </button>
+            </>
+          ) : isUploading ? (
+            <div className="flex h-full items-center justify-center">
+              <Loader2 size={16} className="animate-spin text-[#22D3EE]" />
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-1">
+              <ImageIcon size={16} className="text-[var(--platform-text)]/30" />
+              <span className="text-[9px] text-[var(--platform-text)]/40">Imagem</span>
+            </div>
+          )}
+        </div>
+        {errorEl}
+      </div>
+    );
+  }
+
   // ─── COMPACT variant (hero image, service card image) ─
   if (variant === "compact") {
     return (
@@ -218,7 +259,7 @@ export function ImageUpload({
     );
   }
 
-  // ─── FULL variant (original) ──────────────────────────
+  // ─── FULL variant ─────────────────────────────────────
   return (
     <div>
       <label className="text-xs font-medium text-[var(--platform-text)]/60 mb-2 block">
@@ -226,26 +267,17 @@ export function ImageUpload({
       </label>
 
       <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setDragOver(true);
-        }}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         className={`relative rounded-xl border-2 border-dashed transition-all overflow-hidden ${
-          dragOver
-            ? "border-[#22D3EE] bg-[#22D3EE]/10"
-            : "border-white/20 bg-white/[0.02]"
+          dragOver ? "border-[#22D3EE] bg-[#22D3EE]/10" : "border-white/20 bg-white/[0.02]"
         }`}
-        style={{ aspectRatio }}
+        style={{ aspectRatio, maxHeight: "200px" }}
       >
         {value ? (
-          <div className="relative h-full">
-            <img
-              src={value}
-              alt={label}
-              className="h-full w-full object-cover"
-            />
+          <div className="relative h-full min-h-[100px]">
+            <img src={value} alt={label} className="h-full w-full object-cover" />
             <button
               onClick={handleRemove}
               className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/80"
@@ -256,28 +288,21 @@ export function ImageUpload({
         ) : (
           <div
             onClick={() => inputRef.current?.click()}
-            className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
+            className="flex min-h-[100px] flex-col items-center justify-center gap-2 cursor-pointer py-6"
           >
             {isUploading ? (
-              <Loader2 size={24} className="animate-spin text-[#22D3EE]" />
+              <Loader2 size={20} className="animate-spin text-[#22D3EE]" />
             ) : (
               <>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 mb-2">
-                  <Upload size={20} className="text-[var(--platform-text)]/50" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10">
+                  <Upload size={16} className="text-[var(--platform-text)]/50" />
                 </div>
-                <p className="text-sm font-medium text-[var(--platform-text)]/70">
-                  Clique ou arraste
-                </p>
-                {description && (
-                  <p className="text-xs text-[var(--platform-text)]/40 mt-1">
-                    {description}
-                  </p>
-                )}
+                <p className="text-xs font-medium text-[var(--platform-text)]/60">Clique ou arraste</p>
+                {description && <p className="text-[10px] text-[var(--platform-text)]/40">{description}</p>}
               </>
             )}
           </div>
         )}
-
         {hiddenInput}
       </div>
 

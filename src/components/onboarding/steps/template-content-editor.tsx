@@ -9,6 +9,8 @@ import { LinkDestinationSelect } from "../builders/link-destination-select";
 import { getTemplateBySlug } from "@/lib/onboarding/templates";
 import { MessageCircle, Instagram, Mail, Linkedin, Facebook, Check, Plus, Trash2 } from "lucide-react";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 type Testimonial = { quote: string; author: string };
 
 export function TemplateContentEditor() {
@@ -18,7 +20,7 @@ export function TemplateContentEditor() {
   // Local testimonials state — synced to content.testimonialsJson
   const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
     try {
-      const parsed = JSON.parse(content.testimonialsJson || "[]");
+      const parsed = JSON.parse(str(content.testimonialsJson) || "[]");
       return Array.isArray(parsed) ? parsed : [];
     } catch {
       return [];
@@ -84,11 +86,11 @@ export function TemplateContentEditor() {
   // Registered social links for contact checkboxes
   const registeredLinks = useMemo(() => {
     const links: { type: string; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[] = [];
-    if (content.social_whatsapp?.trim()) links.push({ type: "whatsapp", label: "WhatsApp", Icon: MessageCircle });
-    if (content.social_instagram?.trim()) links.push({ type: "instagram", label: "Instagram", Icon: Instagram });
-    if (content.social_email?.trim()) links.push({ type: "email", label: "E-mail", Icon: Mail });
-    if (content.social_linkedin?.trim()) links.push({ type: "linkedin", label: "LinkedIn", Icon: Linkedin });
-    if (content.social_facebook?.trim()) links.push({ type: "facebook", label: "Facebook", Icon: Facebook });
+    if (str(content.social_whatsapp).trim()) links.push({ type: "whatsapp", label: "WhatsApp", Icon: MessageCircle });
+    if (str(content.social_instagram).trim()) links.push({ type: "instagram", label: "Instagram", Icon: Instagram });
+    if (str(content.social_email).trim()) links.push({ type: "email", label: "E-mail", Icon: Mail });
+    if (str(content.social_linkedin).trim()) links.push({ type: "linkedin", label: "LinkedIn", Icon: Linkedin });
+    if (str(content.social_facebook).trim()) links.push({ type: "facebook", label: "Facebook", Icon: Facebook });
     return links;
   }, [content.social_whatsapp, content.social_instagram, content.social_email, content.social_linkedin, content.social_facebook]);
 
@@ -131,7 +133,7 @@ export function TemplateContentEditor() {
                 </span>
                 <input
                   type="text"
-                  value={content.social_whatsapp || ""}
+                  value={str(content.social_whatsapp)}
                   onChange={(e) => handleContentChange("social_whatsapp", e.target.value)}
                   placeholder="5511999999999"
                   className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
@@ -150,7 +152,7 @@ export function TemplateContentEditor() {
                 </span>
                 <input
                   type="text"
-                  value={content.social_instagram || ""}
+                  value={str(content.social_instagram)}
                   onChange={(e) => handleContentChange("social_instagram", e.target.value)}
                   placeholder="seuperfil"
                   className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
@@ -165,7 +167,7 @@ export function TemplateContentEditor() {
               </label>
               <input
                 type="email"
-                value={content.social_email || ""}
+                value={str(content.social_email)}
                 onChange={(e) => handleContentChange("social_email", e.target.value)}
                 placeholder="contato@exemplo.com"
                 className={inputClass}
@@ -183,7 +185,7 @@ export function TemplateContentEditor() {
                 </span>
                 <input
                   type="text"
-                  value={content.social_linkedin || ""}
+                  value={str(content.social_linkedin)}
                   onChange={(e) => handleContentChange("social_linkedin", e.target.value)}
                   placeholder="in/seuperfil"
                   className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
@@ -202,7 +204,7 @@ export function TemplateContentEditor() {
                 </span>
                 <input
                   type="text"
-                  value={content.social_facebook || ""}
+                  value={str(content.social_facebook)}
                   onChange={(e) => handleContentChange("social_facebook", e.target.value)}
                   placeholder="suapagina"
                   className="w-full rounded-r-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
@@ -231,7 +233,7 @@ export function TemplateContentEditor() {
               <label className={labelClass}>Texto do rodapé</label>
               <input
                 type="text"
-                value={content.footerText || ""}
+                value={str(content.footerText)}
                 onChange={(e) => handleContentChange("footerText", e.target.value)}
                 placeholder="Ex: © 2025 Seu Nome. Todos os direitos reservados."
                 className={inputClass}
@@ -259,7 +261,7 @@ export function TemplateContentEditor() {
               <label className={labelClass}>Eyebrow (pequeno texto acima)</label>
               <input
                 type="text"
-                value={content.heroEyebrow || ""}
+                value={str(content.heroEyebrow)}
                 onChange={(e) => handleContentChange("heroEyebrow", e.target.value)}
                 placeholder="Ex: Psicologia online"
                 className={inputClass}
@@ -270,7 +272,7 @@ export function TemplateContentEditor() {
               <label className={labelClass}>Título principal</label>
               <input
                 type="text"
-                value={content.heroTitle || ""}
+                value={str(content.heroTitle)}
                 onChange={(e) => handleContentChange("heroTitle", e.target.value)}
                 placeholder="Ex: Cuidado emocional para viver com mais clareza"
                 className={inputClass}
@@ -280,7 +282,7 @@ export function TemplateContentEditor() {
             <div>
               <label className={labelClass}>Subtítulo</label>
               <textarea
-                value={content.heroSubtitle || ""}
+                value={str(content.heroSubtitle)}
                 onChange={(e) => handleContentChange("heroSubtitle", e.target.value)}
                 placeholder="Uma breve descrição do que você faz..."
                 rows={2}
@@ -292,7 +294,7 @@ export function TemplateContentEditor() {
               <label className={labelClass}>Texto do botão</label>
               <input
                 type="text"
-                value={content.heroCtaLabel || ""}
+                value={str(content.heroCtaLabel)}
                 onChange={(e) => handleContentChange("heroCtaLabel", e.target.value)}
                 placeholder="Ex: Agendar sessão"
                 className={inputClass}
@@ -302,9 +304,9 @@ export function TemplateContentEditor() {
             <div>
               <label className={labelClass}>Destino do botão</label>
               <LinkDestinationSelect
-                value={content.heroCtaUrl || ""}
+                value={str(content.heroCtaUrl)}
                 onChange={(url) => handleContentChange("heroCtaUrl", url)}
-                content={content}
+                content={content as Record<string, string>}
                 placeholder="Escolha o destino do botão"
               />
             </div>
@@ -321,7 +323,7 @@ export function TemplateContentEditor() {
               <label className={labelClass}>Título da seção</label>
               <input
                 type="text"
-                value={content.servicesTitle || ""}
+                value={str(content.servicesTitle)}
                 onChange={(e) => handleContentChange("servicesTitle", e.target.value)}
                 placeholder="Ex: Serviços"
                 className={inputClass}
@@ -397,7 +399,7 @@ export function TemplateContentEditor() {
               <label className={labelClass}>Título</label>
               <input
                 type="text"
-                value={content.ctaTitle || ""}
+                value={str(content.ctaTitle)}
                 onChange={(e) => handleContentChange("ctaTitle", e.target.value)}
                 placeholder="Ex: Vamos conversar?"
                 className={inputClass}
@@ -407,7 +409,7 @@ export function TemplateContentEditor() {
             <div>
               <label className={labelClass}>Descrição</label>
               <textarea
-                value={content.ctaDescription || ""}
+                value={str(content.ctaDescription)}
                 onChange={(e) => handleContentChange("ctaDescription", e.target.value)}
                 placeholder="Uma frase convidativa..."
                 rows={2}
@@ -420,7 +422,7 @@ export function TemplateContentEditor() {
               <label className={labelClass}>Texto do botão principal</label>
               <input
                 type="text"
-                value={content.ctaButtonLabel || ""}
+                value={str(content.ctaButtonLabel)}
                 onChange={(e) => handleContentChange("ctaButtonLabel", e.target.value)}
                 placeholder="Ex: Falar no WhatsApp"
                 className={inputClass}
@@ -430,9 +432,9 @@ export function TemplateContentEditor() {
             <div>
               <label className={labelClass}>Destino do botão principal</label>
               <LinkDestinationSelect
-                value={content.ctaButtonUrl || ""}
+                value={str(content.ctaButtonUrl)}
                 onChange={(url) => handleContentChange("ctaButtonUrl", url)}
-                content={content}
+                content={content as Record<string, string>}
               />
             </div>
 
@@ -445,7 +447,7 @@ export function TemplateContentEditor() {
                   <label className={labelClass}>Texto</label>
                   <input
                     type="text"
-                    value={content.ctaSecondaryLabel || ""}
+                    value={str(content.ctaSecondaryLabel)}
                     onChange={(e) => handleContentChange("ctaSecondaryLabel", e.target.value)}
                     placeholder="Ex: Saiba mais"
                     className={inputClass}
@@ -455,9 +457,9 @@ export function TemplateContentEditor() {
                 <div>
                   <label className={labelClass}>Destino</label>
                   <LinkDestinationSelect
-                    value={content.ctaSecondaryUrl || ""}
+                    value={str(content.ctaSecondaryUrl)}
                     onChange={(url) => handleContentChange("ctaSecondaryUrl", url)}
-                    content={content}
+                    content={content as Record<string, string>}
                   />
                 </div>
               </div>
@@ -475,7 +477,7 @@ export function TemplateContentEditor() {
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <ImageUpload
               label="Sua foto ou imagem"
-              value={content.aboutImage || ""}
+              value={str(content.aboutImage)}
               onChange={(url) => handleContentChange("aboutImage", url)}
               slot="aboutImage"
               variant="compact"
@@ -488,7 +490,7 @@ export function TemplateContentEditor() {
                 <label className={labelClass}>Título da seção</label>
                 <input
                   type="text"
-                  value={content.aboutTitle || ""}
+                  value={str(content.aboutTitle)}
                   onChange={(e) => handleContentChange("aboutTitle", e.target.value)}
                   placeholder={`Sobre ${state.businessName || "você"}`}
                   className={inputClass}
@@ -498,7 +500,7 @@ export function TemplateContentEditor() {
               <div>
                 <label className={labelClass}>Texto sobre você</label>
                 <textarea
-                  value={content.aboutBody || ""}
+                  value={str(content.aboutBody)}
                   onChange={(e) => handleContentChange("aboutBody", e.target.value)}
                   placeholder="Conte sua história, sua experiência e o que te motiva..."
                   rows={5}
@@ -571,19 +573,19 @@ export function TemplateContentEditor() {
             <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 px-3 py-2.5 transition hover:bg-white/[0.03]">
               <div
                 className={`relative h-5 w-9 rounded-full transition ${
-                  content.floatingButtonsEnabled !== "false" ? "bg-[#22D3EE]" : "bg-white/10"
+                  str(content.floatingButtonsEnabled) !== "false" ? "bg-[#22D3EE]" : "bg-white/10"
                 }`}
               >
                 <div
                   className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                    content.floatingButtonsEnabled !== "false" ? "translate-x-4" : "translate-x-0.5"
+                    str(content.floatingButtonsEnabled) !== "false" ? "translate-x-4" : "translate-x-0.5"
                   }`}
                 />
               </div>
               <input
                 type="checkbox"
                 className="hidden"
-                checked={content.floatingButtonsEnabled !== "false"}
+                checked={str(content.floatingButtonsEnabled) !== "false"}
                 onChange={(e) =>
                   handleContentChange("floatingButtonsEnabled", e.target.checked ? "true" : "false")
                 }
@@ -620,7 +622,7 @@ export function TemplateContentEditor() {
           <div className="mt-3">
             <label className={labelClass}>Estilo de exibição</label>
             <select
-              value={content.testimonialsVariant || "grid"}
+              value={str(content.testimonialsVariant) || "grid"}
               onChange={(e) => handleContentChange("testimonialsVariant", e.target.value)}
               className="mt-1 w-full rounded-lg border border-white/10 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] focus:border-[#22D3EE] focus:outline-none cursor-pointer"
             >
@@ -724,13 +726,13 @@ export function TemplateContentEditor() {
             <div>
               <div className="flex items-center justify-between">
                 <label className={labelClass}>Título SEO</label>
-                <span className={`text-[10px] ${(content.seoTitle || "").length > 60 ? "text-red-400" : "text-[var(--platform-text)]/40"}`}>
-                  {(content.seoTitle || "").length}/60
+                <span className={`text-[10px] ${str(content.seoTitle).length > 60 ? "text-red-400" : "text-[var(--platform-text)]/40"}`}>
+                  {str(content.seoTitle).length}/60
                 </span>
               </div>
               <input
                 type="text"
-                value={content.seoTitle || ""}
+                value={str(content.seoTitle)}
                 onChange={(e) => handleContentChange("seoTitle", e.target.value)}
                 placeholder="Ex: Psicologia Online | Dra. Maria Silva"
                 className={inputClass}
@@ -740,12 +742,12 @@ export function TemplateContentEditor() {
             <div>
               <div className="flex items-center justify-between">
                 <label className={labelClass}>Descrição SEO</label>
-                <span className={`text-[10px] ${(content.seoDescription || "").length > 160 ? "text-red-400" : "text-[var(--platform-text)]/40"}`}>
-                  {(content.seoDescription || "").length}/160
+                <span className={`text-[10px] ${str(content.seoDescription).length > 160 ? "text-red-400" : "text-[var(--platform-text)]/40"}`}>
+                  {str(content.seoDescription).length}/160
                 </span>
               </div>
               <textarea
-                value={content.seoDescription || ""}
+                value={str(content.seoDescription)}
                 onChange={(e) => handleContentChange("seoDescription", e.target.value)}
                 placeholder="Breve descrição do seu negócio que aparece nos resultados do Google..."
                 rows={2}
@@ -757,7 +759,7 @@ export function TemplateContentEditor() {
       </div>
 
       {/* Navigation */}
-      <StepNavigation canProceed={!!content.heroTitle && content.heroTitle.length > 0} />
+      <StepNavigation canProceed={str(content.heroTitle).length > 0} />
     </div>
   );
 }

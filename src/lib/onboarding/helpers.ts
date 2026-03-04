@@ -106,7 +106,7 @@ export function mapVariantToDbVariant(variant: string): string {
 
 /* ─── Default content ─── */
 
-export const DEFAULT_CONTENT = {
+export const DEFAULT_CONTENT: Record<string, unknown> = {
   heroEyebrow: "",
   heroTitle: "Título do seu site",
   heroSubtitle: "Uma breve descrição do que você faz e como pode ajudar seus clientes.",
@@ -121,6 +121,19 @@ export const DEFAULT_CONTENT = {
   ctaSecondaryUrl: "",
   contactTitle: "Contato",
   contactSubtitle: "Entre em contato pelos canais abaixo",
+  aboutTitle: "Sobre mim",
+  aboutBody: "",
+  aboutImage: "",
+  testimonialVariant: "grid",
+  testimonials: [] as { name: string; role: string; text: string; stars: number }[],
+  blogTitle: "Blog",
+  blogPosts: [] as { title: string; excerpt: string; imageUrl: string; link: string }[],
+  galleryTitle: "Galeria",
+  galleryImages: [] as { url: string; alt: string; caption: string }[],
+  faqTitle: "Perguntas frequentes",
+  faqItems: [] as { question: string; answer: string }[],
+  eventsTitle: "Agenda",
+  events: [] as { title: string; date: string; time: string; location: string; description: string }[],
 };
 
 export const DEFAULT_SERVICE_CARDS = [

@@ -50,7 +50,7 @@ const initialState: WizardState = {
   motionStyle: "motion-fade",
   headerStyle: "blur" as const,
   dividerStyle: "wave" as const,
-  enabledSections: ["hero", "services", "about", "cta", "contact"],
+  enabledSections: ["hero", "services", "about", "cta", "testimonials", "contact"],
   sectionColors: {},
 
   // Service cards
@@ -329,6 +329,12 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         addonsSelected: [...state.addonsSelected, sectionId],
       };
     }
+
+    case "REORDER_SECTIONS":
+      return { ...state, enabledSections: action.sections };
+
+    case "SET_CONTENT_ARRAY":
+      return { ...state, content: { ...state.content, [action.key]: action.value } };
 
     case "UPDATE_CONTENT":
       return { ...state, content: { ...state.content, [action.key]: action.value } };

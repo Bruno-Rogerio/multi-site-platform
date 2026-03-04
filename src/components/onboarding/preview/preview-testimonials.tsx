@@ -3,6 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useWizard } from "../wizard-context";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 interface PreviewTestimonialsProps {
   deviceMode: "desktop" | "mobile";
 }
@@ -34,8 +36,8 @@ export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
   const { state } = useWizard();
   const { content, fontFamily } = state;
 
-  const testimonials = parseTestimonials(content.testimonialsJson);
-  const variant = content.testimonialsVariant || "grid";
+  const testimonials = parseTestimonials(str(content.testimonialsJson));
+  const variant = str(content.testimonialsVariant) || "grid";
 
   // Carousel state — always declared (hooks can't be conditional)
   const [current, setCurrent] = useState(0);

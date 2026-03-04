@@ -2,6 +2,8 @@
 
 import { useWizard } from "../wizard-context";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 interface PreviewCtaProps {
   deviceMode: "desktop" | "mobile";
 }
@@ -17,10 +19,10 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
       ? "0px"
       : "6px";
 
-  const title = content.ctaTitle || "Vamos conversar?";
-  const description = content.ctaDescription || "";
-  const buttonLabel = content.ctaButtonLabel || "Entrar em contato";
-  const secondaryLabel = content.ctaSecondaryLabel || "Saiba mais";
+  const title = str(content.ctaTitle) || "Vamos conversar?";
+  const description = str(content.ctaDescription);
+  const buttonLabel = str(content.ctaButtonLabel) || "Entrar em contato";
+  const secondaryLabel = str(content.ctaSecondaryLabel) || "Saiba mais";
 
   // ── banner: flex row, text left, button right ──
   if (ctaVariant === "banner") {

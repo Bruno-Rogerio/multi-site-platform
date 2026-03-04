@@ -1,0 +1,520 @@
+"use client";
+
+import { useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  GripVertical,
+  Trash2,
+  Plus,
+  Check,
+  ChevronDown,
+  X,
+} from "lucide-react";
+import { useWizard } from "../wizard-context";
+import { StepNavigation } from "../step-navigation";
+import { heroVariants, servicesVariants, ctaVariants } from "@/lib/onboarding/section-styles";
+import { ctaTypes } from "@/lib/onboarding/cta-types";
+import type { CtaTypeId } from "@/lib/onboarding/types";
+import * as LucideIcons from "lucide-react";
+import { moveInArray } from "@/lib/onboarding/helpers";
+
+/* ─── Section metadata ─── */
+
+type SectionMeta = {
+  id: string;
+  label: string;
+  emoji: string;
+  accent: string;
+  removable: boolean;
+  variants?: { id: string; name: string; description: string; premium: boolean }[];
+  variantKey?: keyof { heroVariant: string; servicesVariant: string; ctaVariant: string };
+  variantAction?: "SET_HERO_VARIANT" | "SET_SERVICES_VARIANT" | "SET_CTA_VARIANT";
+};
+
+const SECTION_META: Record<string, SectionMeta> = {
+  hero:         { id: "hero",         label: "Hero",        emoji: "🎯", accent: "#22D3EE", removable: false, variants: heroVariants,     variantKey: "heroVariant",     variantAction: "SET_HERO_VARIANT" },
+  services:     { id: "services",     label: "Serviços",    emoji: "🧩", accent: "#7C5CFF", removable: true,  variants: servicesVariants, variantKey: "servicesVariant", variantAction: "SET_SERVICES_VARIANT" },
+  about:        { id: "about",        label: "Sobre mim",   emoji: "👤", accent: "#3B82F6", removable: true },
+  testimonials: { id: "testimonials", label: "Depoimentos", emoji: "⭐", accent: "#F59E0B", removable: true },
+  cta:          { id: "cta",          label: "CTA",         emoji: "📣", accent: "#10B981", removable: true,  variants: ctaVariants,      variantKey: "ctaVariant",      variantAction: "SET_CTA_VARIANT" },
+  contact:      { id: "contact",      label: "Contato",     emoji: "📞", accent: "#22D3EE", removable: false },
+  blog:         { id: "blog",         label: "Blog",        emoji: "📝", accent: "#EC4899", removable: true },
+  gallery:      { id: "gallery",      label: "Galeria",     emoji: "🖼️", accent: "#6366F1", removable: true },
+  faq:          { id: "faq",          label: "FAQ",         emoji: "❓", accent: "#F59E0B", removable: true },
+  events:       { id: "events",       label: "Agenda",      emoji: "📅", accent: "#10B981", removable: true },
+};
+
+const ALL_ADDABLE = ["services", "about", "testimonials", "cta", "blog", "gallery", "faq", "events"];
+
+/* ─── Variant dropdown ─── */
+
+function VariantDropdown({
+  variants,
+  selectedId,
+  onSelect,
+}: {
+  variants: { id: string; name: string; description: string; premium: boolean }[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const selected = variants.find(v => v.id === selectedId) ?? variants[0];
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1.5 text-xs text-[var(--platform-text)]/70 transition hover:border-white/20 hover:text-[var(--platform-text)]"
+      >
+        <span>{selected?.name ?? "Layout"}</span>
+        <ChevronDown size={12} className={`transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <>
+            <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+            <motion.div
+              initial={{ opacity: 0, y: -4, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -4, scale: 0.97 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-0 top-full z-20 mt-1 min-w-[180px] overflow-hidden rounded-xl border border-white/10 bg-[#151E35] shadow-xl"
+            >
+              {variants.map(v => (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => { onSelect(v.id); setOpen(false); }}
+                  className={`flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs transition hover:bg-white/[0.06] ${
+                    v.id === selectedId ? "bg-[#22D3EE]/10 text-[#22D3EE]" : "text-[var(--platform-text)]"
+                  }`}
+                >
+                  <div className="flex-1">
+                    <p className="font-medium leading-tight">{v.name}</p>
+                    <p className="text-[10px] text-[var(--platform-text)]/40 leading-tight">{v.description}</p>
+                  </div>
+                  {v.id === selectedId && <Check size={12} className="shrink-0 text-[#22D3EE]" />}
+                </button>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ─── Section block ─── */
+
+function SectionBlock({
+  sectionId,
+  index,
+  total,
+  isDragging,
+  isDropTarget,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+}: {
+  sectionId: string;
+  index: number;
+  total: number;
+  isDragging: boolean;
+  isDropTarget: boolean;
+  onDragStart: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: () => void;
+  onDragEnd: () => void;
+}) {
+  const { state, dispatch } = useWizard();
+  const meta = SECTION_META[sectionId];
+  if (!meta) return null;
+
+  const currentVariant = meta.variantKey ? (state[meta.variantKey] as string) : "";
+
+  function handleVariantSelect(id: string) {
+    if (meta.variantAction === "SET_HERO_VARIANT") dispatch({ type: "SET_HERO_VARIANT", variant: id });
+    if (meta.variantAction === "SET_SERVICES_VARIANT") dispatch({ type: "SET_SERVICES_VARIANT", variant: id });
+    if (meta.variantAction === "SET_CTA_VARIANT") dispatch({ type: "SET_CTA_VARIANT", variant: id });
+  }
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.97 }}
+      animate={{ opacity: isDragging ? 0.4 : 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95, height: 0 }}
+      transition={{ duration: 0.2 }}
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      className={`group flex items-center gap-3 rounded-xl border bg-[#0F1628] p-3 transition-all ${
+        isDropTarget
+          ? "border-[#22D3EE]/50 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
+          : "border-white/8 hover:border-white/15"
+      }`}
+    >
+      {/* Colored accent bar */}
+      <div
+        className="h-8 w-1 shrink-0 rounded-full"
+        style={{ backgroundColor: meta.accent, opacity: 0.7 }}
+      />
+
+      {/* Drag handle */}
+      <div className="cursor-grab text-[var(--platform-text)]/20 transition group-hover:text-[var(--platform-text)]/40 active:cursor-grabbing">
+        <GripVertical size={16} />
+      </div>
+
+      {/* Emoji + label */}
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <span className="text-base leading-none">{meta.emoji}</span>
+        <div>
+          <p className="text-sm font-semibold text-[var(--platform-text)] leading-tight">{meta.label}</p>
+          {!meta.removable && (
+            <p className="text-[10px] text-[var(--platform-text)]/30 leading-tight">Obrigatório</p>
+          )}
+        </div>
+      </div>
+
+      {/* Variant dropdown */}
+      {meta.variants && meta.variantAction && (
+        <VariantDropdown
+          variants={meta.variants}
+          selectedId={currentVariant}
+          onSelect={handleVariantSelect}
+        />
+      )}
+
+      {/* Delete button */}
+      {meta.removable ? (
+        <button
+          type="button"
+          onClick={() => dispatch({ type: "REMOVE_SECTION", sectionType: sectionId })}
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--platform-text)]/20 transition hover:bg-red-500/10 hover:text-red-400"
+        >
+          <Trash2 size={14} />
+        </button>
+      ) : (
+        <div className="h-7 w-7 shrink-0" />
+      )}
+    </motion.div>
+  );
+}
+
+/* ─── Add section popup ─── */
+
+function AddSectionPopup({
+  enabledSections,
+  onAdd,
+  onClose,
+}: {
+  enabledSections: string[];
+  onAdd: (id: string) => void;
+  onClose: () => void;
+}) {
+  const available = ALL_ADDABLE.filter(id => !enabledSections.includes(id));
+
+  if (available.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.96 }}
+        className="absolute bottom-full left-0 right-0 mb-2 z-30 rounded-xl border border-white/10 bg-[#151E35] p-4 shadow-2xl"
+      >
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-semibold text-[var(--platform-text)]">Todas as seções ativas!</p>
+          <button type="button" onClick={onClose} className="text-[var(--platform-text)]/40 hover:text-[var(--platform-text)]">
+            <X size={14} />
+          </button>
+        </div>
+        <p className="text-xs text-[var(--platform-text)]/50">Você já tem todas as seções disponíveis no seu site.</p>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96, y: 4 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96, y: 4 }}
+      transition={{ duration: 0.15 }}
+      className="absolute bottom-full left-0 z-30 mb-2 w-72 overflow-hidden rounded-xl border border-white/10 bg-[#151E35] shadow-2xl"
+    >
+      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+        <p className="text-sm font-semibold text-[var(--platform-text)]">Adicionar seção</p>
+        <button type="button" onClick={onClose} className="text-[var(--platform-text)]/40 hover:text-[var(--platform-text)]">
+          <X size={14} />
+        </button>
+      </div>
+      <div className="p-2">
+        {available.map(id => {
+          const meta = SECTION_META[id];
+          if (!meta) return null;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => { onAdd(id); onClose(); }}
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition hover:bg-white/[0.06]"
+            >
+              <span className="text-xl leading-none">{meta.emoji}</span>
+              <div>
+                <p className="text-sm font-semibold text-[var(--platform-text)]">{meta.label}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+/* ─── Contact channels card ─── */
+
+function ContactChannelsCard() {
+  const { state, dispatch } = useWizard();
+  const { selectedCtaTypes, ctaConfig, floatingCtaEnabled } = state;
+
+  function handleToggle(id: CtaTypeId) {
+    dispatch({ type: "TOGGLE_CTA_TYPE", ctaTypeId: id });
+  }
+
+  function handleUrlChange(id: CtaTypeId, url: string) {
+    const ctaType = ctaTypes.find(c => c.id === id);
+    dispatch({
+      type: "SET_CTA_CONFIG",
+      ctaTypeId: id,
+      config: { label: ctaType?.label ?? id, url },
+    });
+  }
+
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Canais de contato</h3>
+          <p className="text-xs text-[var(--platform-text)]/50">
+            Como seus visitantes entram em contato com você
+          </p>
+        </div>
+        {/* Floating toggle */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[var(--platform-text)]/50">Flutuante</span>
+          <button
+            type="button"
+            onClick={() => dispatch({ type: "SET_FLOATING_CTA", enabled: !floatingCtaEnabled })}
+            className={`relative h-5 w-9 rounded-full transition ${floatingCtaEnabled ? "bg-[#22D3EE]" : "bg-white/10"}`}
+          >
+            <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${floatingCtaEnabled ? "left-4" : "left-0.5"}`} />
+          </button>
+        </div>
+      </div>
+
+      {/* Channel toggle buttons */}
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+        {ctaTypes.map(cta => {
+          const isSelected = selectedCtaTypes.includes(cta.id);
+          const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[cta.icon];
+
+          return (
+            <button
+              key={cta.id}
+              type="button"
+              onClick={() => handleToggle(cta.id)}
+              className={`flex flex-col items-center gap-1.5 rounded-xl border p-2.5 transition ${
+                isSelected
+                  ? "border-[#22D3EE]/50 bg-[#22D3EE]/10"
+                  : "border-white/10 bg-white/[0.02] hover:border-white/20"
+              }`}
+            >
+              {Icon && <Icon size={16} className={isSelected ? "text-[#22D3EE]" : "text-[var(--platform-text)]/50"} />}
+              <span className={`text-[10px] font-medium ${isSelected ? "text-[#22D3EE]" : "text-[var(--platform-text)]/50"}`}>
+                {cta.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* URL inputs for selected channels */}
+      {selectedCtaTypes.length > 0 && (
+        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+          {selectedCtaTypes.map(ctaId => {
+            const ctaType = ctaTypes.find(c => c.id === ctaId);
+            if (!ctaType) return null;
+            const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[ctaType.icon];
+            const currentValue = ctaConfig[ctaId]?.url ?? "";
+
+            return (
+              <div key={ctaId} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+                {Icon && <Icon size={14} className="shrink-0 text-[#22D3EE]" />}
+                <input
+                  type="text"
+                  value={currentValue}
+                  onChange={e => handleUrlChange(ctaId, e.target.value)}
+                  placeholder={ctaType.placeholder}
+                  className="min-w-0 flex-1 bg-transparent text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:outline-none"
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main step ─── */
+
+export function SectionCanvasStep() {
+  const { state, dispatch } = useWizard();
+  const { enabledSections, selectedCtaTypes } = state;
+
+  // DnD state
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
+  const dragNodeRef = useRef<number | null>(null);
+
+  // Add section popup
+  const [addOpen, setAddOpen] = useState(false);
+
+  function handleDragStart(index: number) {
+    dragNodeRef.current = index;
+    setDraggedIndex(index);
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    if (dragNodeRef.current === null || dragNodeRef.current === index) return;
+    setDropTargetIndex(index);
+  }
+
+  function handleDrop(index: number) {
+    if (dragNodeRef.current === null || dragNodeRef.current === index) {
+      setDraggedIndex(null);
+      setDropTargetIndex(null);
+      return;
+    }
+    const reordered = moveInArray(enabledSections, dragNodeRef.current, index);
+    dispatch({ type: "REORDER_SECTIONS", sections: reordered });
+    setDraggedIndex(null);
+    setDropTargetIndex(null);
+    dragNodeRef.current = null;
+  }
+
+  function handleDragEnd() {
+    setDraggedIndex(null);
+    setDropTargetIndex(null);
+    dragNodeRef.current = null;
+  }
+
+  function handleAddSection(id: string) {
+    dispatch({ type: "ADD_SECTION", sectionType: id });
+  }
+
+  const canProceed = selectedCtaTypes.length > 0;
+
+  return (
+    <div>
+      {/* Header */}
+      <div className="mb-8">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
+          Estrutura do site
+        </p>
+        <h1 className="mt-2 text-2xl font-black text-[var(--platform-text)] md:text-3xl">
+          Monte seu site
+        </h1>
+        <p className="mt-2 max-w-xl text-sm text-[var(--platform-text)]/60">
+          Configure seus canais de contato e arraste as seções para definir a ordem do site.
+        </p>
+      </div>
+
+      <div className="space-y-5">
+        {/* Contact channels */}
+        <ContactChannelsCard />
+
+        {/* Canvas */}
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--platform-text)]">Seções do site</h3>
+              <p className="text-xs text-[var(--platform-text)]/50">
+                Arraste para reordenar · Clique em Layout para trocar o estilo
+              </p>
+            </div>
+            <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[10px] text-[var(--platform-text)]/50">
+              {enabledSections.length} seções
+            </span>
+          </div>
+
+          {/* Section blocks */}
+          <div className="space-y-2">
+            <AnimatePresence initial={false}>
+              {enabledSections.map((sectionId, index) => (
+                <SectionBlock
+                  key={sectionId}
+                  sectionId={sectionId}
+                  index={index}
+                  total={enabledSections.length}
+                  isDragging={draggedIndex === index}
+                  isDropTarget={dropTargetIndex === index && draggedIndex !== index}
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={e => handleDragOver(e, index)}
+                  onDrop={() => handleDrop(index)}
+                  onDragEnd={handleDragEnd}
+                />
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Add section button */}
+          <div className="relative mt-3">
+            <button
+              type="button"
+              onClick={() => setAddOpen(o => !o)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 py-3 text-sm font-medium text-[var(--platform-text)]/40 transition hover:border-[#22D3EE]/40 hover:text-[#22D3EE]"
+            >
+              <Plus size={16} />
+              Adicionar seção
+            </button>
+
+            <AnimatePresence>
+              {addOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-20"
+                    onClick={() => setAddOpen(false)}
+                  />
+                  <AddSectionPopup
+                    enabledSections={enabledSections}
+                    onAdd={handleAddSection}
+                    onClose={() => setAddOpen(false)}
+                  />
+                </>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Tip */}
+        {!canProceed && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-3 text-xs text-amber-400"
+          >
+            Selecione pelo menos um canal de contato para continuar.
+          </motion.div>
+        )}
+      </div>
+
+      <StepNavigation canProceed={canProceed} />
+    </div>
+  );
+}

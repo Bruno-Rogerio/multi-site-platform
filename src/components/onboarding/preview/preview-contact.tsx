@@ -4,6 +4,8 @@ import { useWizard } from "../wizard-context";
 import { ctaTypes } from "@/lib/onboarding/cta-types";
 import * as LucideIcons from "lucide-react";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 interface PreviewContactProps {
   deviceMode: "desktop" | "mobile";
 }
@@ -49,14 +51,14 @@ export function PreviewContact({ deviceMode }: PreviewContactProps) {
           className="text-[9px] font-bold"
           style={{ color: "var(--preview-text)" }}
         >
-          {content.contactTitle || "Contato"}
+          {str(content.contactTitle) || "Contato"}
         </h3>
-        {content.contactSubtitle && (
+        {str(content.contactSubtitle) && (
           <p
             className="text-[6px] mt-0.5"
             style={{ color: "var(--preview-muted)" }}
           >
-            {content.contactSubtitle}
+            {str(content.contactSubtitle)}
           </p>
         )}
       </div>
@@ -103,7 +105,7 @@ export function PreviewContact({ deviceMode }: PreviewContactProps) {
           color: "var(--preview-muted)",
         }}
       >
-        {content.footerText || `© 2026 ${businessName || "Seu Negócio"}`}
+        {str(content.footerText) || `© 2026 ${businessName || "Seu Negócio"}`}
       </div>
     </footer>
   );

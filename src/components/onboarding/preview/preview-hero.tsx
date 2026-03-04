@@ -2,6 +2,8 @@
 
 import { useWizard } from "../wizard-context";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 interface PreviewHeroProps {
   deviceMode: "desktop" | "mobile";
 }
@@ -17,10 +19,10 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
       ? "0px"
       : "6px";
 
-  const title = content.heroTitle || "Seu título principal aqui";
-  const subtitle = content.heroSubtitle || "";
-  const eyebrow = content.heroEyebrow || "";
-  const ctaLabel = content.heroCtaLabel || "Saiba mais";
+  const title = str(content.heroTitle) || "Seu título principal aqui";
+  const subtitle = str(content.heroSubtitle);
+  const eyebrow = str(content.heroEyebrow);
+  const ctaLabel = str(content.heroCtaLabel) || "Saiba mais";
 
   // ── split: grid text + image ──
   if (heroVariant === "split") {

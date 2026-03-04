@@ -3,6 +3,8 @@
 import { useWizard } from "../wizard-context";
 import { Menu } from "lucide-react";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 interface PreviewHeaderProps {
   deviceMode: "desktop" | "mobile";
 }
@@ -10,11 +12,11 @@ interface PreviewHeaderProps {
 export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
   const { state } = useWizard();
   const { businessName, fontFamily, content, logoUrl, headerStyle } = state;
-  const slogan = content.slogan || "";
+  const slogan = str(content.slogan);
 
   const hasTestimonials = (() => {
     try {
-      const parsed = JSON.parse(content.testimonialsJson || "[]");
+      const parsed = JSON.parse(str(content.testimonialsJson) || "[]");
       return Array.isArray(parsed) && parsed.some(
         (t) => typeof t?.quote === "string" && t.quote.trim() && typeof t?.author === "string" && t.author.trim(),
       );

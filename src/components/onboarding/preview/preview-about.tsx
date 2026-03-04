@@ -2,6 +2,8 @@
 
 import { useWizard } from "../wizard-context";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 interface PreviewAboutProps {
   deviceMode: "desktop" | "mobile";
 }
@@ -10,11 +12,11 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
   const { state } = useWizard();
   const { content, fontFamily, businessName } = state;
 
-  const title = content.aboutTitle || `Sobre ${businessName || "Seu Negócio"}`;
+  const title = str(content.aboutTitle) || `Sobre ${businessName || "Seu Negócio"}`;
   const body =
-    content.aboutBody ||
+    str(content.aboutBody) ||
     `${businessName || "Seu Negócio"} — atendimento personalizado com foco em resultado e acolhimento.`;
-  const aboutImage = content.aboutImage || "";
+  const aboutImage = str(content.aboutImage);
 
   return (
     <section

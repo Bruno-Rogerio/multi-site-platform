@@ -76,7 +76,7 @@ export type WizardState = {
   addonsSelected: string[];
 
   // Content editing
-  content: Record<string, string>;
+  content: Record<string, unknown>;
   contactSelectedLinks: string[];
 
   // Images
@@ -155,4 +155,6 @@ export type WizardAction =
   | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl"; url: string }
   | { type: "SET_CONTACT_SELECTED_LINKS"; links: string[] }
   | { type: "SET_LEAD_ID"; leadId: string }
-  | { type: "RESET_WIZARD" };
+  | { type: "RESET_WIZARD" }
+  | { type: "REORDER_SECTIONS"; sections: string[] }
+  | { type: "SET_CONTENT_ARRAY"; key: string; value: unknown[] };

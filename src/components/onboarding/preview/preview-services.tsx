@@ -3,6 +3,8 @@
 import { useWizard } from "../wizard-context";
 import * as LucideIcons from "lucide-react";
 
+function str(v: unknown): string { return String(v ?? ""); }
+
 interface PreviewServicesProps {
   deviceMode: "desktop" | "mobile";
 }
@@ -16,7 +18,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
   const { state, maxServiceCards } = useWizard();
   const { content, serviceCards, fontFamily, servicesVariant } = state;
 
-  const title = content.servicesTitle || "Serviços";
+  const title = str(content.servicesTitle) || "Serviços";
   const cards = serviceCards.slice(0, maxServiceCards);
 
   const getIcon = (card: typeof cards[0]) => {

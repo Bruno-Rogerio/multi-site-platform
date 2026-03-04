@@ -99,7 +99,7 @@ export function getStepsForPlan(plan: OnboardingPlan | null): StepDefinition[] {
     LEAD_CAPTURE_STEP,
     { id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" },
     { id: "visual-identity", label: "Visual", subtitle: "Identidade da marca" },
-    { id: "section-builder", label: "Construção", subtitle: "Seções, ícones e CTAs" },
+    { id: "section-canvas", label: "Monte seu site", subtitle: "Estrutura e canais" },
     { id: "content-editor", label: "Conteúdo", subtitle: "Textos e descrições" },
     { id: "finalizar", label: "Finalizar", subtitle: "Criar demonstração" },
   ];

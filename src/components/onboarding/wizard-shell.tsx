@@ -15,6 +15,7 @@ import { TemplateContentEditor } from "./steps/template-content-editor";
 import { StylePaletteStep } from "./steps/style-palette-step";
 import { VisualIdentityStep } from "./steps/visual-identity-step";
 import { SectionBuilderStep } from "./steps/section-builder-step";
+import { SectionCanvasStep } from "./steps/section-canvas-step";
 import { ContentEditorStep } from "./steps/content-editor-step";
 import { FinalizeStep } from "./steps/finalize-step";
 
@@ -44,6 +45,8 @@ function WizardContent() {
         return VisualIdentityStep;
       case "section-builder":
         return SectionBuilderStep;
+      case "section-canvas":
+        return SectionCanvasStep;
       case "content-editor":
         return ContentEditorStep;
       case "finalizar":
