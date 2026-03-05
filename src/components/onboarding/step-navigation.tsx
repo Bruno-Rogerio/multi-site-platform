@@ -26,7 +26,7 @@ export function StepNavigation({
 
   function handleBack() {
     dispatch({ type: "PREV_STEP" });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   function handleNext() {
@@ -35,7 +35,7 @@ export function StepNavigation({
     } else {
       dispatch({ type: "NEXT_STEP" });
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }
 
   const nextLabel = isLastStep

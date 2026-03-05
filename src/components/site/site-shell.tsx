@@ -62,16 +62,22 @@ export function SiteShell({ site, children }: SiteShellProps) {
   const headerStyle = site.themeSettings.headerStyle ?? "blur";
   const footerText = site.themeSettings.footerText?.trim() || "";
 
-  // Build nav links — add testimonials only if that section exists with content
+  // Build nav links — add optional sections only if they exist
   const hasTestimonials = site.homePage.sections.some(
     (s) =>
       s.type === "testimonials" &&
       Array.isArray(s.content.items) &&
       (s.content.items as unknown[]).length > 0,
   );
+  const hasBlog = site.homePage.sections.some((s) => s.type === "blog");
+  const hasEvents = site.homePage.sections.some((s) => s.type === "events");
+  const hasGallery = site.homePage.sections.some((s) => s.type === "gallery");
   const navLinks = [
     { href: "#services", label: "Serviços" },
     { href: "#about", label: "Sobre" },
+    ...(hasBlog ? [{ href: "#blog", label: "Blog" }] : []),
+    ...(hasEvents ? [{ href: "#events", label: "Agenda" }] : []),
+    ...(hasGallery ? [{ href: "#gallery", label: "Galeria" }] : []),
     ...(hasTestimonials ? [{ href: "#testimonials", label: "Depoimentos" }] : []),
     { href: "#contact", label: "Contato" },
   ];

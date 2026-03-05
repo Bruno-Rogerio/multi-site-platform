@@ -41,6 +41,18 @@ export async function POST(request: Request) {
     );
   }
 
+  // Check if email already registered (lead or active account)
+  const [{ data: existingLead }, { data: existingProfile }] = await Promise.all([
+    admin.from("leads").select("id").eq("email", email).maybeSingle(),
+    admin.from("profiles").select("id").eq("email", email).maybeSingle(),
+  ]);
+  if (existingLead ?? existingProfile) {
+    return NextResponse.json(
+      { error: "Este e-mail já está cadastrado. Faça login em /login ou use outro e-mail." },
+      { status: 409 },
+    );
+  }
+
   const { data: lead, error } = await admin
     .from("leads")
     .insert({

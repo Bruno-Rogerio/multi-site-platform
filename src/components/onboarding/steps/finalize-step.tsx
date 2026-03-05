@@ -39,7 +39,7 @@ export function FinalizeStep() {
     fontFamily, heroVariant, servicesVariant, ctaVariant, motionStyle,
     headerStyle, dividerStyle, buttonStyle, content, serviceCards,
     heroImage, logoUrl, addonsSelected, ctaConfig, selectedCtaTypes,
-    contactSelectedLinks, enabledSections,
+    contactSelectedLinks, enabledSections, floatingCtaEnabled,
   } = state;
 
   const [phase, setPhase] = useState<Phase>("summary");
@@ -58,6 +58,10 @@ export function FinalizeStep() {
   // Resend state
   const [isResending, setIsResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
+
+  // Email correction state (verify-email phase)
+  const [editingEmail, setEditingEmail] = useState(false);
+  const [emailDraft, setEmailDraft] = useState("");
 
   const passwordValidation = validatePassword(regPassword);
   const canRegister =
@@ -154,6 +158,7 @@ export function FinalizeStep() {
       logoUrl,
       ctaConfig,
       selectedCtaTypes,
+      floatingCtaEnabled,
       enabledSections,
     };
 
@@ -190,7 +195,7 @@ export function FinalizeStep() {
     }
   }
 
-  async function handleResendVerification() {
+  async function handleResendVerification(emailOverride?: string) {
     if (isResending) return;
     setIsResending(true);
     setResendSuccess(false);
@@ -198,7 +203,7 @@ export function FinalizeStep() {
       await fetch("/api/onboarding/resend-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: ownerEmail }),
+        body: JSON.stringify({ email: emailOverride ?? ownerEmail }),
       });
       setResendSuccess(true);
     } catch {
@@ -206,6 +211,15 @@ export function FinalizeStep() {
     } finally {
       setIsResending(false);
     }
+  }
+
+  function handleConfirmEmailChange() {
+    const trimmed = emailDraft.trim().toLowerCase();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return;
+    dispatch({ type: "SET_CHECKOUT_FIELD", key: "ownerEmail", value: trimmed });
+    setEditingEmail(false);
+    setResendSuccess(false);
+    void handleResendVerification(trimmed);
   }
 
   // ─── Verify-email phase ──────────────────────────────────────────────────
@@ -228,6 +242,37 @@ export function FinalizeStep() {
             <br />
             <strong className="text-[#22D3EE]">{ownerEmail}</strong>
           </p>
+          {editingEmail ? (
+            <div className="mt-3 flex items-center gap-2">
+              <input
+                type="email"
+                value={emailDraft}
+                onChange={(e) => setEmailDraft(e.target.value)}
+                placeholder="novo@email.com"
+                autoFocus
+                className="flex-1 rounded-lg border border-white/10 bg-white/[0.05] px-3 py-1.5 text-sm text-[#EAF0FF] outline-none focus:border-[#22D3EE]/50"
+              />
+              <button
+                onClick={handleConfirmEmailChange}
+                className="rounded-lg bg-[#22D3EE] px-3 py-1.5 text-xs font-bold text-[#0B1020] transition hover:bg-[#06B6D4]"
+              >
+                Confirmar
+              </button>
+              <button
+                onClick={() => setEditingEmail(false)}
+                className="text-xs text-[#EAF0FF]/40 transition hover:text-[#EAF0FF]"
+              >
+                Cancelar
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setEmailDraft(ownerEmail); setEditingEmail(true); }}
+              className="mt-2 text-xs text-[#EAF0FF]/40 underline transition hover:text-[#EAF0FF]/70"
+            >
+              E-mail incorreto? Alterar
+            </button>
+          )}
         </div>
 
         {/* Preview URL card */}

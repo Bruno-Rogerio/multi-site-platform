@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Eye, X } from "lucide-react";
 import { WizardProvider, useWizard } from "./wizard-context";
@@ -26,6 +26,11 @@ function WizardContent() {
   const { state, steps, monthlyTotal } = useWizard();
   const { currentStep, selectedPlan } = state;
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+
+  // Scroll to top whenever the active step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [currentStep]);
 
   const currentStepId = steps[currentStep]?.id;
 

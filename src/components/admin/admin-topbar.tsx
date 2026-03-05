@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogOut, Shield, User } from "lucide-react";
 import type { AppRole } from "@/lib/auth/session";
@@ -50,22 +51,28 @@ export function AdminTopbar({ email, role, userId }: AdminTopbarProps) {
     <header className="flex items-center justify-between border-b border-white/10 bg-[#0B1020]/80 px-6 py-3 backdrop-blur-sm">
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-2 text-sm pl-12 md:pl-0">
-        {breadcrumbs.map((crumb, index) => (
-          <span key={crumb.href} className="flex items-center gap-2">
-            {index > 0 && (
-              <span className="text-[var(--platform-text)]/30">/</span>
-            )}
-            <span
-              className={
-                index === breadcrumbs.length - 1
-                  ? "font-medium text-[var(--platform-text)]"
-                  : "text-[var(--platform-text)]/50"
-              }
-            >
-              {crumb.label}
+        {breadcrumbs.map((crumb, index) => {
+          const isLast = index === breadcrumbs.length - 1;
+          return (
+            <span key={crumb.href} className="flex items-center gap-2">
+              {index > 0 && (
+                <span className="text-[var(--platform-text)]/30">/</span>
+              )}
+              {isLast ? (
+                <span className="font-medium text-[var(--platform-text)]">
+                  {crumb.label}
+                </span>
+              ) : (
+                <Link
+                  href={crumb.href}
+                  className="text-[var(--platform-text)]/50 transition hover:text-[var(--platform-text)]"
+                >
+                  {crumb.label}
+                </Link>
+              )}
             </span>
-          </span>
-        ))}
+          );
+        })}
       </nav>
 
       {/* Right side */}

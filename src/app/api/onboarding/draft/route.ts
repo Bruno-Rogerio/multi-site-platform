@@ -42,6 +42,7 @@ type OnboardingDraftPayload = {
   logoUrl?: string;
   ctaConfig?: Partial<Record<CtaTypeId, { label: string; url: string }>>;
   selectedCtaTypes?: CtaTypeId[];
+  floatingCtaEnabled?: boolean;
 };
 
 function normalizeSubdomain(input: string): string {
@@ -455,7 +456,7 @@ export async function POST(request: Request) {
       ? [{ type: "whatsapp", url: whatsappUrl, icon: "MessageCircle", label: "WhatsApp" }]
       : [];
   (themeSettings as Record<string, unknown>).floatingLinks = floatingLinksData;
-  (themeSettings as Record<string, unknown>).floatingButtonsEnabled = content.floatingButtonsEnabled !== "false";
+  (themeSettings as Record<string, unknown>).floatingButtonsEnabled = payload.floatingCtaEnabled === true;
   await admin
     .from("sites")
     .update({ theme_settings: themeSettings })
