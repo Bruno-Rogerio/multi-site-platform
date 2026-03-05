@@ -35,7 +35,8 @@ const platformNav: NavItem[] = [
   { label: "Usuários", href: "/admin/platform/users", icon: Users },
   { label: "Pipeline", href: "/admin/platform/pipeline", icon: Kanban },
   { label: "Branding", href: "/admin/platform/branding", icon: Palette },
-  { label: "Mensagens", href: "/admin/platform/messages", icon: MessageSquare },
+  { label: "Mensagens",     href: "/admin/platform/messages", icon: MessageSquare },
+  { label: "Configurações", href: "/admin/platform/settings", icon: Settings },
 ];
 
 const clientNav: NavItem[] = [

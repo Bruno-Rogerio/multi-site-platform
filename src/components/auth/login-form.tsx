@@ -169,6 +169,9 @@ export function LoginForm() {
         {isLoading ? "Entrando..." : "Entrar"}
       </button>
 
+      <p className="pt-1 text-center text-[11px] text-[var(--platform-text)]/40">
+        Esqueceu a senha? Insira seu email acima e clique:
+      </p>
       <button
         type="button"
         onClick={onForgotPassword}

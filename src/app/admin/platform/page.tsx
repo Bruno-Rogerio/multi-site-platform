@@ -6,81 +6,97 @@ import {
   Shield,
   Clock,
   CreditCard,
-  UserPlus,
+  MessageSquare,
   Kanban,
   Palette,
+  Settings,
   ArrowUpRight,
+  TicketCheck,
 } from "lucide-react";
 
-import { CreateUserForm } from "@/components/admin/create-user-form";
 import { requireUserProfile } from "@/lib/auth/session";
 import { getPlatformBrandingSettings } from "@/lib/platform/settings";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
 
-type MetricCard = {
-  label: string;
-  value: number;
-  hint: string;
-  icon: typeof Globe;
-  color: string;
+const PLAN_LABELS: Record<string, string> = {
+  basico:       "Básico",
+  construir:    "Construir",
+  "premium-full": "Premium",
+  landing:      "Landing",
+  pro:          "Pro",
 };
 
-const quickActions = [
-  { label: "Convidar usuário", href: "#invite", icon: UserPlus },
-  { label: "Ver pipeline", href: "/admin/platform/pipeline", icon: Kanban },
-  { label: "Configurar branding", href: "/admin/platform/branding", icon: Palette },
-];
+const STATUS_LABELS: Record<string, string> = {
+  open:           "Aberto",
+  in_progress:    "Em andamento",
+  waiting_client: "Aguardando",
+  resolved:       "Resolvido",
+};
+
+function formatRelative(dateStr: string): string {
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+  if (diff < 60)    return "agora mesmo";
+  if (diff < 3600)  return `${Math.floor(diff / 60)}min atrás`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h atrás`;
+  return `${Math.floor(diff / 86400)}d atrás`;
+}
 
 export default async function PlatformAdminPage() {
   const profile = await requireUserProfile(["admin"]);
   const supabase = await createSupabaseServerAuthClient();
   const platformBranding = await getPlatformBrandingSettings();
 
-  let metrics: MetricCard[] = [];
-  let recentSites: Array<{ id: string; name: string; domain: string }> = [];
-  let recentDrafts: Array<{ id: string; status: string }> = [];
+  type MetricItem = { label: string; value: number; hint: string; icon: typeof Globe; color: string; bg: string; href: string };
+  let metrics: MetricItem[] = [];
+  let recentSites:   Array<{ id: string; name: string; domain: string; theme_settings: Record<string, unknown> | null; created_at: string }> = [];
+  let recentTickets: Array<{ id: string; subject: string; status: string; created_at: string; sites: { name: string } | null }> = [];
 
   if (supabase) {
     const [
-      sitesCountResult,
-      clientsCountResult,
-      adminsCountResult,
-      draftsCountResult,
-      billingActiveResult,
+      sitesCount,
+      clientsCount,
+      adminsCount,
+      draftsCount,
+      billingCount,
+      ticketsCount,
       recentSitesResult,
-      recentDraftsResult,
+      recentTicketsResult,
     ] = await Promise.all([
       supabase.from("sites").select("id", { count: "exact", head: true }),
       supabase.from("user_profiles").select("id", { count: "exact", head: true }).eq("role", "client"),
       supabase.from("user_profiles").select("id", { count: "exact", head: true }).eq("role", "admin"),
-      supabase
-        .from("onboarding_drafts")
-        .select("id", { count: "exact", head: true })
-        .in("status", ["draft", "checkout_pending"]),
-      supabase
-        .from("billing_profiles")
-        .select("id", { count: "exact", head: true })
-        .eq("billing_status", "active"),
-      supabase.from("sites").select("id,name,domain").order("created_at", { ascending: false }).limit(5),
-      supabase.from("onboarding_drafts").select("id,status").order("created_at", { ascending: false }).limit(5),
+      supabase.from("onboarding_drafts").select("id", { count: "exact", head: true }).in("status", ["draft", "checkout_pending"]),
+      supabase.from("billing_profiles").select("id", { count: "exact", head: true }).eq("billing_status", "active"),
+      supabase.from("support_tickets").select("id", { count: "exact", head: true }).in("status", ["open", "in_progress"]),
+      supabase.from("sites").select("id,name,domain,theme_settings,created_at").order("created_at", { ascending: false }).limit(5),
+      supabase.from("support_tickets").select("id,subject,status,created_at,sites(name)").in("status", ["open", "in_progress"]).order("created_at", { ascending: false }).limit(5),
     ]);
 
     metrics = [
-      { label: "Sites ativos", value: sitesCountResult.count ?? 0, hint: "Tenants cadastrados", icon: Globe, color: "text-blue-400" },
-      { label: "Clientes", value: clientsCountResult.count ?? 0, hint: "Usuários finais", icon: Users, color: "text-emerald-400" },
-      { label: "Admins", value: adminsCountResult.count ?? 0, hint: "Equipe interna", icon: Shield, color: "text-purple-400" },
-      { label: "Onboarding pendente", value: draftsCountResult.count ?? 0, hint: "Draft/checkout pendente", icon: Clock, color: "text-amber-400" },
-      { label: "Assinaturas ativas", value: billingActiveResult.count ?? 0, hint: "billing_status=active", icon: CreditCard, color: "text-cyan-400" },
+      { label: "Sites ativos",         value: sitesCount.count    ?? 0, hint: "Total de tenants",          icon: Globe,         color: "text-blue-400",    bg: "bg-blue-500/10",    href: "/admin/platform/sites" },
+      { label: "Clientes",             value: clientsCount.count  ?? 0, hint: "Usuários finais",           icon: Users,         color: "text-emerald-400", bg: "bg-emerald-500/10", href: "/admin/platform/users" },
+      { label: "Admins",               value: adminsCount.count   ?? 0, hint: "Equipe interna",            icon: Shield,        color: "text-purple-400",  bg: "bg-purple-500/10",  href: "/admin/platform/users" },
+      { label: "Onboarding pendente",  value: draftsCount.count   ?? 0, hint: "Draft / checkout",          icon: Clock,         color: "text-amber-400",   bg: "bg-amber-500/10",   href: "/admin/platform/pipeline" },
+      { label: "Assinaturas ativas",   value: billingCount.count  ?? 0, hint: "billing_status = active",   icon: CreditCard,    color: "text-cyan-400",    bg: "bg-cyan-500/10",    href: "/admin/platform/sites" },
+      { label: "Chamados abertos",     value: ticketsCount.count  ?? 0, hint: "Aberto + Em andamento",     icon: TicketCheck,   color: "text-rose-400",    bg: "bg-rose-500/10",    href: "/admin/platform/messages" },
     ];
 
-    recentSites = recentSitesResult.data ?? [];
-    recentDrafts = recentDraftsResult.data ?? [];
+    recentSites   = (recentSitesResult.data   ?? []) as typeof recentSites;
+    recentTickets = (recentTicketsResult.data  ?? []) as unknown as typeof recentTickets;
   }
+
+  const quickActions = [
+    { label: "Usuários",    href: "/admin/platform/users",    icon: Users },
+    { label: "Pipeline",    href: "/admin/platform/pipeline", icon: Kanban },
+    { label: "Branding",    href: "/admin/platform/branding", icon: Palette },
+    { label: "Mensagens",   href: "/admin/platform/messages", icon: MessageSquare },
+    { label: "Configurações", href: "/admin/platform/settings", icon: Settings },
+  ];
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
       {/* Banner */}
-      {platformBranding.dashboard_banner_url ? (
+      {platformBranding.dashboard_banner_url && (
         <section className="mb-6 overflow-hidden rounded-2xl border border-white/10 bg-[#12182B]">
           <div className="relative h-36 w-full md:h-44">
             <Image
@@ -94,16 +110,14 @@ export default async function PlatformAdminPage() {
             <div className="absolute inset-0 flex items-end p-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#22D3EE]">BuildSphere Ops</p>
-                <p className="mt-1 text-sm text-[var(--platform-text)]/85">
-                  Painel central da operação e crescimento da plataforma.
-                </p>
+                <p className="mt-1 text-sm text-[var(--platform-text)]/85">Painel central da operação e crescimento da plataforma.</p>
               </div>
             </div>
           </div>
         </section>
-      ) : null}
+      )}
 
-      {/* Welcome */}
+      {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[var(--platform-text)]">Painel da plataforma</h1>
         <p className="mt-1 text-sm text-[var(--platform-text)]/60">
@@ -111,110 +125,125 @@ export default async function PlatformAdminPage() {
         </p>
       </div>
 
-      {/* Metrics */}
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-        {metrics.map((metric) => {
-          const Icon = metric.icon;
+      {/* Metrics grid */}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
+        {metrics.map((m) => {
+          const Icon = m.icon;
           return (
-            <article key={metric.label} className="rounded-xl border border-white/10 bg-[#12182B] p-4">
+            <Link
+              key={m.label}
+              href={m.href}
+              className="group rounded-xl border border-white/10 bg-[#12182B] p-4 transition hover:border-white/20 hover:bg-[#12182B]/80"
+            >
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--platform-text)]/60">
-                  {metric.label}
+                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--platform-text)]/50 leading-tight">
+                  {m.label}
                 </p>
-                <Icon size={16} className={metric.color} />
+                <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${m.bg}`}>
+                  <Icon size={14} className={m.color} />
+                </div>
               </div>
-              <p className="mt-2 text-3xl font-bold text-[var(--platform-text)]">{metric.value}</p>
-              <p className="mt-1 text-xs text-[var(--platform-text)]/50">{metric.hint}</p>
-            </article>
+              <p className="mt-3 text-3xl font-bold text-[var(--platform-text)]">{m.value}</p>
+              <p className="mt-1 text-[10px] text-[var(--platform-text)]/40">{m.hint}</p>
+            </Link>
           );
         })}
       </div>
 
       {/* Quick actions */}
-      <div className="mt-6 flex flex-wrap gap-3">
-        {quickActions.map((action) => {
-          const Icon = action.icon;
-          const isAnchor = action.href.startsWith("#");
-          const Component = isAnchor ? "a" : Link;
+      <div className="mt-5 flex flex-wrap gap-2">
+        {quickActions.map((a) => {
+          const Icon = a.icon;
           return (
-            <Component
-              key={action.label}
-              href={action.href}
-              className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#12182B] px-4 py-2.5 text-sm font-medium text-[var(--platform-text)]/80 transition hover:border-[#22D3EE]/30 hover:bg-[#22D3EE]/5 hover:text-[var(--platform-text)]"
+            <Link
+              key={a.label}
+              href={a.href}
+              className="flex items-center gap-2 rounded-xl border border-white/10 bg-[#12182B] px-4 py-2 text-sm font-medium text-[var(--platform-text)]/70 transition hover:border-[#22D3EE]/30 hover:bg-[#22D3EE]/5 hover:text-[var(--platform-text)]"
             >
-              <Icon size={16} className="text-[#22D3EE]" />
-              {action.label}
-              <ArrowUpRight size={14} className="text-[var(--platform-text)]/30" />
-            </Component>
+              <Icon size={15} className="text-[#22D3EE]" />
+              {a.label}
+              <ArrowUpRight size={13} className="text-[var(--platform-text)]/30" />
+            </Link>
           );
         })}
       </div>
 
-      {/* Recent data */}
+      {/* Recent activity */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
+        {/* Recent sites */}
         <section className="rounded-xl border border-white/10 bg-[#12182B] p-5">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-[var(--platform-text)]">Tenants recentes</h2>
-            <Link
-              href="/admin/platform/sites"
-              className="text-xs text-[#22D3EE] hover:underline"
-            >
-              Ver todos
+            <Link href="/admin/platform/sites" className="text-xs text-[#22D3EE] hover:underline">
+              Ver todos →
             </Link>
           </div>
           {recentSites.length === 0 ? (
             <div className="py-8 text-center">
-              <Globe size={32} className="mx-auto text-[var(--platform-text)]/20" />
+              <Globe size={28} className="mx-auto text-[var(--platform-text)]/20" />
               <p className="mt-2 text-xs text-[var(--platform-text)]/40">Nenhum site ainda</p>
             </div>
           ) : (
             <ul className="space-y-2">
-              {recentSites.map((site) => (
-                <li key={site.id} className="rounded-lg border border-white/10 bg-[#0B1020] px-3 py-2.5 text-xs">
-                  <p className="font-semibold text-[var(--platform-text)]">{site.name}</p>
-                  <p className="text-[var(--platform-text)]/60">{site.domain}</p>
-                </li>
-              ))}
+              {recentSites.map((site) => {
+                const selectedPlan = (site.theme_settings as Record<string, unknown> | null)?.selectedPlan as string | undefined;
+                const planLabel = PLAN_LABELS[selectedPlan ?? ""] ?? PLAN_LABELS[site.id] ?? "—";
+                return (
+                  <li key={site.id} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#0B1020] px-3 py-2.5">
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-semibold text-[var(--platform-text)]">{site.name}</p>
+                      <p className="truncate text-[10px] text-[#22D3EE]/70">{site.domain}</p>
+                    </div>
+                    <div className="ml-3 flex shrink-0 flex-col items-end gap-1">
+                      <span className="rounded-full bg-white/[0.06] px-2 py-0.5 text-[9px] font-medium text-[var(--platform-text)]/50">
+                        {planLabel}
+                      </span>
+                      <span className="text-[9px] text-[var(--platform-text)]/30">{formatRelative(site.created_at)}</span>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
 
+        {/* Recent tickets */}
         <section className="rounded-xl border border-white/10 bg-[#12182B] p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[var(--platform-text)]">Onboarding recente</h2>
-            <Link
-              href="/admin/platform/pipeline"
-              className="text-xs text-[#22D3EE] hover:underline"
-            >
-              Ver pipeline
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-[var(--platform-text)]">Chamados abertos</h2>
+            <Link href="/admin/platform/messages" className="text-xs text-[#22D3EE] hover:underline">
+              Ver todos →
             </Link>
           </div>
-          {recentDrafts.length === 0 ? (
+          {recentTickets.length === 0 ? (
             <div className="py-8 text-center">
-              <Clock size={32} className="mx-auto text-[var(--platform-text)]/20" />
-              <p className="mt-2 text-xs text-[var(--platform-text)]/40">Nenhum onboarding pendente</p>
+              <TicketCheck size={28} className="mx-auto text-[var(--platform-text)]/20" />
+              <p className="mt-2 text-xs text-[var(--platform-text)]/40">Nenhum chamado aberto</p>
             </div>
           ) : (
             <ul className="space-y-2">
-              {recentDrafts.map((draft) => (
-                <li key={draft.id} className="rounded-lg border border-white/10 bg-[#0B1020] px-3 py-2.5 text-xs">
-                  <p className="font-semibold uppercase tracking-[0.1em] text-[#22D3EE]">{draft.status}</p>
-                  <p className="text-[var(--platform-text)]/55 truncate">ID: {draft.id.slice(0, 12)}...</p>
+              {recentTickets.map((ticket) => (
+                <li key={ticket.id} className="flex items-center justify-between rounded-lg border border-white/[0.06] bg-[#0B1020] px-3 py-2.5">
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-semibold text-[var(--platform-text)]">{ticket.subject}</p>
+                    <p className="text-[10px] text-[var(--platform-text)]/50">{ticket.sites?.name ?? "—"}</p>
+                  </div>
+                  <div className="ml-3 flex shrink-0 flex-col items-end gap-1">
+                    <span className={`rounded-full px-2 py-0.5 text-[9px] font-medium ${
+                      ticket.status === "open" ? "bg-blue-500/10 text-blue-400" :
+                      ticket.status === "in_progress" ? "bg-violet-500/10 text-violet-400" :
+                      "bg-white/[0.06] text-white/40"
+                    }`}>
+                      {STATUS_LABELS[ticket.status] ?? ticket.status}
+                    </span>
+                    <span className="text-[9px] text-[var(--platform-text)]/30">{formatRelative(ticket.created_at)}</span>
+                  </div>
                 </li>
               ))}
             </ul>
           )}
         </section>
       </div>
-
-      {/* Team management */}
-      <section id="invite" className="mt-6 rounded-xl border border-white/10 bg-[#12182B] p-5">
-        <h2 className="text-sm font-semibold text-[var(--platform-text)]">Convidar admin</h2>
-        <p className="mt-1 text-xs text-[var(--platform-text)]/60">
-          Crie acessos internos para a operação da plataforma.
-        </p>
-        <CreateUserForm sites={[]} mode="internal" />
-      </section>
     </div>
   );
 }
