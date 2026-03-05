@@ -61,6 +61,24 @@ async function handleCheckoutCompleted(session: StripeEvent["data"]["object"]) {
   const admin = createSupabaseAdminClient();
   if (!admin) return;
 
+  // ── Domain change (one-time payment) ──────────────────────────────────────
+  if (session.metadata?.type === "domain_change") {
+    const { site_id, new_domain } = session.metadata;
+    if (site_id && new_domain) {
+      const { error } = await admin
+        .from("sites")
+        .update({ domain: new_domain })
+        .eq("id", site_id);
+      if (error) {
+        console.error("[Stripe Webhook] Erro ao atualizar domínio:", error.message);
+      } else {
+        console.log("[Stripe Webhook] Domínio atualizado:", new_domain, "site:", site_id);
+      }
+    }
+    return;
+  }
+
+  // ── Onboarding checkout ───────────────────────────────────────────────────
   // Preferir site_id da metadata (mais confiável que domain)
   const siteId = session.metadata?.site_id;
   const siteDomain = session.metadata?.site_domain;

@@ -8,6 +8,8 @@ import {
   Sparkles,
   ArrowUpRight,
   Rocket,
+  Crown,
+  Zap,
 } from "lucide-react";
 
 import { DraftCountdown } from "@/components/admin/draft-countdown";
@@ -194,6 +196,35 @@ export default async function ClientAdminPage() {
           </div>
         </div>
       </div>
+
+      {/* Upgrade banner (non-premium) */}
+      {selectedPlan !== "premium-full" && (
+        <Link href="/admin/client/settings?tab=plano" className="group mb-5 block">
+          <div className="flex items-center justify-between gap-4 rounded-2xl border border-amber-400/20 bg-gradient-to-br from-amber-500/5 to-violet-500/5 p-5 transition hover:border-amber-400/30">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)]">
+                <Crown size={18} className="text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[var(--platform-text)]">
+                  Desbloqueie todos os recursos Premium
+                </p>
+                <p className="mt-0.5 flex items-center gap-2 text-xs text-[var(--platform-text)]/50">
+                  <Zap size={11} className="text-emerald-400" />
+                  Acesso imediato
+                  <span className="text-[var(--platform-text)]/30">•</span>
+                  <Sparkles size={11} className="text-amber-400" />
+                  Cobrança na próxima renovação
+                </p>
+              </div>
+            </div>
+            <ArrowUpRight
+              size={18}
+              className="shrink-0 text-[var(--platform-text)]/30 transition group-hover:text-amber-300"
+            />
+          </div>
+        </Link>
+      )}
 
       {/* Quick action cards */}
       <div className="grid gap-4 sm:grid-cols-2">

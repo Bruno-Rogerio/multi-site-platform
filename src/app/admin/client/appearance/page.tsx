@@ -1,3 +1,6 @@
+import Link from "next/link";
+import { Sparkles } from "lucide-react";
+
 import { SiteBrandingEditor } from "@/components/admin/site-branding-editor";
 import { requireUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
@@ -34,6 +37,18 @@ export default async function ClientAppearancePage() {
           Personalize a identidade visual do seu site.
         </p>
       </div>
+
+      {selectedPlan === "basico" && (
+        <Link href="/admin/client/settings?tab=plano" className="mb-6 block">
+          <div className="flex items-center gap-3 rounded-xl border border-amber-400/20 bg-amber-500/5 px-4 py-3 transition hover:border-amber-400/30">
+            <Sparkles size={15} className="shrink-0 text-amber-400" />
+            <p className="text-xs text-amber-300">
+              <strong>Plano Básico:</strong> apenas o logotipo pode ser personalizado.{" "}
+              <span className="underline">Upgrade para desbloquear o editor completo →</span>
+            </p>
+          </div>
+        </Link>
+      )}
 
       <SiteBrandingEditor
         sites={scopedSites}
