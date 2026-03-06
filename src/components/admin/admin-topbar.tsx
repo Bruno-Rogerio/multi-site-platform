@@ -20,8 +20,7 @@ const breadcrumbLabels: Record<string, string> = {
   "/admin/platform/branding": "Branding",
   "/admin/platform/messages": "Mensagens",
   "/admin/client": "Dashboard",
-  "/admin/client/editor": "Editor do site",
-  "/admin/client/appearance": "Aparência",
+  "/admin/client/editor": "Meu site",
   "/admin/client/messages": "Mensagens",
   "/admin/client/settings": "Configurações",
 };

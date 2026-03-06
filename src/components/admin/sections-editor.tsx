@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle, Monitor, X,
-  BookOpen, ImageIcon, CalendarDays,
+  BookOpen, ImageIcon, CalendarDays, ChevronUp, ChevronDown,
 } from "lucide-react";
 
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
@@ -77,6 +77,14 @@ const CHANNEL_ICON: Record<string, string> = {
   whatsapp: "MessageCircle", instagram: "Instagram", email: "Mail", linkedin: "Linkedin", facebook: "Facebook",
 };
 
+const CHANNEL_PREFIX: Record<string, string> = {
+  whatsapp: "wa.me/",
+  instagram: "instagram.com/",
+  facebook: "facebook.com/",
+  linkedin: "linkedin.com/in/",
+  email: "",
+};
+
 function parseSocialLinks(content: Record<string, unknown>): SocialLink[] {
   if (Array.isArray(content.socialLinks) && (content.socialLinks as unknown[]).length > 0) {
     return content.socialLinks as SocialLink[];
@@ -147,6 +155,14 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     [sections, syncedSectionsSnapshot],
   );
   const hasUnsavedChanges = dirtySectionIds.length > 0;
+
+  // Derive defaultSocials from loaded theme for AdminLinkSelect pre-fill
+  const defaultSocials = useMemo<Record<string, string>>(() => {
+    const rawLinks = (siteTheme as Record<string, unknown> | null)?.socialLinks;
+    if (!Array.isArray(rawLinks)) return {};
+    const links = rawLinks as SocialLink[];
+    return Object.fromEntries(links.map((l) => [l.type, getChannelDisplayValue(links, l.type)]));
+  }, [siteTheme]);
 
   /* ─── API functions (unchanged logic) ─── */
 
@@ -260,6 +276,37 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     }
   }
 
+  async function handleReorder(sectionId: string, direction: "up" | "down") {
+    const sorted = [...sections].sort((a, b) => a.order - b.order);
+    const idx = sorted.findIndex((s) => s.id === sectionId);
+    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= sorted.length) return;
+    const a = sorted[idx];
+    const b = sorted[swapIdx];
+    setState("saving");
+    try {
+      await Promise.all([
+        fetch(`/api/admin/sections?siteId=${encodeURIComponent(selectedSiteId)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sectionId: a.id, order: b.order, variant: a.variant ?? "default", content: a.content }),
+        }),
+        fetch(`/api/admin/sections?siteId=${encodeURIComponent(selectedSiteId)}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sectionId: b.id, order: a.order, variant: b.variant ?? "default", content: b.content }),
+        }),
+      ]);
+      setSections((prev) =>
+        prev.map((s) => s.id === a.id ? { ...s, order: b.order } : s.id === b.id ? { ...s, order: a.order } : s),
+      );
+    } catch {
+      setStatus({ type: "error", message: "Erro ao reordenar seções." });
+    } finally {
+      setState("idle");
+    }
+  }
+
   async function saveAllSections() {
     const dirty = sections.filter((s) => dirtySectionIds.includes(s.id));
     if (dirty.length === 0) { setStatus({ type: "success", message: "Sem alterações pendentes." }); return; }
@@ -310,6 +357,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
               value={asString(section.content.ctaHref)}
               onChange={(url) => updateContent(section.id, "ctaHref", url)}
               placeholder="Escolha o destino do botão"
+              defaultSocials={defaultSocials}
             />
           </div>
         </div>
@@ -470,6 +518,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
               <AdminLinkSelect
                 value={asString(section.content.buttonHref)}
                 onChange={(url) => updateContent(section.id, "buttonHref", url)}
+                defaultSocials={defaultSocials}
               />
             </div>
           </div>
@@ -479,6 +528,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
               <AdminLinkSelect
                 value={asString(section.content.secondaryHref)}
                 onChange={(url) => updateContent(section.id, "secondaryHref", url)}
+                defaultSocials={defaultSocials}
               />
             </div>
           </div>
@@ -583,17 +633,28 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
             Preencha os canais que deseja exibir. Deixe em branco para ocultar.
           </p>
           <div className="space-y-2">
-            {CHANNEL_DEFS.map(({ type, label, placeholder }) => (
-              <div key={type} className="flex items-center gap-2">
-                <span className="w-[78px] shrink-0 text-xs text-[var(--platform-text)]/60">{label}</span>
-                <input
-                  value={getChannelDisplayValue(links, type)}
-                  placeholder={placeholder}
-                  onChange={(e) => updateChannel(type, e.target.value)}
-                  className="flex-1 rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
-                />
-              </div>
-            ))}
+            {CHANNEL_DEFS.map(({ type, label, placeholder }) => {
+              const prefix = CHANNEL_PREFIX[type] ?? "";
+              return (
+                <div key={type} className="flex items-center gap-2">
+                  <span className="w-[78px] shrink-0 text-xs text-[var(--platform-text)]/60">{label}</span>
+                  <div className="relative flex-1">
+                    {prefix && (
+                      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 select-none text-xs text-[var(--platform-text)]/40">
+                        {prefix}
+                      </span>
+                    )}
+                    <input
+                      value={getChannelDisplayValue(links, type)}
+                      placeholder={placeholder}
+                      onChange={(e) => updateChannel(type, e.target.value)}
+                      className="w-full rounded-xl border border-white/15 bg-[#0B1020] py-2 pr-3 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]"
+                      style={{ paddingLeft: prefix ? `${prefix.length * 7 + 12}px` : "12px" }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -1062,7 +1123,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_1.1fr] xl:items-start">
         <div className="space-y-4">
-          {sections.map((section) => {
+          {[...sections].sort((a, b) => a.order - b.order).map((section, index, sortedArr) => {
             const meta = SECTION_META[section.type] ?? { label: section.type, Icon: Layout };
             const SectionIcon = meta.Icon;
             const isDirty = dirtySectionIds.includes(section.id);
@@ -1081,6 +1142,29 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                 {/* Section header */}
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2.5">
+                    {/* Reorder buttons (client only) */}
+                    {isClient && (
+                      <div className="flex flex-col gap-0.5">
+                        <button
+                          type="button"
+                          disabled={index === 0 || state === "saving"}
+                          onClick={() => void handleReorder(section.id, "up")}
+                          className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
+                          title="Mover para cima"
+                        >
+                          <ChevronUp size={12} />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={index === sortedArr.length - 1 || state === "saving"}
+                          onClick={() => void handleReorder(section.id, "down")}
+                          className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
+                          title="Mover para baixo"
+                        >
+                          <ChevronDown size={12} />
+                        </button>
+                      </div>
+                    )}
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#22D3EE]/10">
                       <SectionIcon size={15} className="text-[#22D3EE]" />
                     </div>

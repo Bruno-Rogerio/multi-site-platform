@@ -12,7 +12,6 @@ import {
   Kanban,
   Palette,
   PenTool,
-  Paintbrush,
   MessageSquare,
   Settings,
   ChevronLeft,
@@ -41,8 +40,7 @@ const platformNav: NavItem[] = [
 
 const clientNav: NavItem[] = [
   { label: "Dashboard", href: "/admin/client", icon: LayoutDashboard },
-  { label: "Editor do site", href: "/admin/client/editor", icon: PenTool },
-  { label: "Aparência", href: "/admin/client/appearance", icon: Paintbrush },
+  { label: "Meu site", href: "/admin/client/editor", icon: PenTool },
   { label: "Mensagens", href: "/admin/client/messages", icon: MessageSquare },
   { label: "Configurações", href: "/admin/client/settings", icon: Settings },
 ];

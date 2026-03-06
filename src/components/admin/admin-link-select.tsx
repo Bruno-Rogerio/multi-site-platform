@@ -33,12 +33,14 @@ interface AdminLinkSelectProps {
   value: string;
   onChange: (url: string) => void;
   placeholder?: string;
+  defaultSocials?: Record<string, string>;
 }
 
 export function AdminLinkSelect({
   value,
   onChange,
   placeholder = "Escolha o destino do link",
+  defaultSocials,
 }: AdminLinkSelectProps) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<"select" | "social-input" | "custom">("select");
@@ -82,11 +84,12 @@ export function AdminLinkSelect({
 
   function handleSocialSelect(opt: OptionItem) {
     setSocialType(opt.value);
-    // Pre-fill from current value if it matches
-    const existing = opt.prefix && value?.startsWith(opt.prefix)
+    // Pre-fill from current value, or from defaultSocials if available
+    const existingFromValue = opt.prefix && value?.startsWith(opt.prefix)
       ? value.replace(opt.prefix, "")
       : "";
-    setSocialInput(existing);
+    const existingFromDefaults = defaultSocials?.[opt.value] ?? "";
+    setSocialInput(existingFromValue || existingFromDefaults);
     setMode("social-input");
   }
 

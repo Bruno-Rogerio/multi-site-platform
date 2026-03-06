@@ -210,6 +210,21 @@ export async function PATCH(request: Request) {
     );
   }
 
+  // Sync socialLinks to theme_settings when the contact section is saved
+  if (data.type === "contact" && Array.isArray(body.content.socialLinks)) {
+    const { data: siteData } = await homePage.supabase
+      .from("sites")
+      .select("theme_settings")
+      .eq("id", siteId)
+      .maybeSingle();
+
+    const currentSettings = (siteData?.theme_settings as Record<string, unknown>) ?? {};
+    await homePage.supabase
+      .from("sites")
+      .update({ theme_settings: { ...currentSettings, socialLinks: body.content.socialLinks } })
+      .eq("id", siteId);
+  }
+
   return NextResponse.json({
     ok: true,
     section: {

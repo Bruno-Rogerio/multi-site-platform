@@ -1,7 +1,6 @@
 import Link from "next/link";
 import {
   PenTool,
-  Paintbrush,
   Settings,
   ExternalLink,
   Globe,
@@ -118,22 +117,13 @@ export default async function ClientAdminPage() {
   /* ── ACTIVE STATE ────────────────────────────────── */
   const actions = [
     {
-      label: "Editar conteúdo",
-      description: "Textos, imagens e seções",
+      label: "Meu site",
+      description: "Conteúdo, aparência e canais de contato",
       href: "/admin/client/editor",
       icon: PenTool,
       iconBg: "bg-[#3B82F6]/10",
       iconColor: "text-[#3B82F6]",
       gradientFrom: "from-[#3B82F6]/10",
-    },
-    {
-      label: "Aparência",
-      description: "Cores, fontes e estilo visual",
-      href: "/admin/client/appearance",
-      icon: Paintbrush,
-      iconBg: "bg-[#7C5CFF]/10",
-      iconColor: "text-[#7C5CFF]",
-      gradientFrom: "from-[#7C5CFF]/10",
     },
     {
       label: "Configurações",
