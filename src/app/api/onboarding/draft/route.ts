@@ -43,6 +43,7 @@ type OnboardingDraftPayload = {
   ctaConfig?: Partial<Record<CtaTypeId, { label: string; url: string }>>;
   selectedCtaTypes?: CtaTypeId[];
   floatingCtaEnabled?: boolean;
+  floatingCtaChannels?: string[];
 };
 
 function normalizeSubdomain(input: string): string {
@@ -448,9 +449,15 @@ export async function POST(request: Request) {
   (themeSettings as Record<string, unknown>).footerText = content.footerText?.trim() || "";
   (themeSettings as Record<string, unknown>).whatsappUrl = whatsappUrl;
 
-  // Floating contact buttons — built from contactSelectedLinks (max 2 channels user chose)
+  // Save all configured social links so admin panel can reference them
+  (themeSettings as Record<string, unknown>).socialLinks = socialLinks;
+
+  // Floating contact buttons — prefer explicit floatingCtaChannels, fall back to contactSelectedLinks
+  const floatingChannels = payload.floatingCtaChannels;
   const floatingLinksData =
-    contactSelectedLinks && contactSelectedLinks.length > 0
+    floatingChannels && floatingChannels.length > 0
+      ? socialLinks.filter((l: { type: string }) => floatingChannels.includes(l.type))
+      : contactSelectedLinks && contactSelectedLinks.length > 0
       ? socialLinks.filter((l: { type: string }) => contactSelectedLinks.includes(l.type))
       : whatsappUrl
       ? [{ type: "whatsapp", url: whatsappUrl, icon: "MessageCircle", label: "WhatsApp" }]

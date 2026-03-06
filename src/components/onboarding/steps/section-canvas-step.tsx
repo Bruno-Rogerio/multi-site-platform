@@ -279,7 +279,7 @@ function AddSectionPopup({
 
 function ContactChannelsCard() {
   const { state, dispatch } = useWizard();
-  const { selectedCtaTypes, ctaConfig, floatingCtaEnabled } = state;
+  const { selectedCtaTypes, ctaConfig, floatingCtaEnabled, floatingCtaChannels } = state;
 
   function handleToggle(id: CtaTypeId) {
     dispatch({ type: "TOGGLE_CTA_TYPE", ctaTypeId: id });
@@ -344,7 +344,7 @@ function ContactChannelsCard() {
 
       {/* URL inputs for selected channels */}
       {selectedCtaTypes.length > 0 && (
-        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+        <div className="mt-4 space-y-2.5">
           {selectedCtaTypes.map(ctaId => {
             const ctaType = ctaTypes.find(c => c.id === ctaId);
             if (!ctaType) return null;
@@ -352,18 +352,66 @@ function ContactChannelsCard() {
             const currentValue = ctaConfig[ctaId]?.url ?? "";
 
             return (
-              <div key={ctaId} className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+              <div key={ctaId} className="flex items-center gap-2">
                 {Icon && <Icon size={14} className="shrink-0 text-[#22D3EE]" />}
-                <input
-                  type="text"
-                  value={currentValue}
-                  onChange={e => handleUrlChange(ctaId, e.target.value)}
-                  placeholder={ctaType.placeholder}
-                  className="min-w-0 flex-1 bg-transparent text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:outline-none"
-                />
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-[var(--platform-text)]/40 pointer-events-none select-none">
+                    {ctaType.urlPrefix}
+                  </span>
+                  <input
+                    type="text"
+                    value={currentValue}
+                    onChange={e => handleUrlChange(ctaId, e.target.value)}
+                    placeholder={ctaType.placeholder}
+                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] py-2 pr-3 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                    style={{ paddingLeft: `${ctaType.urlPrefix.length * 7 + 16}px` }}
+                  />
+                </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Floating channel selector */}
+      {floatingCtaEnabled && selectedCtaTypes.length > 0 && (
+        <div className="mt-3 border-t border-white/10 pt-3">
+          <p className="mb-2 text-xs text-[var(--platform-text)]/50">
+            Canais no botão flutuante ({floatingCtaChannels.length}/2)
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {selectedCtaTypes.map(ctaId => {
+              const def = ctaTypes.find(c => c.id === ctaId);
+              if (!def) return null;
+              const isInFloating = floatingCtaChannels.includes(ctaId);
+              const canAdd = isInFloating || floatingCtaChannels.length < 2;
+              const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[def.icon];
+              return (
+                <button
+                  key={ctaId}
+                  type="button"
+                  onClick={() => {
+                    if (isInFloating) {
+                      dispatch({ type: "SET_FLOATING_CTA_CHANNELS", channels: floatingCtaChannels.filter(id => id !== ctaId) });
+                    } else if (canAdd) {
+                      dispatch({ type: "SET_FLOATING_CTA_CHANNELS", channels: [...floatingCtaChannels, ctaId] });
+                    }
+                  }}
+                  className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition ${
+                    isInFloating
+                      ? "border-[#22D3EE]/50 bg-[#22D3EE]/10 text-[#22D3EE]"
+                      : canAdd
+                      ? "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                      : "border-white/5 text-[var(--platform-text)]/30 cursor-not-allowed"
+                  }`}
+                >
+                  {Icon && <Icon size={12} />}
+                  {def.label}
+                  {isInFloating && <Check size={10} />}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

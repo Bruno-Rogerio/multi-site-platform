@@ -96,7 +96,7 @@ export function SiteBrandingEditor({
   defaultSiteId,
   plan = "basico",
 }: SiteBrandingEditorProps) {
-  const isFullEditor = plan === "premium";
+  const isFullEditor = plan !== "basico";
 
   const [selectedSiteId, setSelectedSiteId] = useState(defaultSiteId ?? "");
   const [themeSettings, setThemeSettings] = useState<ThemeSettings>({});

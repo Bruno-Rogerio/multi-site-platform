@@ -102,6 +102,7 @@ export function CheckoutStep() {
           ctaConfig: state.ctaConfig,
           selectedCtaTypes: state.selectedCtaTypes,
           floatingCtaEnabled: state.floatingCtaEnabled,
+          floatingCtaChannels: state.floatingCtaChannels,
         };
 
       const draftResponse = await fetch("/api/onboarding/draft", {

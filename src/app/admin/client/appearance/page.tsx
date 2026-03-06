@@ -2,8 +2,16 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
 import { SiteBrandingEditor } from "@/components/admin/site-branding-editor";
+import { FloatingButtonsEditor } from "@/components/admin/floating-buttons-editor";
 import { requireUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
+
+type FloatingLink = {
+  type: string;
+  url: string;
+  icon: string;
+  label: string;
+};
 
 type SiteRow = {
   id: string;
@@ -28,6 +36,10 @@ export default async function ClientAppearancePage() {
 
   const selectedPlan = (site?.theme_settings?.selectedPlan as string) ?? "basico";
   const scopedSites = site ? [{ id: site.id, name: site.name, domain: site.domain }] : [];
+
+  const floatingButtonsEnabled = (site?.theme_settings?.floatingButtonsEnabled as boolean) ?? false;
+  const floatingLinks = (site?.theme_settings?.floatingLinks as FloatingLink[]) ?? [];
+  const allSocialLinks = (site?.theme_settings?.socialLinks as FloatingLink[]) ?? [];
 
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-8">
@@ -55,6 +67,17 @@ export default async function ClientAppearancePage() {
         defaultSiteId={profile.site_id ?? scopedSites[0]?.id ?? null}
         plan={selectedPlan}
       />
+
+      {allSocialLinks.length > 0 && site && (
+        <div className="mt-6">
+          <FloatingButtonsEditor
+            siteId={site.id}
+            enabled={floatingButtonsEnabled}
+            floatingLinks={floatingLinks}
+            socialLinks={allSocialLinks}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function FinalizeStep() {
     fontFamily, heroVariant, servicesVariant, ctaVariant, motionStyle,
     headerStyle, dividerStyle, buttonStyle, content, serviceCards,
     heroImage, logoUrl, addonsSelected, ctaConfig, selectedCtaTypes,
-    contactSelectedLinks, enabledSections, floatingCtaEnabled,
+    contactSelectedLinks, enabledSections, floatingCtaEnabled, floatingCtaChannels,
   } = state;
 
   const [phase, setPhase] = useState<Phase>("summary");
@@ -159,6 +159,7 @@ export function FinalizeStep() {
       ctaConfig,
       selectedCtaTypes,
       floatingCtaEnabled,
+      floatingCtaChannels,
       enabledSections,
     };
 
