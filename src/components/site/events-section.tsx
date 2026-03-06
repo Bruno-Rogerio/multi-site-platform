@@ -14,6 +14,8 @@ type EventsSectionProps = {
   title?: string;
   subtitle?: string;
   events?: EventItem[];
+  maxItems?: number;
+  viewAllHref?: string;
 };
 
 function formatDate(dateStr: string): string {
@@ -44,8 +46,19 @@ export function EventsSection({
   title = "Eventos",
   subtitle,
   events = [],
+  maxItems,
+  viewAllHref,
 }: EventsSectionProps) {
-  if (events.length === 0) return null;
+  // Quando maxItems definido: mostrar só próximos eventos, ordenados por data
+  const displayEvents = maxItems
+    ? [...events]
+        .filter((e) => isFuture(e.date))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .slice(0, maxItems)
+    : events;
+
+  if (displayEvents.length === 0 && !maxItems) return null;
+  if (displayEvents.length === 0 && maxItems) return null;
 
   return (
     <section id="events" className="py-16 px-4 sm:px-6 lg:px-8">
@@ -76,7 +89,7 @@ export function EventsSection({
             style={{ backgroundColor: "var(--site-border)" }}
           />
 
-          {events.map((event, i) => {
+          {displayEvents.map((event, i) => {
             const upcoming = isFuture(event.date);
             return (
               <div
@@ -174,6 +187,18 @@ export function EventsSection({
             );
           })}
         </div>
+
+        {viewAllHref && (
+          <div className="mt-8 text-center">
+            <a
+              href={viewAllHref}
+              className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold transition hover:opacity-80"
+              style={{ backgroundColor: "var(--site-primary)", color: "#fff" }}
+            >
+              Ver todos os eventos →
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );

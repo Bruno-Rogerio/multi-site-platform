@@ -15,6 +15,7 @@ type SectionRendererProps = {
   section: Section;
   site: Site;
   buttonStyleClassName: string;
+  maxEventsPreview?: number;
 };
 
 function asString(value: unknown, fallback = ""): string {
@@ -125,6 +126,7 @@ export function SectionRenderer({
   section,
   site,
   buttonStyleClassName,
+  maxEventsPreview,
 }: SectionRendererProps) {
   const variant = section.variant ?? "default";
   const cardRadius = "calc(var(--site-radius, 12px) * 0.67)";
@@ -1622,7 +1624,15 @@ export function SectionRenderer({
     const events = Array.isArray(section.content.events)
       ? (section.content.events as Array<{ title: string; date: string; time?: string; location?: string; description?: string }>)
       : [];
-    return <EventsSection title={title} subtitle={subtitle} events={events} />;
+    return (
+      <EventsSection
+        title={title}
+        subtitle={subtitle}
+        events={events}
+        maxItems={maxEventsPreview}
+        viewAllHref={maxEventsPreview ? "/agenda" : undefined}
+      />
+    );
   }
 
   return null;

@@ -39,7 +39,9 @@ export default async function ClientAppearancePage() {
 
   const floatingButtonsEnabled = (site?.theme_settings?.floatingButtonsEnabled as boolean) ?? false;
   const floatingLinks = (site?.theme_settings?.floatingLinks as FloatingLink[]) ?? [];
-  const allSocialLinks = (site?.theme_settings?.socialLinks as FloatingLink[]) ?? [];
+  // socialLinks é salvo pelo draft moderno; fallback para floatingLinks em sites antigos
+  const socialLinksFromSettings = (site?.theme_settings?.socialLinks as FloatingLink[]) ?? [];
+  const allSocialLinks = socialLinksFromSettings.length > 0 ? socialLinksFromSettings : floatingLinks;
 
   return (
     <div className="mx-auto w-full max-w-4xl px-6 py-8">
@@ -68,7 +70,7 @@ export default async function ClientAppearancePage() {
         plan={selectedPlan}
       />
 
-      {allSocialLinks.length > 0 && site && (
+      {site && (
         <div className="mt-6">
           <FloatingButtonsEditor
             siteId={site.id}

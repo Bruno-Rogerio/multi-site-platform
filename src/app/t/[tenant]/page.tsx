@@ -105,6 +105,7 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
               section={section}
               site={site}
               buttonStyleClassName={buttonStyleClassName}
+              maxEventsPreview={3}
             />
           </AnimatedSection>
         </div>
