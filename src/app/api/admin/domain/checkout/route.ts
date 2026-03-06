@@ -68,6 +68,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Subdomínio já em uso. Escolha outro." }, { status: 400 });
   }
 
+  // ── BYPASS (somente dev/teste) ──────────────────────────────
+  if (process.env.BYPASS_PAYMENT === "true") {
+    await supabase.from("sites").update({ domain: newDomain }).eq("id", profile.site_id);
+    const origin = new URL(request.url).origin;
+    return NextResponse.json({
+      redirectUrl: `${origin}/admin/client/settings?tab=dominio&success=1`,
+    });
+  }
+  // ── FIM BYPASS ───────────────────────────────────────────────
+
   // Stripe
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeKey) {

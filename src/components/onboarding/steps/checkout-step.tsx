@@ -20,7 +20,7 @@ import { validateEmail, validatePassword, validateDocument } from "@/lib/onboard
 
 export function CheckoutStep() {
   const { state, dispatch, monthlyTotal } = useWizard();
-  const { selectedPlan, addonsSelected, businessName, preferredSubdomain, ownerName, ownerEmail, ownerPassword, ownerDocument } = state;
+  const { selectedPlan, addonsSelected, businessName, preferredSubdomain, ownerName, ownerEmail, ownerPassword, ownerDocument, ownerLegalName, ownerAddress, ownerPostalCode, ownerCity, ownerState } = state;
 
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
@@ -133,6 +133,11 @@ export function CheckoutStep() {
           email: ownerEmail,
           password: ownerPassword,
           addonsSelected,
+          legalName: ownerLegalName || undefined,
+          address: ownerAddress || undefined,
+          postalCode: ownerPostalCode || undefined,
+          city: ownerCity || undefined,
+          state: ownerState || undefined,
         }),
       });
 
@@ -263,6 +268,78 @@ export function CheckoutStep() {
                 {ownerDocument && !documentValid.valid && "error" in documentValid && (
                   <p className="mt-1 text-xs text-red-400">{documentValid.error}</p>
                 )}
+              </div>
+            </div>
+          </div>
+
+          {/* Fiscal data (optional) */}
+          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+            <h3 className="text-sm font-semibold text-[var(--platform-text)] mb-1">
+              Dados para nota fiscal
+              <span className="ml-2 text-[10px] font-normal text-[var(--platform-text)]/40 uppercase tracking-wide">(opcional)</span>
+            </h3>
+            <p className="mb-4 text-xs text-[var(--platform-text)]/50">
+              Necessário para emissão de NF. Pode ser preenchido ou atualizado nas configurações.
+            </p>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-medium text-[var(--platform-text)]/60">
+                  Razão social / Nome completo para NF
+                </label>
+                <input
+                  type="text"
+                  value={ownerLegalName}
+                  onChange={(e) => handleChange("ownerLegalName", e.target.value)}
+                  placeholder="Ex: João Silva ou Empresa LTDA"
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-[var(--platform-text)]/60">CEP</label>
+                  <input
+                    type="text"
+                    value={ownerPostalCode}
+                    onChange={(e) => handleChange("ownerPostalCode", e.target.value.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").slice(0, 9))}
+                    placeholder="00000-000"
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[var(--platform-text)]/60">UF</label>
+                  <input
+                    type="text"
+                    value={ownerState}
+                    onChange={(e) => handleChange("ownerState", e.target.value.toUpperCase().slice(0, 2))}
+                    placeholder="SP"
+                    maxLength={2}
+                    className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[var(--platform-text)]/60">Endereço</label>
+                <input
+                  type="text"
+                  value={ownerAddress}
+                  onChange={(e) => handleChange("ownerAddress", e.target.value)}
+                  placeholder="Rua, número, complemento"
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-[var(--platform-text)]/60">Cidade</label>
+                <input
+                  type="text"
+                  value={ownerCity}
+                  onChange={(e) => handleChange("ownerCity", e.target.value)}
+                  placeholder="São Paulo"
+                  className="mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
               </div>
             </div>
           </div>

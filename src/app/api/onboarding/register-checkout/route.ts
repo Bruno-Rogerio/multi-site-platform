@@ -23,6 +23,11 @@ type RegisterCheckoutPayload = {
   email: string;
   password: string;
   addonsSelected?: string[];
+  legalName?: string;
+  address?: string;
+  postalCode?: string;
+  city?: string;
+  state?: string;
 };
 
 function normalizeDocument(value: string): string {
@@ -284,6 +289,11 @@ export async function POST(request: Request) {
         stripe_customer_id: "bypass_dev",
         billing_status: "active",
         monthly_amount: monthlyAmount,
+        legal_name: payload.legalName || null,
+        address: payload.address || null,
+        postal_code: payload.postalCode || null,
+        city: payload.city || null,
+        state: payload.state || null,
       },
       { onConflict: "user_id" },
     );
@@ -333,6 +343,11 @@ export async function POST(request: Request) {
       stripe_customer_id: customerId,
       billing_status: "checkout_pending",
       monthly_amount: monthlyAmount,
+      legal_name: payload.legalName || null,
+      address: payload.address || null,
+      postal_code: payload.postalCode || null,
+      city: payload.city || null,
+      state: payload.state || null,
     },
     { onConflict: "user_id" },
   );

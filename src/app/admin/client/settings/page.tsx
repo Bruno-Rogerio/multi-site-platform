@@ -10,6 +10,14 @@ type SiteRow = {
   theme_settings: Record<string, unknown> | null;
 };
 
+type BillingRow = {
+  legal_name: string | null;
+  address: string | null;
+  postal_code: string | null;
+  city: string | null;
+  state: string | null;
+};
+
 type Props = {
   searchParams: Promise<{ tab?: string; success?: string }>;
 };
@@ -28,13 +36,22 @@ export default async function ClientSettingsPage({ searchParams }: Props) {
   const params = await searchParams;
 
   let site: SiteRow | null = null;
+  let billing: BillingRow | null = null;
   if (supabase && profile.site_id) {
-    const { data } = await supabase
-      .from("sites")
-      .select("id,name,domain,plan,theme_settings")
-      .eq("id", profile.site_id)
-      .maybeSingle<SiteRow>();
-    site = data;
+    const [siteResult, billingResult] = await Promise.all([
+      supabase
+        .from("sites")
+        .select("id,name,domain,plan,theme_settings")
+        .eq("id", profile.site_id)
+        .maybeSingle<SiteRow>(),
+      supabase
+        .from("billing_profiles")
+        .select("legal_name,address,postal_code,city,state")
+        .eq("site_id", profile.site_id)
+        .maybeSingle<BillingRow>(),
+    ]);
+    site = siteResult.data;
+    billing = billingResult.data;
   }
 
   const selectedPlan = (site?.theme_settings?.selectedPlan as string) ?? "basico";
@@ -60,6 +77,7 @@ export default async function ClientSettingsPage({ searchParams }: Props) {
           themeSettings={site.theme_settings ?? {}}
           initialTab={initialTab}
           domainSuccess={domainSuccess}
+          billingProfile={billing ?? undefined}
         />
       ) : (
         <div className="rounded-xl border border-white/10 bg-[#12182B] p-8 text-center">

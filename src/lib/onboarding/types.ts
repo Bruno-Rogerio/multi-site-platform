@@ -98,6 +98,11 @@ export type WizardState = {
   ownerEmail: string;
   ownerPassword: string;
   ownerPasswordConfirm: string;
+  ownerLegalName: string;
+  ownerAddress: string;
+  ownerPostalCode: string;
+  ownerCity: string;
+  ownerState: string;
 
   // Lead capture
   leadId: string;

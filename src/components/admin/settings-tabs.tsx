@@ -9,6 +9,14 @@ import { PlanUpgradeSection } from "@/components/admin/plan-upgrade-section";
 
 type Tab = "conta" | "dominio" | "plano";
 
+type BillingProfile = {
+  legal_name: string | null;
+  address: string | null;
+  postal_code: string | null;
+  city: string | null;
+  state: string | null;
+};
+
 type Props = {
   email: string;
   siteName: string;
@@ -18,6 +26,7 @@ type Props = {
   themeSettings: Record<string, unknown>;
   initialTab?: Tab;
   domainSuccess?: boolean;
+  billingProfile?: BillingProfile;
 };
 
 const TABS: { key: Tab; label: string; icon: typeof Settings2 }[] = [
@@ -35,6 +44,7 @@ export function SettingsTabs({
   themeSettings,
   initialTab = "conta",
   domainSuccess = false,
+  billingProfile,
 }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const isPremium = selectedPlan === "premium-full";
@@ -76,6 +86,7 @@ export function SettingsTabs({
           siteId={siteId}
           selectedPlan={selectedPlan}
           themeSettings={themeSettings}
+          billingProfile={billingProfile}
         />
       )}
       {activeTab === "dominio" && (

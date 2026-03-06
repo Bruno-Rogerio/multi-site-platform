@@ -93,6 +93,11 @@ const initialState: WizardState = {
   ownerEmail: "",
   ownerPassword: "",
   ownerPasswordConfirm: "",
+  ownerLegalName: "",
+  ownerAddress: "",
+  ownerPostalCode: "",
+  ownerCity: "",
+  ownerState: "",
 
   // Lead capture
   leadId: "",

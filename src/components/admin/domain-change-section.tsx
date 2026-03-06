@@ -68,13 +68,14 @@ export function DomainChangeSection({ siteId: _siteId, currentDomain, domainSucc
         body: JSON.stringify({ newSubdomain: subdomain.toLowerCase().trim() }),
       });
       const data = await res.json().catch(() => null) as
-        | { checkoutUrl?: string; error?: string }
+        | { checkoutUrl?: string; redirectUrl?: string; error?: string }
         | null;
-      if (!res.ok || !data?.checkoutUrl) {
+      const target = data?.redirectUrl ?? data?.checkoutUrl;
+      if (!res.ok || !target) {
         setError(data?.error ?? "Erro ao criar checkout. Tente novamente.");
         return;
       }
-      window.location.assign(data.checkoutUrl);
+      window.location.assign(target);
     } finally {
       setIsCheckingOut(false);
     }

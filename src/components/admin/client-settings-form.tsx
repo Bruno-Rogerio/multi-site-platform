@@ -1,9 +1,17 @@
 "use client";
 
-import { Globe, Mail, Lock, Building2, MessageCircle, Check, AlertCircle, Search, Eye } from "lucide-react";
+import { Globe, Mail, Lock, Building2, MessageCircle, Check, AlertCircle, Search, Eye, Receipt } from "lucide-react";
 import { useState } from "react";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+
+type BillingProfile = {
+  legal_name: string | null;
+  address: string | null;
+  postal_code: string | null;
+  city: string | null;
+  state: string | null;
+};
 
 type Props = {
   email: string;
@@ -12,12 +20,13 @@ type Props = {
   siteId: string;
   selectedPlan?: string;
   themeSettings?: Record<string, unknown>;
+  billingProfile?: BillingProfile;
 };
 
 type FieldStatus = { type: "success" | "error"; message: string } | null;
 
-export function ClientSettingsForm({ email, siteName, siteDomain, siteId, selectedPlan = "basico", themeSettings = {} }: Props) {
-  const isPremium = selectedPlan === "premium";
+export function ClientSettingsForm({ email, siteName, siteDomain, siteId, selectedPlan = "basico", themeSettings = {}, billingProfile }: Props) {
+  const isPremium = selectedPlan === "premium-full";
 
   /* ── Password ── */
   const [newPassword, setNewPassword] = useState("");
@@ -45,6 +54,15 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId, select
   const [hideBranding, setHideBranding] = useState((themeSettings.hideBranding as boolean) ?? false);
   const [brandingStatus, setBrandingStatus] = useState<FieldStatus>(null);
   const [isSavingBranding, setIsSavingBranding] = useState(false);
+
+  /* ── Fiscal data ── */
+  const [fiscalLegalName, setFiscalLegalName] = useState(billingProfile?.legal_name ?? "");
+  const [fiscalAddress, setFiscalAddress] = useState(billingProfile?.address ?? "");
+  const [fiscalPostalCode, setFiscalPostalCode] = useState(billingProfile?.postal_code ?? "");
+  const [fiscalCity, setFiscalCity] = useState(billingProfile?.city ?? "");
+  const [fiscalState, setFiscalState] = useState(billingProfile?.state ?? "");
+  const [fiscalStatus, setFiscalStatus] = useState<FieldStatus>(null);
+  const [isSavingFiscal, setIsSavingFiscal] = useState(false);
 
   async function onSavePassword() {
     setPasswordStatus(null);
@@ -145,6 +163,29 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId, select
       return;
     }
     setBrandingStatus({ type: "success", message: value ? "Branding removido!" : "Branding reativado." });
+  }
+
+  async function onSaveFiscal() {
+    setFiscalStatus(null);
+    setIsSavingFiscal(true);
+    const res = await fetch("/api/admin/fiscal-profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        legalName: fiscalLegalName.trim(),
+        address: fiscalAddress.trim(),
+        postalCode: fiscalPostalCode.trim(),
+        city: fiscalCity.trim(),
+        state: fiscalState.trim(),
+      }),
+    });
+    const payload = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+    setIsSavingFiscal(false);
+    if (!res.ok) {
+      setFiscalStatus({ type: "error", message: payload?.error ?? "Erro ao salvar." });
+      return;
+    }
+    setFiscalStatus({ type: "success", message: "Dados fiscais atualizados!" });
   }
 
   const whatsappText = encodeURIComponent(
@@ -385,6 +426,103 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId, select
           )}
         </section>
       )}
+
+      {/* ── Fiscal data ── */}
+      <section className="rounded-2xl border border-white/10 bg-[#12182B] p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <Receipt size={16} className="text-[var(--platform-text)]/40" />
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--platform-text)]">Dados fiscais</h2>
+            <p className="text-xs text-[var(--platform-text)]/50">Para emissão de nota fiscal de serviços</p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="fiscal-legal-name">
+              Razão social / Nome completo
+            </label>
+            <input
+              id="fiscal-legal-name"
+              type="text"
+              value={fiscalLegalName}
+              onChange={(e) => setFiscalLegalName(e.target.value)}
+              placeholder="Ex: João Silva ou Empresa LTDA"
+              className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="fiscal-postal">
+                CEP
+              </label>
+              <input
+                id="fiscal-postal"
+                type="text"
+                value={fiscalPostalCode}
+                onChange={(e) => setFiscalPostalCode(e.target.value.replace(/\D/g, "").replace(/^(\d{5})(\d)/, "$1-$2").slice(0, 9))}
+                placeholder="00000-000"
+                className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="fiscal-state">
+                UF
+              </label>
+              <input
+                id="fiscal-state"
+                type="text"
+                value={fiscalState}
+                onChange={(e) => setFiscalState(e.target.value.toUpperCase().slice(0, 2))}
+                placeholder="SP"
+                maxLength={2}
+                className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="fiscal-address">
+              Endereço
+            </label>
+            <input
+              id="fiscal-address"
+              type="text"
+              value={fiscalAddress}
+              onChange={(e) => setFiscalAddress(e.target.value)}
+              placeholder="Rua, número, complemento"
+              className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+            />
+          </div>
+
+          <div>
+            <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60" htmlFor="fiscal-city">
+              Cidade
+            </label>
+            <input
+              id="fiscal-city"
+              type="text"
+              value={fiscalCity}
+              onChange={(e) => setFiscalCity(e.target.value)}
+              placeholder="São Paulo"
+              className="mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] outline-none transition focus:border-[#22D3EE]"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => void onSaveFiscal()}
+            disabled={isSavingFiscal}
+            className="rounded-xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isSavingFiscal ? "Salvando..." : "Salvar dados fiscais"}
+          </button>
+          <StatusHint status={fiscalStatus} />
+        </div>
+      </section>
 
       {/* ── Subdomain ── */}
       <section className="rounded-2xl border border-white/10 bg-[#12182B] p-5">
