@@ -75,9 +75,9 @@ export function SiteShell({ site, children }: SiteShellProps) {
   const navLinks = [
     { href: "#services", label: "Serviços" },
     { href: "#about", label: "Sobre" },
-    ...(hasBlog ? [{ href: "#blog", label: "Blog" }] : []),
-    ...(hasEvents ? [{ href: "#events", label: "Agenda" }] : []),
-    ...(hasGallery ? [{ href: "#gallery", label: "Galeria" }] : []),
+    ...(hasBlog ? [{ href: "/blog", label: "Blog" }] : []),
+    ...(hasEvents ? [{ href: "/agenda", label: "Agenda" }] : []),
+    ...(hasGallery ? [{ href: "/galeria", label: "Galeria" }] : []),
     ...(hasTestimonials ? [{ href: "#testimonials", label: "Depoimentos" }] : []),
     { href: "#contact", label: "Contato" },
   ];

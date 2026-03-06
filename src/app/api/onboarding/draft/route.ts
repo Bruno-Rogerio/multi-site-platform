@@ -44,6 +44,7 @@ type OnboardingDraftPayload = {
   selectedCtaTypes?: CtaTypeId[];
   floatingCtaEnabled?: boolean;
   floatingCtaChannels?: string[];
+  enabledSections?: string[];
 };
 
 function normalizeSubdomain(input: string): string {
@@ -579,7 +580,68 @@ export async function POST(request: Request) {
     },
   ];
 
-  const { error: sectionsError } = await admin.from("sections").insert(sectionInserts);
+  // Inserir seções extras (blog/gallery/events) antes do contact
+  const rawContent = payload.content as Record<string, unknown> | undefined;
+  const EXTRA_TYPES = ["blog", "gallery", "events"] as const;
+
+  type ExtraInsert = { page_id: string; type: string; variant: string; order: number; content: Record<string, unknown> };
+  const extraInserts: ExtraInsert[] = [];
+
+  for (const sType of (payload.enabledSections ?? [])) {
+    if (!(EXTRA_TYPES as readonly string[]).includes(sType)) continue;
+    if (sType === "blog") {
+      extraInserts.push({
+        page_id: page.id,
+        type: "blog",
+        variant: "default",
+        order: 0, // será recalculado abaixo
+        content: {
+          title: (rawContent?.blogTitle as string) || "Blog",
+          subtitle: "",
+          posts: Array.isArray(rawContent?.blogPosts) ? rawContent.blogPosts : [],
+        },
+      });
+    } else if (sType === "gallery") {
+      extraInserts.push({
+        page_id: page.id,
+        type: "gallery",
+        variant: "default",
+        order: 0,
+        content: {
+          title: (rawContent?.galleryTitle as string) || "Galeria",
+          subtitle: "",
+          images: Array.isArray(rawContent?.galleryImages) ? rawContent.galleryImages : [],
+        },
+      });
+    } else if (sType === "events") {
+      extraInserts.push({
+        page_id: page.id,
+        type: "events",
+        variant: "default",
+        order: 0,
+        content: {
+          title: (rawContent?.eventsTitle as string) || "Agenda",
+          subtitle: "",
+          events: Array.isArray(rawContent?.events) ? rawContent.events : [],
+        },
+      });
+    }
+  }
+
+  // Montar array final: seções existentes (sem contact) + extras + contact
+  const contactSection = sectionInserts.find((s) => s.type === "contact");
+  const baseInserts = sectionInserts.filter((s) => s.type !== "contact");
+  let nextOrder = baseInserts.length + 1;
+  for (const extra of extraInserts) extra.order = nextOrder++;
+  if (contactSection) contactSection.order = nextOrder;
+
+  const allInserts = [
+    ...baseInserts,
+    ...extraInserts,
+    ...(contactSection ? [contactSection] : []),
+  ];
+
+  const { error: sectionsError } = await admin.from("sections").insert(allInserts);
   if (sectionsError) {
     return NextResponse.json(
       { error: "Rascunho criado parcialmente (falha em sections).", details: sectionsError.message },
