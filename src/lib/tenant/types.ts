@@ -43,6 +43,8 @@ export type ThemeSettings = {
   selectedPlan?: string;
   ownerEmail?: string;
   ownerUserId?: string;
+  // Billing / subscription state
+  suspended?: boolean;
 };
 
 export type Section = {

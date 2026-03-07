@@ -79,6 +79,25 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
     }
   }
 
+  // Suspended sites show a generic unavailability page (no billing details exposed)
+  if (site.themeSettings.suspended === true) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8fafc", fontFamily: "-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" }}>
+        <div style={{ textAlign: "center", padding: "48px 24px", maxWidth: 420 }}>
+          <div style={{ width: 64, height: 64, borderRadius: "50%", background: "#e2e8f0", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: 28 }}>
+            ⏸
+          </div>
+          <h1 style={{ margin: "0 0 12px", fontSize: 22, fontWeight: 700, color: "#0f172a" }}>
+            {site.name}
+          </h1>
+          <p style={{ margin: 0, fontSize: 15, color: "#64748b", lineHeight: 1.6 }}>
+            Este site está temporariamente indisponível.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const sectionsToRender = [...site.homePage.sections].sort((a, b) => a.order - b.order);
 
   if (sectionsToRender.length === 0) {

@@ -214,6 +214,145 @@ export async function sendWelcomeEmail(
   await sendEmail(email, "Bem-vindo(a) à BuildSphere! Seu site está pronto.", html);
 }
 
+/* ── Billing / Payments ──────────────────────────────────────────────────── */
+
+/**
+ * Sent right after a successful payment (checkout.session.completed).
+ * Simple receipt — NOT a fiscal document.
+ */
+export async function sendReceiptEmail(
+  email: string,
+  fullName: string,
+  amountBRL: number,
+  planName: string,
+  referenceId: string,
+  paymentDate: string,
+): Promise<void> {
+  const firstName = fullName.trim().split(" ")[0] || "usuário";
+  const dateFormatted = new Date(paymentDate).toLocaleDateString("pt-BR", {
+    day: "2-digit", month: "2-digit", year: "numeric",
+  });
+  const amountFormatted = amountBRL.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 6px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Pagamento confirmado ✓
+    </h1>
+    <p style="margin:0 0 24px;font-size:15px;color:#64748b;line-height:1.6;">
+      Olá, <strong style="color:#1e293b;">${firstName}</strong>! Recebemos seu pagamento. Aqui está o seu comprovante.
+    </p>
+
+    <!-- Receipt box -->
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px;">
+      <tr>
+        <td style="background:#f8fafc;padding:20px 24px;border-bottom:1px solid #e2e8f0;">
+          <p style="margin:0;font-size:13px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;">Valor pago</p>
+          <p style="margin:4px 0 0;font-size:32px;font-weight:800;color:#15803d;">${amountFormatted}</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:0;">
+          <table cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tr>
+              <td style="padding:14px 24px;border-bottom:1px solid #f1f5f9;">
+                <span style="font-size:12px;color:#94a3b8;display:block;">Plano</span>
+                <span style="font-size:14px;font-weight:600;color:#1e293b;">${planName}</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:14px 24px;border-bottom:1px solid #f1f5f9;">
+                <span style="font-size:12px;color:#94a3b8;display:block;">Data</span>
+                <span style="font-size:14px;font-weight:600;color:#1e293b;">${dateFormatted}</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:14px 24px;">
+                <span style="font-size:12px;color:#94a3b8;display:block;">Referência</span>
+                <span style="font-size:14px;font-weight:600;color:#1e293b;font-family:monospace;">#${referenceId}</span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    ${ctaButton("Acessar meu painel", "https://bsph.com.br/admin/client")}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;line-height:1.5;">
+      Este comprovante não é um documento fiscal. Para solicitar nota fiscal, acesse
+      <strong>Configurações → Dados fiscais</strong> no seu painel.
+    </p>
+  `);
+
+  await sendEmail(email, `Comprovante de pagamento — ${amountFormatted} — BuildSphere`, html);
+}
+
+/**
+ * Sent when a subscription is cancelled (customer.subscription.deleted webhook).
+ */
+export async function sendCancellationEmail(
+  email: string,
+  fullName: string,
+  siteDomain: string,
+): Promise<void> {
+  const firstName = fullName.trim().split(" ")[0] || "usuário";
+
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 10px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Assinatura cancelada
+    </h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#64748b;line-height:1.6;">
+      Olá, <strong style="color:#1e293b;">${firstName}</strong>. Sua assinatura BuildSphere foi cancelada
+      e seu site foi temporariamente desativado.
+    </p>
+
+    ${siteDomain ? infoBox("🌐", `Site: <strong>${siteDomain}</strong>`, "#fef2f2", "#fecaca", "#b91c1c") : ""}
+
+    ${infoBox("💡", "Quer reativar? Basta acessar seu painel e escolher um novo plano. Todo o seu conteúdo está preservado.", "#eff6ff", "#bfdbfe", "#1d4ed8")}
+
+    ${ctaButton("Reativar meu site", "https://bsph.com.br/admin/client/settings?tab=plano")}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;line-height:1.5;">
+      Se tiver dúvidas, abra um chamado no painel ou responda este e-mail.
+    </p>
+  `);
+
+  await sendEmail(email, "Sua assinatura BuildSphere foi cancelada", html);
+}
+
+/**
+ * Sent when an invoice payment fails (invoice.payment_failed webhook).
+ */
+export async function sendPaymentFailedEmail(
+  email: string,
+  fullName: string,
+  amountBRL: number,
+): Promise<void> {
+  const firstName = fullName.trim().split(" ")[0] || "usuário";
+  const amountFormatted = amountBRL.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 10px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Falha no pagamento ⚠️
+    </h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#64748b;line-height:1.6;">
+      Olá, <strong style="color:#1e293b;">${firstName}</strong>. Não conseguimos processar o pagamento
+      de <strong>${amountFormatted}</strong> da sua assinatura BuildSphere.
+    </p>
+
+    ${infoBox("⚠️", "Seu site permanece ativo por enquanto. Atualize seu meio de pagamento para evitar a interrupção do serviço.", "#fefce8", "#fde047", "#a16207")}
+
+    ${ctaButton("Atualizar método de pagamento", "https://bsph.com.br/admin/client/settings?tab=plano")}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;line-height:1.5;">
+      Se o pagamento não for regularizado, sua assinatura poderá ser cancelada automaticamente.
+      Em caso de dúvidas, entre em contato com nosso suporte.
+    </p>
+  `);
+
+  await sendEmail(email, "Falha no pagamento — ação necessária — BuildSphere", html);
+}
+
 /* ── Support Tickets ─────────────────────────────────────────────────────── */
 
 const CATEGORY_LABELS: Record<string, string> = {

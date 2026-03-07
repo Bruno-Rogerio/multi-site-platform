@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import {
+  sendWelcomeEmail,
+  sendReceiptEmail,
+  sendCancellationEmail,
+  sendPaymentFailedEmail,
+} from "@/lib/email";
 
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 
@@ -43,21 +49,33 @@ async function verifyStripeSignature(
   return computed === expectedSig;
 }
 
-type StripeEvent = {
+type StripeCheckoutSession = {
   id: string;
-  type: string;
-  data: {
-    object: {
-      id: string;
-      customer: string;
-      subscription?: string;
-      metadata?: Record<string, string>;
-      customer_details?: { email?: string };
-    };
-  };
+  customer: string;
+  subscription?: string;
+  amount_total?: number;
+  metadata?: Record<string, string>;
+  customer_details?: { email?: string; name?: string };
 };
 
-async function handleCheckoutCompleted(session: StripeEvent["data"]["object"]) {
+type StripeSubscription = {
+  id: string;
+  customer: string;
+};
+
+type StripeInvoice = {
+  id: string;
+  customer: string;
+  amount_due: number;
+};
+
+type StripeEvent =
+  | { id: string; type: "checkout.session.completed";     data: { object: StripeCheckoutSession } }
+  | { id: string; type: "customer.subscription.deleted";  data: { object: StripeSubscription } }
+  | { id: string; type: "invoice.payment_failed";         data: { object: StripeInvoice } }
+  | { id: string; type: string;                           data: { object: Record<string, unknown> } };
+
+async function handleCheckoutCompleted(session: StripeCheckoutSession) {
   const admin = createSupabaseAdminClient();
   if (!admin) return;
 
@@ -120,9 +138,27 @@ async function handleCheckoutCompleted(session: StripeEvent["data"]["object"]) {
     return;
   }
 
-  // Atualizar billing_profiles
+  // Atualizar billing_profiles + buscar dados para email
+  let billingFullName = session.customer_details?.name ?? "Cliente";
+  let billingEmail = session.customer_details?.email ?? "";
+  let billingMonthlyAmount = 0;
+
   if (session.customer) {
-    const { error: billingError } = await admin
+    const { data: billing, error: billingError } = await admin
+      .from("billing_profiles")
+      .select("full_name, email, monthly_amount")
+      .eq("stripe_customer_id", session.customer)
+      .maybeSingle();
+
+    if (billingError) {
+      console.error("[Stripe Webhook] Erro ao buscar billing_profiles:", billingError.message);
+    } else if (billing) {
+      billingFullName = billing.full_name ?? billingFullName;
+      billingEmail = billing.email ?? billingEmail;
+      billingMonthlyAmount = billing.monthly_amount ?? 0;
+    }
+
+    const { error: updateError } = await admin
       .from("billing_profiles")
       .update({
         billing_status: "active",
@@ -130,12 +166,99 @@ async function handleCheckoutCompleted(session: StripeEvent["data"]["object"]) {
       })
       .eq("stripe_customer_id", session.customer);
 
-    if (billingError) {
-      console.error("[Stripe Webhook] Erro ao atualizar billing_profiles:", billingError.message);
+    if (updateError) {
+      console.error("[Stripe Webhook] Erro ao atualizar billing_profiles:", updateError.message);
     }
   }
 
   console.log("[Stripe Webhook] Site ativado com sucesso:", site.id);
+
+  // Enviar emails de boas-vindas + recibo
+  if (billingEmail) {
+    const amountBRL = session.amount_total ? session.amount_total / 100 : billingMonthlyAmount;
+    const planName = amountBRL >= 100 ? "Plano Premium Full" : "Plano Básico";
+    const referenceId = session.id.slice(-8).toUpperCase();
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ? `https://${process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN}` : "https://bsph.com.br"}/admin/client`;
+
+    await Promise.all([
+      sendWelcomeEmail(billingEmail, billingFullName, dashboardUrl),
+      sendReceiptEmail(billingEmail, billingFullName, amountBRL, planName, referenceId, new Date().toISOString()),
+    ]);
+  }
+}
+
+async function handleSubscriptionDeleted(subscription: StripeSubscription) {
+  const admin = createSupabaseAdminClient();
+  if (!admin) return;
+
+  // Buscar billing_profile pelo stripe_subscription_id
+  const { data: billing } = await admin
+    .from("billing_profiles")
+    .select("site_id, email, full_name")
+    .eq("stripe_subscription_id", subscription.id)
+    .maybeSingle();
+
+  if (!billing) {
+    console.warn("[Stripe Webhook] billing_profile não encontrado para subscription:", subscription.id);
+    return;
+  }
+
+  // Atualizar status de billing
+  await admin
+    .from("billing_profiles")
+    .update({ billing_status: "canceled" })
+    .eq("stripe_subscription_id", subscription.id);
+
+  // Suspender site
+  const { data: siteData } = await admin
+    .from("sites")
+    .select("theme_settings, domain")
+    .eq("id", billing.site_id)
+    .maybeSingle();
+
+  const currentSettings = (siteData?.theme_settings as Record<string, unknown>) ?? {};
+  await admin
+    .from("sites")
+    .update({ theme_settings: { ...currentSettings, suspended: true } })
+    .eq("id", billing.site_id);
+
+  console.log("[Stripe Webhook] Site suspenso após cancelamento:", billing.site_id);
+
+  // Email de cancelamento
+  if (billing.email) {
+    await sendCancellationEmail(billing.email, billing.full_name ?? "Cliente", siteData?.domain ?? "");
+  }
+}
+
+async function handlePaymentFailed(invoice: StripeInvoice) {
+  const admin = createSupabaseAdminClient();
+  if (!admin) return;
+
+  // Buscar billing_profile pelo stripe_customer_id
+  const { data: billing } = await admin
+    .from("billing_profiles")
+    .select("email, full_name, monthly_amount")
+    .eq("stripe_customer_id", invoice.customer)
+    .maybeSingle();
+
+  if (!billing) {
+    console.warn("[Stripe Webhook] billing_profile não encontrado para customer:", invoice.customer);
+    return;
+  }
+
+  // Marcar como past_due
+  await admin
+    .from("billing_profiles")
+    .update({ billing_status: "past_due" })
+    .eq("stripe_customer_id", invoice.customer);
+
+  console.log("[Stripe Webhook] billing_status atualizado para past_due:", invoice.customer);
+
+  // Email de falha de pagamento
+  if (billing.email) {
+    const amountBRL = invoice.amount_due / 100;
+    await sendPaymentFailedEmail(billing.email, billing.full_name ?? "Cliente", amountBRL);
+  }
 }
 
 export async function POST(request: Request) {
@@ -162,7 +285,13 @@ export async function POST(request: Request) {
 
   switch (event.type) {
     case "checkout.session.completed":
-      await handleCheckoutCompleted(event.data.object);
+      await handleCheckoutCompleted(event.data.object as StripeCheckoutSession);
+      break;
+    case "customer.subscription.deleted":
+      await handleSubscriptionDeleted(event.data.object as StripeSubscription);
+      break;
+    case "invoice.payment_failed":
+      await handlePaymentFailed(event.data.object as StripeInvoice);
       break;
   }
 
