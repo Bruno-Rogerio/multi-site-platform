@@ -16,6 +16,7 @@ export type ProfileResolutionReason =
   | "supabase_missing"
   | "auth_user_error"
   | "no_user"
+  | "email_not_verified"
   | "profile_query_error"
   | "profile_not_found";
 
@@ -43,6 +44,10 @@ export async function getCurrentUserProfileResolution(): Promise<ProfileResoluti
     return { profile: null, reason: "no_user" };
   }
 
+  if (!user.email_confirmed_at) {
+    return { profile: null, reason: "email_not_verified" };
+  }
+
   const { data: profile, error: profileError } = await supabase
     .from("user_profiles")
     .select("id,email,role,site_id")
@@ -67,7 +72,11 @@ export async function getCurrentUserProfile(): Promise<UserProfile | null> {
 
 export async function requireUserProfile(allowedRoles?: AppRole[]) {
   const { profile, reason } = await getCurrentUserProfileResolution();
+
   if (!profile) {
+    if (reason === "email_not_verified") {
+      redirect("/verify-email");
+    }
     redirect(`/login?error=auth_required&reason=${reason}`);
   }
 

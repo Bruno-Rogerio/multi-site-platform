@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 type ContactPayload = {
   siteId: string;
@@ -14,6 +15,13 @@ function isFilledString(value: unknown): value is string {
 }
 
 export async function POST(request: Request) {
+  if (!checkRateLimit(getClientIp(request), "contact", 10, 60 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente novamente mais tarde." },
+      { status: 429 },
+    );
+  }
+
   const body = (await request.json().catch(() => null)) as ContactPayload | null;
 
   if (

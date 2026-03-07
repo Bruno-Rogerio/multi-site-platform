@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendVerificationEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 function getPlatformUrl(request: Request): string {
   const env = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -17,6 +18,13 @@ function getPlatformUrl(request: Request): string {
 }
 
 export async function POST(request: Request) {
+  if (!checkRateLimit(getClientIp(request), "resend-verification", 3, 60 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente novamente mais tarde." },
+      { status: 429 },
+    );
+  }
+
   const admin = createSupabaseAdminClient();
   if (!admin) {
     return NextResponse.json({ error: "Servidor indisponível." }, { status: 500 });

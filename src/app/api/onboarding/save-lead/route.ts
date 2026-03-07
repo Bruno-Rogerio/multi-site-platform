@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { sendLeadConfirmationEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 type SaveLeadPayload = {
   email: string;
@@ -10,6 +11,13 @@ type SaveLeadPayload = {
 };
 
 export async function POST(request: Request) {
+  if (!checkRateLimit(getClientIp(request), "save-lead", 5, 60 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente novamente mais tarde." },
+      { status: 429 },
+    );
+  }
+
   const payload = (await request.json().catch(() => null)) as SaveLeadPayload | null;
 
   if (!payload) {

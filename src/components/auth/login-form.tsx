@@ -81,6 +81,13 @@ export function LoginForm() {
       return;
     }
 
+    // Check if MFA challenge is required (user has TOTP enrolled)
+    const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aalData?.nextLevel === "aal2" && aalData.nextLevel !== aalData.currentLevel) {
+      window.location.assign("/auth/mfa");
+      return;
+    }
+
     window.location.assign("/admin");
   }
 

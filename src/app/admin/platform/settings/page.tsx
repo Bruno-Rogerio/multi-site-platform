@@ -1,8 +1,9 @@
-import { Settings, UserPlus, KeyRound } from "lucide-react";
+import { Settings, UserPlus, KeyRound, ShieldCheck } from "lucide-react";
 
 import { requireUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
 import { CreateUserForm } from "@/components/admin/create-user-form";
+import { MfaEnrollment } from "@/components/admin/mfa-enrollment";
 
 type SiteOption = {
   id: string;
@@ -33,6 +34,22 @@ export default async function PlatformSettingsPage() {
           Gerenciamento de usuários e configurações da plataforma.
         </p>
       </div>
+
+      {/* 2FA / MFA */}
+      <section className="rounded-2xl border border-white/10 bg-[#12182B] p-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/10">
+            <ShieldCheck size={18} className="text-emerald-400" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--platform-text)]">Segurança da conta</h2>
+            <p className="text-xs text-[var(--platform-text)]/50">
+              Configure a autenticação de dois fatores para proteger o acesso de admin.
+            </p>
+          </div>
+        </div>
+        <MfaEnrollment />
+      </section>
 
       {/* Create user */}
       <section className="rounded-2xl border border-white/10 bg-[#12182B] p-6">

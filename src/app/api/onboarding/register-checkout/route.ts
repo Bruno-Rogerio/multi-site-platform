@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
 import { validateDocument } from "@/lib/onboarding/validation";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const BASE_MONTHLY_PRICE = 59.9;
 const ADDON_PRICES: Record<string, number> = {
@@ -136,6 +137,13 @@ async function createStripeCheckoutSession(
 }
 
 export async function POST(request: Request) {
+  if (!checkRateLimit(getClientIp(request), "register-checkout", 3, 60 * 60 * 1000)) {
+    return NextResponse.json(
+      { error: "Muitas tentativas. Tente novamente mais tarde." },
+      { status: 429 },
+    );
+  }
+
   const requestUrl = new URL(request.url);
   const hostname = resolveRequestHostname(
     request.headers.get("x-forwarded-host"),
