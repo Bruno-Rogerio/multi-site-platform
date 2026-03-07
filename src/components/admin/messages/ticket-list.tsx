@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, MessageSquare } from "lucide-react";
+import { Plus, MessageSquare, ShieldAlert } from "lucide-react";
 import { SlaBadge } from "./sla-badge";
 
 export type TicketItem = {
@@ -9,6 +9,7 @@ export type TicketItem = {
   category: string;
   status: string;
   sla_deadline: string;
+  sla_breached?: boolean;
   updated_at: string;
   sites?: { name: string } | null;
   ticket_messages?: { count: number }[];
@@ -123,8 +124,14 @@ export function TicketList({ tickets, selectedId, onSelect, onNewTicket, isAdmin
                       </span>
                     </div>
 
-                    <div className="mt-2">
+                    <div className="mt-2 flex items-center gap-1.5 flex-wrap">
                       <SlaBadge slaDeadline={ticket.sla_deadline} status={ticket.status} />
+                      {ticket.sla_breached && ticket.status !== "resolved" && (
+                        <span className="flex animate-pulse items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-[9px] font-semibold text-red-400">
+                          <ShieldAlert size={9} />
+                          SLA violado
+                        </span>
+                      )}
                     </div>
                   </button>
                 </li>

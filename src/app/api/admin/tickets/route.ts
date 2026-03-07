@@ -8,11 +8,62 @@ import {
 } from "@/lib/email";
 import { createNotificationForMany, getAdminUserIds } from "@/lib/notifications";
 
+// ─── SLA helpers ─────────────────────────────────────────────────────────────
+
+async function lazyUpdateSlaBreached() {
+  const admin = createSupabaseAdminClient();
+  if (!admin) return;
+
+  // Mark past-deadline tickets as breached
+  try {
+    await admin
+      .from("support_tickets")
+      .update({ sla_breached: true })
+      .lt("sla_deadline", new Date().toISOString())
+      .eq("sla_breached", false)
+      .neq("status", "resolved");
+  } catch { /* ignore */ }
+
+  // Send sla_warning notifications for tickets expiring within 2 hours
+  const twoHoursAhead = new Date(Date.now() + 2 * 3_600_000).toISOString();
+
+  const { data: nearDeadline } = await admin
+    .from("support_tickets")
+    .select("id, subject")
+    .gt("sla_deadline", new Date().toISOString())
+    .lt("sla_deadline", twoHoursAhead)
+    .neq("status", "resolved");
+
+  for (const ticket of nearDeadline ?? []) {
+    const { count } = await admin
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("ticket_id", ticket.id)
+      .eq("type", "sla_warning");
+
+    if (!count) {
+      const adminIds = await getAdminUserIds();
+      await createNotificationForMany(
+        adminIds,
+        "sla_warning",
+        "SLA próximo do limite",
+        `Ticket "${ticket.subject}" expira em menos de 2h.`,
+        ticket.id,
+      ).catch(() => {});
+    }
+  }
+}
+
 // ─── GET /api/admin/tickets ──────────────────────────────────────────────────
 export async function GET() {
   const profile = await getCurrentUserProfile();
   if (!profile) {
     return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
+  // Lazy SLA update (fire-and-forget — admins only to avoid double runs)
+  if (profile.role === "admin") {
+    lazyUpdateSlaBreached().catch(() => {});
   }
 
   const supabase = await createSupabaseServerAuthClient();

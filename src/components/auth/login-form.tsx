@@ -21,6 +21,7 @@ const authReasonMessages: Record<string, string> = {
   no_user: "Sessao nao encontrada. Faça login novamente.",
   profile_query_error: "Falha ao carregar perfil do usuario.",
   profile_not_found: "Usuario sem perfil de acesso. Fale com o admin da plataforma.",
+  session_expired: "Sessao encerrada por inatividade. Faca login novamente.",
 };
 
 export function LoginForm() {

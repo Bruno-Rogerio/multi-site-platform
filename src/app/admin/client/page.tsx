@@ -9,11 +9,13 @@ import {
   Rocket,
   Crown,
   Zap,
+  BarChart2,
 } from "lucide-react";
 
 import { DraftCountdown } from "@/components/admin/draft-countdown";
 import { requireUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type SiteRow = {
   id: string;
@@ -53,6 +55,29 @@ export default async function ClientAdminPage() {
   const selectedPlan = (ts.selectedPlan as string) ?? "basico";
   const planInfo = PLAN_LABELS[selectedPlan] ?? PLAN_LABELS.basico;
   const previewExpiresAt = ts.previewExpiresAt as string | undefined;
+
+  // Page view analytics
+  let viewsToday = 0;
+  let viewsWeek = 0;
+  let viewsMonth = 0;
+  if (!isDraft && site?.id) {
+    const adminDb = createSupabaseAdminClient();
+    if (adminDb) {
+      const now = new Date();
+      const startDay = new Date(now); startDay.setHours(0, 0, 0, 0);
+      const startWeek = new Date(now); startWeek.setDate(now.getDate() - 6); startWeek.setHours(0, 0, 0, 0);
+      const startMonth = new Date(now); startMonth.setDate(now.getDate() - 29); startMonth.setHours(0, 0, 0, 0);
+
+      const [r1, r2, r3] = await Promise.all([
+        adminDb.from("page_view_logs").select("id", { count: "exact", head: true }).eq("site_id", site.id).gte("visited_at", startDay.toISOString()),
+        adminDb.from("page_view_logs").select("id", { count: "exact", head: true }).eq("site_id", site.id).gte("visited_at", startWeek.toISOString()),
+        adminDb.from("page_view_logs").select("id", { count: "exact", head: true }).eq("site_id", site.id).gte("visited_at", startMonth.toISOString()),
+      ]);
+      viewsToday = r1.count ?? 0;
+      viewsWeek  = r2.count ?? 0;
+      viewsMonth = r3.count ?? 0;
+    }
+  }
 
   /* ── DRAFT STATE ─────────────────────────────────── */
   if (isDraft) {
@@ -215,6 +240,24 @@ export default async function ClientAdminPage() {
           </div>
         </Link>
       )}
+
+      {/* Analytics cards */}
+      <div className="mb-5 grid grid-cols-3 gap-3">
+        {[
+          { label: "Visitas hoje",       value: viewsToday, period: "nas últimas 24h" },
+          { label: "Visitas esta semana", value: viewsWeek,  period: "últimos 7 dias" },
+          { label: "Visitas este mês",   value: viewsMonth, period: "últimos 30 dias" },
+        ].map((stat) => (
+          <div key={stat.label} className="rounded-2xl border border-white/10 bg-[#12182B] p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <BarChart2 size={14} className="text-[#22D3EE]" />
+              <p className="text-[11px] text-[var(--platform-text)]/50">{stat.label}</p>
+            </div>
+            <p className="text-2xl font-bold text-[var(--platform-text)]">{stat.value.toLocaleString("pt-BR")}</p>
+            <p className="mt-0.5 text-[10px] text-[var(--platform-text)]/35">{stat.period}</p>
+          </div>
+        ))}
+      </div>
 
       {/* Quick action cards */}
       <div className="grid gap-4 sm:grid-cols-2">

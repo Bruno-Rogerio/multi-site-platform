@@ -8,6 +8,7 @@ import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { AdminTopbar } from "@/components/admin/admin-topbar";
 import { ToastProvider } from "@/components/admin/toast-provider";
+import { SessionGuard } from "@/components/admin/session-guard";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const host = await getRequestHostClassification();
@@ -54,7 +55,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         <div className="flex flex-1 flex-col overflow-hidden">
           <AdminTopbar email={profile.email} role={profile.role} userId={profile.id} />
           <main className="flex-1 overflow-y-auto">
-            {children}
+            <SessionGuard>
+              {children}
+            </SessionGuard>
           </main>
         </div>
       </div>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { TicketList, type TicketItem } from "@/components/admin/messages/ticket-list";
 import { TicketThread } from "@/components/admin/messages/ticket-thread";
 import { NewTicketModal } from "@/components/admin/messages/new-ticket-modal";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type Message = {
   id: string;
@@ -37,6 +38,31 @@ export function MessagesClientView({ tickets: initialTickets }: MessagesClientVi
   const [messages, setMessages]       = useState<Message[]>([]);
   const [loadingThread, setLoadingThread] = useState(false);
   const [newTicketOpen, setNewTicketOpen] = useState(false);
+
+  // Realtime: new ticket_messages in the selected thread
+  useEffect(() => {
+    if (!selectedId) return;
+    const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel(`client-thread-${selectedId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "ticket_messages",
+          filter: `ticket_id=eq.${selectedId}`,
+        },
+        (payload: { new: unknown }) => {
+          setMessages((prev) => [...prev, payload.new as Message]);
+        },
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [selectedId]);
 
   async function handleSelect(id: string) {
     setSelectedId(id);

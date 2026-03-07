@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { TicketList, type TicketItem } from "@/components/admin/messages/ticket-list";
 import { TicketThread } from "@/components/admin/messages/ticket-thread";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type Message = {
   id: string;
@@ -34,6 +35,50 @@ export function MessagesPlatformView({ tickets: initialTickets }: MessagesPlatfo
   const [fullTicket, setFullTicket]   = useState<FullTicket | null>(null);
   const [messages, setMessages]       = useState<Message[]>([]);
   const [loadingThread, setLoadingThread] = useState(false);
+
+  // Realtime: new ticket_messages in the selected thread
+  useEffect(() => {
+    if (!selectedId) return;
+    const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel(`platform-thread-${selectedId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "ticket_messages",
+          filter: `ticket_id=eq.${selectedId}`,
+        },
+        (payload: { new: unknown }) => {
+          setMessages((prev) => [...prev, payload.new as Message]);
+        },
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [selectedId]);
+
+  // Realtime: new support_tickets appearing in the list
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
+
+    const channel = supabase
+      .channel("platform-ticket-list")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "support_tickets" },
+        (payload: { new: unknown }) => {
+          setTickets((prev) => [payload.new as TicketItem, ...prev]);
+        },
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   async function handleSelect(id: string) {
     setSelectedId(id);

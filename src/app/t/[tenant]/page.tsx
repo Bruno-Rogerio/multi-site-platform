@@ -98,6 +98,19 @@ export default async function TenantPublicPage({ params }: TenantPageProps) {
     );
   }
 
+  // Track page view (fire-and-forget — does not block render)
+  // At this point: isDraft is false and suspended check has already returned early
+  if (!isDraft) {
+    const platformOrigin =
+      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
+      `https://${process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br"}`;
+    fetch(`${platformOrigin}/api/analytics/pageview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ siteId: site.id }),
+    }).catch(() => {});
+  }
+
   const sectionsToRender = [...site.homePage.sections].sort((a, b) => a.order - b.order);
 
   if (sectionsToRender.length === 0) {
