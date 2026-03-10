@@ -215,6 +215,31 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
             </div>
           </div>
 
+          {/* Divider between sections */}
+          {(() => {
+            const divider = (theme.dividerStyle as string | undefined) || "none";
+            if (divider === "none") return null;
+            if (divider === "line") return (
+              <div className="px-4"><div style={{ borderTop: `1px solid ${text}20` }} /></div>
+            );
+            if (divider === "wave") return (
+              <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
+                <path d="M0,6 C20,0 40,12 60,6 S100,0 120,6 L120,12 L0,12 Z" fill={`${primary}25`} />
+              </svg>
+            );
+            if (divider === "diagonal") return (
+              <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
+                <polygon points="0,0 120,12 120,12 0,12" fill={`${primary}25`} />
+              </svg>
+            );
+            if (divider === "curve") return (
+              <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
+                <path d="M0,12 Q60,0 120,12 Z" fill={`${primary}25`} />
+              </svg>
+            );
+            return null;
+          })()}
+
           {/* CTA strip */}
           <div className="px-4 pb-4">
             <div className="rounded-lg p-3 text-center" style={{ background: `linear-gradient(135deg, ${primary}, ${accent})` }}>
@@ -225,6 +250,24 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Header style legend */}
+      <div className="mt-3 flex items-center justify-between px-1">
+        <span className="text-[10px] text-[var(--platform-text)]/40">Cabeçalho:</span>
+        <span className="text-[10px] font-semibold text-[var(--platform-text)]/60">
+          {(theme.headerStyle as string | undefined) === "solid" ? "Sólido" :
+           (theme.headerStyle as string | undefined) === "minimal" ? "Minimalista" : "Vidro (blur)"}
+        </span>
+      </div>
+      <div className="mt-1 flex items-center justify-between px-1">
+        <span className="text-[10px] text-[var(--platform-text)]/40">Separador:</span>
+        <span className="text-[10px] font-semibold text-[var(--platform-text)]/60">
+          {(theme.dividerStyle as string | undefined) === "wave" ? "Onda" :
+           (theme.dividerStyle as string | undefined) === "diagonal" ? "Diagonal" :
+           (theme.dividerStyle as string | undefined) === "curve" ? "Curva" :
+           (theme.dividerStyle as string | undefined) === "line" ? "Linha" : "Nenhum"}
+        </span>
       </div>
     </aside>
   );

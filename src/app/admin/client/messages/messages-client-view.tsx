@@ -29,9 +29,10 @@ type FullTicket = {
 
 interface MessagesClientViewProps {
   tickets: unknown[];
+  sitePlan: string;
 }
 
-export function MessagesClientView({ tickets: initialTickets }: MessagesClientViewProps) {
+export function MessagesClientView({ tickets: initialTickets, sitePlan }: MessagesClientViewProps) {
   const [tickets, setTickets]         = useState<TicketItem[]>(initialTickets as TicketItem[]);
   const [selectedId, setSelectedId]   = useState<string | null>(null);
   const [fullTicket, setFullTicket]   = useState<FullTicket | null>(null);
@@ -134,6 +135,7 @@ export function MessagesClientView({ tickets: initialTickets }: MessagesClientVi
         open={newTicketOpen}
         onClose={() => setNewTicketOpen(false)}
         onCreated={handleCreated}
+        sitePlan={sitePlan}
       />
     </div>
   );

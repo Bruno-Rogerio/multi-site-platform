@@ -180,6 +180,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: msgError.message }, { status: 400 });
   }
 
+  // Return ticketId + sla_deadline so client can update optimistic state
+  const ticketResponse = { ticketId: ticket.id, sla_deadline: slaDeadline };
+
   // Notify admins: email + in-app (fire-and-forget)
   const adminClient = createSupabaseAdminClient();
   if (adminClient) {
@@ -211,5 +214,5 @@ export async function POST(request: Request) {
     }
   }
 
-  return NextResponse.json({ ticketId: ticket.id }, { status: 201 });
+  return NextResponse.json(ticketResponse, { status: 201 });
 }

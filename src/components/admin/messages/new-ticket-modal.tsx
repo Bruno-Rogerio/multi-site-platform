@@ -9,6 +9,7 @@ interface NewTicketModalProps {
   open: boolean;
   onClose: () => void;
   onCreated: (ticket: TicketItem) => void;
+  sitePlan?: string;
 }
 
 const CATEGORIES = [
@@ -20,7 +21,10 @@ const CATEGORIES = [
 
 type Attachment = { url: string; name: string; size: number; type: string };
 
-export function NewTicketModal({ open, onClose, onCreated }: NewTicketModalProps) {
+export function NewTicketModal({ open, onClose, onCreated, sitePlan = "landing" }: NewTicketModalProps) {
+  const isPro = sitePlan === "pro";
+  const slaHours = isPro ? 2 : 24;
+  const slaLabel = isPro ? "Resposta garantida em até 2h" : "Prazo de resposta: até 24h";
   const [subject, setSubject]     = useState("");
   const [category, setCategory]   = useState("suporte");
   const [body, setBody]           = useState("");
@@ -74,6 +78,7 @@ export function NewTicketModal({ open, onClose, onCreated }: NewTicketModalProps
       if (!createRes.ok) throw new Error(createData.error ?? "Erro ao criar chamado.");
 
       const ticketId: string = createData.ticketId;
+      const slaDeadlineFromApi: string = createData.sla_deadline ?? new Date(Date.now() + slaHours * 3_600_000).toISOString();
 
       // 2. Upload pending files
       const uploadedAttachments: Attachment[] = [];
@@ -96,7 +101,7 @@ export function NewTicketModal({ open, onClose, onCreated }: NewTicketModalProps
         subject: subject.trim(),
         category,
         status: "open",
-        sla_deadline: new Date(Date.now() + 24 * 3_600_000).toISOString(),
+        sla_deadline: slaDeadlineFromApi,
         updated_at: new Date().toISOString(),
         ticket_messages: [{ count: 1 }],
       };
@@ -134,7 +139,16 @@ export function NewTicketModal({ open, onClose, onCreated }: NewTicketModalProps
           >
             {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-              <h2 className="text-base font-semibold text-[var(--platform-text)]">Novo chamado</h2>
+              <div>
+                <h2 className="text-base font-semibold text-[var(--platform-text)]">Novo chamado</h2>
+                <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  isPro
+                    ? "bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "bg-white/[0.06] text-[var(--platform-text)]/50"
+                }`}>
+                  {slaLabel}
+                </span>
+              </div>
               <button
                 onClick={handleClose}
                 className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--platform-text)]/50 transition hover:bg-white/[0.06] hover:text-[var(--platform-text)]"

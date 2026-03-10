@@ -524,42 +524,6 @@ export function ClientSettingsForm({ email, siteName, siteDomain, siteId, select
         </div>
       </section>
 
-      {/* ── Subdomain ── */}
-      <section className="rounded-2xl border border-white/10 bg-[#12182B] p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <Globe size={16} className="text-[var(--platform-text)]/40" />
-          <h2 className="text-sm font-semibold text-[var(--platform-text)]">Subdomínio</h2>
-        </div>
-
-        <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-[#0B1020] px-3 py-2.5">
-          <Globe size={14} className="text-[#22D3EE] shrink-0" />
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-[var(--platform-text)]/40">
-              Endereço atual
-            </p>
-            <p className="font-mono text-sm text-[#22D3EE]">{siteDomain}</p>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-violet-400/20 bg-violet-500/5 p-4">
-          <p className="text-sm font-semibold text-violet-200">
-            Trocar subdomínio — R$&nbsp;19,90
-          </p>
-          <p className="mt-1 text-xs text-[var(--platform-text)]/50">
-            A troca de subdomínio é feita manualmente pela nossa equipe. Entre em
-            contato pelo WhatsApp com o novo subdomínio desejado.
-          </p>
-          <a
-            href={`https://wa.me/5511999999999?text=${whatsappText}`}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#25D366]/10 border border-[#25D366]/30 px-4 py-2 text-sm font-semibold text-[#25D366] transition hover:bg-[#25D366]/20"
-          >
-            <MessageCircle size={15} />
-            Solicitar via WhatsApp
-          </a>
-        </div>
-      </section>
     </div>
   );
 }
