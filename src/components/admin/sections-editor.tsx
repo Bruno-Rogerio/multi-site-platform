@@ -110,7 +110,9 @@ function buildChannelUrl(type: string, raw: string): string {
   const v = raw.trim();
   if (type === "whatsapp") return `https://wa.me/${v.replace(/\D/g, "")}`;
   if (type === "email") return v.startsWith("mailto:") ? v : `mailto:${v}`;
-  return v.startsWith("http") ? v : `https://${v}`;
+  if (v.startsWith("http://") || v.startsWith("https://")) return v;
+  const prefix = CHANNEL_PREFIX[type];
+  return prefix ? `https://${prefix}${v}` : `https://${v}`;
 }
 
 /* ─────────────────────────────────────────────────────────── */

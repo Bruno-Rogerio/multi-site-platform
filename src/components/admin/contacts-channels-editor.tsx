@@ -53,7 +53,9 @@ function buildUrl(type: string, raw: string): string {
   const v = raw.trim();
   if (type === "whatsapp") return `https://wa.me/${v.replace(/\D/g, "")}`;
   if (type === "email") return v.startsWith("mailto:") ? v : `mailto:${v}`;
-  return v.startsWith("http") ? v : `https://${v}`;
+  if (v.startsWith("http://") || v.startsWith("https://")) return v;
+  const def = CHANNEL_DEFS.find((d) => d.type === type);
+  return def?.prefix ? `https://${def.prefix}${v}` : `https://${v}`;
 }
 
 function WhatsappSvgIcon() {
