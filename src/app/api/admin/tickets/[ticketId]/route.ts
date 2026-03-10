@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 
 import { getCurrentUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createNotification } from "@/lib/notifications";
+import { sendTicketStatusChangedEmail } from "@/lib/email";
 
 type Params = { params: Promise<{ ticketId: string }> };
 
@@ -91,7 +93,7 @@ export async function PATCH(request: Request, { params }: Params) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  // Notify client about status change (fire-and-forget)
+  // Notify client about status change: in-app + email (fire-and-forget)
   if (ticket?.owner_id) {
     const STATUS_LABELS: Record<string, string> = {
       open:           "Aberto",
@@ -99,6 +101,7 @@ export async function PATCH(request: Request, { params }: Params) {
       waiting_client: "Aguardando sua resposta",
       resolved:       "Resolvido",
     };
+
     createNotification(
       ticket.owner_id as string,
       "ticket_status_changed",
@@ -106,6 +109,27 @@ export async function PATCH(request: Request, { params }: Params) {
       `"${ticket.subject}" → ${STATUS_LABELS[newStatus] ?? newStatus}`,
       ticketId,
     ).catch(() => {});
+
+    // Send status change email to client
+    const adminClient = createSupabaseAdminClient();
+    if (adminClient) {
+      adminClient
+        .from("user_profiles")
+        .select("email, full_name")
+        .eq("id", ticket.owner_id)
+        .maybeSingle()
+        .then(({ data: ownerProfile }) => {
+          if (ownerProfile?.email) {
+            sendTicketStatusChangedEmail(
+              ownerProfile.email,
+              ownerProfile.full_name ?? "Cliente",
+              { id: ticketId, subject: ticket.subject },
+              newStatus,
+            ).catch(() => {});
+          }
+        })
+        .catch(() => {});
+    }
   }
 
   return NextResponse.json({ ok: true });

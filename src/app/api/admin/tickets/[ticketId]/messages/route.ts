@@ -3,10 +3,6 @@ import { NextResponse } from "next/server";
 import { getCurrentUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import {
-  sendTicketReplyToClientEmail,
-  sendTicketReplyToAdminEmail,
-} from "@/lib/email";
 import { createNotification, createNotificationForMany, getAdminUserIds } from "@/lib/notifications";
 
 type Params = { params: Promise<{ ticketId: string }> };
@@ -75,28 +71,13 @@ export async function POST(request: Request, { params }: Params) {
     return NextResponse.json({ error: msgError?.message ?? "Erro ao enviar mensagem." }, { status: 400 });
   }
 
-  // Email + in-app notifications (fire-and-forget)
+  // In-app notifications only — no email per message (avoids quota exhaustion)
   const adminClient = createSupabaseAdminClient();
   if (adminClient) {
     const siteName = (ticket.sites as { name: string } | null)?.name ?? "Cliente";
     const preview = messageBody.length > 80 ? messageBody.slice(0, 77) + "…" : messageBody;
 
     if (senderRole === "admin") {
-      // Notify ticket owner (client): email + in-app
-      const { data: ownerProfile } = await adminClient
-        .from("user_profiles")
-        .select("email")
-        .eq("id", ticket.owner_id)
-        .maybeSingle();
-
-      if (ownerProfile?.email) {
-        sendTicketReplyToClientEmail(
-          ownerProfile.email,
-          { id: ticketId, subject: ticket.subject },
-          messageBody,
-        ).catch(() => {});
-      }
-
       createNotification(
         ticket.owner_id as string,
         "ticket_message",
@@ -105,21 +86,12 @@ export async function POST(request: Request, { params }: Params) {
         ticketId,
       ).catch(() => {});
     } else {
-      // Notify admin(s): email + in-app
       const { data: adminProfiles } = await adminClient
         .from("user_profiles")
         .select("id, email")
         .eq("role", "admin");
 
       if (adminProfiles?.length) {
-        adminProfiles.forEach((ap) => {
-          sendTicketReplyToAdminEmail(
-            ap.email,
-            { id: ticketId, subject: ticket.subject, businessName: siteName },
-            messageBody,
-          ).catch(() => {});
-        });
-
         const adminIds = adminProfiles.map((ap) => ap.id as string);
         createNotificationForMany(
           adminIds,

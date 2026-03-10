@@ -451,3 +451,53 @@ export async function sendTicketReplyToAdminEmail(
 
   await sendEmail(adminEmail, `Resposta do cliente: ${ticket.subject} — BuildSphere`, html);
 }
+
+/**
+ * Sent to the client when the admin changes the ticket status.
+ */
+export async function sendTicketStatusChangedEmail(
+  clientEmail: string,
+  fullName: string,
+  ticket: { id: string; subject: string },
+  newStatus: string,
+  panelUrl = "https://bsph.com.br/admin/client/messages",
+): Promise<void> {
+  const firstName = fullName.trim().split(" ")[0] || "usuário";
+
+  const STATUS_LABELS: Record<string, { label: string; color: string; bg: string; border: string }> = {
+    open:           { label: "Aberto",                   color: "#1d4ed8", bg: "#eff6ff", border: "#bfdbfe" },
+    in_progress:    { label: "Em andamento",              color: "#a16207", bg: "#fefce8", border: "#fde047" },
+    waiting_client: { label: "Aguardando sua resposta",   color: "#b45309", bg: "#fff7ed", border: "#fed7aa" },
+    resolved:       { label: "Resolvido ✓",               color: "#15803d", bg: "#f0fdf4", border: "#86efac" },
+  };
+
+  const statusInfo = STATUS_LABELS[newStatus] ?? { label: newStatus, color: "#475569", bg: "#f8fafc", border: "#e2e8f0" };
+
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 10px;font-size:22px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Atualização no seu chamado
+    </h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#64748b;line-height:1.6;">
+      Olá, <strong style="color:#1e293b;">${firstName}</strong>! O status do seu chamado foi atualizado.
+    </p>
+
+    ${infoBox("📋", `<strong>Chamado:</strong> ${ticket.subject}`, "#f8fafc", "#e2e8f0", "#475569")}
+
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:16px 0;">
+      <tr>
+        <td style="background:${statusInfo.bg};border:1px solid ${statusInfo.border};border-radius:10px;padding:14px 18px;text-align:center;">
+          <p style="margin:0;font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;">Novo status</p>
+          <p style="margin:6px 0 0;font-size:18px;font-weight:800;color:${statusInfo.color};">${statusInfo.label}</p>
+        </td>
+      </tr>
+    </table>
+
+    ${ctaButton("Ver chamado no painel", `${panelUrl}?ticket=${ticket.id}`)}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;">
+      Se tiver mais dúvidas, responda diretamente pelo painel.
+    </p>
+  `);
+
+  await sendEmail(clientEmail, `Chamado atualizado: ${ticket.subject} — BuildSphere`, html);
+}
