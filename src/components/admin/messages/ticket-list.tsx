@@ -126,7 +126,7 @@ export function TicketList({ tickets, selectedId, onSelect, onNewTicket, isAdmin
 
                     <div className="mt-2 flex items-center gap-1.5 flex-wrap">
                       <SlaBadge slaDeadline={ticket.sla_deadline} status={ticket.status} />
-                      {ticket.sla_breached && ticket.status !== "resolved" && (
+                      {ticket.status !== "resolved" && new Date(ticket.sla_deadline) < new Date() && (
                         <span className="flex animate-pulse items-center gap-1 rounded-full bg-red-500/20 px-2 py-0.5 text-[9px] font-semibold text-red-400">
                           <ShieldAlert size={9} />
                           SLA violado

@@ -75,6 +75,16 @@ export function MessagesPlatformView({ tickets: initialTickets }: MessagesPlatfo
           setTickets((prev) => [payload.new as TicketItem, ...prev]);
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "support_tickets" },
+        (payload: { new: unknown }) => {
+          const updated = payload.new as TicketItem;
+          setTickets((prev) =>
+            prev.map((t) => (t.id === updated.id ? { ...t, ...updated } : t)),
+          );
+        },
+      )
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
