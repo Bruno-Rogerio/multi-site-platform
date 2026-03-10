@@ -11,6 +11,9 @@ type SiteTheme = {
   backgroundColor?: string;
   textColor?: string;
   logoUrl?: string;
+  headerStyle?: string;
+  buttonStyle?: string;
+  fontFamily?: string;
 } | null;
 
 type MiniSitePreviewProps = {
@@ -43,12 +46,29 @@ export function MiniSitePreview({
   themeSettings,
 }: MiniSitePreviewProps) {
   const hasSiteTheme = themeSettings?.primaryColor;
+  const primary  = themeSettings?.primaryColor    ?? "#3B82F6";
+  const accent   = themeSettings?.accentColor     ?? "#22D3EE";
+  const bg       = themeSettings?.backgroundColor ?? "#0B1020";
+  const text     = themeSettings?.textColor       ?? "#EAF0FF";
+  const font     = themeSettings?.fontFamily      ?? undefined;
+  const btnStyle = themeSettings?.buttonStyle     ?? "rounded";
+  const headerStyle = themeSettings?.headerStyle  ?? "blur";
+  const btnRadius = btnStyle === "pill" ? "999px" : btnStyle === "square" ? "0px" : "8px";
+
+  const headerBg =
+    headerStyle === "solid"   ? bg :
+    headerStyle === "minimal" ? "transparent" :
+    "rgba(255,255,255,0.05)"; // blur: vidro fosco
+  const headerBorder =
+    headerStyle === "minimal" ? `1px solid ${text}35` : `1px solid ${text}15`;
+  const headerBackdrop = headerStyle === "blur" ? "blur(8px)" : undefined;
+
   const siteColors = hasSiteTheme
     ? {
-        "--preview-primary": themeSettings.primaryColor,
-        "--preview-accent": themeSettings.accentColor ?? themeSettings.primaryColor,
-        "--preview-bg": themeSettings.backgroundColor ?? "#0B1020",
-        "--preview-text": themeSettings.textColor ?? "#EAF0FF",
+        "--preview-primary": primary,
+        "--preview-accent": accent,
+        "--preview-bg": bg,
+        "--preview-text": text,
       }
     : {};
   const [previewViewport, setPreviewViewport] = useState<"desktop" | "mobile">("desktop");
@@ -141,56 +161,57 @@ export function MiniSitePreview({
               </div>
             )}
 
-            {/* Mini header */}
-            <div
-              className="flex items-center justify-between border-b px-3 py-2"
-              style={{
-                backgroundColor: hasSiteTheme ? `${themeSettings.backgroundColor}ee` : "#0B1020ee",
-                borderColor: hasSiteTheme ? `${themeSettings.textColor}18` : "rgba(255,255,255,0.1)",
-              }}
-            >
-              {themeSettings?.logoUrl ? (
-                <Image
-                  src={themeSettings.logoUrl}
-                  alt={siteName}
-                  width={80}
-                  height={24}
-                  className="h-5 w-auto max-w-[80px] object-contain"
-                />
-              ) : (
-                <span
-                  className="text-[10px] font-bold"
-                  style={{ color: hasSiteTheme ? themeSettings.textColor : undefined }}
-                >
-                  {siteName}
-                </span>
-              )}
-              <span
-                className="rounded px-2 py-0.5 text-[8px] font-semibold text-white"
-                style={{ backgroundColor: hasSiteTheme ? themeSettings.primaryColor : "#3B82F6" }}
+            {/* Wrapper com gradiente — revela diferença do header style */}
+            <div style={{ background: `linear-gradient(180deg, ${primary}45 0%, ${bg} 28%)` }}>
+              {/* Mini header — aplica headerStyle */}
+              <div
+                className="flex items-center justify-between px-3 py-2"
+                style={{
+                  backgroundColor: headerBg,
+                  borderBottom: headerBorder,
+                  backdropFilter: headerBackdrop,
+                  WebkitBackdropFilter: headerBackdrop,
+                  fontFamily: font,
+                }}
               >
-                Menu
-              </span>
-            </div>
+                {themeSettings?.logoUrl ? (
+                  <Image
+                    src={themeSettings.logoUrl}
+                    alt={siteName}
+                    width={80}
+                    height={24}
+                    className="h-5 w-auto max-w-[80px] object-contain"
+                  />
+                ) : (
+                  <span className="text-[10px] font-bold" style={{ color: text }}>
+                    {siteName}
+                  </span>
+                )}
+                <span
+                  className="px-2 py-0.5 text-[8px] font-semibold text-white"
+                  style={{ backgroundColor: primary, borderRadius: btnRadius }}
+                >
+                  Menu
+                </span>
+              </div>
 
-            <div
-              className={`space-y-4 overflow-y-auto px-4 py-4 ${
-                isMobilePreview ? "max-h-[58vh]" : "h-[330px]"
-              }`}
-              style={{
-                backgroundColor: hasSiteTheme ? themeSettings.backgroundColor : "#0D1428",
-                color: hasSiteTheme ? themeSettings.textColor : undefined,
-              }}
-            >
+              <div
+                className={`space-y-4 overflow-y-auto px-4 py-4 ${
+                  isMobilePreview ? "max-h-[58vh]" : "h-[330px]"
+                }`}
+                style={{
+                  backgroundColor: bg,
+                  color: text,
+                  fontFamily: font,
+                }}
+              >
               {orderedSections.map((section) => {
                 const sectionContainerClassName =
                   activeSectionId === section.id
                     ? "ring-2 ring-[#22D3EE] ring-offset-2 ring-offset-[#0B1020]"
                     : "";
 
-                const surfaceBorder = hasSiteTheme
-                  ? `${themeSettings.textColor}18`
-                  : "rgba(255,255,255,0.1)";
+                const surfaceBorder = `${text}18`;
 
                 if (section.type === "hero") {
                   return (
@@ -204,7 +225,7 @@ export function MiniSitePreview({
                     >
                       <p
                         className="text-[10px] font-semibold uppercase tracking-[0.2em]"
-                        style={{ color: hasSiteTheme ? themeSettings.accentColor : "#22D3EE" }}
+                        style={{ color: accent }}
                       >
                         {asString(section.content.eyebrow)}
                       </p>
@@ -258,7 +279,7 @@ export function MiniSitePreview({
                             <div
                               key={i}
                               className="rounded-lg p-2"
-                              style={{ border: `1px solid ${surfaceBorder}`, backgroundColor: hasSiteTheme ? `${themeSettings.primaryColor}12` : "rgba(59,130,246,0.07)" }}
+                              style={{ border: `1px solid ${surfaceBorder}`, backgroundColor: `${primary}12` }}
                             >
                               <p className="text-[10px] font-semibold leading-tight opacity-90">{card.title || "Serviço"}</p>
                             </div>
@@ -282,7 +303,7 @@ export function MiniSitePreview({
                       className={`rounded-xl p-4 text-white ${sectionContainerClassName}`}
                       style={{
                         background: hasSiteTheme
-                          ? `linear-gradient(135deg, ${themeSettings.primaryColor}, ${themeSettings.accentColor})`
+                          ? `linear-gradient(135deg, ${primary}, ${accent})`
                           : "linear-gradient(135deg, #3B82F6, #7C5CFF, #22D3EE)",
                       }}
                     >
@@ -347,7 +368,7 @@ export function MiniSitePreview({
                       {asString(section.content.whatsappUrl) && (
                         <span
                           className="mt-2 inline-block rounded px-2 py-0.5 text-[9px] font-semibold text-white"
-                          style={{ backgroundColor: hasSiteTheme ? themeSettings.accentColor : "#22D3EE" }}
+                          style={{ backgroundColor: accent }}
                         >
                           {asString(section.content.whatsappLabel, "WhatsApp")}
                         </span>
@@ -450,7 +471,7 @@ export function MiniSitePreview({
                           img.url
                             ? <Image key={i} src={img.url} alt={img.alt} width={80} height={60}
                                 className="aspect-square h-full w-full rounded object-cover" />
-                            : <div key={i} className="aspect-square rounded" style={{ backgroundColor: hasSiteTheme ? `${themeSettings.primaryColor}20` : "rgba(59,130,246,0.1)" }} />
+                            : <div key={i} className="aspect-square rounded" style={{ backgroundColor: `${primary}20` }} />
                         ))}
                         {images.length === 0 && (
                           <div className="col-span-3 py-2 text-center text-[10px] opacity-40">Nenhuma imagem cadastrada</div>
@@ -476,7 +497,7 @@ export function MiniSitePreview({
                         {events.slice(0, 3).map((ev, i) => (
                           <div key={i} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5" style={{ border: `1px solid ${surfaceBorder}` }}>
                             <div className="shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold text-white"
-                              style={{ backgroundColor: hasSiteTheme ? themeSettings.primaryColor : "#3B82F6" }}>
+                              style={{ backgroundColor: primary }}>
                               {ev.date ? new Date(ev.date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }) : "—"}
                             </div>
                             <p className="text-[10px] opacity-80 truncate">{ev.title}</p>
@@ -505,13 +526,16 @@ export function MiniSitePreview({
             <div
               className="flex items-center justify-between px-3 py-2 text-[8px] opacity-60"
               style={{
-                borderTop: `1px solid ${hasSiteTheme ? `${themeSettings.textColor}18` : "rgba(255,255,255,0.1)"}`,
-                color: hasSiteTheme ? themeSettings.textColor : undefined,
+                borderTop: `1px solid ${text}15`,
+                color: text,
+                backgroundColor: bg,
+                fontFamily: font,
               }}
             >
               <span>{siteName}</span>
               <span>Powered by BuildSphere</span>
             </div>
+            </div>{/* fecha wrapper gradiente */}
           </div>
 
           {!isMobilePreview ? (

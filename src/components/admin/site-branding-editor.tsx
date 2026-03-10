@@ -103,31 +103,33 @@ type AppearancePreviewProps = {
 function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewProps) {
   const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
 
-  const primary    = (theme.primaryColor   as string | undefined) || "#3B82F6";
-  const accent     = (theme.accentColor    as string | undefined) || "#22D3EE";
-  const bg         = (theme.backgroundColor as string | undefined) || "#0B1020";
-  const text       = (theme.textColor      as string | undefined) || "#EAF0FF";
-  const font       = (theme.fontFamily     as string | undefined) || "system-ui, sans-serif";
-  const btnStyle   = (theme.buttonStyle    as string | undefined) || "rounded";
-  const headerStyle = (theme.headerStyle   as string | undefined) || "blur";
-  const logoUrl    = (theme.logoUrl        as string | undefined) || "";
+  const primary     = (theme.primaryColor    as string | undefined) || "#3B82F6";
+  const accent      = (theme.accentColor     as string | undefined) || "#22D3EE";
+  const bg          = (theme.backgroundColor as string | undefined) || "#0B1020";
+  const text        = (theme.textColor       as string | undefined) || "#EAF0FF";
+  const font        = (theme.fontFamily      as string | undefined) || "system-ui, sans-serif";
+  const btnStyle    = (theme.buttonStyle     as string | undefined) || "rounded";
+  const headerStyle = (theme.headerStyle     as string | undefined) || "blur";
+  const logoUrl     = (theme.logoUrl         as string | undefined) || "";
 
   const btnRadius = btnStyle === "pill" ? "999px" : btnStyle === "square" ? "0px" : "8px";
 
+  // O gradiente no topo do wrapper revela a diferença entre os estilos do header
   const headerBg =
     headerStyle === "solid"   ? bg :
     headerStyle === "minimal" ? "transparent" :
-    `${bg}cc`; // blur sim
+    "rgba(255,255,255,0.05)"; // blur: vidro fosco
 
   const headerBorder =
-    headerStyle === "minimal" ? `1px solid ${text}22` :
-    `1px solid ${text}12`;
+    headerStyle === "minimal" ? `1px solid ${text}35` : `1px solid ${text}15`;
+
+  const headerBackdrop = headerStyle === "blur" ? "blur(8px)" : undefined;
 
   const isMobile = viewport === "mobile";
 
   return (
-    <aside className="sticky top-4 rounded-2xl border border-white/10 bg-[#12182B] p-4 shadow-[0_0_20px_rgba(124,92,255,0.15)]">
-      {/* Header */}
+    <aside className="sticky top-4 rounded-2xl border border-white/10 bg-[#12182B] p-4 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+      {/* Header do painel */}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#22D3EE]">Preview</p>
@@ -162,13 +164,25 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
           </div>
         )}
 
-        {/* Site content */}
+        {/* Site — gradiente no topo revela transparência/blur do header */}
         <div
           className={`mx-auto overflow-hidden transition-all ${isMobile ? "max-w-[240px]" : "w-full"}`}
-          style={{ backgroundColor: bg, fontFamily: font, color: text }}
+          style={{
+            background: `linear-gradient(180deg, ${primary}45 0%, ${bg} 30%)`,
+            fontFamily: font,
+            color: text,
+          }}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-2.5" style={{ backgroundColor: headerBg, borderBottom: headerBorder }}>
+          {/* Header — estilo visível por causa do gradiente atrás */}
+          <div
+            className="flex items-center justify-between px-4 py-2.5"
+            style={{
+              backgroundColor: headerBg,
+              borderBottom: headerBorder,
+              backdropFilter: headerBackdrop,
+              WebkitBackdropFilter: headerBackdrop,
+            }}
+          >
             {logoUrl ? (
               <Image src={logoUrl} alt={siteName} width={80} height={24} className="h-5 w-auto max-w-[80px] object-contain" />
             ) : (
@@ -180,7 +194,7 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
           </div>
 
           {/* Hero */}
-          <div className="px-4 py-5">
+          <div className="px-4 py-5" style={{ backgroundColor: bg }}>
             <p className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: accent }}>
               Profissional
             </p>
@@ -201,7 +215,7 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
           </div>
 
           {/* Services strip */}
-          <div className="px-4 pb-5">
+          <div className="px-4 pb-5" style={{ backgroundColor: bg }}>
             <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: `${text}60` }}>
               Serviços
             </p>
@@ -215,33 +229,33 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
             </div>
           </div>
 
-          {/* Divider between sections */}
+          {/* Divider */}
           {(() => {
             const divider = (theme.dividerStyle as string | undefined) || "none";
             if (divider === "none") return null;
             if (divider === "line") return (
-              <div className="px-4"><div style={{ borderTop: `1px solid ${text}20` }} /></div>
+              <div className="px-4" style={{ backgroundColor: bg }}><div style={{ borderTop: `1px solid ${text}20` }} /></div>
             );
             if (divider === "wave") return (
               <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
-                <path d="M0,6 C20,0 40,12 60,6 S100,0 120,6 L120,12 L0,12 Z" fill={`${primary}25`} />
+                <path d="M0,6 C20,0 40,12 60,6 S100,0 120,6 L120,12 L0,12 Z" fill={`${primary}30`} />
               </svg>
             );
             if (divider === "diagonal") return (
               <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
-                <polygon points="0,0 120,12 120,12 0,12" fill={`${primary}25`} />
+                <polygon points="0,0 120,12 120,12 0,12" fill={`${primary}30`} />
               </svg>
             );
             if (divider === "curve") return (
               <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
-                <path d="M0,12 Q60,0 120,12 Z" fill={`${primary}25`} />
+                <path d="M0,12 Q60,0 120,12 Z" fill={`${primary}30`} />
               </svg>
             );
             return null;
           })()}
 
-          {/* CTA strip */}
-          <div className="px-4 pb-4">
+          {/* CTA */}
+          <div className="px-4 pb-4" style={{ backgroundColor: bg }}>
             <div className="rounded-lg p-3 text-center" style={{ background: `linear-gradient(135deg, ${primary}, ${accent})` }}>
               <p className="text-[10px] font-bold text-white">Vamos conversar?</p>
               <span className="mt-1.5 inline-block border border-white/40 px-3 py-1 text-[8px] font-bold text-white" style={{ borderRadius: btnRadius }}>
@@ -249,81 +263,16 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
               </span>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Visual header style comparison */}
-      <div className="mt-4">
-        <p className="mb-2 px-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--platform-text)]/40">
-          Estilo do cabeçalho
-        </p>
-        <div className="grid grid-cols-3 gap-1.5">
-          {HEADER_STYLES.map((hs) => {
-            const isSelected = headerStyle === hs.value;
-            const hBg =
-              hs.value === "solid"   ? bg :
-              hs.value === "minimal" ? "transparent" :
-              `${bg}bb`;
-            const hBorder =
-              hs.value === "minimal"
-                ? `1px solid ${text}40`
-                : `1px solid ${text}15`;
-            return (
-              <div
-                key={hs.value}
-                className={`overflow-hidden rounded-lg border ${
-                  isSelected ? "border-[#22D3EE]/60" : "border-white/10"
-                }`}
-              >
-                {/* Gradient context behind header to reveal transparency */}
-                <div
-                  className="relative h-10"
-                  style={{ background: `linear-gradient(135deg, ${primary}55, ${accent}45)` }}
-                >
-                  <div
-                    className="absolute inset-x-0 top-0 flex items-center justify-between px-2 py-1.5"
-                    style={{
-                      backgroundColor: hBg,
-                      borderBottom: hBorder,
-                      backdropFilter: hs.value === "blur" ? "blur(6px)" : undefined,
-                      WebkitBackdropFilter: hs.value === "blur" ? "blur(6px)" : undefined,
-                    }}
-                  >
-                    <span className="truncate text-[8px] font-bold" style={{ color: text }}>
-                      {siteName.slice(0, 8)}
-                    </span>
-                    <span
-                      className="px-1.5 py-0.5 text-[7px] font-bold text-white"
-                      style={{ background: primary, borderRadius: btnRadius }}
-                    >
-                      CTA
-                    </span>
-                  </div>
-                </div>
-                <div
-                  className={`py-1 text-center text-[8px] font-medium ${
-                    isSelected
-                      ? "bg-[#22D3EE]/10 text-[#22D3EE]"
-                      : "text-[var(--platform-text)]/50"
-                  }`}
-                >
-                  {hs.label}
-                </div>
-              </div>
-            );
-          })}
+          {/* Footer */}
+          <div
+            className="flex items-center justify-between px-4 py-2 text-[8px]"
+            style={{ borderTop: `1px solid ${text}15`, color: `${text}50`, backgroundColor: bg }}
+          >
+            <span>{siteName}</span>
+            <span>Powered by BuildSphere</span>
+          </div>
         </div>
-      </div>
-
-      {/* Divider label */}
-      <div className="mt-2 flex items-center justify-between px-1">
-        <span className="text-[10px] text-[var(--platform-text)]/40">Separador:</span>
-        <span className="text-[10px] font-semibold text-[var(--platform-text)]/60">
-          {(theme.dividerStyle as string | undefined) === "wave" ? "Onda" :
-           (theme.dividerStyle as string | undefined) === "diagonal" ? "Diagonal" :
-           (theme.dividerStyle as string | undefined) === "curve" ? "Curva" :
-           (theme.dividerStyle as string | undefined) === "line" ? "Linha" : "Nenhum"}
-        </span>
       </div>
     </aside>
   );
