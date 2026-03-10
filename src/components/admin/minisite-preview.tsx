@@ -10,6 +10,7 @@ type SiteTheme = {
   accentColor?: string;
   backgroundColor?: string;
   textColor?: string;
+  logoUrl?: string;
 } | null;
 
 type MiniSitePreviewProps = {
@@ -148,17 +149,27 @@ export function MiniSitePreview({
                 borderColor: hasSiteTheme ? `${themeSettings.textColor}18` : "rgba(255,255,255,0.1)",
               }}
             >
-              <span
-                className="text-[10px] font-bold"
-                style={{ color: hasSiteTheme ? themeSettings.textColor : undefined }}
-              >
-                {siteName}
-              </span>
+              {themeSettings?.logoUrl ? (
+                <Image
+                  src={themeSettings.logoUrl}
+                  alt={siteName}
+                  width={80}
+                  height={24}
+                  className="h-5 w-auto max-w-[80px] object-contain"
+                />
+              ) : (
+                <span
+                  className="text-[10px] font-bold"
+                  style={{ color: hasSiteTheme ? themeSettings.textColor : undefined }}
+                >
+                  {siteName}
+                </span>
+              )}
               <span
                 className="rounded px-2 py-0.5 text-[8px] font-semibold text-white"
                 style={{ backgroundColor: hasSiteTheme ? themeSettings.primaryColor : "#3B82F6" }}
               >
-                CTA
+                Menu
               </span>
             </div>
 
@@ -218,13 +229,13 @@ export function MiniSitePreview({
                 }
 
                 if (section.type === "services") {
-                  const items = asStringArray(section.content.items);
+                  const cards = Array.isArray(section.content.cards)
+                    ? (section.content.cards as Array<{ title: string; description?: string }>)
+                    : [];
                   return (
                     <section
                       key={section.id}
-                      ref={(element) => {
-                        sectionRefs.current[section.id] = element;
-                      }}
+                      ref={(element) => { sectionRefs.current[section.id] = element; }}
                       className={`rounded-xl p-4 ${sectionContainerClassName}`}
                       style={{ border: `1px solid ${surfaceBorder}` }}
                     >
@@ -237,17 +248,26 @@ export function MiniSitePreview({
                           alt={asString(section.content.title, "Serviços")}
                           width={960}
                           height={720}
-                          className="mt-3 aspect-[4/3] h-auto w-full rounded-lg object-cover"
+                          className="mt-2 aspect-[4/3] h-auto w-full rounded-lg object-cover"
                           style={{ border: `1px solid ${surfaceBorder}` }}
                         />
                       )}
-                      <ul className="mt-2 space-y-1">
-                        {items.map((item) => (
-                          <li key={item} className="text-xs opacity-80">
-                            - {item}
-                          </li>
-                        ))}
-                      </ul>
+                      {cards.length > 0 && (
+                        <div className="mt-2 grid grid-cols-2 gap-1.5">
+                          {cards.slice(0, 4).map((card, i) => (
+                            <div
+                              key={i}
+                              className="rounded-lg p-2"
+                              style={{ border: `1px solid ${surfaceBorder}`, backgroundColor: hasSiteTheme ? `${themeSettings.primaryColor}12` : "rgba(59,130,246,0.07)" }}
+                            >
+                              <p className="text-[10px] font-semibold leading-tight opacity-90">{card.title || "Serviço"}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {cards.length === 0 && (
+                        <p className="mt-2 text-[10px] opacity-40">Nenhum serviço cadastrado</p>
+                      )}
                     </section>
                   );
                 }
@@ -336,12 +356,142 @@ export function MiniSitePreview({
                   );
                 }
 
+                if (section.type === "testimonials") {
+                  const items = Array.isArray(section.content.items)
+                    ? (section.content.items as Array<{ quote: string; author: string }>)
+                    : [];
+                  return (
+                    <section
+                      key={section.id}
+                      ref={(element) => { sectionRefs.current[section.id] = element; }}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
+                    >
+                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Depoimentos")}</h3>
+                      <div className="mt-2 space-y-2">
+                        {items.slice(0, 2).map((item, i) => (
+                          <div key={i} className="rounded-lg p-2" style={{ border: `1px solid ${surfaceBorder}` }}>
+                            <p className="text-[10px] opacity-80 line-clamp-2">"{item.quote}"</p>
+                            <p className="mt-1 text-[9px] font-semibold opacity-50">— {item.author}</p>
+                          </div>
+                        ))}
+                        {items.length === 0 && <p className="text-[10px] opacity-40">Nenhum depoimento cadastrado</p>}
+                      </div>
+                    </section>
+                  );
+                }
+
+                if (section.type === "faq") {
+                  const items = Array.isArray(section.content.items)
+                    ? (section.content.items as Array<{ question: string; answer: string }>)
+                    : [];
+                  return (
+                    <section
+                      key={section.id}
+                      ref={(element) => { sectionRefs.current[section.id] = element; }}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
+                    >
+                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Perguntas Frequentes")}</h3>
+                      <div className="mt-2 space-y-1.5">
+                        {items.slice(0, 3).map((item, i) => (
+                          <div key={i} className="rounded-lg px-2.5 py-1.5" style={{ border: `1px solid ${surfaceBorder}` }}>
+                            <p className="text-[10px] font-medium opacity-85">{item.question}</p>
+                          </div>
+                        ))}
+                        {items.length === 0 && <p className="text-[10px] opacity-40">Nenhuma pergunta cadastrada</p>}
+                      </div>
+                    </section>
+                  );
+                }
+
+                if (section.type === "blog") {
+                  const posts = Array.isArray(section.content.posts)
+                    ? (section.content.posts as Array<{ title: string; excerpt?: string; imageUrl?: string }>)
+                    : [];
+                  return (
+                    <section
+                      key={section.id}
+                      ref={(element) => { sectionRefs.current[section.id] = element; }}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
+                    >
+                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Blog")}</h3>
+                      <div className="mt-2 space-y-1.5">
+                        {posts.slice(0, 2).map((post, i) => (
+                          <div key={i} className="flex gap-2 rounded-lg p-2" style={{ border: `1px solid ${surfaceBorder}` }}>
+                            {post.imageUrl && (
+                              <Image src={post.imageUrl} alt={post.title} width={40} height={30}
+                                className="h-7 w-10 shrink-0 rounded object-cover" />
+                            )}
+                            <p className="text-[10px] font-medium opacity-85 line-clamp-2">{post.title || "Artigo"}</p>
+                          </div>
+                        ))}
+                        {posts.length === 0 && <p className="text-[10px] opacity-40">Nenhum artigo cadastrado</p>}
+                      </div>
+                    </section>
+                  );
+                }
+
+                if (section.type === "gallery") {
+                  const images = Array.isArray(section.content.images)
+                    ? (section.content.images as Array<{ url: string; alt: string }>)
+                    : [];
+                  return (
+                    <section
+                      key={section.id}
+                      ref={(element) => { sectionRefs.current[section.id] = element; }}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
+                    >
+                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Galeria")}</h3>
+                      <div className="mt-2 grid grid-cols-3 gap-1">
+                        {images.slice(0, 6).map((img, i) => (
+                          img.url
+                            ? <Image key={i} src={img.url} alt={img.alt} width={80} height={60}
+                                className="aspect-square h-full w-full rounded object-cover" />
+                            : <div key={i} className="aspect-square rounded" style={{ backgroundColor: hasSiteTheme ? `${themeSettings.primaryColor}20` : "rgba(59,130,246,0.1)" }} />
+                        ))}
+                        {images.length === 0 && (
+                          <div className="col-span-3 py-2 text-center text-[10px] opacity-40">Nenhuma imagem cadastrada</div>
+                        )}
+                      </div>
+                    </section>
+                  );
+                }
+
+                if (section.type === "events") {
+                  const events = Array.isArray(section.content.events)
+                    ? (section.content.events as Array<{ title: string; date: string }>)
+                    : [];
+                  return (
+                    <section
+                      key={section.id}
+                      ref={(element) => { sectionRefs.current[section.id] = element; }}
+                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
+                      style={{ border: `1px solid ${surfaceBorder}` }}
+                    >
+                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Agenda")}</h3>
+                      <div className="mt-2 space-y-1.5">
+                        {events.slice(0, 3).map((ev, i) => (
+                          <div key={i} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5" style={{ border: `1px solid ${surfaceBorder}` }}>
+                            <div className="shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold text-white"
+                              style={{ backgroundColor: hasSiteTheme ? themeSettings.primaryColor : "#3B82F6" }}>
+                              {ev.date ? new Date(ev.date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }) : "—"}
+                            </div>
+                            <p className="text-[10px] opacity-80 truncate">{ev.title}</p>
+                          </div>
+                        ))}
+                        {events.length === 0 && <p className="text-[10px] opacity-40">Nenhum evento cadastrado</p>}
+                      </div>
+                    </section>
+                  );
+                }
+
                 return (
                   <section
                     key={section.id}
-                    ref={(element) => {
-                      sectionRefs.current[section.id] = element;
-                    }}
+                    ref={(element) => { sectionRefs.current[section.id] = element; }}
                     className={`rounded-xl p-4 ${sectionContainerClassName}`}
                     style={{ border: `1px solid ${surfaceBorder}` }}
                   >

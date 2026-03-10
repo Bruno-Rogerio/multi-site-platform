@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle, Monitor, X,
-  BookOpen, ImageIcon, CalendarDays, ChevronUp, ChevronDown,
+  BookOpen, ImageIcon, CalendarDays, ChevronUp, ChevronDown, ChevronRight, AlertTriangle,
 } from "lucide-react";
 
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
@@ -115,17 +115,17 @@ function buildChannelUrl(type: string, raw: string): string {
 
 /* ─────────────────────────────────────────────────────────── */
 
-const SECTION_META: Record<string, { label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }> = {
-  hero: { label: "Destaque", Icon: Layout },
-  services: { label: "Serviços", Icon: Grid3X3 },
-  cta: { label: "Chamada para Ação", Icon: Megaphone },
-  about: { label: "Sobre", Icon: User },
-  contact: { label: "Contato", Icon: Mail },
-  testimonials: { label: "Depoimentos", Icon: Quote },
-  faq: { label: "Perguntas Frequentes", Icon: HelpCircle },
-  blog: { label: "Blog / Artigos", Icon: BookOpen },
-  gallery: { label: "Galeria", Icon: ImageIcon },
-  events: { label: "Eventos", Icon: CalendarDays },
+const SECTION_META: Record<string, { label: string; description: string; Icon: React.ComponentType<{ size?: number; className?: string }> }> = {
+  hero:         { label: "Destaque",           description: "Primeira impressão: título, subtítulo e botão de ação.",   Icon: Layout },
+  services:     { label: "Serviços",           description: "Lista o que você oferece com cards e ícones.",             Icon: Grid3X3 },
+  cta:          { label: "Chamada para ação",  description: "Convite direto para o cliente entrar em contato.",         Icon: Megaphone },
+  about:        { label: "Sobre",              description: "Conte a sua história e diferenciais.",                     Icon: User },
+  contact:      { label: "Contato",            description: "Canais de contato: WhatsApp, e-mail, redes sociais.",      Icon: Mail },
+  testimonials: { label: "Depoimentos",        description: "Avaliações e feedbacks de clientes.",                      Icon: Quote },
+  faq:          { label: "Perguntas Frequentes", description: "Respostas às dúvidas mais comuns.",                      Icon: HelpCircle },
+  blog:         { label: "Blog / Artigos",     description: "Compartilhe conteúdo e novidades.",                        Icon: BookOpen },
+  gallery:      { label: "Galeria de fotos",   description: "Mostre seu trabalho com imagens.",                         Icon: ImageIcon },
+  events:       { label: "Agenda / Eventos",   description: "Divulgue eventos, palestras ou consultas.",                Icon: CalendarDays },
 };
 
 const INPUT_CLS = "mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]";
@@ -139,6 +139,8 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   const [sections, setSections] = useState<Section[]>([]);
   const [siteTheme, setSiteTheme] = useState<Record<string, string> | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const [expandedSectionIds, setExpandedSectionIds] = useState<Set<string>>(new Set());
+  const [deletingSection, setDeletingSection] = useState<string | null>(null);
   const [syncedSectionsSnapshot, setSyncedSectionsSnapshot] = useState<SectionSnapshots>({});
   const [state, setState] = useState<LoadState>("idle");
   const [uploadingSectionId, setUploadingSectionId] = useState<string | null>(null);
@@ -182,6 +184,10 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     setSections(loadedSections);
     setSiteTheme(payload?.themeSettings ?? null);
     setSyncedSectionsSnapshot(buildSectionSnapshots(loadedSections));
+    // Auto-expand only the first section
+    if (loadedSections.length > 0) {
+      setExpandedSectionIds(new Set([loadedSections[0].id]));
+    }
     setState("idle");
   }
 
@@ -305,6 +311,56 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     } finally {
       setState("idle");
     }
+  }
+
+  function toggleExpanded(sectionId: string) {
+    setExpandedSectionIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) { next.delete(sectionId); } else { next.add(sectionId); }
+      return next;
+    });
+  }
+
+  async function handleAddSection(type: Section["type"]) {
+    if (!selectedSiteId) return;
+    setState("saving");
+    setStatus(null);
+    const response = await fetch(`/api/admin/sections?siteId=${encodeURIComponent(selectedSiteId)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type }),
+    });
+    const payload = (await response.json().catch(() => null)) as { ok?: boolean; section?: Section; error?: string } | null;
+    setState("idle");
+    if (!response.ok || !payload?.section) {
+      setStatus({ type: "error", message: payload?.error ?? "Não foi possível adicionar a seção." });
+      return;
+    }
+    const newSection = payload.section;
+    setSections((prev) => sortSections([...prev, newSection]));
+    setSyncedSectionsSnapshot((prev) => ({ ...prev, [newSection.id]: serializeSection(newSection) }));
+    setExpandedSectionIds((prev) => new Set([...prev, newSection.id]));
+    setStatus({ type: "success", message: `Seção "${SECTION_META[type]?.label ?? type}" adicionada.` });
+  }
+
+  async function handleDeleteSection(sectionId: string) {
+    if (!selectedSiteId) return;
+    setState("saving");
+    setStatus(null);
+    const response = await fetch(
+      `/api/admin/sections?siteId=${encodeURIComponent(selectedSiteId)}&sectionId=${encodeURIComponent(sectionId)}`,
+      { method: "DELETE" },
+    );
+    const payload = (await response.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+    setState("idle");
+    if (!response.ok || !payload?.ok) {
+      setStatus({ type: "error", message: payload?.error ?? "Não foi possível remover a seção." });
+      return;
+    }
+    setSections((prev) => prev.filter((s) => s.id !== sectionId));
+    setSyncedSectionsSnapshot((prev) => { const next = { ...prev }; delete next[sectionId]; return next; });
+    setDeletingSection(null);
+    if (activeSectionId === sectionId) setActiveSectionId(null);
   }
 
   async function saveAllSections() {
@@ -1058,7 +1114,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   if (!hasSites) {
     return (
       <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
-        <h2 className="text-lg font-semibold text-[var(--platform-text)]">Editor de seções</h2>
+        <h2 className="text-lg font-semibold text-[var(--platform-text)]">Seções do site</h2>
         <p className="mt-2 text-sm text-[var(--platform-text)]/70">
           Nenhum site disponível para edição neste usuário.
         </p>
@@ -1066,13 +1122,16 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     );
   }
 
+  const activeTypesSet = new Set(sections.map((s) => s.type));
+  const availableToAdd = (Object.keys(SECTION_META) as Section["type"][]).filter((t) => !activeTypesSet.has(t));
+
   return (
     <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-[var(--platform-text)]">Editor de seções</h2>
+          <h2 className="text-lg font-semibold text-[var(--platform-text)]">Seções do site</h2>
           <p className="mt-1 text-sm text-[var(--platform-text)]/70">
-            Edite o conteúdo do site em tempo real.
+            Adicione, edite e organize as seções da página inicial.
           </p>
         </div>
         {!isClient && (
@@ -1092,20 +1151,22 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
         )}
       </div>
 
-      <div className="mt-4 flex items-center gap-3">
-        <button
-          type="button"
-          onClick={() => void saveAllSections()}
-          disabled={state === "saving" || !hasUnsavedChanges}
-          className="flex items-center gap-1.5 rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          <Save size={13} />
-          {state === "saving" ? "Salvando..." : `Salvar tudo${hasUnsavedChanges ? ` (${dirtySectionIds.length})` : ""}`}
-        </button>
-        <span className="text-xs text-[var(--platform-text)]/65">
-          {hasUnsavedChanges ? `${dirtySectionIds.length} seções com alteração pendente.` : "Tudo sincronizado."}
-        </span>
-      </div>
+      {hasUnsavedChanges && (
+        <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-amber-300/20 bg-amber-500/5 px-4 py-2.5">
+          <span className="text-xs text-amber-300">
+            {dirtySectionIds.length === 1 ? "1 seção com alterações não salvas." : `${dirtySectionIds.length} seções com alterações não salvas.`}
+          </span>
+          <button
+            type="button"
+            onClick={() => void saveAllSections()}
+            disabled={state === "saving"}
+            className="flex shrink-0 items-center gap-1.5 rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110 disabled:opacity-60"
+          >
+            <Save size={12} />
+            {state === "saving" ? "Salvando..." : "Salvar tudo"}
+          </button>
+        </div>
+      )}
 
       {status && (
         <p className={`mt-4 rounded-lg px-3 py-2 text-xs ${
@@ -1122,116 +1183,200 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
       )}
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_1.1fr] xl:items-start">
-        <div className="space-y-4">
+        <div className="space-y-3">
+          {sections.length === 0 && state !== "loading" && (
+            <div className="rounded-xl border border-dashed border-white/15 py-8 text-center">
+              <p className="text-sm text-[var(--platform-text)]/50">Nenhuma seção ainda.</p>
+              <p className="mt-1 text-xs text-[var(--platform-text)]/30">Adicione seções abaixo para montar sua página.</p>
+            </div>
+          )}
+
           {[...sections].sort((a, b) => a.order - b.order).map((section, index, sortedArr) => {
-            const meta = SECTION_META[section.type] ?? { label: section.type, Icon: Layout };
+            const meta = SECTION_META[section.type] ?? { label: section.type, description: "", Icon: Layout };
             const SectionIcon = meta.Icon;
             const isDirty = dirtySectionIds.includes(section.id);
+            const isExpanded = expandedSectionIds.has(section.id);
+            const isConfirmingDelete = deletingSection === section.id;
 
             return (
               <article
                 key={section.id}
                 onMouseEnter={() => setActiveSectionId(section.id)}
                 onFocusCapture={() => setActiveSectionId(section.id)}
-                className={`rounded-2xl border bg-[#12182B] p-4 transition ${
+                className={`rounded-2xl border bg-[#12182B] transition ${
                   activeSectionId === section.id
                     ? "border-[#22D3EE]/60 shadow-[0_0_20px_rgba(34,211,238,0.15)]"
                     : "border-white/10"
                 }`}
               >
-                {/* Section header */}
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2.5">
-                    {/* Reorder buttons (client only) */}
-                    {isClient && (
-                      <div className="flex flex-col gap-0.5">
-                        <button
-                          type="button"
-                          disabled={index === 0 || state === "saving"}
-                          onClick={() => void handleReorder(section.id, "up")}
-                          className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
-                          title="Mover para cima"
-                        >
-                          <ChevronUp size={12} />
-                        </button>
-                        <button
-                          type="button"
-                          disabled={index === sortedArr.length - 1 || state === "saving"}
-                          onClick={() => void handleReorder(section.id, "down")}
-                          className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
-                          title="Mover para baixo"
-                        >
-                          <ChevronDown size={12} />
-                        </button>
+                {/* Section header — always visible, click to expand/collapse */}
+                <button
+                  type="button"
+                  onClick={() => toggleExpanded(section.id)}
+                  className="flex w-full items-center gap-3 p-4 text-left"
+                >
+                  {isClient && (
+                    <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        disabled={index === 0 || state === "saving"}
+                        onClick={() => void handleReorder(section.id, "up")}
+                        className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
+                        title="Mover para cima"
+                      >
+                        <ChevronUp size={12} />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={index === sortedArr.length - 1 || state === "saving"}
+                        onClick={() => void handleReorder(section.id, "down")}
+                        className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
+                        title="Mover para baixo"
+                      >
+                        <ChevronDown size={12} />
+                      </button>
+                    </div>
+                  )}
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#22D3EE]/10">
+                    <SectionIcon size={16} className="text-[#22D3EE]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-[var(--platform-text)]">{meta.label}</span>
+                      {isDirty && (
+                        <span className="rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">
+                          Não salvo
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-0.5 truncate text-xs text-[var(--platform-text)]/40">{meta.description}</p>
+                  </div>
+                  <ChevronRight
+                    size={15}
+                    className={`shrink-0 text-[var(--platform-text)]/30 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                  />
+                </button>
+
+                {/* Expanded content */}
+                {isExpanded && (
+                  <div className="border-t border-white/[0.06] px-4 pb-4">
+                    {/* Platform-only variant/order */}
+                    {!isClient && (
+                      <div className="mt-3 grid gap-3 md:grid-cols-2">
+                        <div>
+                          <label className={LABEL_CLS}>Variante</label>
+                          <input
+                            value={section.variant ?? "default"}
+                            onChange={(e) => updateSection(section.id, (cur) => ({ ...cur, variant: e.target.value }))}
+                            className={INPUT_CLS}
+                          />
+                        </div>
+                        <div>
+                          <label className={LABEL_CLS}>Ordem</label>
+                          <input
+                            type="number"
+                            value={section.order}
+                            onChange={(e) => updateSection(section.id, (cur) => ({ ...cur, order: Number(e.target.value || "0") }))}
+                            className={INPUT_CLS}
+                          />
+                        </div>
                       </div>
                     )}
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#22D3EE]/10">
-                      <SectionIcon size={15} className="text-[#22D3EE]" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-[var(--platform-text)]">
-                          {meta.label}
-                        </span>
-                        {section.variant && section.variant !== "default" && (
-                          <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[10px] text-[var(--platform-text)]/40">
-                            {section.variant}
-                          </span>
-                        )}
-                      </div>
-                      <span className={`text-[10px] font-semibold uppercase tracking-[0.14em] ${isDirty ? "text-amber-300" : "text-emerald-300"}`}>
-                        {isDirty ? "Não salvo" : "Salvo"}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => void saveSection(section)}
-                    disabled={state === "saving"}
-                    className="flex items-center gap-1.5 rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <Save size={12} />
-                    Salvar
-                  </button>
-                </div>
 
-                {/* Platform-only variant/order */}
-                {!isClient && (
-                  <div className="mt-3 grid gap-3 md:grid-cols-2">
-                    <div>
-                      <label className={LABEL_CLS}>Variante</label>
-                      <input
-                        value={section.variant ?? "default"}
-                        onChange={(e) => updateSection(section.id, (cur) => ({ ...cur, variant: e.target.value }))}
-                        className={INPUT_CLS}
-                      />
-                    </div>
-                    <div>
-                      <label className={LABEL_CLS}>Ordem</label>
-                      <input
-                        type="number"
-                        value={section.order}
-                        onChange={(e) => updateSection(section.id, (cur) => ({ ...cur, order: Number(e.target.value || "0") }))}
-                        className={INPUT_CLS}
-                      />
+                    {/* Section-specific fields */}
+                    {section.type === "hero" && renderHeroFields(section)}
+                    {section.type === "services" && renderServicesFields(section)}
+                    {section.type === "cta" && renderCtaFields(section)}
+                    {section.type === "about" && renderAboutFields(section)}
+                    {section.type === "contact" && renderContactFields(section)}
+                    {section.type === "testimonials" && renderTestimonialsFields(section)}
+                    {section.type === "faq" && renderFaqFields(section)}
+                    {section.type === "blog" && renderBlogFields(section)}
+                    {section.type === "gallery" && renderGalleryFields(section)}
+                    {section.type === "events" && renderEventsFields(section)}
+
+                    {/* Footer actions */}
+                    <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
+                      {/* Delete section */}
+                      {isConfirmingDelete ? (
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle size={13} className="shrink-0 text-red-400" />
+                          <span className="text-xs text-red-300">Remover esta seção?</span>
+                          <button
+                            type="button"
+                            onClick={() => void handleDeleteSection(section.id)}
+                            disabled={state === "saving"}
+                            className="rounded-lg bg-red-500/20 px-2.5 py-1 text-xs font-semibold text-red-300 transition hover:bg-red-500/30 disabled:opacity-50"
+                          >
+                            Sim, remover
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDeletingSection(null)}
+                            className="text-xs text-[var(--platform-text)]/50 hover:text-[var(--platform-text)]"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setDeletingSection(section.id)}
+                          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-[var(--platform-text)]/40 transition hover:bg-red-500/10 hover:text-red-400"
+                        >
+                          <Trash2 size={12} />
+                          Remover seção
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => void saveSection(section)}
+                        disabled={state === "saving" || !isDirty}
+                        className="flex items-center gap-1.5 rounded-lg bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Save size={12} />
+                        {state === "saving" ? "Salvando..." : "Salvar alterações"}
+                      </button>
                     </div>
                   </div>
                 )}
-
-                {/* Section-specific fields */}
-                {section.type === "hero" && renderHeroFields(section)}
-                {section.type === "services" && renderServicesFields(section)}
-                {section.type === "cta" && renderCtaFields(section)}
-                {section.type === "about" && renderAboutFields(section)}
-                {section.type === "contact" && renderContactFields(section)}
-                {section.type === "testimonials" && renderTestimonialsFields(section)}
-                {section.type === "faq" && renderFaqFields(section)}
-                {section.type === "blog" && renderBlogFields(section)}
-                {section.type === "gallery" && renderGalleryFields(section)}
-                {section.type === "events" && renderEventsFields(section)}
               </article>
             );
           })}
+
+          {/* Add Section Panel */}
+          {availableToAdd.length > 0 && (
+            <div className="rounded-2xl border border-dashed border-white/10 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--platform-text)]/40">
+                Adicionar seção
+              </p>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {availableToAdd.map((type) => {
+                  const meta = SECTION_META[type];
+                  const SectionIcon = meta.Icon;
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      disabled={state === "saving"}
+                      onClick={() => void handleAddSection(type)}
+                      className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 text-left transition hover:border-[#22D3EE]/30 hover:bg-[#22D3EE]/5 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#22D3EE]/8">
+                        <SectionIcon size={14} className="text-[#22D3EE]/70" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold text-[var(--platform-text)]/80">{meta.label}</p>
+                        <p className="mt-0.5 truncate text-[10px] text-[var(--platform-text)]/35">{meta.description}</p>
+                      </div>
+                      <Plus size={13} className="ml-auto shrink-0 text-[#22D3EE]/50" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <MiniSitePreview

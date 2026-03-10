@@ -3,7 +3,27 @@ import { NextResponse } from "next/server";
 import { getCurrentUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
 import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
-import type { Section } from "@/lib/tenant/types";
+import type { Section, SectionType } from "@/lib/tenant/types";
+
+const VALID_SECTION_TYPES: SectionType[] = [
+  "hero", "about", "services", "cta", "testimonials", "contact", "faq", "blog", "gallery", "events",
+];
+
+function buildDefaultContent(type: SectionType): Record<string, unknown> {
+  switch (type) {
+    case "hero":         return { eyebrow: "", title: "", subtitle: "", ctaLabel: "Entrar em contato", ctaHref: "", imageUrl: "" };
+    case "about":        return { title: "Sobre", body: "", imageUrl: "" };
+    case "services":     return { title: "Serviços", cards: [], imageUrl: "" };
+    case "cta":          return { title: "Vamos conversar?", description: "", buttonLabel: "Entrar em contato", buttonHref: "" };
+    case "testimonials": return { title: "Depoimentos", items: [] };
+    case "contact":      return { title: "Contato", subtitle: "", socialLinks: [] };
+    case "faq":          return { title: "Perguntas Frequentes", items: [] };
+    case "blog":         return { title: "Blog", posts: [] };
+    case "gallery":      return { title: "Galeria", images: [] };
+    case "events":       return { title: "Agenda", events: [] };
+    default:             return {};
+  }
+}
 
 type HomePageRow = {
   id: string;
@@ -235,4 +255,89 @@ export async function PATCH(request: Request) {
       content: data.content ?? {},
     },
   });
+}
+
+export async function POST(request: Request) {
+  const { errorResponse, siteId } = await resolveScopedSiteId(request);
+  if (errorResponse) return errorResponse;
+  if (!siteId) return NextResponse.json({ error: "Missing siteId." }, { status: 400 });
+
+  const body = (await request.json().catch(() => null)) as { type?: string } | null;
+  const sectionType = body?.type as SectionType | undefined;
+
+  if (!sectionType || !VALID_SECTION_TYPES.includes(sectionType)) {
+    return NextResponse.json({ error: "Invalid section type." }, { status: 400 });
+  }
+
+  const homePage = await getHomePageId(siteId);
+  if (homePage.error || !homePage.pageId || !homePage.supabase) {
+    return homePage.error ?? NextResponse.json({ error: "Could not resolve home page." }, { status: 400 });
+  }
+
+  // Get max existing order
+  const { data: existing } = await homePage.supabase
+    .from("sections")
+    .select("order")
+    .eq("page_id", homePage.pageId)
+    .order("order", { ascending: false })
+    .limit(1);
+
+  const nextOrder = existing && existing.length > 0 ? (existing[0].order as number) + 1 : 0;
+
+  const { data, error } = await homePage.supabase
+    .from("sections")
+    .insert({
+      page_id: homePage.pageId,
+      type: sectionType,
+      variant: "default",
+      order: nextOrder,
+      content: buildDefaultContent(sectionType),
+    })
+    .select("id,type,variant,order,content")
+    .single<SectionRow>();
+
+  if (error || !data) {
+    return NextResponse.json(
+      { error: "Could not create section.", details: error?.message ?? null },
+      { status: 400 },
+    );
+  }
+
+  return NextResponse.json({
+    ok: true,
+    section: {
+      id: data.id,
+      type: data.type,
+      variant: data.variant ?? "default",
+      order: data.order,
+      content: data.content ?? {},
+    },
+  });
+}
+
+export async function DELETE(request: Request) {
+  const { errorResponse, siteId } = await resolveScopedSiteId(request);
+  if (errorResponse) return errorResponse;
+  if (!siteId) return NextResponse.json({ error: "Missing siteId." }, { status: 400 });
+
+  const requestUrl = new URL(request.url);
+  const sectionId = requestUrl.searchParams.get("sectionId");
+  if (!sectionId) return NextResponse.json({ error: "Missing sectionId." }, { status: 400 });
+
+  const homePage = await getHomePageId(siteId);
+  if (homePage.error || !homePage.pageId || !homePage.supabase) {
+    return homePage.error ?? NextResponse.json({ error: "Could not resolve home page." }, { status: 400 });
+  }
+
+  const { error } = await homePage.supabase
+    .from("sections")
+    .delete()
+    .eq("id", sectionId)
+    .eq("page_id", homePage.pageId);
+
+  if (error) {
+    return NextResponse.json({ error: "Could not delete section.", details: error.message }, { status: 400 });
+  }
+
+  return NextResponse.json({ ok: true });
 }
