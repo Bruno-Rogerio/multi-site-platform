@@ -252,15 +252,71 @@ function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewPro
         </div>
       </div>
 
-      {/* Header style legend */}
-      <div className="mt-3 flex items-center justify-between px-1">
-        <span className="text-[10px] text-[var(--platform-text)]/40">Cabeçalho:</span>
-        <span className="text-[10px] font-semibold text-[var(--platform-text)]/60">
-          {(theme.headerStyle as string | undefined) === "solid" ? "Sólido" :
-           (theme.headerStyle as string | undefined) === "minimal" ? "Minimalista" : "Vidro (blur)"}
-        </span>
+      {/* Visual header style comparison */}
+      <div className="mt-4">
+        <p className="mb-2 px-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[var(--platform-text)]/40">
+          Estilo do cabeçalho
+        </p>
+        <div className="grid grid-cols-3 gap-1.5">
+          {HEADER_STYLES.map((hs) => {
+            const isSelected = headerStyle === hs.value;
+            const hBg =
+              hs.value === "solid"   ? bg :
+              hs.value === "minimal" ? "transparent" :
+              `${bg}bb`;
+            const hBorder =
+              hs.value === "minimal"
+                ? `1px solid ${text}40`
+                : `1px solid ${text}15`;
+            return (
+              <div
+                key={hs.value}
+                className={`overflow-hidden rounded-lg border ${
+                  isSelected ? "border-[#22D3EE]/60" : "border-white/10"
+                }`}
+              >
+                {/* Gradient context behind header to reveal transparency */}
+                <div
+                  className="relative h-10"
+                  style={{ background: `linear-gradient(135deg, ${primary}55, ${accent}45)` }}
+                >
+                  <div
+                    className="absolute inset-x-0 top-0 flex items-center justify-between px-2 py-1.5"
+                    style={{
+                      backgroundColor: hBg,
+                      borderBottom: hBorder,
+                      backdropFilter: hs.value === "blur" ? "blur(6px)" : undefined,
+                      WebkitBackdropFilter: hs.value === "blur" ? "blur(6px)" : undefined,
+                    }}
+                  >
+                    <span className="truncate text-[8px] font-bold" style={{ color: text }}>
+                      {siteName.slice(0, 8)}
+                    </span>
+                    <span
+                      className="px-1.5 py-0.5 text-[7px] font-bold text-white"
+                      style={{ background: primary, borderRadius: btnRadius }}
+                    >
+                      CTA
+                    </span>
+                  </div>
+                </div>
+                <div
+                  className={`py-1 text-center text-[8px] font-medium ${
+                    isSelected
+                      ? "bg-[#22D3EE]/10 text-[#22D3EE]"
+                      : "text-[var(--platform-text)]/50"
+                  }`}
+                >
+                  {hs.label}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-      <div className="mt-1 flex items-center justify-between px-1">
+
+      {/* Divider label */}
+      <div className="mt-2 flex items-center justify-between px-1">
         <span className="text-[10px] text-[var(--platform-text)]/40">Separador:</span>
         <span className="text-[10px] font-semibold text-[var(--platform-text)]/60">
           {(theme.dividerStyle as string | undefined) === "wave" ? "Onda" :

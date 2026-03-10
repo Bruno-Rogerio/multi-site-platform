@@ -138,7 +138,7 @@ export async function POST(request: Request) {
   // Fetch site to determine plan → SLA
   const { data: site } = await supabase
     .from("sites")
-    .select("id, name, theme_settings")
+    .select("id, name, plan, theme_settings")
     .eq("id", profile.site_id)
     .maybeSingle();
 
@@ -147,7 +147,8 @@ export async function POST(request: Request) {
   }
 
   const selectedPlan = (site.theme_settings as Record<string, unknown>)?.selectedPlan as string | undefined;
-  const slaHours = selectedPlan === "premium-full" ? 2 : 24;
+  const isPremium = selectedPlan === "premium-full" || site.plan === "pro";
+  const slaHours = isPremium ? 2 : 24;
   const slaDeadline = new Date(Date.now() + slaHours * 3_600_000).toISOString();
 
   // Insert ticket
