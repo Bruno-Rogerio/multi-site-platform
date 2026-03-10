@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 const TIMEOUT_MS = 30 * 60 * 1000; // 30 min
-const WARN_MS = 5 * 60 * 1000; // warn at 28 min
+const WARN_MS = 28 * 60 * 1000; // warn at 28 min
 
 export function SessionGuard({ children }: { children: React.ReactNode }) {
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
