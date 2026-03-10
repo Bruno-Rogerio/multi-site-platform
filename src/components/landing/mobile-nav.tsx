@@ -67,6 +67,14 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             >
               Começar agora
             </Link>
+
+            <Link
+              href="/login"
+              onClick={onClose}
+              className="rounded-xl border border-white/15 bg-white/[0.04] px-8 py-3 text-base font-medium text-[var(--platform-text)] transition hover:bg-white/[0.09]"
+            >
+              Login
+            </Link>
           </nav>
         </motion.div>
       )}

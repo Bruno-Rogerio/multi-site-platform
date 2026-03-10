@@ -78,12 +78,20 @@ export function StickyHeader({ brandElement }: StickyHeaderProps) {
             </Link>
           </nav>
 
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="rounded-lg p-2 text-[var(--platform-text)] transition hover:bg-white/[0.06] md:hidden"
-          >
-            <Menu size={22} />
-          </button>
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              href="/login"
+              className="rounded-lg border border-white/15 bg-white/[0.03] px-3 py-1.5 text-[13px] font-medium text-[var(--platform-text)] transition hover:bg-white/[0.08]"
+            >
+              Login
+            </Link>
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="rounded-lg p-2 text-[var(--platform-text)] transition hover:bg-white/[0.06]"
+            >
+              <Menu size={22} />
+            </button>
+          </div>
         </div>
       </header>
 
