@@ -113,22 +113,23 @@ export async function PATCH(request: Request, { params }: Params) {
     // Send status change email to client
     const adminClient = createSupabaseAdminClient();
     if (adminClient) {
-      adminClient
-        .from("user_profiles")
-        .select("email, full_name")
-        .eq("id", ticket.owner_id)
-        .maybeSingle()
-        .then(({ data: ownerProfile }) => {
+      void (async () => {
+        try {
+          const { data: ownerProfile } = await adminClient
+            .from("user_profiles")
+            .select("email, full_name")
+            .eq("id", ticket.owner_id)
+            .maybeSingle();
           if (ownerProfile?.email) {
-            sendTicketStatusChangedEmail(
+            await sendTicketStatusChangedEmail(
               ownerProfile.email,
               ownerProfile.full_name ?? "Cliente",
               { id: ticketId, subject: ticket.subject },
               newStatus,
-            ).catch(() => {});
+            );
           }
-        })
-        .catch(() => {});
+        } catch { /* ignore */ }
+      })();
     }
   }
 
