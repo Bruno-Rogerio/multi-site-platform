@@ -304,13 +304,17 @@ export async function POST(request: Request) {
     themeSettings.textColor = minimal.textColor;
   }
 
+  const sitePlan = ["premium", "premium-full", "construir"].includes(payload.selectedPlan ?? "")
+    ? "pro"
+    : "landing";
+
   let site: { id: string; name: string; domain: string };
 
   if (existingSite) {
     // Update existing draft
     await admin
       .from("sites")
-      .update({ name: businessName, theme_settings: themeSettings })
+      .update({ name: businessName, plan: sitePlan, theme_settings: themeSettings })
       .eq("id", existingSite.id);
     site = { id: existingSite.id, name: businessName, domain };
   } else {
@@ -320,7 +324,7 @@ export async function POST(request: Request) {
       .insert({
         name: businessName,
         domain,
-        plan: "landing",
+        plan: sitePlan,
         theme_settings: themeSettings,
       })
       .select("id,name,domain")

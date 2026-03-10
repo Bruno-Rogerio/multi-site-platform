@@ -127,10 +127,13 @@ async function handleCheckoutCompleted(session: StripeCheckoutSession) {
 
   // Remover flag de draft para ativar o site
   const { onboardingDraft: _, ...activeSettings } = settings;
+  const activePlan = ["premium", "premium-full", "construir"].includes(settings.selectedPlan as string)
+    ? "pro"
+    : "landing";
 
   const { error: siteUpdateError } = await admin
     .from("sites")
-    .update({ theme_settings: activeSettings })
+    .update({ theme_settings: activeSettings, plan: activePlan })
     .eq("id", site.id);
 
   if (siteUpdateError) {

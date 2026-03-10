@@ -283,10 +283,13 @@ export async function POST(request: Request) {
     // Remove onboardingDraft flag to activate the site
     const currentSettings = (site.theme_settings as Record<string, unknown>) ?? {};
     const { onboardingDraft: _, ...activeSettings } = currentSettings;
+    const activePlan = ["premium", "premium-full", "construir"].includes(currentSettings.selectedPlan as string)
+      ? "pro"
+      : "landing";
 
     await supabaseAdmin
       .from("sites")
-      .update({ theme_settings: activeSettings })
+      .update({ theme_settings: activeSettings, plan: activePlan })
       .eq("id", site.id);
 
     // Create billing profile as active (no Stripe)
