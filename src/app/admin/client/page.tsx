@@ -52,7 +52,8 @@ export default async function ClientAdminPage() {
 
   const ts = site?.theme_settings ?? {};
   const isDraft = ts.onboardingDraft === true;
-  const selectedPlan = (ts.selectedPlan as string) ?? "basico";
+  // Usar sites.plan como fonte da verdade (evita discrepâncias com selectedPlan antigo)
+  const selectedPlan = site?.plan === "pro" ? "premium-full" : "basico";
   const planInfo = PLAN_LABELS[selectedPlan] ?? PLAN_LABELS.basico;
   const previewExpiresAt = ts.previewExpiresAt as string | undefined;
 

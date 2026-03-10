@@ -54,7 +54,8 @@ export default async function ClientSettingsPage({ searchParams }: Props) {
     billing = billingResult.data;
   }
 
-  const selectedPlan = (site?.theme_settings?.selectedPlan as string) ?? "basico";
+  // Usar sites.plan como fonte da verdade
+  const selectedPlan = site?.plan === "pro" ? "premium-full" : "basico";
   const initialTab = resolveTab(params.tab);
   const domainSuccess = params.success === "1" && params.tab === "dominio";
 
