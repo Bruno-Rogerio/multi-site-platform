@@ -11,7 +11,6 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { AnimatedSection } from "@/components/landing/animated-section";
 import { FeatureCard, type IconName } from "@/components/landing/feature-card";
 import { ProductMockup } from "@/components/landing/product-mockup";
-import { SiteShowcase } from "@/components/landing/site-showcase";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { TestimonialsStrip } from "@/components/landing/testimonials-strip";
 import { FaqAccordion, type FaqItem } from "@/components/landing/faq-accordion";
@@ -146,9 +145,6 @@ export default async function PlatformLandingPage() {
           </div>
         </section>
 
-        {/* ─── Site Showcase ─── */}
-        <SiteShowcase />
-
         {/* ─── Funcionalidades ─── */}
         <section id="funcionalidades" className="py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
@@ -179,19 +175,19 @@ export default async function PlatformLandingPage() {
           </div>
         </section>
 
-        {/* ─── Product Mockup ─── */}
-        <section className="py-20 md:py-28">
+        {/* ─── Exemplos ─── */}
+        <section id="exemplos" className="py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
-                Veja na prática
+                Exemplos reais
               </p>
               <h2 className="mt-3 text-3xl font-black text-[var(--platform-text)] md:text-4xl">
-                Sites que impressionam seus clientes
+                Veja como fica o seu site
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-base text-[var(--platform-text)]/60">
-                Cada site é único, com a identidade visual do profissional. Veja
-                como um site criado na BuildSphere se parece.
+                Sites criados com a BuildSphere, para profissionais de diferentes
+                segmentos. Em menos de 5 minutos você tem um como esse.
               </p>
             </AnimatedSection>
 

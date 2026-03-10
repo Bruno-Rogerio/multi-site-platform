@@ -1,106 +1,340 @@
-export default function DemoPersonal() {
-  return (
-    <main style={{ fontFamily: "'Segoe UI', system-ui, sans-serif", background: "#030803", minHeight: "100vh", color: "#F0FDF4" }}>
-      {/* Nav */}
-      <nav style={{ background: "rgba(3,8,3,0.95)", borderBottom: "1px solid rgba(34,197,94,0.15)", padding: "16px 48px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: "33px", zIndex: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{ width: "8px", height: "32px", background: "linear-gradient(180deg,#22C55E,#16A34A)", borderRadius: "4px" }} />
-          <div>
-            <p style={{ margin: 0, fontSize: "15px", fontWeight: "900", color: "#F0FDF4", letterSpacing: "-0.5px", textTransform: "uppercase" }}>Diego Martins</p>
-            <p style={{ margin: 0, fontSize: "10px", color: "rgba(34,197,94,0.6)", letterSpacing: "0.1em" }}>Personal Trainer · CREF 012345-G/SP</p>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
-          {["Programas", "Resultados", "Sobre", "Contato"].map(l => (
-            <a key={l} href="#" style={{ fontSize: "12px", color: "rgba(240,253,244,0.4)", textDecoration: "none", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.05em" }}>{l}</a>
-          ))}
-          <a href="#" style={{ background: "linear-gradient(135deg,#22C55E,#16A34A)", color: "#fff", padding: "10px 22px", borderRadius: "8px", fontSize: "13px", fontWeight: "800", textDecoration: "none" }}>Começar agora</a>
-        </div>
-      </nav>
+import type { CSSProperties } from "react";
 
-      {/* Hero */}
-      <section style={{ padding: "80px 48px 72px", maxWidth: "1100px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr auto", gap: "64px", alignItems: "center" }}>
-        <div>
-          <div style={{ display: "inline-block", background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)", color: "#22C55E", fontSize: "11px", fontWeight: "700", letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 12px", borderRadius: "6px", marginBottom: "20px" }}>Personal Trainer Certificado</div>
-          <h1 style={{ margin: "0 0 16px", fontSize: "52px", fontWeight: "900", lineHeight: "1.05", color: "#F0FDF4", letterSpacing: "-1.5px", textTransform: "uppercase" }}>
-            Resultados reais,<br/><span style={{ color: "#22C55E" }}>sem desculpas</span>
-          </h1>
-          <p style={{ margin: "0 0 36px", fontSize: "17px", color: "rgba(240,253,244,0.5)", lineHeight: "1.7" }}>
-            Mais de 500 alunos transformados com método exclusivo de alta performance. Treino personalizado, acompanhamento próximo e resultados que duram.
-          </p>
-          <div style={{ display: "flex", gap: "12px" }}>
-            <a href="#" style={{ background: "linear-gradient(135deg,#22C55E,#16A34A)", color: "#fff", padding: "14px 32px", borderRadius: "10px", fontSize: "15px", fontWeight: "800", textDecoration: "none", boxShadow: "0 8px 32px rgba(34,197,94,0.3)" }}>Quero começar agora</a>
-            <a href="#" style={{ border: "1px solid rgba(34,197,94,0.25)", color: "#22C55E", padding: "14px 28px", borderRadius: "10px", fontSize: "15px", fontWeight: "600", textDecoration: "none" }}>Ver programas</a>
-          </div>
+// Demo: Personal Trainer — fiel ao que a plataforma entrega
+// Seções: Header · Hero · Serviços · Sobre · Depoimento · Contato · Footer
+
+const PRIMARY = "#22C55E";
+const ACCENT = "#16A34A";
+const BG = "#030803";
+const TEXT = "#F0FDF4";
+const BORDER = "rgba(34,197,94,0.14)";
+const SURFACE = "rgba(255,255,255,0.04)";
+
+const vars = {
+  "--site-primary": PRIMARY,
+  "--site-accent": ACCENT,
+  "--site-background": BG,
+  "--site-text": TEXT,
+  "--site-border": BORDER,
+  "--site-surface": SURFACE,
+  "--site-radius": "10px",
+  "--site-shadow": "0 2px 12px rgba(0,0,0,0.3)",
+  fontFamily: "'Sora', system-ui, sans-serif",
+  background: BG,
+  color: TEXT,
+  minHeight: "100vh",
+} as CSSProperties;
+
+const services = [
+  {
+    icon: "🏋️",
+    title: "Musculação",
+    description: "Treino personalizado para ganho de força e definição muscular com acompanhamento individualizado.",
+  },
+  {
+    icon: "🏃",
+    title: "Emagrecimento",
+    description: "Protocolo focado em queima de gordura com exercícios funcionais e orientação nutricional básica.",
+  },
+  {
+    icon: "⚡",
+    title: "Condicionamento Físico",
+    description: "Melhore sua resistência, mobilidade e desempenho esportivo com treinos de alta performance.",
+  },
+];
+
+export default function PersonalDemo() {
+  return (
+    <div style={vars}>
+      {/* ─── Header ─── */}
+      <header
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          borderBottom: `1px solid ${BORDER}`,
+          background: `${BG}ee`,
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1120,
+            margin: "0 auto",
+            padding: "0 24px",
+            height: 64,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <a
+            href="#"
+            style={{ fontWeight: 800, fontSize: 18, color: TEXT, textDecoration: "none", textTransform: "uppercase", letterSpacing: "-0.5px" }}
+          >
+            Diego Martins
+          </a>
+          <nav style={{ display: "flex", gap: 28, alignItems: "center" }}>
+            {["Serviços", "Sobre", "Depoimentos", "Contato"].map((l) => (
+              <a
+                key={l}
+                href={`#${l.toLowerCase()}`}
+                style={{ fontSize: 14, color: TEXT, opacity: 0.55, textDecoration: "none" }}
+              >
+                {l}
+              </a>
+            ))}
+          </nav>
         </div>
-        <div style={{ display: "grid", gap: "16px" }}>
-          {[["500+", "Alunos transformados"], ["4.9★", "Avaliação média"], ["8 anos", "De experiência"], ["100%", "Foco no resultado"]].map(([num, label]) => (
-            <div key={label} style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)", borderRadius: "12px", padding: "16px 24px", minWidth: "180px" }}>
-              <p style={{ margin: "0 0 2px", fontSize: "24px", fontWeight: "900", color: "#22C55E" }}>{num}</p>
-              <p style={{ margin: 0, fontSize: "12px", color: "rgba(240,253,244,0.4)" }}>{label}</p>
-            </div>
-          ))}
+      </header>
+
+      {/* ─── Hero ─── */}
+      <section style={{ padding: "88px 24px 80px" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <span
+            style={{
+              display: "inline-block",
+              background: "rgba(34,197,94,0.12)",
+              border: `1px solid rgba(34,197,94,0.25)`,
+              color: PRIMARY,
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              padding: "4px 12px",
+              borderRadius: 6,
+              marginBottom: 20,
+            }}
+          >
+            Personal Trainer Certificado · CREF 012345-G/SP
+          </span>
+
+          <h1
+            style={{
+              fontSize: "clamp(32px, 5vw, 52px)",
+              fontWeight: 900,
+              color: TEXT,
+              lineHeight: 1.1,
+              letterSpacing: "-1.5px",
+              textTransform: "uppercase",
+              marginBottom: 20,
+            }}
+          >
+            Resultados reais,{" "}
+            <span style={{ color: PRIMARY }}>sem desculpas</span>
+          </h1>
+
+          <p style={{ fontSize: 17, color: TEXT, opacity: 0.55, lineHeight: 1.7, marginBottom: 32, maxWidth: 540 }}>
+            Mais de 500 alunos transformados com método exclusivo de alta performance.
+            Acompanhamento próximo, treinos sob medida e resultados duradouros.
+          </p>
+
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <a
+              href="https://wa.me/5511999999999"
+              style={{
+                background: `linear-gradient(135deg, ${PRIMARY}, ${ACCENT})`,
+                color: "#fff",
+                fontSize: 15,
+                fontWeight: 700,
+                padding: "14px 28px",
+                borderRadius: 10,
+                textDecoration: "none",
+                display: "inline-block",
+              }}
+            >
+              Quero começar agora
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* Programs */}
-      <section style={{ background: "rgba(34,197,94,0.03)", borderTop: "1px solid rgba(34,197,94,0.08)", padding: "72px 48px" }}>
-        <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
-          <p style={{ margin: "0 0 6px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase", color: "#22C55E" }}>Programas</p>
-          <h2 style={{ margin: "0 0 48px", fontSize: "32px", fontWeight: "800", color: "#F0FDF4" }}>Escolha seu objetivo</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px" }}>
-            {[
-              ["🏋️", "Musculação & Força", "Ganho de massa, força e definição muscular com periodização científica.", "3x/semana", "R$ 320/mês"],
-              ["🏃", "Emagrecimento Total", "Protocolo completo para queima de gordura com acompanhamento nutricional.", "5x/semana", "R$ 420/mês"],
-              ["⚡", "Performance Atlética", "Para atletas e esportistas que buscam o próximo nível de rendimento.", "4x/semana", "R$ 520/mês"],
-            ].map(([icon, name, desc, freq, price]) => (
-              <div key={name} style={{ background: "#050D05", border: "1px solid rgba(34,197,94,0.15)", borderRadius: "16px", padding: "28px 24px", position: "relative", overflow: "hidden" }}>
-                <div style={{ position: "absolute", top: 0, right: 0, width: "60px", height: "60px", background: "radial-gradient(circle,rgba(34,197,94,0.08),transparent)", borderRadius: "0 16px 0 60px" }} />
-                <div style={{ fontSize: "32px", marginBottom: "16px" }}>{icon}</div>
-                <h3 style={{ margin: "0 0 8px", fontSize: "17px", fontWeight: "700", color: "#F0FDF4" }}>{name}</h3>
-                <p style={{ margin: "0 0 16px", fontSize: "13px", color: "rgba(240,253,244,0.45)", lineHeight: "1.6" }}>{desc}</p>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "12px", color: "rgba(34,197,94,0.6)", fontWeight: "600" }}>{freq}</span>
-                  <span style={{ fontSize: "16px", fontWeight: "800", color: "#22C55E" }}>{price}</span>
-                </div>
+      {/* ─── Stats ─── */}
+      <div
+        style={{
+          borderTop: `1px solid ${BORDER}`,
+          borderBottom: `1px solid ${BORDER}`,
+          display: "flex",
+          flexWrap: "wrap",
+        }}
+      >
+        {[["500+", "Alunos atendidos"], ["4.9★", "Avaliação média"], ["8 anos", "de experiência"]].map(([n, l]) => (
+          <div
+            key={l}
+            style={{ flex: "1 1 160px", textAlign: "center", padding: "24px 16px" }}
+          >
+            <p style={{ margin: 0, fontSize: 28, fontWeight: 900, color: PRIMARY }}>{n}</p>
+            <p style={{ margin: "4px 0 0", fontSize: 13, color: TEXT, opacity: 0.5 }}>{l}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ─── Serviços ─── */}
+      <section id="serviços" style={{ padding: "72px 24px" }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: PRIMARY,
+              marginBottom: 12,
+            }}
+          >
+            Programas
+          </p>
+          <h2 style={{ fontSize: 30, fontWeight: 800, color: TEXT, marginBottom: 40 }}>
+            O que ofereço
+          </h2>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+            {services.map((s) => (
+              <div
+                key={s.title}
+                style={{
+                  background: SURFACE,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: 16,
+                  padding: "28px 24px",
+                }}
+              >
+                <div style={{ fontSize: 32, marginBottom: 14 }}>{s.icon}</div>
+                <h3 style={{ fontSize: 17, fontWeight: 700, color: TEXT, marginBottom: 8 }}>{s.title}</h3>
+                <p style={{ fontSize: 14, color: TEXT, opacity: 0.5, lineHeight: 1.65 }}>{s.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonial */}
-      <section style={{ padding: "72px 48px", maxWidth: "1100px", margin: "0 auto" }}>
-        <p style={{ margin: "0 0 6px", fontSize: "11px", fontWeight: "700", letterSpacing: "0.15em", textTransform: "uppercase", color: "#22C55E" }}>Resultados reais</p>
-        <h2 style={{ margin: "0 0 40px", fontSize: "32px", fontWeight: "800", color: "#F0FDF4" }}>O que dizem os alunos</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
-          {[
-            ["Em 4 meses perdi 14kg e ganhei disposição que não tinha há anos. O Diego é mais que um personal, é um transformador de vidas.", "Fernanda R.", "Programa Emagrecimento · 4 meses"],
-            ["Eu já treinei com vários profissionais. Nenhum teve tanto impacto quanto o método do Diego. Em 6 meses bati meu recorde no supino.", "Marcos A.", "Programa Força · 6 meses"],
-          ].map(([quote, name, label]) => (
-            <div key={name} style={{ background: "rgba(34,197,94,0.04)", border: "1px solid rgba(34,197,94,0.12)", borderRadius: "16px", padding: "28px 24px" }}>
-              <p style={{ margin: "0 0 16px", fontSize: "15px", color: "rgba(240,253,244,0.7)", lineHeight: "1.7", fontStyle: "italic" }}>&ldquo;{quote}&rdquo;</p>
-              <div>
-                <p style={{ margin: 0, fontSize: "14px", fontWeight: "700", color: "#F0FDF4" }}>{name}</p>
-                <p style={{ margin: 0, fontSize: "12px", color: "rgba(34,197,94,0.6)" }}>{label}</p>
-              </div>
-            </div>
-          ))}
+      {/* ─── Sobre ─── */}
+      <section
+        id="sobre"
+        style={{
+          padding: "72px 24px",
+          background: "rgba(34,197,94,0.04)",
+          borderTop: `1px solid ${BORDER}`,
+          borderBottom: `1px solid ${BORDER}`,
+        }}
+      >
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: PRIMARY,
+              marginBottom: 12,
+            }}
+          >
+            Sobre o profissional
+          </p>
+          <h2 style={{ fontSize: 28, fontWeight: 800, color: TEXT, marginBottom: 20 }}>Diego Martins</h2>
+          <p style={{ fontSize: 15, color: TEXT, opacity: 0.55, lineHeight: 1.75 }}>
+            Graduado em Educação Física com 8 anos de experiência no mercado. Especialista em composição corporal
+            e treinamento funcional de alta intensidade para todos os níveis. Atende presencialmente em São Paulo
+            e de forma online para todo o Brasil, com planilhas individualizadas e acompanhamento por WhatsApp.
+          </p>
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ background: "linear-gradient(135deg,rgba(34,197,94,0.15),rgba(22,163,74,0.08))", border: "1px solid rgba(34,197,94,0.15)", margin: "0 48px 48px", borderRadius: "24px", padding: "64px 48px", textAlign: "center" }}>
-        <h2 style={{ margin: "0 0 12px", fontSize: "36px", fontWeight: "900", color: "#F0FDF4", letterSpacing: "-1px" }}>Sua transformação começa hoje</h2>
-        <p style={{ margin: "0 0 32px", fontSize: "17px", color: "rgba(240,253,244,0.5)" }}>Primeira semana gratuita. Sem compromisso, sem desculpas.</p>
-        <a href="#" style={{ background: "linear-gradient(135deg,#22C55E,#16A34A)", color: "#fff", padding: "16px 40px", borderRadius: "12px", fontSize: "16px", fontWeight: "800", textDecoration: "none", display: "inline-block", boxShadow: "0 8px 32px rgba(34,197,94,0.35)" }}>Começar agora — grátis</a>
+      {/* ─── Depoimentos ─── */}
+      <section id="depoimentos" style={{ padding: "72px 24px" }}>
+        <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: PRIMARY,
+              marginBottom: 12,
+            }}
+          >
+            Depoimentos
+          </p>
+          <h2 style={{ fontSize: 28, fontWeight: 800, color: TEXT, marginBottom: 36 }}>Resultados reais</h2>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+            {[
+              { quote: "Em 4 meses perdi 14kg com saúde. O Diego está sempre presente, ajusta o treino quando preciso e motiva demais. Recomendo muito.", author: "Fernanda R.", detail: "Programa Emagrecimento" },
+              { quote: "Treinei com vários personais e o Diego é diferente. O acompanhamento é muito mais próximo e os resultados aparecem rápido.", author: "Lucas M.", detail: "Programa Musculação" },
+            ].map((t) => (
+              <div
+                key={t.author}
+                style={{
+                  background: "rgba(34,197,94,0.04)",
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: 16,
+                  padding: "28px 24px",
+                }}
+              >
+                <p style={{ fontSize: 14, color: TEXT, opacity: 0.65, lineHeight: 1.7, fontStyle: "italic", marginBottom: 16 }}>
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: PRIMARY, margin: 0 }}>{t.author}</p>
+                <p style={{ fontSize: 12, color: TEXT, opacity: 0.4, margin: "2px 0 0" }}>{t.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{ padding: "28px 48px", borderTop: "1px solid rgba(34,197,94,0.08)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <p style={{ margin: 0, fontSize: "14px", fontWeight: "900", color: "#22C55E", textTransform: "uppercase" }}>Diego Martins</p>
-        <p style={{ margin: 0, fontSize: "12px", color: "rgba(240,253,244,0.2)" }}>CREF 012345-G/SP · São Paulo, SP</p>
+      {/* ─── Contato ─── */}
+      <section
+        id="contato"
+        style={{
+          padding: "64px 24px",
+          background: `linear-gradient(135deg, rgba(34,197,94,0.18), rgba(22,163,74,0.10))`,
+          borderTop: `1px solid ${BORDER}`,
+          textAlign: "center",
+        }}
+      >
+        <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: PRIMARY, marginBottom: 12 }}>
+          Contato
+        </p>
+        <h2 style={{ fontSize: 28, fontWeight: 800, color: TEXT, marginBottom: 12 }}>Sua transformação começa hoje</h2>
+        <p style={{ fontSize: 15, color: TEXT, opacity: 0.55, marginBottom: 28 }}>
+          Fale comigo pelo WhatsApp e vamos montar seu plano de treino personalizado.
+        </p>
+        <a
+          href="https://wa.me/5511999999999"
+          style={{
+            display: "inline-block",
+            background: PRIMARY,
+            color: "#fff",
+            fontSize: 15,
+            fontWeight: 700,
+            padding: "14px 32px",
+            borderRadius: 10,
+            textDecoration: "none",
+          }}
+        >
+          Falar no WhatsApp
+        </a>
+      </section>
+
+      {/* ─── Footer ─── */}
+      <footer
+        style={{
+          borderTop: `1px solid ${BORDER}`,
+          padding: "20px 24px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          flexWrap: "wrap",
+          gap: 8,
+          fontSize: 12,
+          color: TEXT,
+          opacity: 0.45,
+        }}
+      >
+        <span>Diego Martins · Personal Trainer · CREF 012345-G/SP · São Paulo, SP</span>
+        <span>Powered by BuildSphere</span>
       </footer>
-    </main>
+    </div>
   );
 }
