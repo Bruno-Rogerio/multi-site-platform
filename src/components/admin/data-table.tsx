@@ -61,9 +61,9 @@ export function DataTable<T>({
       )}
 
       {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#12182B]">
+      <div className="overflow-visible rounded-xl border border-white/10 bg-[#12182B]">
         {/* Header */}
-        <div className="hidden border-b border-white/10 bg-[#0B1020]/50 md:grid" style={{ gridTemplateColumns: columns.map(() => "1fr").join(" ") }}>
+        <div className="hidden rounded-t-xl border-b border-white/10 bg-[#0B1020]/50 md:grid" style={{ gridTemplateColumns: columns.map(() => "1fr").join(" ") }}>
           {columns.map((col) => (
             <div
               key={col.key}
@@ -76,15 +76,15 @@ export function DataTable<T>({
 
         {/* Rows */}
         {paginated.length === 0 ? (
-          <div className="py-12 text-center">
+          <div className="rounded-b-xl py-12 text-center">
             {emptyIcon && <div className="mx-auto mb-3">{emptyIcon}</div>}
             <p className="text-sm text-[var(--platform-text)]/40">{emptyMessage}</p>
           </div>
         ) : (
-          paginated.map((row) => (
+          paginated.map((row, rowIdx) => (
             <div
               key={keyExtractor(row)}
-              className="grid border-b border-white/5 transition hover:bg-white/[0.02] md:grid-cols-none"
+              className={`grid border-b border-white/5 transition hover:bg-white/[0.02] md:grid-cols-none ${rowIdx === paginated.length - 1 ? "rounded-b-xl" : ""}`}
               style={{ gridTemplateColumns: columns.map(() => "1fr").join(" ") }}
             >
               {columns.map((col) => (
