@@ -8,6 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: base,                        lastModified: new Date(), priority: 1.0, changeFrequency: "monthly" },
     { url: `${base}/quero-comecar`,     lastModified: new Date(), priority: 0.9, changeFrequency: "monthly" },
+    { url: `${base}/premium`,           lastModified: new Date(), priority: 0.8, changeFrequency: "monthly" },
   ];
 
   const admin = createSupabaseAdminClient();

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -6,6 +7,13 @@ import { Brand } from "@/components/platform/brand";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Criar meu site profissional — BuildSphere",
+  description:
+    "Configure seu site profissional em menos de 5 minutos. Escolha seu plano, personalize e publique. Sem código, sem taxa de setup.",
+  robots: { index: true, follow: false },
+};
 
 export default async function QueroComecarPage({
   searchParams,

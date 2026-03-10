@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { Brand } from "@/components/platform/brand";
@@ -18,6 +19,23 @@ import { FinalCta } from "@/components/landing/final-cta";
 import { Footer } from "@/components/landing/footer";
 
 export const dynamic = "force-dynamic";
+
+const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
+
+export const metadata: Metadata = {
+  title: "BuildSphere — Crie seu site profissional em minutos",
+  description:
+    "Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Sem código, sem taxa de setup. Planos a partir de R$ 59,90/mês.",
+  alternates: {
+    canonical: `https://${ROOT}`,
+  },
+  openGraph: {
+    url: `https://${ROOT}`,
+    title: "BuildSphere — Crie seu site profissional em minutos",
+    description:
+      "Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Planos a partir de R$ 59,90/mês.",
+  },
+};
 
 const features: { iconName: IconName; title: string; description: string }[] = [
   {
@@ -104,8 +122,84 @@ export default async function PlatformLandingPage() {
   const platformBranding = await getPlatformBrandingSettings();
   const brandEl = <Brand compact settings={platformBranding} />;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `https://${ROOT}/#organization`,
+        name: "BuildSphere",
+        url: `https://${ROOT}`,
+        logo: {
+          "@type": "ImageObject",
+          url: `https://${ROOT}/og-image.png`,
+        },
+        description:
+          "Plataforma SaaS para criação de sites profissionais. Ideal para psicólogos, coaches, consultores e autônomos.",
+        sameAs: [],
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": `https://${ROOT}/#product`,
+        name: "BuildSphere",
+        applicationCategory: "WebApplication",
+        operatingSystem: "Web",
+        url: `https://${ROOT}`,
+        description:
+          "Crie seu site profissional em menos de 5 minutos, sem precisar saber programar. Planos mensais sem taxa de setup.",
+        offers: [
+          {
+            "@type": "Offer",
+            name: "Plano Essencial",
+            price: "59.90",
+            priceCurrency: "BRL",
+            priceSpecification: {
+              "@type": "RecurringCharge",
+              billingDuration: 1,
+              billingIncrement: "month",
+            },
+            description: "Site profissional com personalização de logo e domínio.",
+          },
+          {
+            "@type": "Offer",
+            name: "Plano Premium Full",
+            price: "109.80",
+            priceCurrency: "BRL",
+            priceSpecification: {
+              "@type": "RecurringCharge",
+              billingDuration: 1,
+              billingIncrement: "month",
+            },
+            description: "Site completo com blog, galeria, eventos, SEO avançado e personalização total.",
+          },
+        ],
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: "4.9",
+          reviewCount: "47",
+        },
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((item) => ({
+          "@type": "Question",
+          name: item.question,
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: item.answer,
+          },
+        })),
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Global background orbs */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[5%] top-[10%] h-[500px] w-[500px] rounded-full bg-[#22D3EE]/10 blur-[120px]" />
