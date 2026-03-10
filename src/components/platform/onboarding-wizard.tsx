@@ -568,6 +568,16 @@ export function OnboardingWizard() {
   const [ownerPassword, setOwnerPassword] = useState("");
   const [ownerPasswordConfirm, setOwnerPasswordConfirm] = useState("");
 
+  // Fiscal / address fields (optional — for future NF-e)
+  const [fiscalPostalCode, setFiscalPostalCode] = useState("");
+  const [fiscalStreet, setFiscalStreet] = useState("");
+  const [fiscalNumber, setFiscalNumber] = useState("");
+  const [fiscalComplement, setFiscalComplement] = useState("");
+  const [fiscalNeighborhood, setFiscalNeighborhood] = useState("");
+  const [fiscalCity, setFiscalCity] = useState("");
+  const [fiscalState, setFiscalState] = useState("");
+  const [cepLoading, setCepLoading] = useState(false);
+
   const selectedPalette = useMemo(() => {
     if (paletteId === "custom") {
       return {
@@ -688,6 +698,32 @@ export function OnboardingWizard() {
     );
   }
 
+  async function fetchCep(rawCep: string) {
+    const cep = rawCep.replace(/\D/g, "");
+    if (cep.length !== 8) return;
+    setCepLoading(true);
+    try {
+      const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = (await res.json()) as {
+        erro?: boolean;
+        logradouro?: string;
+        bairro?: string;
+        localidade?: string;
+        uf?: string;
+      };
+      if (!data.erro) {
+        setFiscalStreet(data.logradouro ?? "");
+        setFiscalNeighborhood(data.bairro ?? "");
+        setFiscalCity(data.localidade ?? "");
+        setFiscalState(data.uf ?? "");
+      }
+    } catch {
+      // silently ignore — user can fill manually
+    } finally {
+      setCepLoading(false);
+    }
+  }
+
   async function createDraftTenant() {
     setSubmitState("submitting");
     setSubmitMessage("");
@@ -748,6 +784,13 @@ export function OnboardingWizard() {
         email: ownerEmail,
         password: ownerPassword,
         addonsSelected: effectiveAddonsSelected,
+        address: fiscalStreet || undefined,
+        addressNumber: fiscalNumber || undefined,
+        addressComplement: fiscalComplement || undefined,
+        neighborhood: fiscalNeighborhood || undefined,
+        postalCode: fiscalPostalCode.replace(/\D/g, "") || undefined,
+        city: fiscalCity || undefined,
+        state: fiscalState || undefined,
       }),
     });
 
@@ -1056,6 +1099,90 @@ export function OnboardingWizard() {
 
           <div className="mt-3 rounded-lg border border-white/10 bg-[#12182B] px-3 py-2 text-xs text-[var(--platform-text)]/75">
             Requisitos da senha: 10+ caracteres, maiuscula, minuscula, numero e simbolo.
+          </div>
+
+          <div className="mt-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#22D3EE]">
+              Dados para recibo / fiscal
+              <span className="ml-2 rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-[9px] normal-case tracking-normal text-[var(--platform-text)]/50">
+                Opcional — preenchimento facilita a emissão futura de NF
+              </span>
+            </p>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              <label className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--platform-text)]/65">
+                CEP
+                <div className="mt-1 flex gap-2">
+                  <input
+                    value={fiscalPostalCode}
+                    onChange={(event) => {
+                      setFiscalPostalCode(event.target.value);
+                      fetchCep(event.target.value);
+                    }}
+                    maxLength={9}
+                    className="w-full rounded-lg border border-white/15 bg-[#12182B] px-3 py-2 text-sm normal-case tracking-normal text-[var(--platform-text)] outline-none focus:border-[#22D3EE]"
+                    placeholder="00000-000"
+                  />
+                  {cepLoading ? (
+                    <span className="flex items-center text-xs text-[#22D3EE]/70">buscando...</span>
+                  ) : null}
+                </div>
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--platform-text)]/65">
+                Logradouro
+                <input
+                  value={fiscalStreet}
+                  onChange={(event) => setFiscalStreet(event.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-[#12182B] px-3 py-2 text-sm normal-case tracking-normal text-[var(--platform-text)] outline-none focus:border-[#22D3EE]"
+                  placeholder="Rua, Av., Travessa..."
+                />
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--platform-text)]/65">
+                Número
+                <input
+                  value={fiscalNumber}
+                  onChange={(event) => setFiscalNumber(event.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-[#12182B] px-3 py-2 text-sm normal-case tracking-normal text-[var(--platform-text)] outline-none focus:border-[#22D3EE]"
+                  placeholder="123"
+                />
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--platform-text)]/65">
+                Complemento
+                <input
+                  value={fiscalComplement}
+                  onChange={(event) => setFiscalComplement(event.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-[#12182B] px-3 py-2 text-sm normal-case tracking-normal text-[var(--platform-text)] outline-none focus:border-[#22D3EE]"
+                  placeholder="Apto, sala, bloco..."
+                />
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--platform-text)]/65">
+                Bairro
+                <input
+                  value={fiscalNeighborhood}
+                  onChange={(event) => setFiscalNeighborhood(event.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-[#12182B] px-3 py-2 text-sm normal-case tracking-normal text-[var(--platform-text)] outline-none focus:border-[#22D3EE]"
+                  placeholder="Bairro"
+                />
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--platform-text)]/65">
+                Cidade
+                <input
+                  value={fiscalCity}
+                  onChange={(event) => setFiscalCity(event.target.value)}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-[#12182B] px-3 py-2 text-sm normal-case tracking-normal text-[var(--platform-text)] outline-none focus:border-[#22D3EE]"
+                  placeholder="Cidade"
+                />
+              </label>
+              <label className="text-xs font-semibold uppercase tracking-[0.1em] text-[var(--platform-text)]/65">
+                Estado (UF)
+                <input
+                  value={fiscalState}
+                  onChange={(event) => setFiscalState(event.target.value.toUpperCase().slice(0, 2))}
+                  maxLength={2}
+                  className="mt-1 w-full rounded-lg border border-white/15 bg-[#12182B] px-3 py-2 text-sm normal-case tracking-normal text-[var(--platform-text)] outline-none focus:border-[#22D3EE]"
+                  placeholder="SP"
+                />
+              </label>
+            </div>
           </div>
 
           {checkoutState !== "idle" ? (

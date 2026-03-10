@@ -26,6 +26,9 @@ type RegisterCheckoutPayload = {
   addonsSelected?: string[];
   legalName?: string;
   address?: string;
+  addressNumber?: string;
+  addressComplement?: string;
+  neighborhood?: string;
   postalCode?: string;
   city?: string;
   state?: string;
@@ -299,6 +302,9 @@ export async function POST(request: Request) {
         monthly_amount: monthlyAmount,
         legal_name: payload.legalName || null,
         address: payload.address || null,
+        address_number: payload.addressNumber || null,
+        address_complement: payload.addressComplement || null,
+        neighborhood: payload.neighborhood || null,
         postal_code: payload.postalCode || null,
         city: payload.city || null,
         state: payload.state || null,
@@ -353,6 +359,9 @@ export async function POST(request: Request) {
       monthly_amount: monthlyAmount,
       legal_name: payload.legalName || null,
       address: payload.address || null,
+      address_number: payload.addressNumber || null,
+      address_complement: payload.addressComplement || null,
+      neighborhood: payload.neighborhood || null,
       postal_code: payload.postalCode || null,
       city: payload.city || null,
       state: payload.state || null,
