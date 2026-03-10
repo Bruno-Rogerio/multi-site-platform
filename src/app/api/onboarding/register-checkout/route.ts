@@ -4,6 +4,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
 import { validateDocument } from "@/lib/onboarding/validation";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { sendWelcomeEmail, sendReceiptEmail } from "@/lib/email";
 
 const BASE_MONTHLY_PRICE = 59.9;
 const ADDON_PRICES: Record<string, number> = {
@@ -311,6 +312,16 @@ export async function POST(request: Request) {
       },
       { onConflict: "user_id" },
     );
+
+    // Send welcome + receipt emails (mirrors what the Stripe webhook does)
+    const planName = monthlyAmount >= 100 ? "Plano Premium Full" : "Plano Básico";
+    const referenceId = `BYPASS-${site.id.slice(-8).toUpperCase()}`;
+    const dashboardUrl = `${process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ? `https://${process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN}` : "https://bsph.com.br"}/admin/client`;
+
+    await Promise.all([
+      sendWelcomeEmail(email, fullName, dashboardUrl),
+      sendReceiptEmail(email, fullName, monthlyAmount, planName, referenceId, new Date().toISOString()),
+    ]);
 
     return NextResponse.json({
       ok: true,
