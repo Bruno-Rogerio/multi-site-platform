@@ -353,6 +353,40 @@ export async function sendPaymentFailedEmail(
   await sendEmail(email, "Falha no pagamento — ação necessária — BuildSphere", html);
 }
 
+/**
+ * Sent when a platform admin is invited to create their account.
+ * The inviteUrl is a Supabase-generated magic link (generateLink type=invite).
+ */
+export async function sendAdminInviteEmail(
+  email: string,
+  inviteUrl: string,
+): Promise<void> {
+  const html = emailWrapper(`
+    <h1 style="margin:0 0 10px;font-size:26px;font-weight:800;color:#0f172a;letter-spacing:-0.5px;">
+      Você foi convidado(a) 🎉
+    </h1>
+    <p style="margin:0 0 20px;font-size:15px;color:#64748b;line-height:1.6;">
+      Você recebeu um convite para acessar o painel administrativo da
+      <strong style="color:#1e293b;">BuildSphere</strong> como administrador(a).
+      Clique no botão abaixo para definir sua senha e ativar sua conta.
+    </p>
+
+    ${infoBox("🔒", "Este link expira em <strong>24 horas</strong> e pode ser usado apenas uma vez.", "#eff6ff", "#bfdbfe", "#1d4ed8")}
+
+    ${ctaButton("Aceitar convite e definir senha", inviteUrl)}
+
+    <p style="margin:24px 0 0;font-size:12px;color:#94a3b8;line-height:1.5;">
+      Se o botão não funcionar, copie e cole este link no navegador:<br/>
+      <span style="color:#64748b;word-break:break-all;">${inviteUrl}</span>
+    </p>
+    <p style="margin:16px 0 0;font-size:12px;color:#cbd5e1;">
+      Se você não esperava este convite, ignore este e-mail com segurança.
+    </p>
+  `);
+
+  await sendEmail(email, "Convite para BuildSphere — defina sua senha", html);
+}
+
 /* ── Support Tickets ─────────────────────────────────────────────────────── */
 
 const CATEGORY_LABELS: Record<string, string> = {
