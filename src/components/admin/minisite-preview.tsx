@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { Section } from "@/lib/tenant/types";
 
-type SiteTheme = {
+export type SiteTheme = {
   primaryColor?: string;
   accentColor?: string;
   backgroundColor?: string;
@@ -14,6 +14,7 @@ type SiteTheme = {
   headerStyle?: string;
   buttonStyle?: string;
   fontFamily?: string;
+  [key: string]: unknown;
 } | null;
 
 type MiniSitePreviewProps = {

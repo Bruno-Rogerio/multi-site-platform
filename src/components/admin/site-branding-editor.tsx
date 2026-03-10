@@ -1,8 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { Lock, Sparkles, Monitor, Smartphone } from "lucide-react";
+import { Lock, Sparkles } from "lucide-react";
 
 import {
   palettePresets,
@@ -11,6 +10,8 @@ import {
   type PalettePreset,
 } from "@/lib/onboarding/palettes";
 import { UpgradeModal } from "@/components/admin/upgrade-modal";
+import { MiniSitePreview, type SiteTheme } from "@/components/admin/minisite-preview";
+import type { Section } from "@/lib/tenant/types";
 
 type SiteOption = {
   id: string;
@@ -25,6 +26,7 @@ type SiteBrandingEditorProps = {
   defaultSiteId: string | null;
   /** "basico" = locked view. "construir" | "premium-full" = full editor. */
   plan?: string;
+  initialSections?: Section[];
 };
 
 type Status =
@@ -92,196 +94,12 @@ function applyPalette(
   };
 }
 
-/* ── Appearance Mini Preview ─────────────────────────────────────────────── */
-
-type AppearancePreviewProps = {
-  siteName: string;
-  siteDomain: string;
-  theme: ThemeSettings;
-};
-
-function AppearancePreview({ siteName, siteDomain, theme }: AppearancePreviewProps) {
-  const [viewport, setViewport] = useState<"desktop" | "mobile">("desktop");
-
-  const primary     = (theme.primaryColor    as string | undefined) || "#3B82F6";
-  const accent      = (theme.accentColor     as string | undefined) || "#22D3EE";
-  const bg          = (theme.backgroundColor as string | undefined) || "#0B1020";
-  const text        = (theme.textColor       as string | undefined) || "#EAF0FF";
-  const font        = (theme.fontFamily      as string | undefined) || "system-ui, sans-serif";
-  const btnStyle    = (theme.buttonStyle     as string | undefined) || "rounded";
-  const headerStyle = (theme.headerStyle     as string | undefined) || "blur";
-  const logoUrl     = (theme.logoUrl         as string | undefined) || "";
-
-  const btnRadius = btnStyle === "pill" ? "999px" : btnStyle === "square" ? "0px" : "8px";
-
-  // O gradiente no topo do wrapper revela a diferença entre os estilos do header
-  const headerBg =
-    headerStyle === "solid"   ? bg :
-    headerStyle === "minimal" ? "transparent" :
-    "rgba(255,255,255,0.05)"; // blur: vidro fosco
-
-  const headerBorder =
-    headerStyle === "minimal" ? `1px solid ${text}35` : `1px solid ${text}15`;
-
-  const headerBackdrop = headerStyle === "blur" ? "blur(8px)" : undefined;
-
-  const isMobile = viewport === "mobile";
-
-  return (
-    <aside className="sticky top-4 rounded-2xl border border-white/10 bg-[#12182B] p-4 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
-      {/* Header do painel */}
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#22D3EE]">Preview</p>
-          <p className="text-sm font-semibold text-[var(--platform-text)]">{siteName}</p>
-          <p className="text-xs text-[var(--platform-text)]/60">{siteDomain}</p>
-        </div>
-        <div className="inline-flex rounded-md border border-white/15 bg-[#0B1020] p-0.5">
-          <button type="button" onClick={() => setViewport("desktop")}
-            className={`rounded px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] transition ${viewport === "desktop" ? "bg-[#3B82F6] text-white" : "text-[var(--platform-text)]/65 hover:text-[var(--platform-text)]"}`}>
-            <Monitor size={12} />
-          </button>
-          <button type="button" onClick={() => setViewport("mobile")}
-            className={`rounded px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] transition ${viewport === "mobile" ? "bg-[#3B82F6] text-white" : "text-[var(--platform-text)]/65 hover:text-[var(--platform-text)]"}`}>
-            <Smartphone size={12} />
-          </button>
-        </div>
-      </div>
-
-      {/* Browser frame */}
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0B1020]">
-        {/* Chrome */}
-        {isMobile ? (
-          <div className="px-4 pt-3"><div className="mx-auto h-1.5 w-20 rounded-full bg-white/25" /></div>
-        ) : (
-          <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1122] px-3 py-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
-            <div className="ml-2 h-5 flex-1 rounded-md border border-white/10 bg-white/[0.03] px-2 text-[10px] leading-5 text-[var(--platform-text)]/50">
-              {siteDomain}
-            </div>
-          </div>
-        )}
-
-        {/* Site — gradiente no topo revela transparência/blur do header */}
-        <div
-          className={`mx-auto overflow-hidden transition-all ${isMobile ? "max-w-[240px]" : "w-full"}`}
-          style={{
-            background: `linear-gradient(180deg, ${primary}45 0%, ${bg} 30%)`,
-            fontFamily: font,
-            color: text,
-          }}
-        >
-          {/* Header — estilo visível por causa do gradiente atrás */}
-          <div
-            className="flex items-center justify-between px-4 py-2.5"
-            style={{
-              backgroundColor: headerBg,
-              borderBottom: headerBorder,
-              backdropFilter: headerBackdrop,
-              WebkitBackdropFilter: headerBackdrop,
-            }}
-          >
-            {logoUrl ? (
-              <Image src={logoUrl} alt={siteName} width={80} height={24} className="h-5 w-auto max-w-[80px] object-contain" />
-            ) : (
-              <span className="text-[11px] font-bold" style={{ color: text }}>{siteName}</span>
-            )}
-            <span className="px-2.5 py-1 text-[9px] font-bold text-white" style={{ background: primary, borderRadius: btnRadius }}>
-              Contato
-            </span>
-          </div>
-
-          {/* Hero */}
-          <div className="px-4 py-5" style={{ backgroundColor: bg }}>
-            <p className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: accent }}>
-              Profissional
-            </p>
-            <h2 className="mt-1.5 text-base font-black leading-tight" style={{ color: text }}>
-              {siteName}
-            </h2>
-            <p className="mt-1.5 text-[10px] leading-relaxed" style={{ color: `${text}99` }}>
-              Bem-vindo ao meu site profissional. Aqui você encontra tudo sobre meus serviços.
-            </p>
-            <div className="mt-4 flex items-center gap-2">
-              <span className="px-3 py-1.5 text-[10px] font-bold text-white" style={{ background: primary, borderRadius: btnRadius }}>
-                Saiba mais
-              </span>
-              <span className="border px-3 py-1.5 text-[10px] font-semibold" style={{ borderColor: `${text}30`, color: text, borderRadius: btnRadius }}>
-                Ver serviços
-              </span>
-            </div>
-          </div>
-
-          {/* Services strip */}
-          <div className="px-4 pb-5" style={{ backgroundColor: bg }}>
-            <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.15em]" style={{ color: `${text}60` }}>
-              Serviços
-            </p>
-            <div className="grid grid-cols-3 gap-1.5">
-              {["Serviço 1", "Serviço 2", "Serviço 3"].map((s) => (
-                <div key={s} className="rounded-lg p-2 text-center" style={{ background: `${primary}18`, border: `1px solid ${primary}25` }}>
-                  <div className="mx-auto mb-1 h-4 w-4 rounded-full" style={{ background: `${accent}40` }} />
-                  <p className="text-[8px] font-semibold leading-tight" style={{ color: text }}>{s}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          {(() => {
-            const divider = (theme.dividerStyle as string | undefined) || "none";
-            if (divider === "none") return null;
-            if (divider === "line") return (
-              <div className="px-4" style={{ backgroundColor: bg }}><div style={{ borderTop: `1px solid ${text}20` }} /></div>
-            );
-            if (divider === "wave") return (
-              <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
-                <path d="M0,6 C20,0 40,12 60,6 S100,0 120,6 L120,12 L0,12 Z" fill={`${primary}30`} />
-              </svg>
-            );
-            if (divider === "diagonal") return (
-              <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
-                <polygon points="0,0 120,12 120,12 0,12" fill={`${primary}30`} />
-              </svg>
-            );
-            if (divider === "curve") return (
-              <svg viewBox="0 0 120 12" preserveAspectRatio="none" className="w-full" style={{ height: 10, display: "block" }}>
-                <path d="M0,12 Q60,0 120,12 Z" fill={`${primary}30`} />
-              </svg>
-            );
-            return null;
-          })()}
-
-          {/* CTA */}
-          <div className="px-4 pb-4" style={{ backgroundColor: bg }}>
-            <div className="rounded-lg p-3 text-center" style={{ background: `linear-gradient(135deg, ${primary}, ${accent})` }}>
-              <p className="text-[10px] font-bold text-white">Vamos conversar?</p>
-              <span className="mt-1.5 inline-block border border-white/40 px-3 py-1 text-[8px] font-bold text-white" style={{ borderRadius: btnRadius }}>
-                Entrar em contato
-              </span>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div
-            className="flex items-center justify-between px-4 py-2 text-[8px]"
-            style={{ borderTop: `1px solid ${text}15`, color: `${text}50`, backgroundColor: bg }}
-          >
-            <span>{siteName}</span>
-            <span>Powered by BuildSphere</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-  );
-}
 
 export function SiteBrandingEditor({
   sites,
   defaultSiteId,
   plan = "basico",
+  initialSections = [],
 }: SiteBrandingEditorProps) {
   const isFullEditor = plan !== "basico";
 
@@ -289,6 +107,7 @@ export function SiteBrandingEditor({
   const [themeSettings, setThemeSettings] = useState<ThemeSettings>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [status, setStatus] = useState<Status>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -352,11 +171,13 @@ export function SiteBrandingEditor({
       });
       return;
     }
+    setIsDirty(false);
     setStatus({ type: "success", message: "Aparência salva com sucesso!" });
   }
 
   function set(key: string, value: unknown) {
     setThemeSettings((c) => ({ ...c, [key]: value }));
+    setIsDirty(true);
   }
 
   const currentPalette = palettePresets.find(
@@ -519,7 +340,7 @@ export function SiteBrandingEditor({
                 key={palette.id}
                 type="button"
                 title={palette.name}
-                onClick={() => setThemeSettings((c) => applyPalette(c, palette))}
+                onClick={() => { setThemeSettings((c) => applyPalette(c, palette)); setIsDirty(true); }}
                 className={`group flex flex-col items-center gap-1.5 rounded-xl p-1.5 transition ${
                   isActive
                     ? "ring-2 ring-[#22D3EE] ring-offset-2 ring-offset-[#12182B]"
@@ -721,11 +542,14 @@ export function SiteBrandingEditor({
       </div>
     </div>
 
-    {/* Live preview column */}
-    <AppearancePreview
+    {/* Live preview column — mesmo componente do editor de conteúdo */}
+    <MiniSitePreview
       siteName={selectedSite?.name ?? "Meu Site"}
       siteDomain={selectedSite?.domain ?? "seunome.bsph.com.br"}
-      theme={themeSettings}
+      sections={initialSections}
+      hasUnsavedChanges={isDirty}
+      activeSectionId={null}
+      themeSettings={themeSettings as SiteTheme}
     />
     </div>
   );

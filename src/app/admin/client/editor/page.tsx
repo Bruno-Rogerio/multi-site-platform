@@ -83,6 +83,7 @@ export default async function ClientEditorPage() {
       siteName={site.name}
       siteDomain={site.domain}
       plan={selectedPlan}
+      sections={sections}
       contactSection={contactSection}
       floatingButtonsEnabled={floatingButtonsEnabled}
       floatingLinks={floatingLinks}

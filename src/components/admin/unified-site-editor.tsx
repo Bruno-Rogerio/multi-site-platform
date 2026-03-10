@@ -19,6 +19,7 @@ type Props = {
   siteName: string;
   siteDomain: string;
   plan: string;
+  sections: Section[];
   // Contatos tab
   contactSection: Section | null;
   floatingButtonsEnabled: boolean;
@@ -44,6 +45,7 @@ export function UnifiedSiteEditor({
   siteName,
   siteDomain,
   plan,
+  sections,
   contactSection,
   floatingButtonsEnabled,
   floatingLinks,
@@ -125,6 +127,7 @@ export function UnifiedSiteEditor({
             sites={scopedSites}
             defaultSiteId={siteId}
             plan={plan}
+            initialSections={sections}
           />
         </div>
       )}
