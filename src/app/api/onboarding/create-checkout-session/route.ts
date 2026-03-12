@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
 import { validateDocument } from "@/lib/onboarding/validation";
+import { sendWelcomeEmail, sendReceiptEmail } from "@/lib/email";
 
 type CheckoutSessionPayload = {
   siteId: string;
@@ -141,6 +142,18 @@ export async function POST(request: Request) {
         { onConflict: "user_id" },
       );
     }
+
+    // Send welcome + receipt emails (fire-and-forget)
+    const selectedPlan = typeof settings.selectedPlan === "string" ? settings.selectedPlan : "";
+    const isPremiumPlan = selectedPlan === "premium-full";
+    const planName = isPremiumPlan ? "Premium Full" : "Essencial";
+    const amountBRL = isPremiumPlan ? 109.80 : 59.90;
+    const referenceId = `BYPASS-${site.id.slice(-8).toUpperCase()}`;
+    const dashboardUrl = "https://bsph.com.br/admin/client";
+    Promise.all([
+      sendWelcomeEmail(ownerEmail, ownerName, dashboardUrl),
+      sendReceiptEmail(ownerEmail, ownerName, amountBRL, planName, referenceId, new Date().toISOString()),
+    ]).catch(() => {});
 
     return NextResponse.json({ bypass: true });
   }
