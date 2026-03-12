@@ -17,7 +17,8 @@
 #   6.3, 6.4) funcionam normalmente em produção.
 # ============================================================
 
-BASE="${1:-http://localhost:3000}"
+BASE="${1:-https://bsph.com.br}"
+BASE="${BASE%/}"  # remove trailing slash to avoid double // in URLs
 echo "Base URL: $BASE"
 
 # ──────────────────────────────────────────────────────────
@@ -27,12 +28,12 @@ echo "Base URL: $BASE"
 #   2. Copie o valor do cookie "sb-<project>-auth-token"
 #   3. Cole abaixo SEM as aspas externas do browser
 # ──────────────────────────────────────────────────────────
-CLIENT_COOKIE="sb-XXXX-auth-token=COLE_AQUI_SESSAO_CLIENT"
-ADMIN_COOKIE="sb-XXXX-auth-token=COLE_AQUI_SESSAO_ADMIN"
+CLIENT_COOKIE="sb-qtlaxgeckbzdveszkmtg-auth-token"
+ADMIN_COOKIE="sb-qtlaxgeckbzdveszkmtg-auth-token"
 
 # IDs reais (preencha com valores do seu banco)
-TICKET_DO_CLIENT_B="UUID_DE_UM_TICKET_DO_OUTRO_CLIENTE"
-DRAFT_ID_QUALQUER="UUID_DE_UM_DRAFT_EXISTENTE"
+TICKET_DO_CLIENT_B="05412884-afe4-4f04-aba3-7e679eca5306"
+DRAFT_ID_QUALQUER="76d6477f-1320-468d-84c0-98e015bf39ff"
 
 # ──────────────────────────────────────────────────────────
 # Cores para output
@@ -60,7 +61,7 @@ check_rate_limit() {
   info "Enviando $TOTAL requests para $URL (limite=$LIMIT, ip=$IP)"
 
   for i in $(seq 1 $TOTAL); do
-    STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$URL" \
+    STATUS=$(curl -s -L -o /dev/null -w "%{http_code}" -X POST "$URL" \
       -H "Content-Type: application/json" \
       -H "x-forwarded-for: $IP" \
       -d "$BODY")
@@ -135,7 +136,7 @@ section "6.2 Autorização de Endpoints"
 
 echo ""
 info "→ GET /api/admin/tickets sem autenticação → espera 401"
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/api/admin/tickets")
+STATUS=$(curl -s -L -o /dev/null -w "%{http_code}" "$BASE/api/admin/tickets")
 if [ "$STATUS" -eq 401 ]; then
   pass "GET /api/admin/tickets sem auth → 401 ✓"
 else
@@ -144,11 +145,11 @@ fi
 
 echo ""
 info "→ POST /api/admin/tickets como admin (role=admin) → espera 403"
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE/api/admin/tickets" \
+STATUS=$(curl -s -L -o /dev/null -w "%{http_code}" -X POST "$BASE/api/admin/tickets" \
   -H "Content-Type: application/json" \
   -H "Cookie: $ADMIN_COOKIE" \
   -d '{"subject":"Teste admin","category":"suporte","body":"Mensagem de teste longa o suficiente"}')
-BODY=$(curl -s -X POST "$BASE/api/admin/tickets" \
+BODY=$(curl -s -L -X POST "$BASE/api/admin/tickets" \
   -H "Content-Type: application/json" \
   -H "Cookie: $ADMIN_COOKIE" \
   -d '{"subject":"Teste admin","category":"suporte","body":"Mensagem de teste longa o suficiente"}')
@@ -160,7 +161,7 @@ fi
 
 echo ""
 info "→ PATCH /api/admin/pipeline/$DRAFT_ID_QUALQUER como client → espera 403"
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X PATCH "$BASE/api/admin/pipeline/$DRAFT_ID_QUALQUER" \
+STATUS=$(curl -s -L -o /dev/null -w "%{http_code}" -X PATCH "$BASE/api/admin/pipeline/$DRAFT_ID_QUALQUER" \
   -H "Content-Type: application/json" \
   -H "Cookie: $CLIENT_COOKIE" \
   -d '{"status":"active"}')
@@ -172,7 +173,7 @@ fi
 
 echo ""
 info "→ GET /api/admin/tickets/$TICKET_DO_CLIENT_B como client A → espera 403 ou 404"
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/api/admin/tickets/$TICKET_DO_CLIENT_B" \
+STATUS=$(curl -s -L -o /dev/null -w "%{http_code}" "$BASE/api/admin/tickets/$TICKET_DO_CLIENT_B" \
   -H "Cookie: $CLIENT_COOKIE")
 if [ "$STATUS" -eq 403 ] || [ "$STATUS" -eq 404 ]; then
   pass "GET ticket de outro site → $STATUS ✓"
@@ -186,7 +187,7 @@ section "6.3 Isolamento de Tenant (RLS)"
 
 echo ""
 info "→ Client A não vê tickets do Client B via GET /api/admin/tickets"
-TICKETS=$(curl -s "$BASE/api/admin/tickets" -H "Cookie: $CLIENT_COOKIE")
+TICKETS=$(curl -s -L "$BASE/api/admin/tickets" -H "Cookie: $CLIENT_COOKIE")
 echo "  Tickets retornados para Client A:"
 echo "$TICKETS" | grep -o '"site_id":"[^"]*"' | sort -u || echo "  (nenhum ou formato diferente)"
 info "  Verifique manualmente se algum site_id diferente do seu aparece acima."
@@ -203,7 +204,7 @@ section "6.4 Inputs Maliciosos"
 echo ""
 info "→ Ticket com XSS no assunto"
 XSS_PAYLOAD='<script>alert(1)<\/script>'
-RESP=$(curl -s -X POST "$BASE/api/admin/tickets" \
+RESP=$(curl -s -L -X POST "$BASE/api/admin/tickets" \
   -H "Content-Type: application/json" \
   -H "Cookie: $CLIENT_COOKIE" \
   -d "{\"subject\":\"$XSS_PAYLOAD\",\"category\":\"suporte\",\"body\":\"Mensagem de teste para verificar XSS no assunto do ticket\"}")
@@ -215,7 +216,7 @@ info "  3. DevTools → Elements: o texto está escaped (&lt;script&gt;)"
 
 echo ""
 info "→ Nome de site com caracteres especiais"
-RESP=$(curl -s -X PATCH "$BASE/api/admin/site-settings" \
+RESP=$(curl -s -L -X PATCH "$BASE/api/admin/site-settings" \
   -H "Content-Type: application/json" \
   -H "Cookie: $CLIENT_COOKIE" \
   -d '{"name":"Café & Bistrô <Especial> \"Testando\" '\''aspas'\''"}')
