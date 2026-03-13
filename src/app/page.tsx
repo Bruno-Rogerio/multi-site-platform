@@ -18,6 +18,8 @@ import { TestimonialsStrip } from "@/components/landing/testimonials-strip";
 import { FaqAccordion, type FaqItem } from "@/components/landing/faq-accordion";
 import { FinalCta } from "@/components/landing/final-cta";
 import { Footer } from "@/components/landing/footer";
+import { CookieBanner } from "@/components/landing/cookie-banner";
+import { FloatingSocialButtons } from "@/components/landing/floating-social-buttons";
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +45,7 @@ const features: { iconName: IconName; title: string; description: string }[] = [
     iconName: "Globe",
     title: "Domínio profissional",
     description:
-      "Seu site com subdomínio personalizado ou domínio próprio. Presença online séria desde o primeiro dia.",
+      "Seu site com subdomínio personalizado incluído. Presença online séria desde o primeiro dia.",
   },
   {
     iconName: "Palette",
@@ -84,9 +86,9 @@ const faqItems: FaqItem[] = [
       "Não! A BuildSphere foi criada pensando em profissionais que não tem conhecimento técnico. Todo o processo de configuração e edição é visual e intuitivo.",
   },
   {
-    question: "Posso usar meu próprio domínio?",
+    question: "Quais profissionais podem usar a BuildSphere?",
     answer:
-      "Sim. Você pode usar um subdomínio gratuito (seunome.buildsphere.app) ou conectar um domínio próprio que já possua.",
+      "A BuildSphere é ideal para qualquer profissional autônomo ou prestador de serviço: psicólogos, nutricionistas, coaches, advogados, fotógrafos, personal trainers, consultores, professores particulares, terapeutas e muito mais. Se você precisa de presença online profissional, a BuildSphere é para você.",
   },
   {
     question: "Quanto tempo leva para ter meu site no ar?",
@@ -340,7 +342,9 @@ export default async function PlatformLandingPage() {
       </main>
 
       {/* Footer */}
-      <Footer brandElement={brandEl} />
+      <Footer brandElement={brandEl} branding={platformBranding} />
+      <CookieBanner />
+      <FloatingSocialButtons branding={platformBranding} />
     </>
   );
 }

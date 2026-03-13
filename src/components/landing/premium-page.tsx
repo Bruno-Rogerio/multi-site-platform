@@ -162,6 +162,18 @@ export function PremiumPage({ brandElement, basicoPrice = 59.9, premiumPrice = 1
               >
                 Ver todos os planos →
               </Link>
+              <Link
+                href="/termos"
+                className="text-sm font-medium text-[#EAF0FF]/50 hover:text-[#EAF0FF] transition"
+              >
+                Termos
+              </Link>
+              <Link
+                href="/privacidade"
+                className="text-sm font-medium text-[#EAF0FF]/50 hover:text-[#EAF0FF] transition"
+              >
+                Privacidade
+              </Link>
             </div>
           </div>
         </FadeIn>
@@ -283,6 +295,11 @@ export function PremiumPage({ brandElement, basicoPrice = 59.9, premiumPrice = 1
               <div className="mt-5 flex items-center justify-center gap-2 text-xs text-[#EAF0FF]/40">
                 <Shield size={13} />
                 Pagamento seguro · Dados protegidos
+              </div>
+              <div className="mt-4 flex items-center justify-center gap-4 text-[10px] text-[#EAF0FF]/30">
+                <Link href="/termos" className="hover:text-[#EAF0FF]/60 transition">Termos de Uso</Link>
+                <span>·</span>
+                <Link href="/privacidade" className="hover:text-[#EAF0FF]/60 transition">Privacidade</Link>
               </div>
             </div>
           </div>
