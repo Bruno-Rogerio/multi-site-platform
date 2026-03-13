@@ -33,17 +33,24 @@ export function StickyHeader({ brandElement }: StickyHeaderProps) {
     <>
       {/* Announcement bar */}
       {announcementVisible && !scrolled && (
-        <div className="relative z-50 bg-[linear-gradient(90deg,#3B82F6,#7C5CFF,#22D3EE)] py-2.5 text-center text-xs font-semibold text-white">
-          <span className="inline-flex items-center gap-2">
-            <Sparkles size={12} className="shrink-0" />
-            Novo: Blog, Galeria e Eventos disponíveis no Plano Premium
-            <Link href="/premium" className="underline underline-offset-2 opacity-90 hover:opacity-100">
-              Saiba mais →
+        <div className="relative z-50 bg-[linear-gradient(90deg,#1e3a8a,#4c1d95,#164e63)] py-2.5 text-center text-xs font-semibold text-white">
+          {/* Shimmer overlay */}
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_50%,transparent_100%)] animate-[shimmer_3s_ease-in-out_infinite]" />
+          <span className="relative inline-flex items-center gap-2.5">
+            <Sparkles size={12} className="shrink-0 text-[#22D3EE]" />
+            <span className="hidden sm:inline text-white/80">Novidade:</span>
+            <span className="font-bold">Blog, Galeria e Eventos no Plano Premium</span>
+            <Link
+              href="/premium"
+              className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-0.5 text-[11px] font-bold text-white ring-1 ring-white/25 transition-all hover:bg-white/25 hover:ring-white/40"
+            >
+              Ver planos
+              <ArrowRight size={10} />
             </Link>
           </span>
           <button
             onClick={() => setAnnouncementVisible(false)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100"
+            className="absolute right-4 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100 transition-opacity"
             aria-label="Fechar"
           >
             <X size={14} />
