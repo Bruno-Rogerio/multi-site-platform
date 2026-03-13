@@ -7,7 +7,6 @@ import {
   Eye, EyeOff, User, Lock, Mail, RefreshCw,
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
-import { PLAN_PRICE_IDS } from "@/lib/onboarding/plans";
 import { formatPrice } from "@/lib/onboarding/pricing";
 import { validatePassword } from "@/lib/onboarding/validation";
 
@@ -677,5 +676,4 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-// Suppress unused import warning for PLAN_PRICE_IDS
-void PLAN_PRICE_IDS;
+

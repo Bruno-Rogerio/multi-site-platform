@@ -14,6 +14,7 @@ import {
   PenTool,
   MessageSquare,
   Settings,
+  Tag,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -34,6 +35,7 @@ const platformNav: NavItem[] = [
   { label: "Usuários", href: "/admin/platform/users", icon: Users },
   { label: "Pipeline", href: "/admin/platform/pipeline", icon: Kanban },
   { label: "Branding", href: "/admin/platform/branding", icon: Palette },
+  { label: "Planos & Promoções", href: "/admin/platform/plans", icon: Tag },
   { label: "Mensagens",     href: "/admin/platform/messages", icon: MessageSquare },
   { label: "Configurações", href: "/admin/platform/settings", icon: Settings },
 ];

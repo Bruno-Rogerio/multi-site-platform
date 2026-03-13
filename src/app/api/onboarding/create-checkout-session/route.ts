@@ -8,6 +8,7 @@ type CheckoutSessionPayload = {
   siteId: string;
   priceId: string;
   document?: string;
+  couponCode?: string; // código promocional opcional
 };
 
 function isUuid(v: string): boolean {
@@ -169,6 +170,26 @@ export async function POST(request: Request) {
     );
   }
 
+  // Resolve coupon: se informado, busca o stripe_promotion_code_id no DB
+  let stripePromotionCodeId: string | null = null;
+  if (payload.couponCode) {
+    const couponCode = payload.couponCode.trim().toUpperCase();
+    const { data: coupon } = await admin
+      .from("platform_coupons")
+      .select("stripe_promotion_code_id, active, expires_at, max_redemptions, redemption_count")
+      .eq("active", true)
+      .ilike("code", couponCode)
+      .maybeSingle();
+
+    if (
+      coupon?.stripe_promotion_code_id &&
+      (!coupon.expires_at || new Date(coupon.expires_at) >= new Date()) &&
+      (coupon.max_redemptions === null || coupon.redemption_count < coupon.max_redemptions)
+    ) {
+      stripePromotionCodeId = coupon.stripe_promotion_code_id;
+    }
+  }
+
   // Create embedded Checkout Session
   const params = new URLSearchParams();
   params.set("mode", "subscription");
@@ -177,10 +198,16 @@ export async function POST(request: Request) {
   params.set("return_url", `${requestUrl.origin}/login?checkout=success`);
   params.set("line_items[0][price]", payload.priceId);
   params.set("line_items[0][quantity]", "1");
-  params.set("allow_promotion_codes", "true");
   params.set("metadata[site_id]", site.id);
   params.set("metadata[site_domain]", site.domain);
   params.set("metadata[source]", "buildsphere_onboarding");
+
+  // Se temos um cupom pré-aplicado, usamos discounts; senão habilitamos campo livre
+  if (stripePromotionCodeId) {
+    params.set("discounts[0][promotion_code]", stripePromotionCodeId);
+  } else {
+    params.set("allow_promotion_codes", "true");
+  }
 
   const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",

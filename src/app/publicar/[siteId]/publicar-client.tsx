@@ -1,18 +1,27 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Lock, ShieldCheck, Sparkles, Loader2 } from "lucide-react";
-import { PLAN_PRICE_IDS, planDefinitions } from "@/lib/onboarding/plans";
+import { ArrowLeft, Lock, ShieldCheck, Sparkles, Loader2, Tag, Check, X } from "lucide-react";
+import { planDefinitions } from "@/lib/onboarding/plans";
 import type { OnboardingPlan } from "@/lib/onboarding/types";
 import { validateDocument } from "@/lib/onboarding/validation";
-import { formatPrice, calculateMonthlyTotal } from "@/lib/onboarding/pricing";
+import { formatPrice } from "@/lib/onboarding/pricing";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "");
 
 type Phase = "form" | "loading" | "checkout";
+
+type CouponInfo = {
+  code: string;
+  discount_label: string;
+  percent_off: number | null;
+  amount_off_cents: number | null;
+  duration: string;
+  stripe_promotion_code_id: string;
+};
 
 type Props = {
   siteId: string;
@@ -21,19 +30,69 @@ type Props = {
   ownerEmail: string;
   selectedPlan: string;
   previewExpiresAt: string;
+  priceId: string;
+  monthlyPrice: number;
 };
 
-export function PublicarClient({ siteId, siteName, siteDomain, ownerEmail, selectedPlan }: Props) {
+export function PublicarClient({ siteId, siteName, siteDomain, ownerEmail, selectedPlan, priceId, monthlyPrice }: Props) {
   const plan = selectedPlan as OnboardingPlan;
   const planDef = planDefinitions.find((p) => p.id === plan) ?? planDefinitions[0];
-  const monthlyTotal = calculateMonthlyTotal(plan);
-  const priceId = PLAN_PRICE_IDS[plan] ?? PLAN_PRICE_IDS["basico"];
+  const monthlyTotal = monthlyPrice;
 
   const [docValue, setDocValue] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [phase, setPhase] = useState<Phase>("form");
   const [error, setError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+
+  // Cupom
+  const [couponInput, setCouponInput] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<CouponInfo | null>(null);
+
+  // Lê ?promo=CODE da URL e aplica automaticamente
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const promoCode = params.get("promo");
+    if (promoCode) {
+      setCouponInput(promoCode.toUpperCase());
+      validateCoupon(promoCode.toUpperCase());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function validateCoupon(code?: string) {
+    const codeToValidate = (code ?? couponInput).trim().toUpperCase();
+    if (!codeToValidate) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/onboarding/validate-coupon", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: codeToValidate, planKey: plan }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setAppliedCoupon(data as CouponInfo);
+        setCouponError("");
+      } else {
+        setCouponError(data.error ?? "Cupom inválido.");
+        setAppliedCoupon(null);
+      }
+    } catch {
+      setCouponError("Erro ao validar cupom.");
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function removeCoupon() {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  }
 
   const documentValid = docValue ? validateDocument(docValue) : { valid: true };
   const canSubmit = documentValid.valid && acceptTerms && phase === "form";
@@ -47,7 +106,12 @@ export function PublicarClient({ siteId, siteName, siteDomain, ownerEmail, selec
       const res = await fetch("/api/onboarding/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ siteId, priceId, document: docValue }),
+        body: JSON.stringify({
+          siteId,
+          priceId,
+          document: docValue,
+          couponCode: appliedCoupon?.code ?? undefined,
+        }),
       });
 
       const data = await res.json();
@@ -117,6 +181,14 @@ export function PublicarClient({ siteId, siteName, siteDomain, ownerEmail, selec
                     <p className="text-xs text-[#EAF0FF]/40">/mês</p>
                   </div>
                 </div>
+                {appliedCoupon && (
+                  <div className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2">
+                    <Tag size={12} className="text-emerald-400 shrink-0" />
+                    <span className="text-xs text-emerald-300 font-medium">
+                      {appliedCoupon.discount_label} aplicado
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Form */}
@@ -151,6 +223,64 @@ export function PublicarClient({ siteId, siteName, siteDomain, ownerEmail, selec
                   />
                   {docValue && !documentValid.valid && (
                     <p className="mt-1 text-xs text-red-400">CPF ou CNPJ inválido</p>
+                  )}
+                </div>
+
+                {/* Cupom de desconto */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#EAF0FF]/50">
+                    Cupom de desconto{" "}
+                    <span className="normal-case tracking-normal font-normal text-[#EAF0FF]/30">
+                      (opcional)
+                    </span>
+                  </label>
+
+                  {appliedCoupon ? (
+                    <div className="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+                      <Check size={14} className="text-emerald-400 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-mono font-semibold text-emerald-300">
+                          {appliedCoupon.code}
+                        </p>
+                        <p className="text-xs text-emerald-300/70">{appliedCoupon.discount_label}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={removeCoupon}
+                        className="text-emerald-300/50 hover:text-emerald-300 transition"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Tag size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#EAF0FF]/30" />
+                        <input
+                          type="text"
+                          value={couponInput}
+                          onChange={(e) => {
+                            setCouponInput(e.target.value.toUpperCase());
+                            setCouponError("");
+                          }}
+                          onKeyDown={(e) => e.key === "Enter" && validateCoupon()}
+                          placeholder="CODIGO"
+                          maxLength={30}
+                          className="w-full rounded-lg border border-white/10 bg-white/[0.04] pl-9 pr-3 py-3 text-sm font-mono text-[#EAF0FF] placeholder-white/20 outline-none transition focus:border-[#3B82F6]/60 focus:bg-white/[0.07] uppercase"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => validateCoupon()}
+                        disabled={!couponInput.trim() || couponLoading}
+                        className="rounded-lg border border-white/10 px-4 text-xs font-semibold text-[#EAF0FF]/60 hover:border-[#22D3EE]/40 hover:text-[#22D3EE] disabled:opacity-40 transition"
+                      >
+                        {couponLoading ? <Loader2 size={13} className="animate-spin" /> : "Aplicar"}
+                      </button>
+                    </div>
+                  )}
+                  {couponError && (
+                    <p className="mt-1 text-xs text-red-400">{couponError}</p>
                   )}
                 </div>
 

@@ -72,6 +72,17 @@ export default async function PublicarPage({ params }: Props) {
   const selectedPlan = typeof settings.selectedPlan === "string" ? settings.selectedPlan : "basico";
   const previewExpiresAt = typeof settings.previewExpiresAt === "string" ? settings.previewExpiresAt : "";
 
+  // Busca preço e price_id do plano no DB
+  const planDbKey = ["premium", "premium-full", "construir"].includes(selectedPlan) ? "premium" : "basico";
+  const { data: planRow } = await admin
+    .from("platform_plans")
+    .select("stripe_price_id, monthly_price")
+    .eq("key", planDbKey)
+    .maybeSingle();
+
+  const priceId = planRow?.stripe_price_id ?? (planDbKey === "premium" ? "price_1T59ImFFAjgAeuC1PHZZu2M7" : "price_1T59HfFFAjgAeuC1RGfeU8wW");
+  const monthlyPrice = planRow?.monthly_price ?? (planDbKey === "premium" ? 109.80 : 59.90);
+
   return (
     <PublicarClient
       siteId={site.id}
@@ -80,6 +91,8 @@ export default async function PublicarPage({ params }: Props) {
       ownerEmail={ownerEmail}
       selectedPlan={selectedPlan}
       previewExpiresAt={previewExpiresAt}
+      priceId={priceId}
+      monthlyPrice={monthlyPrice}
     />
   );
 }

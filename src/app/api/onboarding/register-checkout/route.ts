@@ -6,7 +6,6 @@ import { validateDocument } from "@/lib/onboarding/validation";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendWelcomeEmail, sendReceiptEmail } from "@/lib/email";
 
-const BASE_MONTHLY_PRICE = 59.9;
 const ADDON_PRICES: Record<string, number> = {
   "premium-design": 19.9,
   "extra-section": 9.9,
@@ -18,7 +17,6 @@ const ADDON_PRICES: Record<string, number> = {
 
 type RegisterCheckoutPayload = {
   siteId: string;
-  priceId?: string;
   creationMode?: "template" | "builder" | "builder-premium";
   fullName: string;
   document: string;
@@ -53,9 +51,8 @@ function isUuid(value: string): boolean {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-function toMonthlyAmount(addonsSelected: string[]): number {
-  const addonsTotal = addonsSelected.reduce((sum, addonId) => sum + (ADDON_PRICES[addonId] ?? 0), 0);
-  return BASE_MONTHLY_PRICE + addonsTotal;
+function addonsTotal(addonsSelected: string[]): number {
+  return addonsSelected.reduce((sum, addonId) => sum + (ADDON_PRICES[addonId] ?? 0), 0);
 }
 
 async function createStripeCustomer(
@@ -274,9 +271,27 @@ export async function POST(request: Request) {
     userId = createdUser.user.id;
   }
 
-  const monthlyAmount = toMonthlyAmount(addonsSelected);
-  // Use fixed price_id when provided, otherwise fallback to dynamic amount
-  const stripePriceOrAmount: string | number = payload.priceId || monthlyAmount;
+  // Busca preço do plano no DB
+  const selectedPlanKey = typeof (site.theme_settings as Record<string, unknown>)?.selectedPlan === "string"
+    ? ((site.theme_settings as Record<string, unknown>).selectedPlan as string)
+    : "basico";
+  const planDbKey = ["premium", "premium-full", "construir"].includes(selectedPlanKey) ? "premium" : "basico";
+
+  const { data: planRow } = await supabaseAdmin
+    .from("platform_plans")
+    .select("stripe_price_id, monthly_price")
+    .eq("key", planDbKey)
+    .maybeSingle();
+
+  const basePlanPrice = planRow?.monthly_price ?? (planDbKey === "premium" ? 109.80 : 59.90);
+  const extrasTotal = addonsTotal(addonsSelected);
+  const monthlyAmount = basePlanPrice + extrasTotal;
+
+  // Se não há addons, usa o Price ID fixo do Stripe; senão, price_data com valor total
+  const stripePriceOrAmount: string | number =
+    extrasTotal === 0 && planRow?.stripe_price_id
+      ? planRow.stripe_price_id
+      : monthlyAmount;
 
   // --- BYPASS: skip Stripe, activate site directly ---
   if (bypassPayment) {
