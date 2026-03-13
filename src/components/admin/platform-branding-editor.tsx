@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { SOCIAL_META } from "@/lib/platform/settings";
+import { SOCIAL_META } from "@/lib/platform/branding-utils";
 
 type PlatformSettings = Record<string, string>;
 
