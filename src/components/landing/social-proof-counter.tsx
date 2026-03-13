@@ -1,94 +1,41 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { Users, Clock, TrendingUp, Star } from "lucide-react";
 
-type Metric = {
-  value: string;
-  label: string;
-  numericTarget?: number;
-  prefix?: string;
-  suffix?: string;
-};
-
-const metrics: Metric[] = [
-  {
-    value: "500+",
-    label: "Profissionais ativos",
-    numericTarget: 500,
-    suffix: "+",
-  },
-  {
-    value: "99.9%",
-    label: "Uptime garantido",
-    numericTarget: 99.9,
-    suffix: "%",
-  },
-  {
-    value: "< 5min",
-    label: "Para configurar",
-    prefix: "< ",
-    numericTarget: 5,
-    suffix: "min",
-  },
-  {
-    value: "4.9",
-    label: "Satisfação dos clientes",
-    numericTarget: 4.9,
-    suffix: "/5",
-  },
-  {
-    value: "8+",
-    label: "Nichos atendidos",
-    numericTarget: 8,
-    suffix: "+",
-  },
-  {
-    value: "< 24h",
-    label: "Tempo de resposta",
-    prefix: "< ",
-    numericTarget: 24,
-    suffix: "h",
-  },
+const COUNTERS = [
+  { icon: Users, value: 500, suffix: "+", label: "Sites publicados", color: "#3B82F6" },
+  { icon: Clock, value: 5, suffix: "min", label: "Tempo médio de setup", color: "#7C5CFF" },
+  { icon: Star, value: 4.9, suffix: "★", label: "Avaliação média", color: "#22D3EE" },
+  { icon: TrendingUp, value: 98, suffix: "%", label: "Clientes satisfeitos", color: "#A855F7" },
 ];
 
-function AnimatedCounter({
-  target,
-  prefix = "",
-  suffix = "",
-  decimals = 0,
-  inView,
-}: {
-  target: number;
-  prefix?: string;
-  suffix?: string;
-  decimals?: number;
-  inView: boolean;
-}) {
+function Counter({ target, suffix, duration = 2000 }: { target: number; suffix: string; duration?: number }) {
   const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
 
   useEffect(() => {
     if (!inView) return;
-    const duration = 1500;
-    const steps = 60;
-    const increment = target / steps;
-    let current = 0;
+    const isFloat = !Number.isInteger(target);
+    const start = Date.now();
     const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(current);
-      }
-    }, duration / steps);
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = isFloat
+        ? Math.round(target * eased * 10) / 10
+        : Math.floor(target * eased);
+      setCount(current);
+      if (progress >= 1) clearInterval(timer);
+    }, 16);
     return () => clearInterval(timer);
-  }, [inView, target]);
+  }, [inView, target, duration]);
 
   return (
-    <span className="text-3xl font-black md:text-4xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] bg-clip-text text-transparent">
-      {prefix}
-      {decimals > 0 ? count.toFixed(decimals) : Math.floor(count)}
+    <span ref={ref}>
+      {Number.isInteger(target) ? count : count.toFixed(1)}
       {suffix}
     </span>
   );
@@ -96,29 +43,47 @@ function AnimatedCounter({
 
 export function SocialProofCounter() {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-40px" });
+  const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <div
-      ref={ref}
-      className="mx-auto max-w-7xl border-y border-white/[0.06] px-5 py-10 md:px-8"
-    >
-      <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-6">
-        {metrics.map((metric) => (
-          <div key={metric.label} className="text-center">
-            <AnimatedCounter
-              target={metric.numericTarget ?? 0}
-              prefix={metric.prefix}
-              suffix={metric.suffix}
-              decimals={metric.value.includes(".") ? 1 : 0}
-              inView={isInView}
-            />
-            <p className="mt-2 text-xs uppercase tracking-[0.14em] text-[var(--platform-text)]/55">
-              {metric.label}
-            </p>
+    <section ref={ref} className="py-12 md:py-16">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <motion.div
+          className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-8 md:p-10"
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7 }}
+        >
+          {/* Background */}
+          <div className="absolute inset-0">
+            <div className="absolute left-[10%] top-0 h-[200px] w-[200px] rounded-full bg-[#3B82F6]/10 blur-[80px]" />
+            <div className="absolute right-[10%] top-0 h-[200px] w-[200px] rounded-full bg-[#22D3EE]/8 blur-[80px]" />
           </div>
-        ))}
+
+          <div className="relative grid grid-cols-2 gap-8 md:grid-cols-4">
+            {COUNTERS.map(({ icon: Icon, value, suffix, label, color }, i) => (
+              <motion.div
+                key={label}
+                className="text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+              >
+                <div
+                  className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl"
+                  style={{ background: `${color}20`, border: `1px solid ${color}30` }}
+                >
+                  <Icon size={22} style={{ color }} />
+                </div>
+                <p className="text-3xl font-black text-[#EAF0FF] md:text-4xl" style={{ color }}>
+                  <Counter target={value} suffix={suffix} />
+                </p>
+                <p className="mt-1 text-sm text-[#EAF0FF]/50">{label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
-    </div>
+    </section>
   );
 }

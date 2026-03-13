@@ -3,65 +3,115 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, Shield, Users } from "lucide-react";
+import { ArrowRight, Shield, Zap, Star, Clock } from "lucide-react";
 
 export function FinalCta() {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="px-5 py-20 md:px-8 md:py-28">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-        transition={{ duration: 0.7, ease: [0.25, 0.4, 0.25, 1] }}
-        className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE,#3B82F6)] bg-[length:300%_300%] animate-gradient-text p-12 text-center md:p-16"
-      >
-        {/* Grain overlay */}
-        <div className="bg-grain pointer-events-none absolute inset-0" />
-
-        {/* Decorative orbs */}
-        <div className="pointer-events-none absolute -left-20 -top-20 h-60 w-60 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -right-20 h-60 w-60 rounded-full bg-white/10 blur-3xl" />
-
-        <div className="relative z-10">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-semibold text-white">
-            <Users size={13} />
-            Mais de 500 profissionais já usam a BuildSphere
+    <section ref={ref} className="py-20 md:py-28">
+      <div className="mx-auto max-w-7xl px-5 md:px-8">
+        <motion.div
+          className="relative overflow-hidden rounded-3xl"
+          initial={{ opacity: 0, y: 40 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+        >
+          {/* Gradient border */}
+          <div className="absolute inset-0 rounded-3xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] p-px">
+            <div className="h-full w-full rounded-3xl bg-[#080D1C]" />
           </div>
 
-          <h2 className="text-3xl font-black text-white md:text-5xl">
-            Pronto para ter seu site profissional?
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-white/85">
-            Em menos de 5 minutos você tem um site incrível, sem código e sem complicação.
-          </p>
-
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/quero-comecar"
-              className="group inline-flex items-center gap-2 rounded-xl bg-white px-8 py-4 text-sm font-bold text-[#0B1020] shadow-[0_14px_40px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
-            >
-              Começar agora
-              <ArrowRight
-                size={16}
-                className="transition-transform duration-300 group-hover:translate-x-1"
+          {/* Content */}
+          <div className="relative px-8 py-16 text-center md:py-20">
+            {/* Background elements */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="absolute left-[20%] top-[-20%] h-[400px] w-[400px] rounded-full bg-[#7C5CFF]/20 blur-[100px]" />
+              <div className="absolute right-[20%] top-[-10%] h-[300px] w-[300px] rounded-full bg-[#22D3EE]/15 blur-[80px]" />
+              <div className="absolute bottom-[-20%] left-[40%] h-[300px] w-[300px] rounded-full bg-[#3B82F6]/15 blur-[80px]" />
+              {/* Grid */}
+              <div
+                className="absolute inset-0 opacity-[0.04]"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgba(34,211,238,1) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,1) 1px, transparent 1px)",
+                  backgroundSize: "40px 40px",
+                }}
               />
-            </Link>
-          </div>
+            </div>
 
-          <div className="mt-5 flex items-center justify-center gap-4 text-xs text-white/60">
-            <span className="flex items-center gap-1.5">
-              <Shield size={12} />
-              Pagamento seguro
-            </span>
-            <span>·</span>
-            <span>Sem fidelidade</span>
-            <span>·</span>
-            <span>Cancele quando quiser</span>
+            <motion.div
+              className="relative"
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#22D3EE]/30 bg-[#22D3EE]/10 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#22D3EE]">
+                <Zap size={11} />
+                Comece hoje mesmo
+              </span>
+
+              <h2 className="mx-auto mt-6 max-w-3xl text-4xl font-black leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
+                <span className="text-[#EAF0FF]">Seu site profissional</span>
+                <br />
+                <span className="bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] bg-clip-text text-transparent">
+                  a um clique de distância
+                </span>
+              </h2>
+
+              <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#EAF0FF]/55 md:text-lg">
+                Junte-se a centenas de profissionais que já têm presença online profissional. Configure
+                em minutos, sem código e sem complicação.
+              </p>
+
+              {/* Trust stats */}
+              <div className="mx-auto mt-8 grid max-w-lg grid-cols-3 gap-4">
+                {[
+                  { icon: Zap, value: "< 5 min", label: "Para publicar" },
+                  { icon: Star, value: "4.9★", label: "Avaliação" },
+                  { icon: Clock, value: "24/7", label: "Disponível" },
+                ].map(({ icon: Icon, value, label }) => (
+                  <div key={label} className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-3">
+                    <Icon size={16} className="mx-auto mb-1 text-[#22D3EE]" />
+                    <p className="text-sm font-bold text-[#EAF0FF]">{value}</p>
+                    <p className="text-[11px] text-[#EAF0FF]/45">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+                <Link
+                  href="/quero-comecar"
+                  className="group inline-flex items-center gap-2.5 rounded-2xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-10 py-4 text-base font-bold text-white shadow-[0_0_50px_rgba(124,92,255,0.4)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_70px_rgba(124,92,255,0.6)]"
+                >
+                  Criar meu site agora
+                  <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+                </Link>
+                <Link
+                  href="/premium"
+                  className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-10 py-4 text-base font-semibold text-[#EAF0FF]/80 transition-all duration-300 hover:border-white/30 hover:bg-white/[0.08]"
+                >
+                  Ver planos →
+                </Link>
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+                {[
+                  { icon: Shield, text: "Sem taxa de setup" },
+                  { icon: Zap, text: "Cancele quando quiser" },
+                  { icon: Star, text: "Sem fidelidade" },
+                ].map(({ icon: Icon, text }) => (
+                  <span key={text} className="flex items-center gap-1.5 text-xs text-[#EAF0FF]/35">
+                    <Icon size={12} className="text-[#22D3EE]/60" />
+                    {text}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </section>
   );
 }

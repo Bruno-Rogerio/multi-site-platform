@@ -11,7 +11,6 @@ import { HeroAnimatedHeadline } from "@/components/landing/hero-animated-headlin
 import { SocialProofCounter } from "@/components/landing/social-proof-counter";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { AnimatedSection } from "@/components/landing/animated-section";
-import { FeatureCard, type IconName } from "@/components/landing/feature-card";
 import { ProductMockup } from "@/components/landing/product-mockup";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { TestimonialsStrip } from "@/components/landing/testimonials-strip";
@@ -40,44 +39,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const features: { iconName: IconName; title: string; description: string }[] = [
-  {
-    iconName: "Globe",
-    title: "Domínio profissional",
-    description:
-      "Seu site com subdomínio personalizado incluído. Presença online séria desde o primeiro dia.",
-  },
-  {
-    iconName: "Palette",
-    title: "Visual personalizável",
-    description:
-      "Escolha entre estilos, paletas e layouts. Seu site reflete a identidade do seu trabalho.",
-  },
-  {
-    iconName: "Smartphone",
-    title: "Responsivo em qualquer tela",
-    description:
-      "Design adaptado para desktop, tablet e celular. Seus visitantes tem a melhor experiência sempre.",
-  },
-  {
-    iconName: "Zap",
-    title: "Performance otimizada",
-    description:
-      "Carregamento ultra-rápido com infraestrutura moderna. SEO e velocidade que fazem diferença.",
-  },
-  {
-    iconName: "Shield",
-    title: "Seguro e confiável",
-    description:
-      "SSL, backups automáticos e infraestrutura profissional. Seus dados e os de seus clientes protegidos.",
-  },
-  {
-    iconName: "PenTool",
-    title: "Edição sem código",
-    description:
-      "Painel intuitivo para atualizar textos, imagens e informações. Você no controle total.",
-  },
-];
 
 const faqItems: FaqItem[] = [
   {
@@ -245,7 +206,7 @@ export default async function PlatformLandingPage() {
           </div>
         </section>
 
-        {/* ─── Funcionalidades ─── */}
+        {/* ─── Funcionalidades bento grid ─── */}
         <section id="funcionalidades" className="py-20 md:py-28">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection>
@@ -256,21 +217,116 @@ export default async function PlatformLandingPage() {
                 Tudo que você precisa em um só lugar
               </h2>
               <p className="mt-3 max-w-2xl text-base text-[var(--platform-text)]/60">
-                Recursos pensados para profissionais que querem uma presença
-                online de qualidade sem complicação.
+                Do básico ao avançado — recursos pensados para profissionais que querem resultado real.
               </p>
             </AnimatedSection>
 
-            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {features.map((feature, i) => (
-                <AnimatedSection key={feature.title} delay={i * 0.08}>
-                  <FeatureCard
-                    iconName={feature.iconName}
-                    title={feature.title}
-                    description={feature.description}
-                  />
-                </AnimatedSection>
-              ))}
+            <div className="mt-12 grid auto-rows-[180px] grid-cols-2 gap-4 md:grid-cols-4 lg:auto-rows-[200px]">
+              {/* Card 1: Large — Site em minutos (col-span-2, row-span-2) */}
+              <AnimatedSection delay={0} className="col-span-2 row-span-2">
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-7 transition-all duration-500 hover:border-[#3B82F6]/40">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(59,130,246,0.15),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="absolute bottom-0 right-0 h-48 w-48 rounded-full bg-[#3B82F6]/10 blur-[60px]" />
+                  <div className="relative flex h-full flex-col justify-between">
+                    <div>
+                      <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF)]">
+                        <span className="text-2xl">⚡</span>
+                      </div>
+                      <h3 className="text-2xl font-black text-[#EAF0FF] md:text-3xl">Site pronto<br />em minutos</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-[#EAF0FF]/55 md:text-base">Assistente guiado passo a passo. Você preenche suas informações e o site é criado automaticamente. Zero código, zero complicação.</p>
+                    </div>
+                    <div className="flex gap-2">
+                      <span className="rounded-full border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-3 py-1 text-[11px] font-semibold text-[#3B82F6]">Setup guiado</span>
+                      <span className="rounded-full border border-[#7C5CFF]/30 bg-[#7C5CFF]/10 px-3 py-1 text-[11px] font-semibold text-[#7C5CFF]">Sem código</span>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              {/* Card 2: SEO */}
+              <AnimatedSection delay={0.08}>
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-5 transition-all duration-500 hover:border-[#22D3EE]/40">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(34,211,238,0.12),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="relative">
+                    <span className="text-3xl">🔍</span>
+                    <h3 className="mt-3 text-base font-black text-[#EAF0FF]">SEO avançado</h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#EAF0FF]/50">Apareça no Google com título e descrição personalizados.</p>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              {/* Card 3: Visual IA */}
+              <AnimatedSection delay={0.12}>
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-5 transition-all duration-500 hover:border-[#A855F7]/40">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(168,85,247,0.12),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="relative">
+                    <span className="text-3xl">🎨</span>
+                    <h3 className="mt-3 text-base font-black text-[#EAF0FF]">Visual com IA</h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#EAF0FF]/50">Paletas, fontes e estilos personalizados para o seu nicho.</p>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              {/* Card 4: Blog + Galeria + Eventos (col-span-2) */}
+              <AnimatedSection delay={0.16} className="col-span-2">
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(135deg,rgba(124,92,255,0.08),rgba(34,211,238,0.05))] p-6 transition-all duration-500 hover:border-[#7C5CFF]/40">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(124,92,255,0.12),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="relative flex h-full flex-col justify-between">
+                    <div>
+                      <div className="flex gap-3">
+                        {["📝", "🖼️", "📅"].map((emoji, i) => (
+                          <div key={i} className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/[0.06] text-lg">{emoji}</div>
+                        ))}
+                      </div>
+                      <h3 className="mt-3 text-lg font-black text-[#EAF0FF]">Blog · Galeria · Eventos</h3>
+                      <p className="mt-1.5 text-sm text-[#EAF0FF]/50">Publique artigos, mostre seu portfólio e divulgue sua agenda. Tudo integrado ao seu site Premium.</p>
+                    </div>
+                    <span className="self-start rounded-full border border-[#7C5CFF]/30 bg-[#7C5CFF]/10 px-3 py-1 text-[11px] font-bold text-[#7C5CFF]">✦ Plano Premium</span>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              {/* Card 5: Responsivo + SSL (col-span-2) */}
+              <AnimatedSection delay={0.2} className="col-span-2">
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-6 transition-all duration-500 hover:border-emerald-500/40">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(16,185,129,0.10),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="relative flex h-full items-center gap-5">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/15 text-3xl">🛡️</div>
+                    <div>
+                      <h3 className="text-lg font-black text-[#EAF0FF]">Responsivo + SSL gratuito</h3>
+                      <p className="mt-1 text-sm text-[#EAF0FF]/50">Design perfeito em qualquer dispositivo. Certificado SSL automático em todos os planos.</p>
+                      <div className="mt-2.5 flex gap-2">
+                        <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">Mobile-first</span>
+                        <span className="rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">SSL incluso</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              {/* Card 6: Suporte */}
+              <AnimatedSection delay={0.24}>
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-5 transition-all duration-500 hover:border-amber-500/40">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(245,158,11,0.10),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="relative">
+                    <span className="text-3xl">💬</span>
+                    <h3 className="mt-3 text-base font-black text-[#EAF0FF]">Suporte real</h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#EAF0FF]/50">Atendimento por e-mail. Prioritário no Premium.</p>
+                  </div>
+                </div>
+              </AnimatedSection>
+
+              {/* Card 7: Edição fácil */}
+              <AnimatedSection delay={0.28}>
+                <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-5 transition-all duration-500 hover:border-[#22D3EE]/40">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(34,211,238,0.10),transparent_60%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="relative">
+                    <span className="text-3xl">✏️</span>
+                    <h3 className="mt-3 text-base font-black text-[#EAF0FF]">Edição sem código</h3>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#EAF0FF]/50">Painel intuitivo para atualizar tudo a qualquer momento.</p>
+                  </div>
+                </div>
+              </AnimatedSection>
             </div>
           </div>
         </section>
