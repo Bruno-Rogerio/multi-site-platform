@@ -12,6 +12,7 @@ import type { WizardState, WizardAction, StepDefinition, CtaTypeId } from "@/lib
 import { generateTheme } from "@/lib/onboarding/theme-generator";
 import { getStepsForPlan } from "@/lib/onboarding/plans";
 import { calculateMonthlyTotal } from "@/lib/onboarding/pricing";
+import type { PlanPrices } from "@/lib/onboarding/get-plan-prices";
 import {
   isFeatureUnlocked as checkFeatureUnlocked,
   getServiceCardsLimit,
@@ -429,6 +430,7 @@ type WizardContextValue = {
   steps: StepDefinition[];
   totalSteps: number;
   monthlyTotal: number;
+  planPrices: PlanPrices;
   isFeatureUnlocked: (featureId: PremiumFeatureId) => boolean;
   maxServiceCards: number;
   maxSections: number;
@@ -437,7 +439,7 @@ type WizardContextValue = {
 
 const WizardContext = createContext<WizardContextValue | null>(null);
 
-export function WizardProvider({ children, initialPlan }: { children: ReactNode; initialPlan?: "basico" | "premium" }) {
+export function WizardProvider({ children, initialPlan, planPrices: externalPlanPrices }: { children: ReactNode; initialPlan?: "basico" | "premium"; planPrices?: PlanPrices }) {
   const [state, dispatch] = useReducer(
     wizardReducer,
     initialPlan ? { ...initialState, selectedPlan: initialPlan } : initialState,
@@ -445,7 +447,10 @@ export function WizardProvider({ children, initialPlan }: { children: ReactNode;
 
   const value = useMemo(() => {
     const steps = getStepsForPlan(state.selectedPlan);
-    const monthlyTotal = calculateMonthlyTotal(state.selectedPlan);
+    const planPrices: PlanPrices = externalPlanPrices ?? { basico: 59.9, premium: 109.8 };
+    const monthlyTotal = state.selectedPlan
+      ? (state.selectedPlan === "premium" ? planPrices.premium : planPrices.basico)
+      : calculateMonthlyTotal(state.selectedPlan);
 
     return {
       state,
@@ -453,6 +458,7 @@ export function WizardProvider({ children, initialPlan }: { children: ReactNode;
       steps,
       totalSteps: steps.length,
       monthlyTotal,
+      planPrices,
       isFeatureUnlocked: (featureId: PremiumFeatureId) =>
         checkFeatureUnlocked(featureId, state.selectedPlan),
       maxServiceCards: getServiceCardsLimit(state.selectedPlan),

@@ -82,7 +82,7 @@ function PlanCard({ plan, isSelected, onSelect }: { plan: PlanDefinition; isSele
 }
 
 export function PlanSelection() {
-  const { state, dispatch } = useWizard();
+  const { state, dispatch, planPrices } = useWizard();
   const { selectedPlan } = state;
 
   function handleSelectPlan(planId: PlanDefinition["id"]) {
@@ -117,14 +117,21 @@ export function PlanSelection() {
 
       {/* Plan cards */}
       <div className="grid gap-4 md:grid-cols-2">
-        {planDefinitions.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            isSelected={selectedPlan === plan.id}
-            onSelect={() => handleSelectPlan(plan.id)}
-          />
-        ))}
+        {planDefinitions.map((plan) => {
+          const dynamicPrice = planPrices[plan.id as "basico" | "premium"];
+          const planWithPrice = {
+            ...plan,
+            price: dynamicPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+          };
+          return (
+            <PlanCard
+              key={plan.id}
+              plan={planWithPrice}
+              isSelected={selectedPlan === plan.id}
+              onSelect={() => handleSelectPlan(plan.id)}
+            />
+          );
+        })}
       </div>
 
       {/* Navigation */}

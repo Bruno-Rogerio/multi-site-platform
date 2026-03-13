@@ -8,18 +8,14 @@ import { useToast } from "@/components/admin/toast-provider";
 type Props = {
   selectedPlan: string;
   siteId: string;
+  basicoPrice?: number;
+  premiumPrice?: number;
 };
 
 const PLAN_LABELS: Record<string, string> = {
   basico:         "Básico",
   construir:      "Construir",
   "premium-full": "Premium",
-};
-
-const PLAN_PRICES: Record<string, string> = {
-  basico:         "R$ 59,90/mês",
-  construir:      "R$ 79,90/mês",
-  "premium-full": "R$ 109,80/mês",
 };
 
 const PREMIUM_BENEFITS = [
@@ -45,7 +41,13 @@ const PREMIUM_BENEFITS = [
   },
 ] as const;
 
-export function PlanUpgradeSection({ selectedPlan, siteId: _siteId }: Props) {
+export function PlanUpgradeSection({ selectedPlan, siteId: _siteId, basicoPrice = 59.9, premiumPrice = 109.8 }: Props) {
+  const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const planPriceLabel: Record<string, string> = {
+    basico:         `${fmt(basicoPrice)}/mês`,
+    construir:      `${fmt(basicoPrice)}/mês`,
+    "premium-full": `${fmt(premiumPrice)}/mês`,
+  };
   const { toast } = useToast();
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -79,7 +81,7 @@ export function PlanUpgradeSection({ selectedPlan, siteId: _siteId }: Props) {
           </div>
           <div>
             <p className="text-sm font-bold text-emerald-300">Você está no plano Premium ✓</p>
-            <p className="text-xs text-[var(--platform-text)]/50">{PLAN_PRICES["premium-full"]}</p>
+            <p className="text-xs text-[var(--platform-text)]/50">{planPriceLabel["premium-full"]}</p>
           </div>
         </div>
         <ul className="space-y-2">
@@ -140,7 +142,7 @@ export function PlanUpgradeSection({ selectedPlan, siteId: _siteId }: Props) {
                 <Sparkles size={16} className="mx-auto mb-1.5 text-amber-400" />
                 <p className="text-[11px] font-bold text-amber-300">Próxima renovação</p>
                 <p className="mt-0.5 text-[10px] text-[var(--platform-text)]/40">
-                  Cobrança de R$ 109,80 na renovação
+                  Cobrança de {fmt(premiumPrice)} na renovação
                 </p>
               </div>
             </div>
@@ -180,7 +182,7 @@ export function PlanUpgradeSection({ selectedPlan, siteId: _siteId }: Props) {
         <p className="mt-1 text-lg font-bold text-[var(--platform-text)]">
           {PLAN_LABELS[selectedPlan] ?? "Básico"}
           <span className="ml-2 text-sm font-normal text-[var(--platform-text)]/50">
-            — {PLAN_PRICES[selectedPlan] ?? "R$ 59,90/mês"}
+            — {planPriceLabel[selectedPlan] ?? "R$ 59,90/mês"}
           </span>
         </p>
       </section>
@@ -193,7 +195,7 @@ export function PlanUpgradeSection({ selectedPlan, siteId: _siteId }: Props) {
           </div>
           <div>
             <p className="text-sm font-bold text-[var(--platform-text)]">Upgrade para Premium</p>
-            <p className="text-xs text-[var(--platform-text)]/50">R$ 109,80/mês</p>
+            <p className="text-xs text-[var(--platform-text)]/50">{fmt(premiumPrice)}/mês</p>
           </div>
         </div>
 

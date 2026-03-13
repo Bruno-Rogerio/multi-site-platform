@@ -17,10 +17,12 @@ type Plan = {
   highlighted?: boolean;
 };
 
-const plans: Plan[] = [
+function buildPlans(basicoPrice: number, premiumPrice: number): Plan[] {
+  const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return [
   {
     name: "Básico",
-    price: "R$ 59,90",
+    price: fmt(basicoPrice),
     priceNote: "/mês",
     description:
       "Escolha um layout pronto e personalize o conteúdo. Ideal para quem quer praticidade e velocidade.",
@@ -37,7 +39,7 @@ const plans: Plan[] = [
   {
     name: "Premium",
     badge: "Recomendado",
-    price: "R$ 109,80",
+    price: fmt(premiumPrice),
     priceNote: "/mês",
     description:
       "Personalização visual completa, múltiplas páginas e todos os recursos desbloqueados.",
@@ -53,9 +55,11 @@ const plans: Plan[] = [
     cta: "Quero o Premium",
     highlighted: true,
   },
-];
+  ];
+}
 
-export function PricingSection() {
+export function PricingSection({ basicoPrice, premiumPrice }: { basicoPrice: number; premiumPrice: number }) {
+  const plans = buildPlans(basicoPrice, premiumPrice);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 

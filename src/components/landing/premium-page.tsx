@@ -100,7 +100,8 @@ function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 }
 
-export function PremiumPage({ brandElement }: { brandElement: React.ReactNode }) {
+export function PremiumPage({ brandElement, basicoPrice = 59.9, premiumPrice = 109.8 }: { brandElement: React.ReactNode; basicoPrice?: number; premiumPrice?: number }) {
+  const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   return (
     <div className="min-h-screen bg-[#0B1020] text-[#EAF0FF]" style={{ fontFamily: "var(--font-sora, Sora, sans-serif)" }}>
       {/* Header */}
@@ -144,7 +145,7 @@ export function PremiumPage({ brandElement }: { brandElement: React.ReactNode })
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#EAF0FF]/65">
               Personalização visual com IA, blog, galeria, eventos, SEO e sem branding BuildSphere.
               Por{" "}
-              <span className="font-bold text-[#EAF0FF]">R$ 109,80/mês</span>{" "}
+              <span className="font-bold text-[#EAF0FF]">{fmt(premiumPrice)}/mês</span>{" "}
               — sem fidelidade, cancele quando quiser.
             </p>
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -175,11 +176,11 @@ export function PremiumPage({ brandElement }: { brandElement: React.ReactNode })
                 <div />
                 <div className="text-center text-xs font-semibold uppercase tracking-[0.14em] text-[#EAF0FF]/50">
                   Básico
-                  <div className="mt-0.5 text-base font-bold text-[#EAF0FF]">R$ 59,90</div>
+                  <div className="mt-0.5 text-base font-bold text-[#EAF0FF]">{fmt(basicoPrice)}</div>
                 </div>
                 <div className="text-center text-xs font-semibold uppercase tracking-[0.14em] text-[#22D3EE]">
                   Premium ★
-                  <div className="mt-0.5 text-base font-bold text-[#EAF0FF]">R$ 109,80</div>
+                  <div className="mt-0.5 text-base font-bold text-[#EAF0FF]">{fmt(premiumPrice)}</div>
                 </div>
               </div>
 
@@ -268,7 +269,7 @@ export function PremiumPage({ brandElement }: { brandElement: React.ReactNode })
                 Comece hoje
               </p>
               <h2 className="mt-3 text-3xl font-black md:text-4xl">
-                R$ 109,80<span className="text-lg font-normal text-[#EAF0FF]/50">/mês</span>
+                {fmt(premiumPrice)}<span className="text-lg font-normal text-[#EAF0FF]/50">/mês</span>
               </h2>
               <p className="mt-3 text-[#EAF0FF]/60">
                 Sem taxa de setup · Sem fidelidade · Cancele quando quiser

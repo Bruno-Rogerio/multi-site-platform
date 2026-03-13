@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Brand } from "@/components/platform/brand";
 import { getPlatformBrandingSettings } from "@/lib/platform/settings";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
+import { getPlanPrices, formatBRL } from "@/lib/onboarding/get-plan-prices";
 
 import { StickyHeader } from "@/components/landing/sticky-header";
 import { HeroAnimatedHeadline } from "@/components/landing/hero-animated-headline";
@@ -22,20 +23,20 @@ export const dynamic = "force-dynamic";
 
 const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
 
-export const metadata: Metadata = {
-  title: "BuildSphere — Crie seu site profissional em minutos",
-  description:
-    "Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Sem código, sem taxa de setup. Planos a partir de R$ 59,90/mês.",
-  alternates: {
-    canonical: `https://${ROOT}`,
-  },
-  openGraph: {
-    url: `https://${ROOT}`,
+export async function generateMetadata(): Promise<Metadata> {
+  const prices = await getPlanPrices();
+  const priceStr = formatBRL(prices.basico);
+  return {
     title: "BuildSphere — Crie seu site profissional em minutos",
-    description:
-      "Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Planos a partir de R$ 59,90/mês.",
-  },
-};
+    description: `Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Sem código, sem taxa de setup. Planos a partir de ${priceStr}/mês.`,
+    alternates: { canonical: `https://${ROOT}` },
+    openGraph: {
+      url: `https://${ROOT}`,
+      title: "BuildSphere — Crie seu site profissional em minutos",
+      description: `Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Planos a partir de ${priceStr}/mês.`,
+    },
+  };
+}
 
 const features: { iconName: IconName; title: string; description: string }[] = [
   {
@@ -119,7 +120,10 @@ export default async function PlatformLandingPage() {
   if (host.kind === "tenant") {
     redirect(`/t/${host.tenant}`);
   }
-  const platformBranding = await getPlatformBrandingSettings();
+  const [platformBranding, planPrices] = await Promise.all([
+    getPlatformBrandingSettings(),
+    getPlanPrices(),
+  ]);
   const brandEl = <Brand compact settings={platformBranding} />;
 
   const jsonLd = {
@@ -151,7 +155,7 @@ export default async function PlatformLandingPage() {
           {
             "@type": "Offer",
             name: "Plano Essencial",
-            price: "59.90",
+            price: planPrices.basico.toFixed(2),
             priceCurrency: "BRL",
             priceSpecification: {
               "@type": "RecurringCharge",
@@ -163,7 +167,7 @@ export default async function PlatformLandingPage() {
           {
             "@type": "Offer",
             name: "Plano Premium Full",
-            price: "109.80",
+            price: planPrices.premium.toFixed(2),
             priceCurrency: "BRL",
             priceSpecification: {
               "@type": "RecurringCharge",
@@ -308,7 +312,7 @@ export default async function PlatformLandingPage() {
               </p>
             </AnimatedSection>
 
-            <PricingSection />
+            <PricingSection basicoPrice={planPrices.basico} premiumPrice={planPrices.premium} />
           </div>
         </section>
 

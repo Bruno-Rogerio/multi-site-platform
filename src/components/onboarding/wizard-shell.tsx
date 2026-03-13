@@ -176,9 +176,9 @@ function WizardContent() {
   );
 }
 
-export function WizardShell({ initialPlan }: { initialPlan?: "basico" | "premium" }) {
+export function WizardShell({ initialPlan, planPrices }: { initialPlan?: "basico" | "premium"; planPrices?: { basico: number; premium: number } }) {
   return (
-    <WizardProvider initialPlan={initialPlan}>
+    <WizardProvider initialPlan={initialPlan} planPrices={planPrices}>
       <WizardContent />
     </WizardProvider>
   );

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { WizardShell } from "@/components/onboarding/wizard-shell";
 import { Brand } from "@/components/platform/brand";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
+import { getPlanPrices } from "@/lib/onboarding/get-plan-prices";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,8 @@ export default async function QueroComecarPage({
   const planParam = typeof params.plan === "string" ? params.plan : undefined;
   const initialPlan = planParam === "premium" ? "premium" : planParam === "basico" ? "basico" : undefined;
 
+  const planPrices = await getPlanPrices();
+
   return (
     <main className="relative min-h-screen bg-[var(--platform-bg)]">
       {/* Top navigation bar */}
@@ -45,7 +48,7 @@ export default async function QueroComecarPage({
       </div>
 
       {/* Wizard */}
-      <WizardShell initialPlan={initialPlan} />
+      <WizardShell initialPlan={initialPlan} planPrices={planPrices} />
     </main>
   );
 }

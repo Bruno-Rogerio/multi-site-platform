@@ -27,6 +27,8 @@ type Props = {
   initialTab?: Tab;
   domainSuccess?: boolean;
   billingProfile?: BillingProfile;
+  basicoPrice?: number;
+  premiumPrice?: number;
 };
 
 const TABS: { key: Tab; label: string; icon: typeof Settings2 }[] = [
@@ -45,6 +47,8 @@ export function SettingsTabs({
   initialTab = "conta",
   domainSuccess = false,
   billingProfile,
+  basicoPrice,
+  premiumPrice,
 }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
   const isPremium = selectedPlan === "premium-full";
@@ -97,7 +101,7 @@ export function SettingsTabs({
         />
       )}
       {activeTab === "plano" && (
-        <PlanUpgradeSection selectedPlan={selectedPlan} siteId={siteId} />
+        <PlanUpgradeSection selectedPlan={selectedPlan} siteId={siteId} basicoPrice={basicoPrice} premiumPrice={premiumPrice} />
       )}
     </>
   );

@@ -1,6 +1,7 @@
 import { SettingsTabs } from "@/components/admin/settings-tabs";
 import { requireUserProfile } from "@/lib/auth/session";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
+import { getPlanPrices } from "@/lib/onboarding/get-plan-prices";
 
 type SiteRow = {
   id: string;
@@ -37,6 +38,7 @@ export default async function ClientSettingsPage({ searchParams }: Props) {
 
   let site: SiteRow | null = null;
   let billing: BillingRow | null = null;
+  const planPrices = await getPlanPrices();
   if (supabase && profile.site_id) {
     const [siteResult, billingResult] = await Promise.all([
       supabase
@@ -79,6 +81,8 @@ export default async function ClientSettingsPage({ searchParams }: Props) {
           initialTab={initialTab}
           domainSuccess={domainSuccess}
           billingProfile={billing ?? undefined}
+          basicoPrice={planPrices.basico}
+          premiumPrice={planPrices.premium}
         />
       ) : (
         <div className="rounded-xl border border-white/10 bg-[#12182B] p-8 text-center">
