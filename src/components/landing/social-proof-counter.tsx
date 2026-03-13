@@ -46,7 +46,7 @@ export function SocialProofCounter() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="py-12 md:py-16">
+    <section ref={ref} className="py-8 md:py-12">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <motion.div
           className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#0E1428] p-8 md:p-10"

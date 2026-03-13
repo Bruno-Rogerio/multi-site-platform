@@ -52,7 +52,7 @@ export function HeroAnimatedHeadline() {
         />
       </div>
 
-      <div className="flex flex-col items-center py-24 text-center md:py-32">
+      <div className="flex flex-col items-center py-14 text-center md:py-20">
         {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.9 }}

@@ -179,7 +179,7 @@ export default async function PlatformLandingPage() {
 
       <main className="relative">
         {/* ─── Hero ─── */}
-        <section className="flex min-h-[90vh] items-center py-20">
+        <section className="flex min-h-[80vh] items-center">
           <HeroAnimatedHeadline />
         </section>
 
@@ -187,7 +187,7 @@ export default async function PlatformLandingPage() {
         <SocialProofCounter />
 
         {/* ─── Como funciona ─── */}
-        <section id="como-funciona" className="py-20 md:py-28">
+        <section id="como-funciona" className="py-14 md:py-20">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection>
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
@@ -207,7 +207,7 @@ export default async function PlatformLandingPage() {
         </section>
 
         {/* ─── Funcionalidades bento grid ─── */}
-        <section id="funcionalidades" className="py-20 md:py-28">
+        <section id="funcionalidades" className="py-14 md:py-20">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection>
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
@@ -332,7 +332,7 @@ export default async function PlatformLandingPage() {
         </section>
 
         {/* ─── Exemplos ─── */}
-        <section id="exemplos" className="py-20 md:py-28">
+        <section id="exemplos" className="py-14 md:py-20">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
@@ -355,7 +355,7 @@ export default async function PlatformLandingPage() {
         <TestimonialsStrip />
 
         {/* ─── Preços ─── */}
-        <section id="precos" className="py-20 md:py-28">
+        <section id="precos" className="py-14 md:py-20">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">
@@ -375,7 +375,7 @@ export default async function PlatformLandingPage() {
         </section>
 
         {/* ─── FAQ ─── */}
-        <section id="faq" className="py-20 md:py-28">
+        <section id="faq" className="py-14 md:py-20">
           <div className="mx-auto max-w-7xl px-5 md:px-8">
             <AnimatedSection className="text-center">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">

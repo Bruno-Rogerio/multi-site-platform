@@ -160,7 +160,7 @@ export function TestimonialsStrip() {
   const row2 = TESTIMONIALS.slice(half);
 
   return (
-    <section ref={ref} className="relative overflow-hidden py-20 md:py-28">
+    <section ref={ref} className="relative overflow-hidden py-14 md:py-20">
       {/* Background */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-[#22D3EE]/20 to-transparent" />

@@ -63,7 +63,7 @@ export function Footer({ brandElement, branding }: FooterProps) {
       <div className="h-px w-full bg-[linear-gradient(90deg,transparent_5%,#3B82F6_30%,#7C5CFF_50%,#22D3EE_70%,transparent_95%)] opacity-40" />
 
       {/* ── BIG CTA BLOCK ── */}
-      <div className="relative mx-auto max-w-7xl px-5 pb-0 pt-20 md:px-8 md:pt-24">
+      <div className="relative mx-auto max-w-7xl px-5 pb-0 pt-14 md:px-8 md:pt-16">
         <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(135deg,rgba(59,130,246,0.07),rgba(124,92,255,0.10),rgba(34,211,238,0.06))] px-8 py-14 text-center md:px-14 md:py-16">
           {/* Card inner glow */}
           <div className="pointer-events-none absolute inset-0">
@@ -107,7 +107,7 @@ export function Footer({ brandElement, branding }: FooterProps) {
       </div>
 
       {/* ── LINKS GRID ── */}
-      <div className="relative mx-auto max-w-7xl px-5 pb-10 pt-16 md:px-8 md:pb-14 md:pt-20">
+      <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-12 md:px-8 md:pb-10 md:pt-14">
         <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr_1fr]">
 
           {/* Brand column */}

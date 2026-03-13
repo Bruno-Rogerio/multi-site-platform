@@ -10,7 +10,7 @@ export function FinalCta() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="py-20 md:py-28">
+    <section ref={ref} className="py-14 md:py-20">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <motion.div
           className="relative overflow-hidden rounded-3xl"
