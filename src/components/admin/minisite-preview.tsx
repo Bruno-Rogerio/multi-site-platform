@@ -145,6 +145,33 @@ export function MiniSitePreview({
         </div>
       </div>
 
+      {/*
+        CSS overrides para preview mobile:
+        As classes md: do Tailwind são viewport-based (não container-based).
+        No admin o viewport é desktop >768px, então md:grid-cols-2, md:flex-row,
+        md:py-28 etc. sempre ativam — mesmo com 390px virtual.
+        Injetamos overrides escopados em .preview-mobile para simular mobile real.
+      */}
+      {isMobilePreview && (
+        <style>{`
+          .preview-mobile section { min-height: 0 !important; }
+          .preview-mobile [class*="md:grid-cols-"] { grid-template-columns: 1fr !important; }
+          .preview-mobile [class*="md:flex-row"] { flex-direction: column !important; }
+          .preview-mobile [class*="md:py-28"] { padding-top: 3rem !important; padding-bottom: 3rem !important; }
+          .preview-mobile [class*="md:py-24"] { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+          .preview-mobile [class*="md:py-20"] { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+          .preview-mobile [class*="md:py-16"] { padding-top: 2rem !important; padding-bottom: 2rem !important; }
+          .preview-mobile [class*="md:p-12"] { padding: 1.5rem !important; }
+          .preview-mobile [class*="md:p-8"] { padding: 1rem !important; }
+          .preview-mobile [class*="md:text-6xl"] { font-size: 2.5rem !important; line-height: 1.15 !important; }
+          .preview-mobile [class*="md:text-5xl"] { font-size: 2rem !important; line-height: 1.2 !important; }
+          .preview-mobile [class*="md:text-3xl"] { font-size: 1.5rem !important; }
+          .preview-mobile [class*="md:w-64"] { width: 100% !important; max-width: 100% !important; }
+          .preview-mobile [class*="md:h-56"] { height: auto !important; }
+          .preview-mobile [class*="md:items-center"] { align-items: flex-start !important; }
+        `}</style>
+      )}
+
       {/* Device chrome + site — proportionally scaled */}
       <div
         ref={containerRef}
@@ -156,6 +183,9 @@ export function MiniSitePreview({
             style={{
               zoom: scale,
               width: VIRTUAL_WIDTH,
+              height: innerHeight,
+              display: "flex",
+              flexDirection: "column",
               backgroundColor: theme.backgroundColor,
               ...(isMobilePreview && {
                 borderRadius: "44px",
@@ -167,7 +197,7 @@ export function MiniSitePreview({
           >
             {/* Browser bar (desktop) */}
             {!isMobilePreview && (
-              <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1122] px-3 py-2">
+              <div className="flex shrink-0 items-center gap-2 border-b border-white/10 bg-[#0A1122] px-3 py-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
                 <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
@@ -179,14 +209,14 @@ export function MiniSitePreview({
 
             {/* Phone notch (mobile) */}
             {isMobilePreview && (
-              <div className="flex justify-center bg-black pt-2 pb-3">
+              <div className="flex shrink-0 justify-center bg-black pt-2 pb-3">
                 <div className="h-4 w-20 rounded-full bg-black border border-white/10" />
               </div>
             )}
 
             {/* Mini header */}
             <div
-              className="flex items-center justify-between px-4 py-2.5 sticky top-0 z-10"
+              className="flex shrink-0 items-center justify-between px-4 py-2.5"
               style={{
                 backgroundColor:
                   (theme.headerStyle ?? "blur") === "solid"
@@ -225,10 +255,10 @@ export function MiniSitePreview({
               </span>
             </div>
 
-            {/* Sections — real SectionRenderer */}
+            {/* Sections — real SectionRenderer, flex-1 para o footer sempre aparecer */}
             <div
-              className="overflow-y-auto scrollbar-thin scrollbar-thumb-white/10"
-              style={{ ...siteStyles, maxHeight: innerHeight }}
+              className={`${isMobilePreview ? "preview-mobile" : ""} overflow-y-auto scrollbar-thin scrollbar-thumb-white/10`}
+              style={{ ...siteStyles, flex: 1 }}
             >
               {orderedSections.length === 0 ? (
                 <div className="py-12 text-center" style={{ color: theme.textColor, opacity: 0.4 }}>
@@ -255,9 +285,9 @@ export function MiniSitePreview({
               )}
             </div>
 
-            {/* Mini footer */}
+            {/* Mini footer — sempre visível graças ao flex */}
             <div
-              className="flex items-center justify-between px-4 py-2 text-[10px] opacity-50"
+              className="flex shrink-0 items-center justify-between px-4 py-2 text-[10px] opacity-50"
               style={{ color: theme.textColor, borderTop: `1px solid var(--site-border, rgba(234,240,255,0.16))`, fontFamily: theme.fontFamily }}
             >
               <span>{siteName}</span>
