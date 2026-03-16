@@ -38,6 +38,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       headers: {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
+        "Stripe-Version": "2023-10-16",
       },
       body: promoParams.toString(),
     }).catch(() => {});
@@ -81,6 +82,7 @@ export async function DELETE(_request: Request, { params }: { params: Promise<{ 
       headers: {
         Authorization: `Bearer ${stripeKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
+        "Stripe-Version": "2023-10-16",
       },
       body: "active=false",
     }).catch(() => {});

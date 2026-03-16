@@ -98,12 +98,15 @@ export async function POST(request: Request) {
   }
   couponParams.set("metadata[source]", "buildsphere_admin");
 
+  const stripeHeaders = {
+    Authorization: `Bearer ${stripeKey}`,
+    "Content-Type": "application/x-www-form-urlencoded",
+    "Stripe-Version": "2023-10-16",
+  };
+
   const couponRes = await fetch("https://api.stripe.com/v1/coupons", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${stripeKey}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    headers: stripeHeaders,
     body: couponParams.toString(),
   });
   const couponData = (await couponRes.json().catch(() => null)) as {
@@ -131,10 +134,7 @@ export async function POST(request: Request) {
 
   const promoRes = await fetch("https://api.stripe.com/v1/promotion_codes", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${stripeKey}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    headers: stripeHeaders,
     body: promoParams.toString(),
   });
   const promoData = (await promoRes.json().catch(() => null)) as {
