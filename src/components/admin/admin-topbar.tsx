@@ -31,7 +31,7 @@ function getBreadcrumbs(pathname: string): { label: string; href: string }[] {
   if (pathname.startsWith("/admin/platform")) {
     crumbs.push({ label: "Plataforma", href: "/admin/platform" });
   } else if (pathname.startsWith("/admin/client")) {
-    crumbs.push({ label: "Meu site", href: "/admin/client" });
+    crumbs.push({ label: "Dashboard", href: "/admin/client" });
   }
 
   const label = breadcrumbLabels[pathname];
