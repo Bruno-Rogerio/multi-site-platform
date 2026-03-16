@@ -199,18 +199,7 @@ export function SectionRenderer({
                   className="aspect-[4/3] h-auto w-full object-cover"
                 />
               </div>
-            ) : (
-              <div
-                className="flex aspect-[4/3] items-center justify-center"
-                style={{
-                  borderRadius: cardRadius,
-                  border: "1px dashed var(--site-border)",
-                  backgroundColor: "color-mix(in srgb, var(--site-primary) 5%, transparent)",
-                }}
-              >
-                <span className="text-sm opacity-30">Sua imagem aqui</span>
-              </div>
-            )}
+            ) : null}
           </div>
         </section>
       );

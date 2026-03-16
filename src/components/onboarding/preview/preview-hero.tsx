@@ -82,18 +82,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
             >
               <img src={heroImage} alt="Hero" className="h-full w-full object-cover aspect-[4/3]" style={{ objectPosition: heroImgPos }} />
             </div>
-          ) : (
-            <div
-              className={`flex items-center justify-center ${deviceMode === "mobile" ? "h-20 w-full" : "w-[40%] shrink-0 aspect-[4/3]"}`}
-              style={{
-                borderRadius: "var(--preview-radius)",
-                border: "1px dashed color-mix(in srgb, var(--preview-primary) 40%, transparent)",
-                background: "color-mix(in srgb, var(--preview-primary) 10%, transparent)",
-              }}
-            >
-              <span className="text-[6px]" style={{ color: "var(--preview-primary)" }}>Imagem</span>
-            </div>
-          )}
+          ) : null}
         </div>
       </section>
     );
