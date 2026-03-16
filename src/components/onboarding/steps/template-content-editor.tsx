@@ -49,7 +49,7 @@ function AccordionSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+    <div className="rounded-xl border border-white/10 bg-white/[0.02]">
       <button
         type="button"
         onClick={() => onToggle(id)}
@@ -65,6 +65,104 @@ function AccordionSection({
         />
       </button>
       {isOpen && <div className="border-t border-white/10 px-5 pb-5 pt-4">{children}</div>}
+    </div>
+  );
+}
+
+/* ─── Upload de imagem inline (sem preview grande) ─── */
+
+function ServiceImageControl({
+  cardIndex,
+  imageUrl,
+  objectPosition,
+  onChangeUrl,
+  onChangePosition,
+}: {
+  cardIndex: number;
+  imageUrl: string;
+  objectPosition: string;
+  onChangeUrl: (url: string) => void;
+  onChangePosition: (pos: string) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  async function handleFile(file: File) {
+    if (!file.type.startsWith("image/")) { setUploadError("Apenas imagens"); return; }
+    if (file.size > 5 * 1024 * 1024) { setUploadError("Máximo 5 MB"); return; }
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("slot", `serviceCard-${cardIndex}`);
+      const res = await fetch("/api/onboarding/upload", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erro no upload");
+      onChangeUrl(data.url);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Erro no upload");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  const hiddenInput = (
+    <input
+      ref={fileInputRef}
+      type="file"
+      accept="image/*"
+      className="hidden"
+      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); if (e.target) e.target.value = ""; }}
+    />
+  );
+
+  if (!imageUrl) {
+    return (
+      <div>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="flex w-full cursor-pointer items-center gap-2.5 rounded-lg border border-dashed border-white/15 px-3 py-2.5 text-xs text-[var(--platform-text)]/40 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE]/60"
+        >
+          {uploading ? (
+            <span className="animate-pulse">Enviando…</span>
+          ) : (
+            <><span className="text-sm">🖼</span> Adicionar imagem ao card (opcional)</>
+          )}
+        </button>
+        {uploadError && <p className="mt-1 text-[10px] text-red-400">{uploadError}</p>}
+        {hiddenInput}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <ImageFocalPointPicker
+        imageUrl={imageUrl}
+        value={objectPosition || "50% 50%"}
+        onChange={onChangePosition}
+      />
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="text-[10px] text-[var(--platform-text)]/40 transition hover:text-[var(--platform-text)]/70"
+        >
+          {uploading ? "Enviando…" : "Trocar imagem"}
+        </button>
+        <button
+          type="button"
+          onClick={() => onChangeUrl("")}
+          className="text-[10px] text-red-400/50 transition hover:text-red-400"
+        >
+          Remover
+        </button>
+      </div>
+      {uploadError && <p className="text-[10px] text-red-400">{uploadError}</p>}
+      {hiddenInput}
     </div>
   );
 }
@@ -675,22 +773,14 @@ export function TemplateContentEditor() {
                     <Plus size={10} /> Adicionar linha de texto
                   </button>
 
-                  {/* Image upload + position */}
-                  <ImageUpload
-                    label="Imagem"
-                    value={card.imageUrl || ""}
-                    onChange={(url) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { imageUrl: url } })}
-                    slot={`serviceCard-${i}`}
-                    variant="compact"
-                    description="Imagem para este serviço (opcional)"
+                  {/* Imagem + posição */}
+                  <ServiceImageControl
+                    cardIndex={i}
+                    imageUrl={card.imageUrl || ""}
+                    objectPosition={card.imageObjectPosition || "50% 50%"}
+                    onChangeUrl={(url) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { imageUrl: url } })}
+                    onChangePosition={(pos) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { imageObjectPosition: pos } })}
                   />
-                  {card.imageUrl && (
-                    <ImageFocalPointPicker
-                      imageUrl={card.imageUrl}
-                      value={card.imageObjectPosition || "50% 50%"}
-                      onChange={(pos) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { imageObjectPosition: pos } })}
-                    />
-                  )}
                 </div>
               ))}
               {serviceCards.length < 4 && (
