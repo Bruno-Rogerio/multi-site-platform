@@ -13,7 +13,6 @@ import {
   Mail,
   Linkedin,
   Facebook,
-  Check,
   Plus,
   Trash2,
   ChevronDown,
@@ -471,7 +470,7 @@ export function TemplateContentEditor() {
     dispatch({ type: "UPDATE_SERVICE_CARD", index: cardIndex, data: { extraLines: current } });
   }
 
-  // Registered social links for contact checkboxes
+  // Registered social links for contact section
   const registeredLinks = useMemo(() => {
     const links: { type: string; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[] = [];
     if (str(content.social_whatsapp).trim()) links.push({ type: "whatsapp", label: "WhatsApp", Icon: MessageCircle });
@@ -481,6 +480,33 @@ export function TemplateContentEditor() {
     if (str(content.social_facebook).trim()) links.push({ type: "facebook", label: "Facebook", Icon: Facebook });
     return links;
   }, [content.social_whatsapp, content.social_instagram, content.social_email, content.social_linkedin, content.social_facebook]);
+
+  // Auto-sync: all registered channels are always shown in the contact section
+  useEffect(() => {
+    const allTypes = registeredLinks.map((l) => l.type);
+    const current = state.contactSelectedLinks;
+    const same = allTypes.length === current.length && allTypes.every((t) => current.includes(t));
+    if (!same) {
+      dispatch({ type: "SET_CONTACT_SELECTED_LINKS", links: allTypes });
+    }
+    // Also prune floating channels that no longer have a registered link
+    const validFloating = state.floatingCtaChannels.filter((c) => allTypes.includes(c));
+    if (validFloating.length !== state.floatingCtaChannels.length) {
+      dispatch({ type: "SET_FLOATING_CTA_CHANNELS", channels: validFloating });
+      dispatch({ type: "SET_FLOATING_CTA", enabled: validFloating.length > 0 });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registeredLinks.map((l) => l.type).join(",")]);
+
+  function toggleFloatingChannel(type: string) {
+    const ctaType = type as import("@/lib/onboarding/types").CtaTypeId;
+    const isFloating = state.floatingCtaChannels.includes(ctaType);
+    const newChannels = isFloating
+      ? state.floatingCtaChannels.filter((c) => c !== ctaType)
+      : [...state.floatingCtaChannels, ctaType];
+    dispatch({ type: "SET_FLOATING_CTA_CHANNELS", channels: newChannels });
+    dispatch({ type: "SET_FLOATING_CTA", enabled: newChannels.length > 0 });
+  }
 
   return (
     <div>
@@ -965,7 +991,7 @@ export function TemplateContentEditor() {
         <AccordionSection
           id="contact"
           title="Seção de Contato"
-          subtitle="Escolha até 2 canais para exibir no site"
+          subtitle="Ative o botão flutuante para até 2 canais"
           isOpen={openSections.has("contact")}
           onToggle={toggleSection}
         >
@@ -975,78 +1001,58 @@ export function TemplateContentEditor() {
                 Preencha seus canais acima para exibi-los na seção de contato
               </p>
             ) : (
-              registeredLinks.map((link) => {
-                const isChecked = state.contactSelectedLinks.includes(link.type);
-                const atLimit = state.contactSelectedLinks.length >= 2 && !isChecked;
-                return (
-                  <label
-                    key={link.type}
-                    className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 transition ${
-                      isChecked
-                        ? "border-[#22D3EE]/30 bg-[#22D3EE]/10"
-                        : atLimit
-                        ? "border-white/10 opacity-40 cursor-not-allowed"
-                        : "border-white/10 cursor-pointer hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      disabled={atLimit}
-                      onChange={() => {
-                        const newLinks = isChecked
-                          ? state.contactSelectedLinks.filter((t) => t !== link.type)
-                          : [...state.contactSelectedLinks, link.type];
-                        dispatch({ type: "SET_CONTACT_SELECTED_LINKS", links: newLinks });
-                      }}
-                      className="hidden"
-                    />
+              <>
+                <p className="mb-3 text-[10px] text-[var(--platform-text)]/40">
+                  Todos os canais cadastrados aparecem na seção de contato. Ative o flutuante para fixar até 2 no canto da tela.
+                </p>
+                {registeredLinks.map((link) => {
+                  const isFloating = state.floatingCtaChannels.includes(
+                    link.type as import("@/lib/onboarding/types").CtaTypeId
+                  );
+                  const atLimit = state.floatingCtaChannels.length >= 2 && !isFloating;
+                  return (
                     <div
-                      className={`flex h-4 w-4 items-center justify-center rounded border-2 ${
-                        isChecked ? "border-[#22D3EE] bg-[#22D3EE]" : "border-white/20"
-                      }`}
+                      key={link.type}
+                      className="flex items-center gap-3 rounded-lg border border-white/10 px-3 py-2.5"
                     >
-                      {isChecked && <Check size={10} className="text-[#0B1020]" />}
+                      <link.Icon size={14} className="text-[var(--platform-text)]/60 shrink-0" />
+                      <span className="flex-1 text-sm text-[var(--platform-text)]">{link.label}</span>
+                      {/* Mini floating toggle */}
+                      <button
+                        type="button"
+                        disabled={atLimit}
+                        onClick={() => toggleFloatingChannel(link.type)}
+                        className={`flex items-center gap-1.5 rounded-full px-2 py-1 text-[10px] font-medium transition ${
+                          isFloating
+                            ? "bg-[#22D3EE]/20 text-[#22D3EE]"
+                            : atLimit
+                            ? "opacity-30 cursor-not-allowed bg-white/5 text-[var(--platform-text)]/40"
+                            : "bg-white/5 text-[var(--platform-text)]/40 hover:bg-white/10 hover:text-[var(--platform-text)]/70"
+                        }`}
+                        title={atLimit ? "Máximo de 2 botões flutuantes atingido" : isFloating ? "Desativar flutuante" : "Ativar flutuante"}
+                      >
+                        <div
+                          className={`relative h-3.5 w-6 rounded-full transition ${
+                            isFloating ? "bg-[#22D3EE]" : "bg-white/20"
+                          }`}
+                        >
+                          <div
+                            className={`absolute top-0.5 h-2.5 w-2.5 rounded-full bg-white shadow transition-transform ${
+                              isFloating ? "translate-x-2.5" : "translate-x-0.5"
+                            }`}
+                          />
+                        </div>
+                        Flutuante
+                      </button>
                     </div>
-                    <link.Icon size={14} className="text-[var(--platform-text)]/60" />
-                    <span className="text-sm text-[var(--platform-text)]">{link.label}</span>
-                  </label>
-                );
-              })
+                  );
+                })}
+                {state.floatingCtaChannels.length >= 2 && (
+                  <p className="mt-1 text-[10px] text-[#22D3EE]/70">Máximo de 2 botões flutuantes ativados</p>
+                )}
+              </>
             )}
           </div>
-          {state.contactSelectedLinks.length >= 2 && (
-            <p className="mt-2 text-[10px] text-[#22D3EE]/70">Máximo de 2 canais selecionados</p>
-          )}
-
-          {/* Floating buttons toggle */}
-          {registeredLinks.length > 0 && (
-            <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 px-3 py-2.5 transition hover:bg-white/[0.03]">
-              <div
-                className={`relative h-5 w-9 rounded-full transition ${
-                  state.floatingCtaEnabled ? "bg-[#22D3EE]" : "bg-white/10"
-                }`}
-              >
-                <div
-                  className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                    state.floatingCtaEnabled ? "translate-x-4" : "translate-x-0.5"
-                  }`}
-                />
-              </div>
-              <input
-                type="checkbox"
-                className="hidden"
-                checked={state.floatingCtaEnabled}
-                onChange={(e) => dispatch({ type: "SET_FLOATING_CTA", enabled: e.target.checked })}
-              />
-              <div>
-                <p className="text-xs font-medium text-[var(--platform-text)]">Botões flutuantes de contato</p>
-                <p className="text-[10px] text-[var(--platform-text)]/40">
-                  Aparecem fixos no canto da tela em todos os dispositivos
-                </p>
-              </div>
-            </label>
-          )}
         </AccordionSection>
 
         {/* ─── 8. Depoimentos ─── */}

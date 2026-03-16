@@ -578,9 +578,7 @@ export async function POST(request: Request) {
         title: content.contactTitle?.trim() || "Contato",
         subtitle:
           content.contactSubtitle?.trim() || "Entre em contato pelos canais abaixo",
-        socialLinks: contactSelectedLinks && contactSelectedLinks.length > 0
-          ? socialLinks.filter((link: { type: string }) => contactSelectedLinks.includes(link.type))
-          : socialLinks,
+        socialLinks: socialLinks,
         // Backward compat fields
         whatsappUrl: whatsappUrl || (ctaHref.startsWith("https://wa.me/") ? ctaHref : ""),
         whatsappLabel: content.ctaButtonLabel?.trim() || "Falar no WhatsApp",
