@@ -78,13 +78,13 @@ export function PricingSection({ basicoPrice, premiumPrice }: { basicoPrice: num
             delay: 0.15 * i,
             ease: [0.25, 0.4, 0.25, 1],
           }}
-          className="relative"
+          className={`relative ${plan.highlighted ? "drop-shadow-[0_0_40px_rgba(124,92,255,0.35)]" : ""}`}
         >
-          {/* Shimmer border wrapper */}
+          {/* Border wrapper */}
           <div
             className={`rounded-3xl p-[1px] ${
               plan.highlighted
-                ? "animate-shimmer bg-[linear-gradient(90deg,#3B82F6,#7C5CFF,#22D3EE,#7C5CFF,#3B82F6)]"
+                ? "bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)]"
                 : "bg-white/10"
             }`}
           >
