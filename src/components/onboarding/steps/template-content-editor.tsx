@@ -463,6 +463,12 @@ export function TemplateContentEditor() {
               variant="compact"
               description="Recomendado: 1920 × 800 px · máx. 5 MB"
             />
+            {state.heroImage && (
+              <ImagePositionPicker
+                value={str(content.heroImageObjectPosition) || "center center"}
+                onChange={(pos) => handleContentChange("heroImageObjectPosition", pos)}
+              />
+            )}
 
             <div>
               <label className={labelClass}>Eyebrow (pequeno texto acima)</label>

@@ -11,6 +11,7 @@ interface PreviewHeroProps {
 export function PreviewHero({ deviceMode }: PreviewHeroProps) {
   const { state } = useWizard();
   const { content, fontFamily, buttonStyle, heroVariant, heroImage } = state;
+  const heroImgPos = str(content.heroImageObjectPosition) || "center center";
 
   const buttonRadius =
     buttonStyle === "pill"
@@ -74,7 +75,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
                 boxShadow: "0 4px 16px color-mix(in srgb, var(--preview-primary) 18%, transparent)",
               }}
             >
-              <img src={heroImage} alt="Hero" className="h-full w-full object-cover aspect-[4/3]" />
+              <img src={heroImage} alt="Hero" className="h-full w-full object-cover aspect-[4/3]" style={{ objectPosition: heroImgPos }} />
             </div>
           ) : (
             <div
@@ -122,7 +123,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
                 boxShadow: "0 4px 14px color-mix(in srgb, var(--preview-primary) 14%, transparent)",
               }}
             >
-              <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+              <img src={heroImage} alt="Hero" className="h-full w-full object-cover" style={{ objectPosition: heroImgPos }} />
             </div>
           )}
           {eyebrow && (
@@ -163,7 +164,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
             className="mb-3 h-12 w-full overflow-hidden"
             style={{ borderRadius: "var(--preview-radius)", border: "1px solid var(--preview-text)18" }}
           >
-            <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+            <img src={heroImage} alt="Hero" className="h-full w-full object-cover" style={{ objectPosition: heroImgPos }} />
           </div>
         )}
         {eyebrow && (
@@ -223,7 +224,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
         >
           {heroImage && (
             <div className="-mx-3 -mt-3 mb-3 h-16 overflow-hidden">
-              <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+              <img src={heroImage} alt="Hero" className="h-full w-full object-cover" style={{ objectPosition: heroImgPos }} />
             </div>
           )}
           {eyebrow && (
@@ -271,7 +272,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
         <div className="relative">
           {heroImage && (
             <div className="mx-auto mb-3 h-16 w-full max-w-[80%] overflow-hidden rounded-lg border border-white/20">
-              <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+              <img src={heroImage} alt="Hero" className="h-full w-full object-cover" style={{ objectPosition: heroImgPos }} />
             </div>
           )}
           {eyebrow && (
@@ -324,7 +325,7 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
             border: "1px solid color-mix(in srgb, var(--preview-primary) 20%, transparent)",
           }}
         >
-          <img src={heroImage} alt="Hero" className="h-full w-full object-cover" />
+          <img src={heroImage} alt="Hero" className="h-full w-full object-cover" style={{ objectPosition: heroImgPos }} />
         </div>
       )}
       {eyebrow && (
