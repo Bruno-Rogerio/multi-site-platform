@@ -22,6 +22,12 @@ function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
 }
 
+function richHtml(value: unknown, fallback = ""): string {
+  const raw = typeof value === "string" ? value : fallback;
+  if (!raw) return fallback;
+  return raw.replace(/^<p>([\s\S]*)<\/p>$/, "$1").replace(/<\/p><p>/g, "<br>").trim() || fallback;
+}
+
 function asStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value.filter((item): item is string => typeof item === "string");
@@ -136,8 +142,9 @@ export function SectionRenderer({
   // ─── HERO ───────────────────────────────────────────────
   if (section.type === "hero") {
     const eyebrow = asString(section.content.eyebrow);
-    const title = asString(section.content.title, site.name);
-    const subtitle = asString(section.content.subtitle);
+    const titlePlain = asString(section.content.title, site.name);
+    const title = richHtml(section.content.title, site.name);
+    const subtitle = richHtml(section.content.subtitle);
     const ctaLabel = asString(section.content.ctaLabel, "Entrar em contato");
     const ctaHref = asString(section.content.ctaHref, "#contact");
     const imageUrl = asString(section.content.imageUrl);
@@ -162,9 +169,9 @@ export function SectionRenderer({
                   {eyebrow}
                 </p>
               )}
-              <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
+              <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl" dangerouslySetInnerHTML={{ __html: title }} />
               {subtitle && (
-                <p className="mt-5 max-w-lg text-lg leading-relaxed opacity-70">{subtitle}</p>
+                <p className="mt-5 max-w-lg text-lg leading-relaxed opacity-70" dangerouslySetInnerHTML={{ __html: subtitle }} />
               )}
               <a
                 href={ctaHref}
@@ -186,7 +193,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlain}
                   width={1280}
                   height={960}
                   className="aspect-[4/3] h-auto w-full object-cover"
@@ -242,7 +249,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlain}
                   width={1280}
                   height={720}
                   className="aspect-[16/9] h-auto w-full object-cover"
@@ -254,9 +261,9 @@ export function SectionRenderer({
                 {eyebrow}
               </p>
             )}
-            <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
+            <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl" dangerouslySetInnerHTML={{ __html: title }} />
             {subtitle && (
-              <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed opacity-70">{subtitle}</p>
+              <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed opacity-70" dangerouslySetInnerHTML={{ __html: subtitle }} />
             )}
             <a
               href={ctaHref}
@@ -291,7 +298,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlain}
                   width={1280}
                   height={540}
                   className="aspect-[21/9] h-auto w-full object-cover"
@@ -306,11 +313,10 @@ export function SectionRenderer({
             <h1
               className="max-w-4xl border-l-[6px] pl-6 text-4xl font-bold leading-[1.1] md:text-6xl lg:text-7xl"
               style={{ borderColor: "var(--site-primary)" }}
-            >
-              {title}
-            </h1>
+              dangerouslySetInnerHTML={{ __html: title }}
+            />
             {subtitle && (
-              <p className="mt-6 max-w-2xl text-lg leading-relaxed opacity-60">{subtitle}</p>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: subtitle }} />
             )}
             <a
               href={ctaHref}
@@ -366,7 +372,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlain}
                   width={1280}
                   height={720}
                   className="aspect-[16/9] h-auto w-full object-cover"
@@ -378,9 +384,9 @@ export function SectionRenderer({
                 {eyebrow}
               </p>
             )}
-            <h1 className="text-4xl font-bold leading-[1.05] md:text-5xl lg:text-6xl">{title}</h1>
+            <h1 className="text-4xl font-bold leading-[1.05] md:text-5xl lg:text-6xl" dangerouslySetInnerHTML={{ __html: title }} />
             {subtitle && (
-              <p className="mt-4 text-base leading-relaxed opacity-70">{subtitle}</p>
+              <p className="mt-4 text-base leading-relaxed opacity-70" dangerouslySetInnerHTML={{ __html: subtitle }} />
             )}
             <a
               href={ctaHref}
@@ -418,7 +424,7 @@ export function SectionRenderer({
               <div className="mx-auto mb-8 max-w-3xl overflow-hidden rounded-2xl border border-white/20">
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlain}
                   width={1280}
                   height={720}
                   className="aspect-[16/9] h-auto w-full object-cover"
@@ -430,11 +436,9 @@ export function SectionRenderer({
                 {eyebrow}
               </p>
             )}
-            <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
+            <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl" dangerouslySetInnerHTML={{ __html: title }} />
             {subtitle && (
-              <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80">
-                {subtitle}
-              </p>
+              <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/80" dangerouslySetInnerHTML={{ __html: subtitle }} />
             )}
             <a
               href={ctaHref}
@@ -479,7 +483,7 @@ export function SectionRenderer({
             >
               <Image
                 src={imageUrl}
-                alt={title}
+                alt={titlePlain}
                 width={1280}
                 height={720}
                 className="aspect-[16/9] h-auto w-full max-w-3xl object-cover"
@@ -499,9 +503,9 @@ export function SectionRenderer({
               />
             </>
           )}
-          <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl">{title}</h1>
+          <h1 className="text-5xl font-bold leading-[1.05] md:text-6xl lg:text-7xl" dangerouslySetInnerHTML={{ __html: title }} />
           {subtitle && (
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed opacity-70">{subtitle}</p>
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed opacity-70" dangerouslySetInnerHTML={{ __html: subtitle }} />
           )}
           <a
             href={ctaHref}
@@ -517,8 +521,9 @@ export function SectionRenderer({
 
   // ─── ABOUT ──────────────────────────────────────────────
   if (section.type === "about") {
-    const title = asString(section.content.title, "Sobre");
-    const body = asString(section.content.body);
+    const titlePlainAbout = asString(section.content.title, "Sobre");
+    const title = richHtml(section.content.title, "Sobre");
+    const body = richHtml(section.content.body);
     const aboutImageUrl = asString(section.content.imageUrl);
 
     return (
@@ -549,7 +554,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={aboutImageUrl}
-                  alt={title}
+                  alt={titlePlainAbout}
                   width={360}
                   height={480}
                   className="aspect-[3/4] h-auto w-full object-cover"
@@ -557,22 +562,18 @@ export function SectionRenderer({
               </div>
               <div>
                 <SectionEyebrow label="Sobre" />
-                <h2 className="text-3xl font-bold">{title}</h2>
+                <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
                 {body && (
-                  <p className="mt-5 whitespace-pre-line text-base leading-relaxed opacity-80">
-                    {body}
-                  </p>
+                  <p className="mt-5 whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
                 )}
               </div>
             </div>
           ) : (
             <>
               <SectionEyebrow label="Sobre" />
-              <h2 className="text-3xl font-bold">{title}</h2>
+              <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
               {body && (
-                <p className="mt-5 max-w-3xl whitespace-pre-line text-base leading-relaxed opacity-80">
-                  {body}
-                </p>
+                <p className="mt-5 max-w-3xl whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
               )}
             </>
           )}
@@ -583,7 +584,8 @@ export function SectionRenderer({
 
   // ─── SERVICES ───────────────────────────────────────────
   if (section.type === "services") {
-    const title = asString(section.content.title, "Serviços");
+    const titlePlainServices = asString(section.content.title, "Serviços");
+    const title = richHtml(section.content.title, "Serviços");
     const cards = asCards(section.content.cards);
     const items = asStringArray(section.content.items);
     const imageUrl = asString(section.content.imageUrl);
@@ -604,7 +606,7 @@ export function SectionRenderer({
         >
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Serviços" />
-            <h2 className="text-3xl font-bold">{title}</h2>
+            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -612,7 +614,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlainServices}
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
@@ -652,9 +654,9 @@ export function SectionRenderer({
                       />
                     )}
                     <div className="flex-1">
-                      <span className="text-base font-medium">{card.title}</span>
+                      <span className="text-base font-medium" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
-                        <p className="mt-1 text-sm opacity-60">{card.description}</p>
+                        <p className="mt-1 text-sm opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
                       )}
                       {(card.extraLines ?? []).length > 0 && (
                         <ul className="mt-1.5 space-y-0.5">
@@ -707,7 +709,7 @@ export function SectionRenderer({
           />
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Serviços" />
-            <h2 className="text-3xl font-bold">{title}</h2>
+            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -715,7 +717,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlainServices}
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
@@ -756,11 +758,9 @@ export function SectionRenderer({
                           <Icon size={20} className="text-[var(--site-primary)]" />
                         </div>
                       )}
-                      <h3 className="text-base font-semibold">{card.title}</h3>
+                      <h3 className="text-base font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
-                        <p className="mt-2 text-sm leading-relaxed opacity-60">
-                          {card.description}
-                        </p>
+                        <p className="mt-2 text-sm leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
                       )}
                       {(card.extraLines ?? []).length > 0 && (
                         <ul className="mt-2 space-y-0.5">
@@ -796,7 +796,7 @@ export function SectionRenderer({
           <div className={`relative ${containerClass}`}>
             <div className="text-center">
               <SectionEyebrow label="Serviços" />
-              <h2 className="text-3xl font-bold">{title}</h2>
+              <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
             </div>
             {imageUrl && (
               <div
@@ -805,7 +805,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlainServices}
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
@@ -834,11 +834,9 @@ export function SectionRenderer({
                       </div>
                     )}
                     <div className={`flex-1 ${isReversed ? "text-right" : ""}`}>
-                      <h3 className="text-base font-semibold">{card.title}</h3>
+                      <h3 className="text-base font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
-                        <p className="mt-1 text-sm leading-relaxed opacity-60">
-                          {card.description}
-                        </p>
+                        <p className="mt-1 text-sm leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
                       )}
                       {(card.extraLines ?? []).length > 0 && (
                         <ul className={`mt-1.5 space-y-0.5 ${isReversed ? "items-end" : ""}`}>
@@ -891,7 +889,7 @@ export function SectionRenderer({
           />
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Como funciona" />
-            <h2 className="text-3xl font-bold">{title}</h2>
+            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -899,7 +897,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlainServices}
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
@@ -940,12 +938,10 @@ export function SectionRenderer({
                         {Icon && (
                           <Icon size={16} className="text-[var(--site-primary)]" />
                         )}
-                        <span className="text-base font-semibold">{card.title}</span>
+                        <span className="text-base font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       </div>
                       {card.description && (
-                        <p className="mt-1 text-sm leading-relaxed opacity-60">
-                          {card.description}
-                        </p>
+                        <p className="mt-1 text-sm leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
                       )}
                       {(card.extraLines ?? []).length > 0 && (
                         <ul className="mt-1.5 space-y-0.5">
@@ -995,7 +991,7 @@ export function SectionRenderer({
         >
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Serviços" />
-            <h2 className="text-3xl font-bold">{title}</h2>
+            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -1003,7 +999,7 @@ export function SectionRenderer({
               >
                 <Image
                   src={imageUrl}
-                  alt={title}
+                  alt={titlePlainServices}
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
@@ -1032,11 +1028,9 @@ export function SectionRenderer({
                           <Icon size={22} className="text-[var(--site-primary)]" />
                         </div>
                       )}
-                      <h3 className="text-xl font-semibold">{card.title}</h3>
+                      <h3 className="text-xl font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
-                        <p className="mt-3 text-base leading-relaxed opacity-60">
-                          {card.description}
-                        </p>
+                        <p className="mt-3 text-base leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
                       )}
                       {(card.extraLines ?? []).length > 0 && (
                         <ul className="mt-2 space-y-1">
@@ -1105,7 +1099,7 @@ export function SectionRenderer({
         />
         <div className={`relative ${containerClass}`}>
           <SectionEyebrow label="Serviços" />
-          <h2 className="text-3xl font-bold">{title}</h2>
+          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
           {imageUrl && (
             <div
               className="mt-6 overflow-hidden"
@@ -1113,7 +1107,7 @@ export function SectionRenderer({
             >
               <Image
                 src={imageUrl}
-                alt={title}
+                alt={titlePlainServices}
                 width={1200}
                 height={600}
                 className="aspect-[2/1] h-auto w-full object-cover"
@@ -1142,9 +1136,9 @@ export function SectionRenderer({
                       <Icon size={22} className="text-[var(--site-primary)]" />
                     </div>
                   )}
-                  <h3 className="text-base font-semibold">{card.title}</h3>
+                  <h3 className="text-base font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                   {card.description && (
-                    <p className="mt-2 text-sm leading-relaxed opacity-60">{card.description}</p>
+                    <p className="mt-2 text-sm leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
                   )}
                   {(card.extraLines ?? []).length > 0 && (
                     <ul className="mt-2 space-y-0.5 text-left">
@@ -1167,8 +1161,8 @@ export function SectionRenderer({
 
   // ─── CTA ────────────────────────────────────────────────
   if (section.type === "cta") {
-    const title = asString(section.content.title, "Vamos conversar?");
-    const description = asString(section.content.description);
+    const title = richHtml(section.content.title, "Vamos conversar?");
+    const description = richHtml(section.content.description);
     const buttonLabel = asString(section.content.buttonLabel, "Entrar em contato");
     const buttonHref = asString(section.content.buttonHref, "#contact");
     const secondaryLabel = asString(section.content.secondaryLabel);
@@ -1194,9 +1188,9 @@ export function SectionRenderer({
           />
           <div className="relative mx-auto flex max-w-7xl flex-col gap-4 px-6 py-12 md:flex-row md:items-center md:justify-between md:py-16">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+              <h2 className="text-2xl font-bold md:text-3xl" dangerouslySetInnerHTML={{ __html: title }} />
               {description && (
-                <p className="mt-3 max-w-xl text-base opacity-70">{description}</p>
+                <p className="mt-3 max-w-xl text-base opacity-70" dangerouslySetInnerHTML={{ __html: description }} />
               )}
             </div>
             <a
@@ -1241,9 +1235,9 @@ export function SectionRenderer({
                 ...glassCard,
               }}
             >
-              <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+              <h2 className="text-2xl font-bold md:text-3xl" dangerouslySetInnerHTML={{ __html: title }} />
               {description && (
-                <p className="mx-auto mt-3 max-w-xl text-base opacity-70">{description}</p>
+                <p className="mx-auto mt-3 max-w-xl text-base opacity-70" dangerouslySetInnerHTML={{ __html: description }} />
               )}
               <a
                 href={buttonHref}
@@ -1281,9 +1275,9 @@ export function SectionRenderer({
 
           <div className="relative mx-auto flex max-w-7xl flex-col gap-4 px-6 py-12 md:flex-row md:items-center md:justify-between md:py-16">
             <div className="flex-1">
-              <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+              <h2 className="text-2xl font-bold md:text-3xl" dangerouslySetInnerHTML={{ __html: title }} />
               {description && (
-                <p className="mt-3 max-w-xl text-base text-white/80">{description}</p>
+                <p className="mt-3 max-w-xl text-base text-white/80" dangerouslySetInnerHTML={{ __html: description }} />
               )}
             </div>
             <a
@@ -1320,9 +1314,9 @@ export function SectionRenderer({
           <div className="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-white opacity-[0.10] blur-3xl" />
 
           <div className="relative mx-auto max-w-3xl px-6 py-12 text-center md:py-16">
-            <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+            <h2 className="text-2xl font-bold md:text-3xl" dangerouslySetInnerHTML={{ __html: title }} />
             {description && (
-              <p className="mx-auto mt-3 max-w-xl text-base text-white/80">{description}</p>
+              <p className="mx-auto mt-3 max-w-xl text-base text-white/80" dangerouslySetInnerHTML={{ __html: description }} />
             )}
             <a
               href={buttonHref}
@@ -1359,9 +1353,9 @@ export function SectionRenderer({
             style={{ background: "var(--site-accent)" }}
           />
           <div className="relative mx-auto max-w-3xl px-6 text-center">
-            <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+            <h2 className="text-2xl font-bold md:text-3xl" dangerouslySetInnerHTML={{ __html: title }} />
             {description && (
-              <p className="mx-auto mt-3 max-w-xl text-base opacity-70">{description}</p>
+              <p className="mx-auto mt-3 max-w-xl text-base opacity-70" dangerouslySetInnerHTML={{ __html: description }} />
             )}
             <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
               <a
@@ -1403,9 +1397,9 @@ export function SectionRenderer({
         }}
       >
         <div className="relative mx-auto max-w-3xl px-6 text-center">
-          <h2 className="text-2xl font-bold md:text-3xl">{title}</h2>
+          <h2 className="text-2xl font-bold md:text-3xl" dangerouslySetInnerHTML={{ __html: title }} />
           {description && (
-            <p className="mx-auto mt-3 max-w-xl text-base opacity-70">{description}</p>
+            <p className="mx-auto mt-3 max-w-xl text-base opacity-70" dangerouslySetInnerHTML={{ __html: description }} />
           )}
           <a
             href={buttonHref}
@@ -1457,7 +1451,7 @@ export function SectionRenderer({
           />
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Depoimentos" />
-            <h2 className="text-3xl font-bold">{title}</h2>
+            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
             <div className="mt-6 divide-y divide-[var(--site-border)]">
               {testimonials.map((testimonial, i) => (
                 <div
@@ -1514,7 +1508,7 @@ export function SectionRenderer({
         />
         <div className={`relative ${containerClass}`}>
           <SectionEyebrow label="Depoimentos" />
-          <h2 className="text-3xl font-bold">{title}</h2>
+          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
           <StaggeredCards className="mt-6 grid gap-5 sm:grid-cols-2">
             {testimonials.map((testimonial, i) => (
               <article
@@ -1603,7 +1597,7 @@ export function SectionRenderer({
         />
         <div className={`relative ${containerClass} text-center`}>
           <SectionEyebrow label="Contato" />
-          <h2 className="text-3xl font-bold">{title}</h2>
+          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
           {subtitle && <p className="mt-3 text-base opacity-70">{subtitle}</p>}
           {allLinks.length > 0 && (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
