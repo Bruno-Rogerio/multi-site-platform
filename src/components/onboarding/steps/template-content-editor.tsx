@@ -17,8 +17,7 @@ import {
   Plus,
   Trash2,
   ChevronDown,
-  ArrowUp,
-  ArrowDown,
+  GripVertical,
 } from "lucide-react";
 import { moveInArray } from "@/lib/onboarding/helpers";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -275,67 +274,93 @@ function ImageFocalPointPicker({
 
 /* ─── Section reorder list ─── */
 
-const SECTION_LABELS: Record<string, { label: string; fixed?: boolean }> = {
-  hero:         { label: "Capa",            fixed: true },
-  services:     { label: "Serviços" },
-  about:        { label: "Sobre você" },
-  cta:          { label: "Call to Action" },
-  testimonials: { label: "Depoimentos" },
-  contact:      { label: "Contato",         fixed: true },
+const SECTION_META_BASIC: Record<string, { label: string; emoji: string; accent: string; fixed?: boolean }> = {
+  hero:         { label: "Capa",           emoji: "🎯", accent: "#22D3EE", fixed: true },
+  services:     { label: "Serviços",       emoji: "🧩", accent: "#7C5CFF" },
+  about:        { label: "Sobre você",     emoji: "👤", accent: "#3B82F6" },
+  cta:          { label: "Call to Action", emoji: "📣", accent: "#10B981" },
+  testimonials: { label: "Depoimentos",    emoji: "⭐", accent: "#F59E0B" },
+  contact:      { label: "Contato",        emoji: "📞", accent: "#22D3EE", fixed: true },
 };
 
 function SectionOrderCard() {
   const { state, dispatch } = useWizard();
   const sections = state.enabledSections;
 
-  function move(index: number, direction: "up" | "down") {
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    const reordered = moveInArray(sections, index, targetIndex);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
+  const dragNodeRef = useRef<number | null>(null);
+
+  function handleDragStart(index: number) {
+    dragNodeRef.current = index;
+    setDraggedIndex(index);
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    if (dragNodeRef.current === null || dragNodeRef.current === index) return;
+    setDropTargetIndex(index);
+  }
+
+  function handleDrop(index: number) {
+    if (dragNodeRef.current === null || dragNodeRef.current === index) {
+      setDraggedIndex(null);
+      setDropTargetIndex(null);
+      return;
+    }
+    const reordered = moveInArray(sections, dragNodeRef.current, index);
     dispatch({ type: "REORDER_SECTIONS", sections: reordered });
+    setDraggedIndex(null);
+    setDropTargetIndex(null);
+    dragNodeRef.current = null;
+  }
+
+  function handleDragEnd() {
+    setDraggedIndex(null);
+    setDropTargetIndex(null);
+    dragNodeRef.current = null;
   }
 
   return (
     <div className="space-y-1.5">
       {sections.map((id, index) => {
-        const meta = SECTION_LABELS[id];
-        const label = meta?.label ?? id;
-        const isFixed = meta?.fixed === true;
-        const canMoveUp = !isFixed && index > 1; // hero always at 0
-        const canMoveDown = !isFixed && index < sections.length - 2; // contact always last
+        const meta = SECTION_META_BASIC[id] ?? { label: id, emoji: "📄", accent: "#666" };
+        const isFixed = meta.fixed === true;
+        const isDragging = draggedIndex === index;
+        const isDropTarget = dropTargetIndex === index;
 
         return (
           <div
             key={id}
-            className="flex items-center gap-2 rounded-lg border border-white/8 bg-white/[0.02] px-3 py-2"
+            draggable={!isFixed}
+            onDragStart={!isFixed ? () => handleDragStart(index) : undefined}
+            onDragOver={!isFixed ? (e) => handleDragOver(e, index) : undefined}
+            onDrop={!isFixed ? () => handleDrop(index) : undefined}
+            onDragEnd={!isFixed ? handleDragEnd : undefined}
+            className={`flex items-center gap-2.5 rounded-xl border p-2.5 transition-all select-none ${
+              isDropTarget
+                ? "border-[#22D3EE]/50 shadow-[0_0_10px_rgba(34,211,238,0.12)] bg-[#22D3EE]/5"
+                : isFixed
+                ? "border-white/5 bg-white/[0.01]"
+                : "border-white/8 bg-white/[0.02] hover:border-white/15"
+            } ${isDragging ? "opacity-40" : ""}`}
           >
-            <span className="flex-1 text-sm text-[var(--platform-text)]">{label}</span>
+            <div className="h-7 w-1 shrink-0 rounded-full" style={{ backgroundColor: meta.accent, opacity: 0.7 }} />
             {isFixed ? (
-              <span className="text-[10px] text-[var(--platform-text)]/30">fixo</span>
+              <div className="w-4 shrink-0" />
             ) : (
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  disabled={!canMoveUp}
-                  onClick={() => move(index, "up")}
-                  className="flex h-6 w-6 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
-                >
-                  <ArrowUp size={12} />
-                </button>
-                <button
-                  type="button"
-                  disabled={!canMoveDown}
-                  onClick={() => move(index, "down")}
-                  className="flex h-6 w-6 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
-                >
-                  <ArrowDown size={12} />
-                </button>
+              <div className="cursor-grab text-[var(--platform-text)]/25 hover:text-[var(--platform-text)]/50 active:cursor-grabbing">
+                <GripVertical size={15} />
               </div>
             )}
+            <span className="text-sm">{meta.emoji}</span>
+            <span className="flex-1 text-sm text-[var(--platform-text)]">{meta.label}</span>
+            {isFixed && <span className="text-[10px] text-[var(--platform-text)]/25">fixo</span>}
           </div>
         );
       })}
       <p className="text-[10px] text-[var(--platform-text)]/30">
-        As alterações refletem em tempo real no preview
+        Arraste para reordenar • Alterações refletem em tempo real no preview
       </p>
     </div>
   );
@@ -348,7 +373,7 @@ export function TemplateContentEditor() {
   const { selectedTemplateSlug, content, serviceCards } = state;
 
   // Accordion state — default: first section open
-  const [openSections, setOpenSections] = useState<Set<string>>(new Set(["contacts"]));
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(["order", "contacts"]));
   function toggleSection(id: string) {
     setOpenSections((prev) => {
       const next = new Set(prev);

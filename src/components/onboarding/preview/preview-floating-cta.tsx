@@ -3,6 +3,7 @@
 import { useWizard } from "../wizard-context";
 import { ctaTypes } from "@/lib/onboarding/cta-types";
 import { buildCtaUrl } from "@/lib/onboarding/cta-types";
+import type { CtaTypeId } from "@/lib/onboarding/types";
 import * as LucideIcons from "lucide-react";
 
 export function PreviewFloatingCta() {
@@ -27,8 +28,8 @@ export function PreviewFloatingCta() {
         if (!ctaDef) return null;
 
         const Icon = (LucideIcons as unknown as Record<string, React.ComponentType<{ size?: number; className?: string }>>)[ctaDef.icon];
-        const config = ctaConfig[ctaId];
-        const redirectUrl = config?.url ? buildCtaUrl(ctaId, config.url) : "";
+        const config = ctaConfig[ctaId as CtaTypeId];
+        const redirectUrl = config?.url ? buildCtaUrl(ctaId as CtaTypeId, config.url) : "";
 
         return (
           <div
