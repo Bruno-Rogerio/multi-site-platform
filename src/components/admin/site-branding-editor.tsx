@@ -10,7 +10,7 @@ import {
   type PalettePreset,
 } from "@/lib/onboarding/palettes";
 import { UpgradeModal } from "@/components/admin/upgrade-modal";
-import { MiniSitePreview, type SiteTheme } from "@/components/admin/minisite-preview";
+import { MiniSitePreview } from "@/components/admin/minisite-preview";
 import type { Section } from "@/lib/tenant/types";
 
 type SiteOption = {
@@ -549,7 +549,7 @@ export function SiteBrandingEditor({
       sections={initialSections}
       hasUnsavedChanges={isDirty}
       activeSectionId={null}
-      themeSettings={themeSettings as SiteTheme}
+      themeSettings={themeSettings as Record<string, unknown>}
     />
     </div>
   );

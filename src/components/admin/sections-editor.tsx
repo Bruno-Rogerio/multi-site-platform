@@ -148,7 +148,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
   const isClient = role === "client";
   const [selectedSiteId, setSelectedSiteId] = useState(defaultSiteId ?? "");
   const [sections, setSections] = useState<Section[]>([]);
-  const [siteTheme, setSiteTheme] = useState<Record<string, string> | null>(null);
+  const [siteTheme, setSiteTheme] = useState<Record<string, unknown> | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const [expandedSectionIds, setExpandedSectionIds] = useState<Set<string>>(new Set());
   const [deletingSection, setDeletingSection] = useState<string | null>(null);

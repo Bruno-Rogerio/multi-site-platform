@@ -3,19 +3,10 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-import type { Section } from "@/lib/tenant/types";
-
-export type SiteTheme = {
-  primaryColor?: string;
-  accentColor?: string;
-  backgroundColor?: string;
-  textColor?: string;
-  logoUrl?: string;
-  headerStyle?: string;
-  buttonStyle?: string;
-  fontFamily?: string;
-  [key: string]: unknown;
-} | null;
+import type { Section, Site, ThemeSettings } from "@/lib/tenant/types";
+import { defaultThemeSettings } from "@/lib/tenant/types";
+import { SectionRenderer } from "@/components/site/section-renderer";
+import { buttonStyleClasses, buildSiteStyles } from "@/components/site/site-shell";
 
 type MiniSitePreviewProps = {
   siteName: string;
@@ -23,26 +14,27 @@ type MiniSitePreviewProps = {
   sections: Section[];
   hasUnsavedChanges: boolean;
   activeSectionId: string | null;
-  themeSettings?: SiteTheme;
+  themeSettings?: Record<string, unknown> | null;
 };
 
-function asString(value: unknown, fallback = ""): string {
-  return typeof value === "string" ? value : fallback;
-}
-
-// For RichTextEditor fields: strip outer <p> and return __html object
-function richHtml(value: unknown, fallback = ""): { __html: string } {
-  const raw = typeof value === "string" ? value : "";
-  const inner = raw.replace(/^<p>([\s\S]*)<\/p>$/, "$1").trim();
-  return { __html: inner || fallback };
-}
-
-function asStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.filter((item): item is string => typeof item === "string");
+function buildTheme(raw: Record<string, unknown> | null | undefined): ThemeSettings {
+  const d = defaultThemeSettings;
+  return {
+    primaryColor:   (raw?.primaryColor   as string) || d.primaryColor,
+    accentColor:    (raw?.accentColor    as string) || d.accentColor,
+    backgroundColor:(raw?.backgroundColor as string) || d.backgroundColor,
+    textColor:      (raw?.textColor      as string) || d.textColor,
+    fontFamily:     (raw?.fontFamily     as string) || d.fontFamily,
+    buttonStyle:    ((raw?.buttonStyle   as ThemeSettings["buttonStyle"]) || d.buttonStyle),
+    logoUrl:        (raw?.logoUrl        as string) || undefined,
+    headerStyle:    (raw?.headerStyle    as ThemeSettings["headerStyle"]) || "blur",
+    dividerStyle:   (raw?.dividerStyle   as ThemeSettings["dividerStyle"]) || undefined,
+    motionStyle:    (raw?.motionStyle    as string) || undefined,
+    footerText:     (raw?.footerText     as string) || undefined,
+    "--site-radius":  (raw?.["--site-radius"]  as string) || undefined,
+    "--site-spacing": (raw?.["--site-spacing"] as string) || undefined,
+    "--site-shadow":  (raw?.["--site-shadow"]  as string) || undefined,
+  };
 }
 
 export function MiniSitePreview({
@@ -53,41 +45,32 @@ export function MiniSitePreview({
   activeSectionId,
   themeSettings,
 }: MiniSitePreviewProps) {
-  const hasSiteTheme = themeSettings?.primaryColor;
-  const primary  = themeSettings?.primaryColor    ?? "#3B82F6";
-  const accent   = themeSettings?.accentColor     ?? "#22D3EE";
-  const bg       = themeSettings?.backgroundColor ?? "#0B1020";
-  const text     = themeSettings?.textColor       ?? "#EAF0FF";
-  const font     = themeSettings?.fontFamily      ?? undefined;
-  const btnStyle = themeSettings?.buttonStyle     ?? "rounded";
-  const headerStyle = themeSettings?.headerStyle  ?? "blur";
-  const btnRadius = btnStyle === "pill" ? "999px" : btnStyle === "square" ? "0px" : "8px";
-
-  const headerBg =
-    headerStyle === "solid"   ? bg :
-    headerStyle === "minimal" ? "transparent" :
-    "rgba(255,255,255,0.05)"; // blur: vidro fosco
-  const headerBorder =
-    headerStyle === "minimal" ? `1px solid ${text}35` : `1px solid ${text}15`;
-  const headerBackdrop = headerStyle === "blur" ? "blur(8px)" : undefined;
-
-  const siteColors = hasSiteTheme
-    ? {
-        "--preview-primary": primary,
-        "--preview-accent": accent,
-        "--preview-bg": bg,
-        "--preview-text": text,
-      }
-    : {};
   const [previewViewport, setPreviewViewport] = useState<"desktop" | "mobile">("desktop");
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const orderedSections = [...sections].sort((a, b) => a.order - b.order);
   const isMobilePreview = previewViewport === "mobile";
 
+  const theme = buildTheme(themeSettings);
+  const btnClass = buttonStyleClasses[theme.buttonStyle] ?? buttonStyleClasses.rounded;
+  const siteStyles = buildSiteStyles(theme);
+
+  const mockSite: Site = {
+    id: "preview",
+    name: siteName,
+    domain: siteDomain,
+    plan: "landing",
+    themeSettings: theme,
+    homePage: {
+      id: "preview-page",
+      siteId: "preview",
+      slug: "home",
+      title: siteName,
+      sections: orderedSections,
+    },
+  };
+
   useEffect(() => {
-    if (!activeSectionId) {
-      return;
-    }
+    if (!activeSectionId) return;
     sectionRefs.current[activeSectionId]?.scrollIntoView({
       behavior: "smooth",
       block: "nearest",
@@ -96,6 +79,7 @@ export function MiniSitePreview({
 
   return (
     <aside className="sticky top-4 rounded-2xl border border-white/10 bg-[#12182B] p-4 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
+      {/* Topbar */}
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#22D3EE]">Preview</p>
@@ -139,422 +123,112 @@ export function MiniSitePreview({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0B1020]">
-        <div className="border-b border-white/10 px-4 py-3">
-          <p className="text-sm font-semibold text-[var(--platform-text)]">{siteName}</p>
-          <p className="text-xs text-[var(--platform-text)]/60">Mini-site em tempo real (pre-save)</p>
+      {/* Device chrome + site */}
+      <div
+        className={`mx-auto overflow-hidden rounded-xl border border-white/10 transition-all duration-300 ${
+          isMobilePreview ? "max-w-[360px]" : "w-full"
+        }`}
+        style={{ backgroundColor: theme.backgroundColor }}
+      >
+        {/* Browser bar (desktop) */}
+        {!isMobilePreview && (
+          <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1122] px-3 py-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
+            <div className="ml-2 h-5 flex-1 rounded-md border border-white/10 bg-white/[0.03] px-2 text-[10px] leading-5 text-[var(--platform-text)]/50 font-mono truncate">
+              {siteDomain}
+            </div>
+          </div>
+        )}
+
+        {/* Phone notch (mobile) */}
+        {isMobilePreview && (
+          <div className="flex justify-center bg-black pt-2 pb-3">
+            <div className="h-4 w-20 rounded-full bg-black border border-white/10" />
+          </div>
+        )}
+
+        {/* Mini header */}
+        <div
+          className="flex items-center justify-between px-4 py-2.5 sticky top-0 z-10"
+          style={{
+            backgroundColor:
+              (theme.headerStyle ?? "blur") === "solid"
+                ? theme.backgroundColor
+                : (theme.headerStyle ?? "blur") === "minimal"
+                ? "transparent"
+                : `${theme.backgroundColor}cc`,
+            borderBottom: `1px solid var(--site-border, rgba(234,240,255,0.16))`,
+            backdropFilter: (theme.headerStyle ?? "blur") === "blur" ? "blur(8px)" : undefined,
+            fontFamily: theme.fontFamily,
+            ...siteStyles,
+          }}
+        >
+          {theme.logoUrl ? (
+            <Image
+              src={theme.logoUrl}
+              alt={siteName}
+              width={32}
+              height={32}
+              className="h-8 w-auto max-w-[100px] object-contain rounded"
+            />
+          ) : (
+            <span className="text-xs font-bold truncate" style={{ color: theme.textColor }}>
+              {siteName}
+            </span>
+          )}
+          <span
+            className="shrink-0 px-2.5 py-1 text-[10px] font-semibold"
+            style={{
+              backgroundColor: theme.primaryColor,
+              color: siteStyles["--site-button-text" as keyof typeof siteStyles] as string || "#fff",
+              borderRadius: btnClass.includes("full") ? "9999px" : btnClass.includes("none") ? "0" : "6px",
+            }}
+          >
+            Menu
+          </span>
         </div>
 
-        <div className="p-4">
-          <div
-            style={siteColors as React.CSSProperties}
-            className={`mx-auto overflow-hidden border transition-all ${
-              isMobilePreview
-                ? "max-w-[310px] rounded-[2rem] border-white/15"
-                : "w-full rounded-2xl border-white/15 shadow-[0_10px_30px_rgba(0,0,0,0.35)]"
-            }`}
-          >
-            {isMobilePreview ? (
-              <div className="px-4 pt-3">
-                <div className="mx-auto h-1.5 w-20 rounded-full bg-white/25" />
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1122] px-3 py-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
-                <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
-                <div className="ml-2 h-5 flex-1 rounded-md border border-white/10 bg-white/[0.03] px-2 text-[10px] leading-5 text-[var(--platform-text)]/50">
-                  {siteDomain}
-                </div>
-              </div>
-            )}
-
-            {/* Wrapper com gradiente — revela diferença do header style */}
-            <div style={{ background: `linear-gradient(180deg, ${primary}45 0%, ${bg} 28%)` }}>
-              {/* Mini header — aplica headerStyle */}
+        {/* Sections — real SectionRenderer */}
+        <div
+          className={`overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 ${
+            isMobilePreview ? "max-h-[65vh]" : "max-h-[500px]"
+          }`}
+          style={siteStyles}
+        >
+          {orderedSections.length === 0 ? (
+            <div className="py-12 text-center" style={{ color: theme.textColor, opacity: 0.4 }}>
+              <p className="text-sm">Nenhuma seção cadastrada</p>
+            </div>
+          ) : (
+            orderedSections.map((section) => (
               <div
-                className="flex items-center justify-between px-3 py-2"
-                style={{
-                  backgroundColor: headerBg,
-                  borderBottom: headerBorder,
-                  backdropFilter: headerBackdrop,
-                  WebkitBackdropFilter: headerBackdrop,
-                  fontFamily: font,
-                }}
-              >
-                {themeSettings?.logoUrl ? (
-                  <Image
-                    src={themeSettings.logoUrl}
-                    alt={siteName}
-                    width={80}
-                    height={24}
-                    className="h-5 w-auto max-w-[80px] object-contain"
-                  />
-                ) : (
-                  <span className="text-[10px] font-bold" style={{ color: text }}>
-                    {siteName}
-                  </span>
-                )}
-                <span
-                  className="px-2 py-0.5 text-[8px] font-semibold text-white"
-                  style={{ backgroundColor: primary, borderRadius: btnRadius }}
-                >
-                  Menu
-                </span>
-              </div>
-
-              <div
-                className={`space-y-4 overflow-y-auto px-4 py-4 ${
-                  isMobilePreview ? "max-h-[58vh]" : "h-[330px]"
-                }`}
-                style={{
-                  backgroundColor: bg,
-                  color: text,
-                  fontFamily: font,
-                }}
-              >
-              {orderedSections.map((section) => {
-                const sectionContainerClassName =
+                key={section.id}
+                ref={(el) => { sectionRefs.current[section.id] = el; }}
+                className={`transition ${
                   activeSectionId === section.id
-                    ? "ring-2 ring-[#22D3EE] ring-offset-2 ring-offset-[#0B1020]"
-                    : "";
+                    ? "outline outline-2 outline-[#22D3EE] outline-offset-[-2px]"
+                    : ""
+                }`}
+              >
+                <SectionRenderer
+                  section={section}
+                  site={mockSite}
+                  buttonStyleClassName={btnClass}
+                />
+              </div>
+            ))
+          )}
+        </div>
 
-                const surfaceBorder = `${text}18`;
-
-                if (section.type === "hero") {
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => {
-                        sectionRefs.current[section.id] = element;
-                      }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <p
-                        className="text-[10px] font-semibold uppercase tracking-[0.2em]"
-                        style={{ color: accent }}
-                      >
-                        {asString(section.content.eyebrow)}
-                      </p>
-                      <h3
-                        className="mt-2 text-lg font-semibold"
-                        dangerouslySetInnerHTML={richHtml(section.content.title, siteName)}
-                      />
-                      <p
-                        className="mt-2 text-xs opacity-75"
-                        dangerouslySetInnerHTML={richHtml(section.content.subtitle)}
-                      />
-                      {asString(section.content.imageUrl) && (
-                        <Image
-                          src={asString(section.content.imageUrl)}
-                          alt={asString(section.content.title, siteName)}
-                          width={1280}
-                          height={720}
-                          className="mt-3 aspect-[16/9] h-auto w-full rounded-lg object-cover"
-                          style={{ border: `1px solid ${surfaceBorder}` }}
-                        />
-                      )}
-                    </section>
-                  );
-                }
-
-                if (section.type === "services") {
-                  const cards = Array.isArray(section.content.cards)
-                    ? (section.content.cards as Array<{ title: string; description?: string }>)
-                    : [];
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => { sectionRefs.current[section.id] = element; }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3 className="text-sm font-semibold">
-                        {asString(section.content.title, "Serviços")}
-                      </h3>
-                      {asString(section.content.imageUrl) && (
-                        <Image
-                          src={asString(section.content.imageUrl)}
-                          alt={asString(section.content.title, "Serviços")}
-                          width={960}
-                          height={720}
-                          className="mt-2 aspect-[4/3] h-auto w-full rounded-lg object-cover"
-                          style={{ border: `1px solid ${surfaceBorder}` }}
-                        />
-                      )}
-                      {cards.length > 0 && (
-                        <div className="mt-2 grid grid-cols-2 gap-1.5">
-                          {cards.slice(0, 4).map((card, i) => (
-                            <div
-                              key={i}
-                              className="rounded-lg p-2"
-                              style={{ border: `1px solid ${surfaceBorder}`, backgroundColor: `${primary}12` }}
-                            >
-                              <p className="text-[10px] font-semibold leading-tight opacity-90" dangerouslySetInnerHTML={richHtml(card.title, "Serviço")} />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {cards.length === 0 && (
-                        <p className="mt-2 text-[10px] opacity-40">Nenhum serviço cadastrado</p>
-                      )}
-                    </section>
-                  );
-                }
-
-                if (section.type === "cta") {
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => {
-                        sectionRefs.current[section.id] = element;
-                      }}
-                      className={`rounded-xl p-4 text-white ${sectionContainerClassName}`}
-                      style={{
-                        background: hasSiteTheme
-                          ? `linear-gradient(135deg, ${primary}, ${accent})`
-                          : "linear-gradient(135deg, #3B82F6, #7C5CFF, #22D3EE)",
-                      }}
-                    >
-                      <h3
-                        className="text-sm font-semibold"
-                        dangerouslySetInnerHTML={richHtml(section.content.title, "Vamos conversar?")}
-                      />
-                      <p
-                        className="mt-2 text-xs text-white/90"
-                        dangerouslySetInnerHTML={richHtml(section.content.description)}
-                      />
-                      {asString(section.content.imageUrl) && (
-                        <Image
-                          src={asString(section.content.imageUrl)}
-                          alt={asString(section.content.title, "CTA")}
-                          width={1280}
-                          height={720}
-                          className="mt-3 aspect-[16/9] h-auto w-full rounded-lg border border-white/35 object-cover"
-                        />
-                      )}
-                      <span className="mt-3 inline-block rounded-lg border border-white/35 px-3 py-1 text-xs font-semibold">
-                        {asString(section.content.buttonLabel, "Entrar em contato")}
-                      </span>
-                    </section>
-                  );
-                }
-
-                if (section.type === "about") {
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => {
-                        sectionRefs.current[section.id] = element;
-                      }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3
-                        className="text-sm font-semibold"
-                        dangerouslySetInnerHTML={richHtml(section.content.title, "Sobre")}
-                      />
-                      <p
-                        className="mt-2 text-xs opacity-80 line-clamp-3"
-                        dangerouslySetInnerHTML={richHtml(section.content.body)}
-                      />
-                    </section>
-                  );
-                }
-
-                if (section.type === "contact") {
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => {
-                        sectionRefs.current[section.id] = element;
-                      }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3 className="text-sm font-semibold">
-                        {asString(section.content.title, "Contato")}
-                      </h3>
-                      <p className="mt-1 text-xs opacity-70">
-                        {asString(section.content.subtitle)}
-                      </p>
-                      {asString(section.content.whatsappUrl) && (
-                        <span
-                          className="mt-2 inline-block rounded px-2 py-0.5 text-[9px] font-semibold text-white"
-                          style={{ backgroundColor: accent }}
-                        >
-                          {asString(section.content.whatsappLabel, "WhatsApp")}
-                        </span>
-                      )}
-                    </section>
-                  );
-                }
-
-                if (section.type === "testimonials") {
-                  const items = Array.isArray(section.content.items)
-                    ? (section.content.items as Array<{ quote: string; author: string }>)
-                    : [];
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => { sectionRefs.current[section.id] = element; }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Depoimentos")}</h3>
-                      <div className="mt-2 space-y-2">
-                        {items.slice(0, 2).map((item, i) => (
-                          <div key={i} className="rounded-lg p-2" style={{ border: `1px solid ${surfaceBorder}` }}>
-                            <p className="text-[10px] opacity-80 line-clamp-2">"{item.quote}"</p>
-                            <p className="mt-1 text-[9px] font-semibold opacity-50">— {item.author}</p>
-                          </div>
-                        ))}
-                        {items.length === 0 && <p className="text-[10px] opacity-40">Nenhum depoimento cadastrado</p>}
-                      </div>
-                    </section>
-                  );
-                }
-
-                if (section.type === "faq") {
-                  const items = Array.isArray(section.content.items)
-                    ? (section.content.items as Array<{ question: string; answer: string }>)
-                    : [];
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => { sectionRefs.current[section.id] = element; }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Perguntas Frequentes")}</h3>
-                      <div className="mt-2 space-y-1.5">
-                        {items.slice(0, 3).map((item, i) => (
-                          <div key={i} className="rounded-lg px-2.5 py-1.5" style={{ border: `1px solid ${surfaceBorder}` }}>
-                            <p className="text-[10px] font-medium opacity-85">{item.question}</p>
-                          </div>
-                        ))}
-                        {items.length === 0 && <p className="text-[10px] opacity-40">Nenhuma pergunta cadastrada</p>}
-                      </div>
-                    </section>
-                  );
-                }
-
-                if (section.type === "blog") {
-                  const posts = Array.isArray(section.content.posts)
-                    ? (section.content.posts as Array<{ title: string; excerpt?: string; imageUrl?: string }>)
-                    : [];
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => { sectionRefs.current[section.id] = element; }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Blog")}</h3>
-                      <div className="mt-2 space-y-1.5">
-                        {posts.slice(0, 2).map((post, i) => (
-                          <div key={i} className="flex gap-2 rounded-lg p-2" style={{ border: `1px solid ${surfaceBorder}` }}>
-                            {post.imageUrl && (
-                              <Image src={post.imageUrl} alt={post.title} width={40} height={30}
-                                className="h-7 w-10 shrink-0 rounded object-cover" />
-                            )}
-                            <p className="text-[10px] font-medium opacity-85 line-clamp-2">{post.title || "Artigo"}</p>
-                          </div>
-                        ))}
-                        {posts.length === 0 && <p className="text-[10px] opacity-40">Nenhum artigo cadastrado</p>}
-                      </div>
-                    </section>
-                  );
-                }
-
-                if (section.type === "gallery") {
-                  const images = Array.isArray(section.content.images)
-                    ? (section.content.images as Array<{ url: string; alt: string }>)
-                    : [];
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => { sectionRefs.current[section.id] = element; }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Galeria")}</h3>
-                      <div className="mt-2 grid grid-cols-3 gap-1">
-                        {images.slice(0, 6).map((img, i) => (
-                          img.url
-                            ? <Image key={i} src={img.url} alt={img.alt} width={80} height={60}
-                                className="aspect-square h-full w-full rounded object-cover" />
-                            : <div key={i} className="aspect-square rounded" style={{ backgroundColor: `${primary}20` }} />
-                        ))}
-                        {images.length === 0 && (
-                          <div className="col-span-3 py-2 text-center text-[10px] opacity-40">Nenhuma imagem cadastrada</div>
-                        )}
-                      </div>
-                    </section>
-                  );
-                }
-
-                if (section.type === "events") {
-                  const events = Array.isArray(section.content.events)
-                    ? (section.content.events as Array<{ title: string; date: string }>)
-                    : [];
-                  return (
-                    <section
-                      key={section.id}
-                      ref={(element) => { sectionRefs.current[section.id] = element; }}
-                      className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                      style={{ border: `1px solid ${surfaceBorder}` }}
-                    >
-                      <h3 className="text-sm font-semibold">{asString(section.content.title, "Agenda")}</h3>
-                      <div className="mt-2 space-y-1.5">
-                        {events.slice(0, 3).map((ev, i) => (
-                          <div key={i} className="flex items-center gap-2 rounded-lg px-2.5 py-1.5" style={{ border: `1px solid ${surfaceBorder}` }}>
-                            <div className="shrink-0 rounded px-1.5 py-0.5 text-[8px] font-bold text-white"
-                              style={{ backgroundColor: primary }}>
-                              {ev.date ? new Date(ev.date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }) : "—"}
-                            </div>
-                            <p className="text-[10px] opacity-80 truncate">{ev.title}</p>
-                          </div>
-                        ))}
-                        {events.length === 0 && <p className="text-[10px] opacity-40">Nenhum evento cadastrado</p>}
-                      </div>
-                    </section>
-                  );
-                }
-
-                return (
-                  <section
-                    key={section.id}
-                    ref={(element) => { sectionRefs.current[section.id] = element; }}
-                    className={`rounded-xl p-4 ${sectionContainerClassName}`}
-                    style={{ border: `1px solid ${surfaceBorder}` }}
-                  >
-                    <p className="text-xs opacity-80">Seção {section.type}</p>
-                  </section>
-                );
-              })}
-            </div>
-
-            {/* Mini footer */}
-            <div
-              className="flex items-center justify-between px-3 py-2 text-[8px] opacity-60"
-              style={{
-                borderTop: `1px solid ${text}15`,
-                color: text,
-                backgroundColor: bg,
-                fontFamily: font,
-              }}
-            >
-              <span>{siteName}</span>
-              <span>Powered by BuildSphere</span>
-            </div>
-            </div>{/* fecha wrapper gradiente */}
-          </div>
-
-          {!isMobilePreview ? (
-            <div className="mx-auto mt-2 h-2 w-[220px] rounded-full bg-white/10" />
-          ) : null}
+        {/* Mini footer */}
+        <div
+          className="flex items-center justify-between px-4 py-2 text-[10px] opacity-50"
+          style={{ color: theme.textColor, borderTop: `1px solid var(--site-border, rgba(234,240,255,0.16))`, fontFamily: theme.fontFamily }}
+        >
+          <span>{siteName}</span>
+          <span>Powered by BuildSphere</span>
         </div>
       </div>
     </aside>

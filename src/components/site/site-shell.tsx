@@ -57,6 +57,27 @@ function resolveReadableText(textHex: string, backgroundHex: string) {
     : light;
 }
 
+export function buildSiteStyles(theme: Site["themeSettings"]): CSSProperties {
+  const readableText = resolveReadableText(theme.textColor, theme.backgroundColor);
+  const isDarkText = luminance(readableText) < 0.4;
+  const solidHeaderText = luminance(theme.primaryColor) > 0.35 ? "#0B1020" : "#FFFFFF";
+  return {
+    "--site-primary": theme.primaryColor,
+    "--site-accent": theme.accentColor,
+    "--site-background": theme.backgroundColor,
+    "--site-text": readableText,
+    "--site-button-text": solidHeaderText,
+    "--site-surface": isDarkText ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.06)",
+    "--site-border": isDarkText ? "rgba(11,16,32,0.14)" : "rgba(234,240,255,0.16)",
+    "--site-radius": theme["--site-radius"] ?? "24px",
+    "--site-spacing": theme["--site-spacing"] ?? "16px",
+    "--site-shadow": theme["--site-shadow"] ?? "0 2px 8px rgba(0,0,0,0.1)",
+    fontFamily: theme.fontFamily,
+    backgroundColor: theme.backgroundColor,
+    color: readableText,
+  } as CSSProperties;
+}
+
 export function SiteShell({ site, children }: SiteShellProps) {
   const logoUrl = site.themeSettings.logoUrl?.trim() ?? "";
   const headerStyle = site.themeSettings.headerStyle ?? "blur";
@@ -81,33 +102,9 @@ export function SiteShell({ site, children }: SiteShellProps) {
     ...(hasTestimonials ? [{ href: "/#testimonials", label: "Depoimentos" }] : []),
     { href: "/#contact", label: "Contato" },
   ];
-  const readableText = resolveReadableText(
-    site.themeSettings.textColor,
-    site.themeSettings.backgroundColor,
-  );
+  const style = buildSiteStyles(site.themeSettings);
+  const readableText = resolveReadableText(site.themeSettings.textColor, site.themeSettings.backgroundColor);
   const isDarkText = luminance(readableText) < 0.4;
-
-  // Compute auto-contrast text for elements using primary as background (buttons, solid header)
-  const solidHeaderText = luminance(site.themeSettings.primaryColor) > 0.35 ? "#0B1020" : "#FFFFFF";
-
-  const style = {
-    "--site-primary": site.themeSettings.primaryColor,
-    "--site-accent": site.themeSettings.accentColor,
-    "--site-background": site.themeSettings.backgroundColor,
-    "--site-text": readableText,
-    "--site-button-text": solidHeaderText,
-    "--site-surface": isDarkText
-      ? "rgba(255,255,255,0.9)"
-      : "rgba(255,255,255,0.06)",
-    "--site-border": isDarkText
-      ? "rgba(11,16,32,0.14)"
-      : "rgba(234,240,255,0.16)",
-    "--site-radius": site.themeSettings["--site-radius"] ?? "24px",
-    "--site-spacing": site.themeSettings["--site-spacing"] ?? "16px",
-    "--site-shadow":
-      site.themeSettings["--site-shadow"] ?? "0 2px 8px rgba(0,0,0,0.1)",
-    fontFamily: site.themeSettings.fontFamily,
-  } as CSSProperties;
 
   const logoImg = logoUrl ? (
     <Image
