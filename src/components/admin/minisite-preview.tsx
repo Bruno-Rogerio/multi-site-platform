@@ -30,6 +30,13 @@ function asString(value: unknown, fallback = ""): string {
   return typeof value === "string" ? value : fallback;
 }
 
+// For RichTextEditor fields: strip outer <p> and return __html object
+function richHtml(value: unknown, fallback = ""): { __html: string } {
+  const raw = typeof value === "string" ? value : "";
+  const inner = raw.replace(/^<p>([\s\S]*)<\/p>$/, "$1").trim();
+  return { __html: inner || fallback };
+}
+
 function asStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) {
     return [];
@@ -230,12 +237,14 @@ export function MiniSitePreview({
                       >
                         {asString(section.content.eyebrow)}
                       </p>
-                      <h3 className="mt-2 text-lg font-semibold">
-                        {asString(section.content.title, siteName)}
-                      </h3>
-                      <p className="mt-2 text-xs opacity-75">
-                        {asString(section.content.subtitle)}
-                      </p>
+                      <h3
+                        className="mt-2 text-lg font-semibold"
+                        dangerouslySetInnerHTML={richHtml(section.content.title, siteName)}
+                      />
+                      <p
+                        className="mt-2 text-xs opacity-75"
+                        dangerouslySetInnerHTML={richHtml(section.content.subtitle)}
+                      />
                       {asString(section.content.imageUrl) && (
                         <Image
                           src={asString(section.content.imageUrl)}
@@ -282,7 +291,7 @@ export function MiniSitePreview({
                               className="rounded-lg p-2"
                               style={{ border: `1px solid ${surfaceBorder}`, backgroundColor: `${primary}12` }}
                             >
-                              <p className="text-[10px] font-semibold leading-tight opacity-90">{card.title || "Serviço"}</p>
+                              <p className="text-[10px] font-semibold leading-tight opacity-90" dangerouslySetInnerHTML={richHtml(card.title, "Serviço")} />
                             </div>
                           ))}
                         </div>
@@ -308,12 +317,14 @@ export function MiniSitePreview({
                           : "linear-gradient(135deg, #3B82F6, #7C5CFF, #22D3EE)",
                       }}
                     >
-                      <h3 className="text-sm font-semibold">
-                        {asString(section.content.title, "Vamos conversar?")}
-                      </h3>
-                      <p className="mt-2 text-xs text-white/90">
-                        {asString(section.content.description)}
-                      </p>
+                      <h3
+                        className="text-sm font-semibold"
+                        dangerouslySetInnerHTML={richHtml(section.content.title, "Vamos conversar?")}
+                      />
+                      <p
+                        className="mt-2 text-xs text-white/90"
+                        dangerouslySetInnerHTML={richHtml(section.content.description)}
+                      />
                       {asString(section.content.imageUrl) && (
                         <Image
                           src={asString(section.content.imageUrl)}
@@ -340,12 +351,14 @@ export function MiniSitePreview({
                       className={`rounded-xl p-4 ${sectionContainerClassName}`}
                       style={{ border: `1px solid ${surfaceBorder}` }}
                     >
-                      <h3 className="text-sm font-semibold">
-                        {asString(section.content.title, "Sobre")}
-                      </h3>
-                      <p className="mt-2 text-xs opacity-80 line-clamp-3">
-                        {asString(section.content.body)}
-                      </p>
+                      <h3
+                        className="text-sm font-semibold"
+                        dangerouslySetInnerHTML={richHtml(section.content.title, "Sobre")}
+                      />
+                      <p
+                        className="mt-2 text-xs opacity-80 line-clamp-3"
+                        dangerouslySetInnerHTML={richHtml(section.content.body)}
+                      />
                     </section>
                   );
                 }
