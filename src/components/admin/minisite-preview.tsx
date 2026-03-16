@@ -47,8 +47,26 @@ export function MiniSitePreview({
 }: MiniSitePreviewProps) {
   const [previewViewport, setPreviewViewport] = useState<"desktop" | "mobile">("desktop");
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
   const orderedSections = [...sections].sort((a, b) => a.order - b.order);
   const isMobilePreview = previewViewport === "mobile";
+
+  // Virtual widths: desktop renders as 1280px page, mobile as 390px (iPhone)
+  const VIRTUAL_WIDTH = isMobilePreview ? 390 : 1280;
+  const PREVIEW_HEIGHT = 540; // visible height in px
+
+  const scale = containerWidth > 0 ? containerWidth / VIRTUAL_WIDTH : 0;
+  const innerHeight = scale > 0 ? Math.round(PREVIEW_HEIGHT / scale) : 9999;
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    setContainerWidth(el.getBoundingClientRect().width);
+    const ro = new ResizeObserver(([entry]) => setContainerWidth(entry.contentRect.width));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const theme = buildTheme(themeSettings);
   const btnClass = buttonStyleClasses[theme.buttonStyle] ?? buttonStyleClasses.rounded;
@@ -123,113 +141,120 @@ export function MiniSitePreview({
         </div>
       </div>
 
-      {/* Device chrome + site */}
+      {/* Device chrome + site — proportionally scaled */}
       <div
-        className={`mx-auto overflow-hidden rounded-xl border border-white/10 transition-all duration-300 ${
-          isMobilePreview ? "max-w-[360px]" : "w-full"
-        }`}
-        style={{ backgroundColor: theme.backgroundColor }}
+        ref={containerRef}
+        className="overflow-hidden rounded-xl border border-white/10"
+        style={{ height: PREVIEW_HEIGHT }}
       >
-        {/* Browser bar (desktop) */}
-        {!isMobilePreview && (
-          <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1122] px-3 py-2">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
-            <div className="ml-2 h-5 flex-1 rounded-md border border-white/10 bg-white/[0.03] px-2 text-[10px] leading-5 text-[var(--platform-text)]/50 font-mono truncate">
-              {siteDomain}
-            </div>
-          </div>
-        )}
-
-        {/* Phone notch (mobile) */}
-        {isMobilePreview && (
-          <div className="flex justify-center bg-black pt-2 pb-3">
-            <div className="h-4 w-20 rounded-full bg-black border border-white/10" />
-          </div>
-        )}
-
-        {/* Mini header */}
-        <div
-          className="flex items-center justify-between px-4 py-2.5 sticky top-0 z-10"
-          style={{
-            backgroundColor:
-              (theme.headerStyle ?? "blur") === "solid"
-                ? theme.backgroundColor
-                : (theme.headerStyle ?? "blur") === "minimal"
-                ? "transparent"
-                : `${theme.backgroundColor}cc`,
-            borderBottom: `1px solid var(--site-border, rgba(234,240,255,0.16))`,
-            backdropFilter: (theme.headerStyle ?? "blur") === "blur" ? "blur(8px)" : undefined,
-            fontFamily: theme.fontFamily,
-            ...siteStyles,
-          }}
-        >
-          {theme.logoUrl ? (
-            <Image
-              src={theme.logoUrl}
-              alt={siteName}
-              width={32}
-              height={32}
-              className="h-8 w-auto max-w-[100px] object-contain rounded"
-            />
-          ) : (
-            <span className="text-xs font-bold truncate" style={{ color: theme.textColor }}>
-              {siteName}
-            </span>
-          )}
-          <span
-            className="shrink-0 px-2.5 py-1 text-[10px] font-semibold"
+        {scale > 0 && (
+          <div
             style={{
-              backgroundColor: theme.primaryColor,
-              color: siteStyles["--site-button-text" as keyof typeof siteStyles] as string || "#fff",
-              borderRadius: btnClass.includes("full") ? "9999px" : btnClass.includes("none") ? "0" : "6px",
+              zoom: scale,
+              width: VIRTUAL_WIDTH,
+              backgroundColor: theme.backgroundColor,
             }}
           >
-            Menu
-          </span>
-        </div>
-
-        {/* Sections — real SectionRenderer */}
-        <div
-          className={`overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 ${
-            isMobilePreview ? "max-h-[65vh]" : "max-h-[500px]"
-          }`}
-          style={siteStyles}
-        >
-          {orderedSections.length === 0 ? (
-            <div className="py-12 text-center" style={{ color: theme.textColor, opacity: 0.4 }}>
-              <p className="text-sm">Nenhuma seção cadastrada</p>
-            </div>
-          ) : (
-            orderedSections.map((section) => (
-              <div
-                key={section.id}
-                ref={(el) => { sectionRefs.current[section.id] = el; }}
-                className={`transition ${
-                  activeSectionId === section.id
-                    ? "outline outline-2 outline-[#22D3EE] outline-offset-[-2px]"
-                    : ""
-                }`}
-              >
-                <SectionRenderer
-                  section={section}
-                  site={mockSite}
-                  buttonStyleClassName={btnClass}
-                />
+            {/* Browser bar (desktop) */}
+            {!isMobilePreview && (
+              <div className="flex items-center gap-2 border-b border-white/10 bg-[#0A1122] px-3 py-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
+                <div className="ml-2 h-5 flex-1 rounded-md border border-white/10 bg-white/[0.03] px-2 text-[10px] leading-5 text-[var(--platform-text)]/50 font-mono truncate">
+                  {siteDomain}
+                </div>
               </div>
-            ))
-          )}
-        </div>
+            )}
 
-        {/* Mini footer */}
-        <div
-          className="flex items-center justify-between px-4 py-2 text-[10px] opacity-50"
-          style={{ color: theme.textColor, borderTop: `1px solid var(--site-border, rgba(234,240,255,0.16))`, fontFamily: theme.fontFamily }}
-        >
-          <span>{siteName}</span>
-          <span>Powered by BuildSphere</span>
-        </div>
+            {/* Phone notch (mobile) */}
+            {isMobilePreview && (
+              <div className="flex justify-center bg-black pt-2 pb-3">
+                <div className="h-4 w-20 rounded-full bg-black border border-white/10" />
+              </div>
+            )}
+
+            {/* Mini header */}
+            <div
+              className="flex items-center justify-between px-4 py-2.5 sticky top-0 z-10"
+              style={{
+                backgroundColor:
+                  (theme.headerStyle ?? "blur") === "solid"
+                    ? theme.backgroundColor
+                    : (theme.headerStyle ?? "blur") === "minimal"
+                    ? "transparent"
+                    : `${theme.backgroundColor}cc`,
+                borderBottom: `1px solid var(--site-border, rgba(234,240,255,0.16))`,
+                backdropFilter: (theme.headerStyle ?? "blur") === "blur" ? "blur(8px)" : undefined,
+                fontFamily: theme.fontFamily,
+                ...siteStyles,
+              }}
+            >
+              {theme.logoUrl ? (
+                <Image
+                  src={theme.logoUrl}
+                  alt={siteName}
+                  width={32}
+                  height={32}
+                  className="h-8 w-auto max-w-[100px] object-contain rounded"
+                />
+              ) : (
+                <span className="text-xs font-bold truncate" style={{ color: theme.textColor }}>
+                  {siteName}
+                </span>
+              )}
+              <span
+                className="shrink-0 px-2.5 py-1 text-[10px] font-semibold"
+                style={{
+                  backgroundColor: theme.primaryColor,
+                  color: siteStyles["--site-button-text" as keyof typeof siteStyles] as string || "#fff",
+                  borderRadius: btnClass.includes("full") ? "9999px" : btnClass.includes("none") ? "0" : "6px",
+                }}
+              >
+                Menu
+              </span>
+            </div>
+
+            {/* Sections — real SectionRenderer */}
+            <div
+              className="overflow-y-auto scrollbar-thin scrollbar-thumb-white/10"
+              style={{ ...siteStyles, maxHeight: innerHeight }}
+            >
+              {orderedSections.length === 0 ? (
+                <div className="py-12 text-center" style={{ color: theme.textColor, opacity: 0.4 }}>
+                  <p className="text-sm">Nenhuma seção cadastrada</p>
+                </div>
+              ) : (
+                orderedSections.map((section) => (
+                  <div
+                    key={section.id}
+                    ref={(el) => { sectionRefs.current[section.id] = el; }}
+                    className={`transition ${
+                      activeSectionId === section.id
+                        ? "outline outline-2 outline-[#22D3EE] outline-offset-[-2px]"
+                        : ""
+                    }`}
+                  >
+                    <SectionRenderer
+                      section={section}
+                      site={mockSite}
+                      buttonStyleClassName={btnClass}
+                    />
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Mini footer */}
+            <div
+              className="flex items-center justify-between px-4 py-2 text-[10px] opacity-50"
+              style={{ color: theme.textColor, borderTop: `1px solid var(--site-border, rgba(234,240,255,0.16))`, fontFamily: theme.fontFamily }}
+            >
+              <span>{siteName}</span>
+              <span>Powered by BuildSphere</span>
+            </div>
+          </div>
+        )}
       </div>
     </aside>
   );

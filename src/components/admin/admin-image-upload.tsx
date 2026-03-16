@@ -3,11 +3,95 @@
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 
-const POSITION_GRID = [
-  ["left top",    "center top",    "right top"],
-  ["left center", "center center", "right center"],
-  ["left bottom", "center bottom", "right bottom"],
-] as const;
+/* ─── Focal point picker (arraste livre) ─── */
+
+function parsePos(val: string): { x: number; y: number } {
+  if (!val) return { x: 50, y: 50 };
+  const named = (s: string) => {
+    if (s === "left" || s === "top") return 0;
+    if (s === "right" || s === "bottom") return 100;
+    if (s === "center") return 50;
+    const n = parseFloat(s);
+    return isNaN(n) ? 50 : n;
+  };
+  const parts = val.trim().split(/\s+/);
+  return { x: named(parts[0] ?? "50%"), y: named(parts[1] ?? "50%") };
+}
+
+function ImageFocalPointPicker({
+  imageUrl,
+  value,
+  onChange,
+}: {
+  imageUrl: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const pos = parsePos(value);
+
+  function updateFromClient(clientX: number, clientY: number) {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
+    const y = Math.round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)));
+    onChange(`${x}% ${y}%`);
+  }
+
+  function handleMouseDown(e: React.MouseEvent) {
+    e.preventDefault();
+    dragging.current = true;
+    updateFromClient(e.clientX, e.clientY);
+    const onMove = (ev: MouseEvent) => { if (dragging.current) updateFromClient(ev.clientX, ev.clientY); };
+    const onUp = () => { dragging.current = false; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    updateFromClient(t.clientX, t.clientY);
+    const onMove = (ev: TouchEvent) => { const t2 = ev.touches[0]; if (t2) updateFromClient(t2.clientX, t2.clientY); };
+    const onEnd = () => { window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd); };
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
+  }
+
+  return (
+    <div>
+      <p className="mb-1 text-[10px] text-[var(--platform-text)]/40">Posição — arraste para reposicionar</p>
+      <div
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        className="relative h-28 w-full overflow-hidden rounded-lg cursor-crosshair select-none"
+        style={{ border: "1px solid rgba(255,255,255,0.12)" }}
+      >
+        <img
+          src={imageUrl}
+          alt="focal point"
+          draggable={false}
+          className="pointer-events-none h-full w-full object-cover"
+          style={{ objectPosition: value || "50% 50%" }}
+        />
+        {/* Linhas de mira */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-0 bottom-0 w-px" style={{ left: `${pos.x}%`, background: "rgba(255,255,255,0.35)" }} />
+          <div className="absolute left-0 right-0 h-px" style={{ top: `${pos.y}%`, background: "rgba(255,255,255,0.35)" }} />
+        </div>
+        {/* Ponto focal */}
+        <div
+          className="pointer-events-none absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white"
+          style={{ left: `${pos.x}%`, top: `${pos.y}%`, background: "rgba(34,211,238,0.5)", boxShadow: "0 0 0 1.5px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.5)" }}
+        />
+        <div className="pointer-events-none absolute bottom-1.5 right-2 rounded bg-black/50 px-1.5 py-0.5 text-[9px] text-white/70">
+          arraste
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface AdminImageUploadProps {
   label: string;
@@ -96,27 +180,14 @@ export function AdminImageUpload({
           </div>
         </div>
 
-        {/* Position picker — only when position change is enabled */}
+        {/* Focal point picker — only when position change is enabled */}
         {onPositionChange && (
-          <div className="mt-2 flex items-center gap-3">
-            <span className="text-[10px] text-[var(--platform-text)]/40">Posição</span>
-            <div className="inline-grid grid-cols-3 gap-0.5">
-              {POSITION_GRID.map((row, ri) =>
-                row.map((pos, ci) => (
-                  <button
-                    key={`${ri}-${ci}`}
-                    type="button"
-                    title={pos}
-                    onClick={() => onPositionChange(pos)}
-                    className={`h-4 w-4 rounded-sm transition ${
-                      objectPosition === pos
-                        ? "bg-[#22D3EE]"
-                        : "bg-white/15 hover:bg-white/30"
-                    }`}
-                  />
-                ))
-              )}
-            </div>
+          <div className="mt-2">
+            <ImageFocalPointPicker
+              imageUrl={currentUrl}
+              value={objectPosition}
+              onChange={onPositionChange}
+            />
           </div>
         )}
 
