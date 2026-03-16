@@ -56,9 +56,9 @@ export function MiniSitePreview({
   const VIRTUAL_WIDTH = isMobilePreview ? 390 : 1280;
   const PREVIEW_HEIGHT = 540; // visible height in px
 
-  // For mobile, the phone should occupy ~55% of the container (centered), not fill it entirely
+  // For mobile, render at a phone-like width (78% of container, max 360px) — scale ~0.8
   const targetDisplayWidth = isMobilePreview
-    ? Math.min(containerWidth * 0.55, 240)
+    ? Math.min(containerWidth * 0.78, 360)
     : containerWidth;
   const scale = targetDisplayWidth > 0 ? targetDisplayWidth / VIRTUAL_WIDTH : 0;
   const innerHeight = scale > 0 ? Math.round(PREVIEW_HEIGHT / scale) : 9999;
@@ -148,7 +148,7 @@ export function MiniSitePreview({
       {/* Device chrome + site — proportionally scaled */}
       <div
         ref={containerRef}
-        className={`overflow-hidden rounded-xl border border-white/10 ${isMobilePreview ? "flex items-start justify-center bg-[#0B1020]" : ""}`}
+        className={`overflow-hidden rounded-xl border border-white/10 ${isMobilePreview ? "flex items-start justify-center bg-[#070D1A] py-3" : ""}`}
         style={{ height: PREVIEW_HEIGHT }}
       >
         {scale > 0 && (
@@ -158,11 +158,10 @@ export function MiniSitePreview({
               width: VIRTUAL_WIDTH,
               backgroundColor: theme.backgroundColor,
               ...(isMobilePreview && {
-                borderRadius: "32px",
-                border: "6px solid #1a1a2e",
-                boxShadow: "0 0 0 2px #2a2a4a, 0 8px 32px rgba(0,0,0,0.6)",
+                borderRadius: "44px",
+                border: "10px solid #111827",
+                boxShadow: "0 0 0 2px #1f2937, 0 12px 40px rgba(0,0,0,0.7)",
                 overflow: "hidden",
-                marginTop: "8px",
               }),
             }}
           >
