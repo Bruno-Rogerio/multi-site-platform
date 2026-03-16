@@ -21,7 +21,7 @@ type SectionsEditorProps = { sites: SiteOption[]; defaultSiteId: string | null; 
 type LoadState = "idle" | "loading" | "saving";
 type StatusMessage = { type: "error" | "success"; message: string } | null;
 type SectionSnapshots = Record<string, string>;
-type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string };
+type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string; extraLines?: string[] };
 
 /* ─── Helpers ────────────────────────────────────────────── */
 
@@ -37,6 +37,7 @@ function asCards(content: Record<string, unknown>): ServiceCard[] {
       description: typeof item?.description === "string" ? item.description : "",
       iconName: typeof item?.iconName === "string" ? item.iconName : "",
       imageUrl: typeof item?.imageUrl === "string" ? item.imageUrl : "",
+      extraLines: Array.isArray(item?.extraLines) ? (item.extraLines as unknown[]).filter((l): l is string => typeof l === "string") : [],
     }));
   }
   // Migrate from legacy "items" format
@@ -446,7 +447,7 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     }
 
     function addCard() {
-      updateContent(section.id, "cards", [...cards, { title: "", description: "", iconName: "Star", imageUrl: "" }]);
+      updateContent(section.id, "cards", [...cards, { title: "", description: "", iconName: "Star", imageUrl: "", extraLines: [] }]);
     }
 
     function removeCard(index: number) {
@@ -510,6 +511,42 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                     onChange={(e) => updateCard(index, { description: e.target.value })}
                     className={INPUT_CLS}
                   />
+                </div>
+
+                {/* Extra lines */}
+                <div className="mt-2 space-y-1.5">
+                  {(card.extraLines ?? []).map((line, li) => (
+                    <div key={li} className="flex items-center gap-1.5">
+                      <input
+                        value={line}
+                        placeholder={`Linha ${li + 1}`}
+                        onChange={(e) => {
+                          const updated = [...(card.extraLines ?? [])];
+                          updated[li] = e.target.value;
+                          updateCard(index, { extraLines: updated });
+                        }}
+                        className={INPUT_CLS}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = (card.extraLines ?? []).filter((_, i) => i !== li);
+                          updateCard(index, { extraLines: updated });
+                        }}
+                        className="rounded p-1 text-red-400/60 transition hover:bg-red-500/10 hover:text-red-400"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => updateCard(index, { extraLines: [...(card.extraLines ?? []), ""] })}
+                    className="flex items-center gap-1 text-[10px] text-[var(--platform-text)]/40 transition hover:text-[#22D3EE]"
+                  >
+                    <Plus size={11} />
+                    Adicionar linha de texto
+                  </button>
                 </div>
 
                 <div className="mt-2">

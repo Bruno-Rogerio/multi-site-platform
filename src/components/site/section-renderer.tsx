@@ -27,7 +27,7 @@ function asStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string");
 }
 
-type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string };
+type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string; extraLines?: string[] };
 
 function asCards(value: unknown): ServiceCard[] {
   if (!Array.isArray(value)) return [];
@@ -42,6 +42,7 @@ function asCards(value: unknown): ServiceCard[] {
       description: typeof rec.description === "string" ? rec.description : "",
       iconName: typeof rec.iconName === "string" ? rec.iconName : "",
       imageUrl: typeof rec.imageUrl === "string" ? rec.imageUrl : "",
+      extraLines: Array.isArray(rec.extraLines) ? (rec.extraLines as unknown[]).filter((l): l is string => typeof l === "string" && l.trim() !== "") : [],
     });
   }
   return result;
@@ -653,6 +654,16 @@ export function SectionRenderer({
                       {card.description && (
                         <p className="mt-1 text-sm opacity-60">{card.description}</p>
                       )}
+                      {(card.extraLines ?? []).length > 0 && (
+                        <ul className="mt-1.5 space-y-0.5">
+                          {(card.extraLines ?? []).map((line, i) => (
+                            <li key={i} className="flex items-start gap-1.5 text-sm opacity-55">
+                              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--site-accent)" }} />
+                              {line}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                     {card.imageUrl && (
                       <div
@@ -746,6 +757,16 @@ export function SectionRenderer({
                           {card.description}
                         </p>
                       )}
+                      {(card.extraLines ?? []).length > 0 && (
+                        <ul className="mt-2 space-y-0.5">
+                          {(card.extraLines ?? []).map((line, i) => (
+                            <li key={i} className="flex items-start gap-1.5 text-sm opacity-55">
+                              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--site-accent)" }} />
+                              {line}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                   </div>
                 );
@@ -812,6 +833,16 @@ export function SectionRenderer({
                         <p className="mt-1 text-sm leading-relaxed opacity-60">
                           {card.description}
                         </p>
+                      )}
+                      {(card.extraLines ?? []).length > 0 && (
+                        <ul className={`mt-1.5 space-y-0.5 ${isReversed ? "items-end" : ""}`}>
+                          {(card.extraLines ?? []).map((line, i) => (
+                            <li key={i} className={`flex items-start gap-1.5 text-sm opacity-55 ${isReversed ? "flex-row-reverse" : ""}`}>
+                              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--site-accent)" }} />
+                              {line}
+                            </li>
+                          ))}
+                        </ul>
                       )}
                     </div>
                     {card.imageUrl && (
@@ -908,6 +939,16 @@ export function SectionRenderer({
                           {card.description}
                         </p>
                       )}
+                      {(card.extraLines ?? []).length > 0 && (
+                        <ul className="mt-1.5 space-y-0.5">
+                          {(card.extraLines ?? []).map((line, i) => (
+                            <li key={i} className="flex items-start gap-1.5 text-sm opacity-55">
+                              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--site-accent)" }} />
+                              {line}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                     {card.imageUrl && (
                       <div
@@ -986,6 +1027,16 @@ export function SectionRenderer({
                         <p className="mt-3 text-base leading-relaxed opacity-60">
                           {card.description}
                         </p>
+                      )}
+                      {(card.extraLines ?? []).length > 0 && (
+                        <ul className="mt-2 space-y-1">
+                          {(card.extraLines ?? []).map((line, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm opacity-55">
+                              <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--site-accent)" }} />
+                              {line}
+                            </li>
+                          ))}
+                        </ul>
                       )}
                     </div>
                     {card.imageUrl ? (
@@ -1083,6 +1134,16 @@ export function SectionRenderer({
                   <h3 className="text-base font-semibold">{card.title}</h3>
                   {card.description && (
                     <p className="mt-2 text-sm leading-relaxed opacity-60">{card.description}</p>
+                  )}
+                  {(card.extraLines ?? []).length > 0 && (
+                    <ul className="mt-2 space-y-0.5 text-left">
+                      {(card.extraLines ?? []).map((line, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-sm opacity-55">
+                          <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full" style={{ background: "var(--site-accent)" }} />
+                          {line}
+                        </li>
+                      ))}
+                    </ul>
                   )}
                 </div>
               );
