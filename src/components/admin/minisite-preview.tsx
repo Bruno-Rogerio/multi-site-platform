@@ -56,7 +56,11 @@ export function MiniSitePreview({
   const VIRTUAL_WIDTH = isMobilePreview ? 390 : 1280;
   const PREVIEW_HEIGHT = 540; // visible height in px
 
-  const scale = containerWidth > 0 ? containerWidth / VIRTUAL_WIDTH : 0;
+  // For mobile, the phone should occupy ~55% of the container (centered), not fill it entirely
+  const targetDisplayWidth = isMobilePreview
+    ? Math.min(containerWidth * 0.55, 240)
+    : containerWidth;
+  const scale = targetDisplayWidth > 0 ? targetDisplayWidth / VIRTUAL_WIDTH : 0;
   const innerHeight = scale > 0 ? Math.round(PREVIEW_HEIGHT / scale) : 9999;
 
   useEffect(() => {
@@ -144,7 +148,7 @@ export function MiniSitePreview({
       {/* Device chrome + site — proportionally scaled */}
       <div
         ref={containerRef}
-        className="overflow-hidden rounded-xl border border-white/10"
+        className={`overflow-hidden rounded-xl border border-white/10 ${isMobilePreview ? "flex items-start justify-center bg-[#0B1020]" : ""}`}
         style={{ height: PREVIEW_HEIGHT }}
       >
         {scale > 0 && (
@@ -153,6 +157,13 @@ export function MiniSitePreview({
               zoom: scale,
               width: VIRTUAL_WIDTH,
               backgroundColor: theme.backgroundColor,
+              ...(isMobilePreview && {
+                borderRadius: "32px",
+                border: "6px solid #1a1a2e",
+                boxShadow: "0 0 0 2px #2a2a4a, 0 8px 32px rgba(0,0,0,0.6)",
+                overflow: "hidden",
+                marginTop: "8px",
+              }),
             }}
           >
             {/* Browser bar (desktop) */}
