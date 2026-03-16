@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { ImageUpload } from "../builders/image-upload";
@@ -69,41 +69,105 @@ function AccordionSection({
   );
 }
 
-/* ─── Image position picker (3×3 grid) ─── */
+/* ─── Image focal point picker (drag livre) ─── */
 
-const IMAGE_POSITIONS = [
-  "left top",    "center top",    "right top",
-  "left center", "center center", "right center",
-  "left bottom", "center bottom", "right bottom",
-];
+function parsePos(val: string): { x: number; y: number } {
+  if (!val) return { x: 50, y: 50 };
+  const named = (s: string, axis: "x" | "y") => {
+    if (s === "left" || s === "top") return 0;
+    if (s === "right" || s === "bottom") return 100;
+    if (s === "center") return 50;
+    const n = parseFloat(s);
+    return isNaN(n) ? 50 : n;
+  };
+  const parts = val.trim().split(/\s+/);
+  return { x: named(parts[0] ?? "50%", "x"), y: named(parts[1] ?? "50%", "y") };
+}
 
-function ImagePositionPicker({
+function ImageFocalPointPicker({
+  imageUrl,
   value,
   onChange,
 }: {
+  imageUrl: string;
   value: string;
   onChange: (v: string) => void;
 }) {
-  const current = value || "center center";
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const pos = parsePos(value);
+
+  function updateFromClient(clientX: number, clientY: number) {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
+    const y = Math.round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)));
+    onChange(`${x}% ${y}%`);
+  }
+
+  function handleMouseDown(e: React.MouseEvent) {
+    e.preventDefault();
+    dragging.current = true;
+    updateFromClient(e.clientX, e.clientY);
+    const onMove = (ev: MouseEvent) => { if (dragging.current) updateFromClient(ev.clientX, ev.clientY); };
+    const onUp = () => { dragging.current = false; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    updateFromClient(t.clientX, t.clientY);
+    const onMove = (ev: TouchEvent) => { const t2 = ev.touches[0]; if (t2) updateFromClient(t2.clientX, t2.clientY); };
+    const onEnd = () => { window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd); };
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
+  }
+
   return (
     <div>
-      <p className={labelClass}>Posição da imagem no card</p>
-      <div className="mt-2 inline-grid grid-cols-3 gap-1">
-        {IMAGE_POSITIONS.map((pos) => (
-          <button
-            key={pos}
-            type="button"
-            title={pos}
-            onClick={() => onChange(pos)}
-            className={`h-5 w-8 rounded-sm transition ${
-              current === pos
-                ? "bg-[#22D3EE]/80 ring-1 ring-[#22D3EE]"
-                : "bg-white/10 hover:bg-white/20"
-            }`}
+      <p className={`${labelClass} mb-1.5`}>Posição da imagem — arraste para reposicionar</p>
+      <div
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        className="relative h-28 w-full overflow-hidden rounded-lg cursor-crosshair select-none"
+        style={{ border: "1px solid rgba(255,255,255,0.12)" }}
+      >
+        <img
+          src={imageUrl}
+          alt="focal point"
+          draggable={false}
+          className="pointer-events-none h-full w-full object-cover"
+          style={{ objectPosition: value || "50% 50%" }}
+        />
+        {/* Linhas de mira */}
+        <div className="pointer-events-none absolute inset-0">
+          <div
+            className="absolute top-0 bottom-0 w-px"
+            style={{ left: `${pos.x}%`, background: "rgba(255,255,255,0.35)" }}
           />
-        ))}
+          <div
+            className="absolute left-0 right-0 h-px"
+            style={{ top: `${pos.y}%`, background: "rgba(255,255,255,0.35)" }}
+          />
+        </div>
+        {/* Ponto focal */}
+        <div
+          className="pointer-events-none absolute h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white"
+          style={{
+            left: `${pos.x}%`,
+            top: `${pos.y}%`,
+            background: "rgba(34,211,238,0.5)",
+            boxShadow: "0 0 0 1.5px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.5)",
+          }}
+        />
+        {/* Hint */}
+        <div className="pointer-events-none absolute bottom-1.5 right-2 rounded bg-black/50 px-1.5 py-0.5 text-[9px] text-white/70">
+          arraste
+        </div>
       </div>
-      <p className="mt-1 text-[10px] text-[var(--platform-text)]/30">{current}</p>
+      <p className="mt-1 text-[10px] text-[var(--platform-text)]/30">{value || "50% 50%"}</p>
     </div>
   );
 }
@@ -464,8 +528,9 @@ export function TemplateContentEditor() {
               description="Recomendado: 1920 × 800 px · máx. 5 MB"
             />
             {state.heroImage && (
-              <ImagePositionPicker
-                value={str(content.heroImageObjectPosition) || "center center"}
+              <ImageFocalPointPicker
+                imageUrl={state.heroImage}
+                value={str(content.heroImageObjectPosition) || "50% 50%"}
                 onChange={(pos) => handleContentChange("heroImageObjectPosition", pos)}
               />
             )}
@@ -620,8 +685,9 @@ export function TemplateContentEditor() {
                     description="Imagem para este serviço (opcional)"
                   />
                   {card.imageUrl && (
-                    <ImagePositionPicker
-                      value={card.imageObjectPosition || "center center"}
+                    <ImageFocalPointPicker
+                      imageUrl={card.imageUrl}
+                      value={card.imageObjectPosition || "50% 50%"}
                       onChange={(pos) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { imageObjectPosition: pos } })}
                     />
                   )}
