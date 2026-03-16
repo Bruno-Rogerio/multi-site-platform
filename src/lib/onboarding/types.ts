@@ -84,6 +84,7 @@ export type WizardState = {
   // Images
   heroImage: string;
   logoUrl: string;
+  servicesImage: string;
 
   // Business info
   businessName: string;
@@ -159,7 +160,7 @@ export type WizardAction =
   | { type: "SET_CHECKOUT_STATE"; state: WizardState["checkoutState"]; message?: string; url?: string }
   | { type: "TOGGLE_SECTION_PREMIUM"; sectionId: "premium-paleta" | "premium-tipografia" | "premium-variantes" | "premium-canais" | "premium-cards" }
   | { type: "SET_VISUAL_IDENTITY"; primaryColor: string; tone: "dark" | "light" | "neutral"; personality: "clean" | "bold" | "elegant" | "friendly"; motion: "none" | "subtle" | "lively" }
-  | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl"; url: string }
+  | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl" | "servicesImage"; url: string }
   | { type: "SET_CONTACT_SELECTED_LINKS"; links: string[] }
   | { type: "SET_LEAD_ID"; leadId: string }
   | { type: "RESET_WIZARD" }

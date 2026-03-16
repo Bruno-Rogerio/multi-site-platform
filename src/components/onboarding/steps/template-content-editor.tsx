@@ -776,6 +776,15 @@ export function TemplateContentEditor() {
               />
             </div>
 
+            <ImageUpload
+              label="Imagem da seção (opcional)"
+              value={state.servicesImage}
+              onChange={(url) => dispatch({ type: "SET_IMAGE", key: "servicesImage", url })}
+              slot="servicesImage"
+              variant="compact"
+              description="Aparece acima dos cards de serviço · 4:3 · máx. 5 MB"
+            />
+
             <div className="space-y-3">
               {serviceCards.slice(0, 4).map((card, i) => (
                 <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">

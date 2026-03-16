@@ -105,6 +105,7 @@ export function UnifiedSiteEditor({
             sites={scopedSites}
             defaultSiteId={siteId}
             role="client"
+            plan={plan}
           />
         </div>
       )}

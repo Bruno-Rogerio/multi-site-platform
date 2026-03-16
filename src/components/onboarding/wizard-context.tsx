@@ -78,6 +78,7 @@ const initialState: WizardState = {
   // Images
   heroImage: "",
   logoUrl: "",
+  servicesImage: "",
 
   // Business info
   businessName: "",

@@ -40,6 +40,7 @@ type OnboardingDraftPayload = {
   content?: Record<string, string>;
   heroImage?: string;
   logoUrl?: string;
+  servicesImage?: string;
   ctaConfig?: Partial<Record<CtaTypeId, { label: string; url: string }>>;
   selectedCtaTypes?: CtaTypeId[];
   floatingCtaEnabled?: boolean;
@@ -368,7 +369,7 @@ export async function POST(request: Request) {
   const whatsappUrl = socialWhatsapp ? `https://wa.me/${socialWhatsapp}` : "";
 
   // Parse service cards if sent as JSON
-  type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string };
+  type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string; extraLines?: string[] };
   let serviceCards: ServiceCard[] | null = null;
   if (content.serviceCardsJson) {
     try {
@@ -504,11 +505,13 @@ export async function POST(request: Request) {
       order: secOrder("services", 2),
       content: {
         title: content.servicesTitle?.trim() || "Como posso ajudar",
+        imageUrl: payload.servicesImage || "",
+        imageObjectPosition: "center center",
         items: serviceCards
           ? serviceCards.map((c) => c.title).filter(Boolean)
           : toItems(content.servicesItems?.trim() || payload.businessHighlights || ""),
         cards: serviceCards
-          ? serviceCards.map((c) => ({ title: c.title, description: c.description || "", iconName: c.iconName || "", imageUrl: c.imageUrl || "" })).filter((c) => c.title)
+          ? serviceCards.map((c) => ({ title: c.title, description: c.description || "", iconName: c.iconName || "", imageUrl: c.imageUrl || "", extraLines: c.extraLines ?? [] })).filter((c) => c.title)
           : toItems(content.servicesItems?.trim() || payload.businessHighlights || "").map((t) => ({ title: t, description: "", iconName: "", imageUrl: "" })),
       },
     },

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle, Monitor, X,
-  BookOpen, ImageIcon, CalendarDays, ChevronUp, ChevronDown, ChevronRight, AlertTriangle,
+  BookOpen, ImageIcon, CalendarDays, GripVertical, ChevronRight, AlertTriangle,
 } from "lucide-react";
 
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -18,7 +18,7 @@ import type { Section } from "@/lib/tenant/types";
 /* ─── Types ─────────────────────────────────────────────── */
 
 type SiteOption = { id: string; name: string; domain: string };
-type SectionsEditorProps = { sites: SiteOption[]; defaultSiteId: string | null; role?: "platform" | "client" };
+type SectionsEditorProps = { sites: SiteOption[]; defaultSiteId: string | null; role?: "platform" | "client"; plan?: string };
 type LoadState = "idle" | "loading" | "saving";
 type StatusMessage = { type: "error" | "success"; message: string } | null;
 type SectionSnapshots = Record<string, string>;
@@ -137,9 +137,14 @@ const INPUT_CLS = "mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px
 const PLATFORM_PALETTE = ["#3B82F6", "#7C5CFF", "#22D3EE", "#EAF0FF"];
 const LABEL_CLS = "text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60";
 
+// Sections fixed at top/bottom for clients (cannot be moved or deleted)
+const FIXED_SECTION_TYPES: Set<Section["type"]> = new Set(["hero", "contact"]);
+// Sections allowed in basic plan
+const BASIC_PLAN_SECTION_TYPES: Section["type"][] = ["hero", "services", "about", "cta", "testimonials", "contact"];
+
 /* ─── Component ──────────────────────────────────────────── */
 
-export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: SectionsEditorProps) {
+export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }: SectionsEditorProps) {
   const isClient = role === "client";
   const [selectedSiteId, setSelectedSiteId] = useState(defaultSiteId ?? "");
   const [sections, setSections] = useState<Section[]>([]);
@@ -152,6 +157,9 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   const [uploadingSectionId, setUploadingSectionId] = useState<string | null>(null);
   const [status, setStatus] = useState<StatusMessage>(null);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
+  const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
+  const dragNodeRef = useRef<string | null>(null);
 
   const hasSites = sites.length > 0;
   const canLoad = hasSites && Boolean(selectedSiteId);
@@ -288,30 +296,35 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
     }
   }
 
-  async function handleReorder(sectionId: string, direction: "up" | "down") {
+  async function handleDragReorder(fromId: string, toId: string) {
     const sorted = [...sections].sort((a, b) => a.order - b.order);
-    const idx = sorted.findIndex((s) => s.id === sectionId);
-    const swapIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (swapIdx < 0 || swapIdx >= sorted.length) return;
-    const a = sorted[idx];
-    const b = sorted[swapIdx];
+    const fromIdx = sorted.findIndex((s) => s.id === fromId);
+    const toIdx = sorted.findIndex((s) => s.id === toId);
+    if (fromIdx === toIdx || fromIdx < 0 || toIdx < 0) return;
+
+    const reordered = [...sorted];
+    const [moved] = reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, moved);
+
+    const withNewOrders = reordered.map((s, i) => ({ ...s, order: i + 1 }));
+    const changed = withNewOrders.filter((s) => sections.find((o) => o.id === s.id)?.order !== s.order);
+
+    setSections(withNewOrders);
     setState("saving");
     try {
-      await Promise.all([
-        fetch(`/api/admin/sections?siteId=${encodeURIComponent(selectedSiteId)}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sectionId: a.id, order: b.order, variant: a.variant ?? "default", content: a.content }),
-        }),
-        fetch(`/api/admin/sections?siteId=${encodeURIComponent(selectedSiteId)}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sectionId: b.id, order: a.order, variant: b.variant ?? "default", content: b.content }),
-        }),
-      ]);
-      setSections((prev) =>
-        prev.map((s) => s.id === a.id ? { ...s, order: b.order } : s.id === b.id ? { ...s, order: a.order } : s),
+      await Promise.all(
+        changed.map((s) =>
+          fetch(`/api/admin/sections?siteId=${encodeURIComponent(selectedSiteId)}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sectionId: s.id, order: s.order, variant: s.variant ?? "default", content: s.content }),
+          }),
+        ),
       );
+      setSyncedSectionsSnapshot((cur) => ({
+        ...cur,
+        ...Object.fromEntries(changed.map((s) => [s.id, serializeSection(s)])),
+      }));
     } catch {
       setStatus({ type: "error", message: "Erro ao reordenar seções." });
     } finally {
@@ -1220,7 +1233,11 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   }
 
   const activeTypesSet = new Set(sections.map((s) => s.type));
-  const availableToAdd = (Object.keys(SECTION_META) as Section["type"][]).filter((t) => !activeTypesSet.has(t));
+  const isBasicPlan = isClient && (plan === "basico" || plan === "landing" || !plan);
+  const allowedSectionTypes = isBasicPlan
+    ? BASIC_PLAN_SECTION_TYPES
+    : (Object.keys(SECTION_META) as Section["type"][]);
+  const availableToAdd = allowedSectionTypes.filter((t) => !activeTypesSet.has(t));
 
   return (
     <section className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5 shadow-[0_0_20px_rgba(59,130,246,0.15)]">
@@ -1288,23 +1305,57 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
             </div>
           )}
 
-          {[...sections].sort((a, b) => a.order - b.order).map((section, index, sortedArr) => {
+          {[...sections].sort((a, b) => a.order - b.order).map((section) => {
             const meta = SECTION_META[section.type] ?? { label: section.type, description: "", Icon: Layout };
             const SectionIcon = meta.Icon;
             const isDirty = dirtySectionIds.includes(section.id);
             const isExpanded = expandedSectionIds.has(section.id);
             const isConfirmingDelete = deletingSection === section.id;
+            const isFixed = isClient && FIXED_SECTION_TYPES.has(section.type);
+            const isDragging = draggedId === section.id;
+            const isDropTarget = dropTargetId === section.id;
 
             return (
               <article
                 key={section.id}
+                draggable={isClient && !isFixed}
+                onDragStart={() => {
+                  if (isClient && !isFixed) {
+                    dragNodeRef.current = section.id;
+                    setDraggedId(section.id);
+                  }
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  if (dragNodeRef.current && section.id !== dragNodeRef.current && !isFixed) {
+                    setDropTargetId(section.id);
+                  }
+                }}
+                onDragLeave={() => setDropTargetId((prev) => prev === section.id ? null : prev)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const fromId = dragNodeRef.current;
+                  if (fromId && section.id !== fromId && !isFixed) {
+                    void handleDragReorder(fromId, section.id);
+                  }
+                  dragNodeRef.current = null;
+                  setDraggedId(null);
+                  setDropTargetId(null);
+                }}
+                onDragEnd={() => {
+                  dragNodeRef.current = null;
+                  setDraggedId(null);
+                  setDropTargetId(null);
+                }}
                 onMouseEnter={() => setActiveSectionId(section.id)}
                 onFocusCapture={() => setActiveSectionId(section.id)}
-                className={`rounded-2xl border bg-[#12182B] transition ${
-                  activeSectionId === section.id
+                className={`rounded-2xl border bg-[#12182B] transition select-none ${
+                  isDropTarget
+                    ? "border-[#22D3EE] shadow-[0_0_20px_rgba(34,211,238,0.3)]"
+                    : activeSectionId === section.id
                     ? "border-[#22D3EE]/60 shadow-[0_0_20px_rgba(34,211,238,0.15)]"
                     : "border-white/10"
-                }`}
+                } ${isDragging ? "opacity-40" : ""}`}
               >
                 {/* Section header — always visible, click to expand/collapse */}
                 <button
@@ -1313,25 +1364,12 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                   className="flex w-full items-center gap-3 p-4 text-left"
                 >
                   {isClient && (
-                    <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        disabled={index === 0 || state === "saving"}
-                        onClick={() => void handleReorder(section.id, "up")}
-                        className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
-                        title="Mover para cima"
-                      >
-                        <ChevronUp size={12} />
-                      </button>
-                      <button
-                        type="button"
-                        disabled={index === sortedArr.length - 1 || state === "saving"}
-                        onClick={() => void handleReorder(section.id, "down")}
-                        className="flex h-5 w-5 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
-                        title="Mover para baixo"
-                      >
-                        <ChevronDown size={12} />
-                      </button>
+                    <div
+                      className={`shrink-0 ${isFixed ? "cursor-default text-[var(--platform-text)]/10" : "cursor-grab touch-none text-[var(--platform-text)]/30 hover:text-[var(--platform-text)]/60 active:cursor-grabbing"}`}
+                      onClick={(e) => e.stopPropagation()}
+                      title={isFixed ? "Seção fixa" : "Arrastar para reordenar"}
+                    >
+                      <GripVertical size={14} />
                     </div>
                   )}
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#22D3EE]/10">
@@ -1394,8 +1432,10 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
 
                     {/* Footer actions */}
                     <div className="mt-4 flex items-center justify-between gap-2 border-t border-white/[0.06] pt-3">
-                      {/* Delete section */}
-                      {isConfirmingDelete ? (
+                      {/* Delete section — hidden for fixed client sections */}
+                      {isFixed ? (
+                        <span className="text-[10px] text-[var(--platform-text)]/20">Seção fixa</span>
+                      ) : isConfirmingDelete ? (
                         <div className="flex items-center gap-2">
                           <AlertTriangle size={13} className="shrink-0 text-red-400" />
                           <span className="text-xs text-red-300">Remover esta seção?</span>
