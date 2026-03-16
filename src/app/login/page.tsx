@@ -59,10 +59,10 @@ export default async function LoginPage({ searchParams }: Props) {
 
       {/* ── LEFT PANEL — marketing ── */}
       <div className="relative hidden flex-col justify-between px-12 py-12 lg:flex lg:w-[55%] xl:px-16">
-        {/* Brand */}
-        <div>
+        {/* Brand — clicável para voltar à home */}
+        <a href="/" className="inline-block transition-opacity hover:opacity-80">
           <Brand compact />
-        </div>
+        </a>
 
         {/* Center content */}
         <div className="max-w-lg">
@@ -134,10 +134,10 @@ export default async function LoginPage({ searchParams }: Props) {
 
       {/* ── RIGHT PANEL — form ── */}
       <div className="flex w-full flex-col items-center justify-center px-6 py-12 lg:w-[45%] lg:px-12">
-        {/* Mobile brand */}
-        <div className="mb-8 lg:hidden">
+        {/* Mobile brand — clicável para voltar à home */}
+        <a href="/" className="mb-8 inline-block transition-opacity hover:opacity-80 lg:hidden">
           <Brand compact />
-        </div>
+        </a>
 
         <div className="w-full max-w-sm">
           {/* Form card */}
