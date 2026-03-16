@@ -91,7 +91,7 @@ export function LeadCaptureStep() {
   }
 
   function handleSubdomain(value: string) {
-    const clean = value.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/^-+|-+$/g, "");
+    const clean = value.toLowerCase().replace(/[^a-z0-9-]/g, "");
     handleField("preferredSubdomain", clean);
   }
 
