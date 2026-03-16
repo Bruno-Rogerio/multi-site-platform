@@ -127,7 +127,7 @@ function PreviewDivider({ style }: { style: string }) {
 export function LivePreviewPanel() {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const { state } = useWizard();
-  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content, contactSelectedLinks } = state;
+  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content } = state;
   const hasTestimonials = (() => {
     try {
       const parsed = JSON.parse(str(content.testimonialsJson) || "[]");
@@ -137,20 +137,6 @@ export function LivePreviewPanel() {
     }
   })();
 
-  // Floating buttons for basic plan: based on contactSelectedLinks + toggle
-  const basicFloatingLinks = (() => {
-    if (str(content.floatingButtonsEnabled) === "false") return [];
-    const allLinks: { type: string; icon: string; label: string }[] = [];
-    if (str(content.social_whatsapp).trim()) allLinks.push({ type: "whatsapp", icon: "MessageCircle", label: "WhatsApp" });
-    if (str(content.social_instagram).trim()) allLinks.push({ type: "instagram", icon: "Instagram", label: "Instagram" });
-    if (str(content.social_email).trim()) allLinks.push({ type: "email", icon: "Mail", label: "E-mail" });
-    if (str(content.social_linkedin).trim()) allLinks.push({ type: "linkedin", icon: "Linkedin", label: "LinkedIn" });
-    if (str(content.social_facebook).trim()) allLinks.push({ type: "facebook", icon: "Facebook", label: "Facebook" });
-    const filtered = contactSelectedLinks.length > 0
-      ? allLinks.filter((l) => contactSelectedLinks.includes(l.type))
-      : allLinks.slice(0, 1);
-    return filtered.slice(0, 2);
-  })();
 
   const palette = paletteId ? getPaletteById(paletteId) : null;
   const { container: containerVariants, item: itemVariants } = getMotionVariants(motionStyle);
@@ -355,37 +341,8 @@ export function LivePreviewPanel() {
                 }
               })}
               <div className="flex-1" />
-              {/* Premium plan: floating CTA channels */}
+              {/* Floating contact buttons */}
               {floatingCtaEnabled && <PreviewFloatingCta />}
-              {/* Basic plan: floating contact buttons */}
-              {!floatingCtaEnabled && basicFloatingLinks.length > 0 && (
-                <div className="sticky bottom-2 ml-auto mr-2 w-fit z-20 flex flex-col gap-1.5 items-end">
-                  {basicFloatingLinks.map((link) => {
-                    const Icon = (
-                      LucideIcons as unknown as Record<
-                        string,
-                        React.ComponentType<{ size?: number; className?: string }>
-                      >
-                    )[link.icon];
-                    return (
-                      <div
-                        key={link.type}
-                        className="flex h-8 w-8 items-center justify-center rounded-full shadow-md"
-                        style={{
-                          backgroundColor: link.type === "whatsapp" ? "#25D366" : "var(--preview-primary)",
-                        }}
-                        title={link.label}
-                      >
-                        {Icon ? (
-                          <Icon size={14} className="text-white" />
-                        ) : (
-                          <span className="text-white text-[8px] font-bold">{link.label[0]}</span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </motion.div>
           </div>
         </div>

@@ -7,11 +7,13 @@ import * as LucideIcons from "lucide-react";
 
 export function PreviewFloatingCta() {
   const { state } = useWizard();
-  const { floatingCtaChannels, selectedCtaTypes, ctaConfig } = state;
+  const { floatingCtaChannels, contactSelectedLinks, selectedCtaTypes, ctaConfig } = state;
 
-  // Use floatingCtaChannels if set, otherwise fall back to first selectedCtaType
+  // Priority: explicit floatingCtaChannels → contactSelectedLinks (basic plan) → first selectedCtaType
   const channels = floatingCtaChannels.length > 0
     ? floatingCtaChannels
+    : contactSelectedLinks.length > 0
+    ? contactSelectedLinks
     : selectedCtaTypes.length > 0
     ? [selectedCtaTypes[0]]
     : [];
