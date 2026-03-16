@@ -1,6 +1,7 @@
 "use client";
 
 import { useWizard } from "../wizard-context";
+import { renderAccentedText } from "./accent-text";
 
 function str(v: unknown): string { return String(v ?? ""); }
 
@@ -20,6 +21,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
       : "6px";
 
   const title = str(content.ctaTitle) || "Vamos conversar?";
+  const titleNode = renderAccentedText(title, str(content.ctaTitleAccentWord), str(content.ctaTitleAccentEffect) || "gradient");
   const description = str(content.ctaDescription);
   const buttonLabel = str(content.ctaButtonLabel) || "Entrar em contato";
   const secondaryLabel = str(content.ctaSecondaryLabel) || "Saiba mais";
@@ -39,7 +41,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
         >
           <div className="flex-1 min-w-0">
             <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-              {title}
+              {titleNode}
             </h2>
             {description && (
               <p className="text-[7px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>
@@ -88,7 +90,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           }}
         >
           <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-            {title}
+            {titleNode}
           </h2>
           {description && (
             <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
@@ -125,7 +127,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           {/* White orbs */}
           <div className="pointer-events-none absolute -right-3 top-1/2 h-10 w-10 -translate-y-1/2 rounded-full bg-white opacity-[0.15] blur-lg" />
           <div className="relative flex-1 min-w-0">
-            <h2 className="text-[10px] font-bold text-white">{title}</h2>
+            <h2 className="text-[10px] font-bold text-white">{titleNode}</h2>
             {description && (
               <p className="text-[7px] mt-0.5 text-white/70 line-clamp-1">{description}</p>
             )}
@@ -158,7 +160,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
         {/* White orbs */}
         <div className="pointer-events-none absolute -right-4 -top-4 h-12 w-12 rounded-full bg-white opacity-[0.14] blur-xl" />
         <div className="pointer-events-none absolute -bottom-4 -left-2 h-10 w-10 rounded-full bg-white opacity-[0.10] blur-lg" />
-        <h2 className="relative text-[10px] font-bold text-white">{title}</h2>
+        <h2 className="relative text-[10px] font-bold text-white">{titleNode}</h2>
         {description && (
           <p className="relative text-[7px] mt-0.5 mx-auto max-w-[80%] text-white/70">{description}</p>
         )}
@@ -192,7 +194,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           style={{ background: "var(--preview-accent)" }}
         />
         <h2 className="relative text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-          {title}
+          {titleNode}
         </h2>
         {description && (
           <p className="relative text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
@@ -233,7 +235,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
       }}
     >
       <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-        {title}
+        {titleNode}
       </h2>
       {description && (
         <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>

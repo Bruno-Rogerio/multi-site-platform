@@ -12,7 +12,7 @@ interface PreviewContactProps {
 
 export function PreviewContact({ deviceMode }: PreviewContactProps) {
   const { state } = useWizard();
-  const { content, fontFamily, selectedCtaTypes, contactSelectedLinks, businessName } = state;
+  const { content, fontFamily, selectedCtaTypes, contactSelectedLinks, businessName, logoUrl } = state;
 
   const activeCtaTypes = ctaTypes.filter((cta) => {
     if (contactSelectedLinks.length > 0) {
@@ -97,15 +97,22 @@ export function PreviewContact({ deviceMode }: PreviewContactProps) {
         </div>
       )}
 
-      {/* Footer text */}
+      {/* Footer: logo + text */}
       <div
-        className="relative pt-2 border-t text-[6px]"
-        style={{
-          borderColor: `color-mix(in srgb, var(--preview-primary) 15%, transparent)`,
-          color: "var(--preview-muted)",
-        }}
+        className="relative pt-2 border-t flex items-center gap-2"
+        style={{ borderColor: `color-mix(in srgb, var(--preview-primary) 15%, transparent)` }}
       >
-        {str(content.footerText) || `© 2026 ${businessName || "Seu Negócio"}`}
+        {logoUrl && (
+          <img
+            src={logoUrl}
+            alt="Logo"
+            className="h-5 w-5 shrink-0 rounded-sm object-cover"
+            style={{ objectPosition: str(content.logoObjectPosition) || "center center" }}
+          />
+        )}
+        <span className="text-[6px]" style={{ color: "var(--preview-muted)" }}>
+          {str(content.footerText) || `© 2026 ${businessName || "Seu Negócio"}`}
+        </span>
       </div>
     </footer>
   );

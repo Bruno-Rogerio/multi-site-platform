@@ -43,7 +43,7 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
   const logoBlock = (
     <div className="flex items-center gap-1.5 min-w-0">
       {logoUrl && (
-        <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded-sm object-cover shrink-0" />
+        <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded-sm object-cover shrink-0" style={{ objectPosition: str(content.logoObjectPosition) || "center center" }} />
       )}
       <div className="min-w-0">
         <div className="text-xs font-bold truncate leading-tight" style={{ color: "var(--preview-primary)" }}>
@@ -72,7 +72,7 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 min-w-0">
             {logoUrl && (
-              <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded-sm object-cover shrink-0" />
+              <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded-sm object-cover shrink-0" style={{ objectPosition: str(content.logoObjectPosition) || "center center" }} />
             )}
             <div className="text-xs font-bold truncate leading-tight">
               {businessName || "Seu Negócio"}
@@ -107,7 +107,7 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
           <div className="flex flex-col items-center gap-0.5">
             <div className="flex items-center gap-1.5">
               {logoUrl && (
-                <img src={logoUrl} alt="Logo" className="h-4 w-4 rounded-sm object-cover" />
+                <img src={logoUrl} alt="Logo" className="h-4 w-4 rounded-sm object-cover" style={{ objectPosition: str(content.logoObjectPosition) || "center center" }} />
               )}
               <div className="text-xs font-bold" style={{ color: "var(--preview-primary)" }}>
                 {businessName || "Seu Negócio"}

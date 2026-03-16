@@ -19,6 +19,7 @@ import {
   ChevronDown,
   ArrowUp,
   ArrowDown,
+  Sparkles,
 } from "lucide-react";
 import { moveInArray } from "@/lib/onboarding/helpers";
 
@@ -71,18 +72,20 @@ function AccordionSection({
 
 /* ─── Upload de imagem inline (sem preview grande) ─── */
 
-function ServiceImageControl({
-  cardIndex,
+function ImageWithFocalControl({
+  uploadSlot,
   imageUrl,
   objectPosition,
   onChangeUrl,
   onChangePosition,
+  uploadLabel = "Adicionar imagem (opcional)",
 }: {
-  cardIndex: number;
+  uploadSlot: string;
   imageUrl: string;
   objectPosition: string;
   onChangeUrl: (url: string) => void;
   onChangePosition: (pos: string) => void;
+  uploadLabel?: string;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -96,7 +99,7 @@ function ServiceImageControl({
     try {
       const fd = new FormData();
       fd.append("file", file);
-      fd.append("slot", `serviceCard-${cardIndex}`);
+      fd.append("slot", uploadSlot);
       const res = await fetch("/api/onboarding/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Erro no upload");
@@ -266,6 +269,95 @@ function ImageFocalPointPicker({
         </div>
       </div>
       <p className="mt-1 text-[10px] text-[var(--platform-text)]/30">{value || "50% 50%"}</p>
+    </div>
+  );
+}
+
+/* ─── Efeito de destaque em texto (word accent) ─── */
+
+const ACCENT_EFFECTS = [
+  { id: "gradient",   label: "Gradiente" },
+  { id: "neon",       label: "Neon" },
+  { id: "underline",  label: "Sublinhado" },
+  { id: "highlight",  label: "Destaque" },
+  { id: "bold-accent",label: "Negrito" },
+] as const;
+
+function AccentWordControl({
+  toggleLabel,
+  wordKey,
+  effectKey,
+  content,
+  onChange,
+}: {
+  toggleLabel: string;
+  wordKey: string;
+  effectKey: string;
+  content: Record<string, unknown>;
+  onChange: (key: string, value: string) => void;
+}) {
+  const word = str(content[wordKey]);
+  const effect = str(content[effectKey]) || "gradient";
+  const [open, setOpen] = useState(!!word);
+
+  function handleToggle() {
+    if (open && word) {
+      // fechar e limpar
+      onChange(wordKey, "");
+      onChange(effectKey, "");
+    }
+    setOpen((o) => !o);
+  }
+
+  return (
+    <div className="mt-2">
+      <button
+        type="button"
+        onClick={handleToggle}
+        className="flex items-center gap-1.5 text-[11px] text-[var(--platform-text)]/40 transition hover:text-[#22D3EE]"
+      >
+        <Sparkles size={11} />
+        {open ? "Remover efeito visual" : toggleLabel}
+      </button>
+      {open && (
+        <div className="mt-2 rounded-lg border border-white/8 bg-white/[0.02] p-3 space-y-3">
+          <div>
+            <label className={labelClass}>Trecho a destacar</label>
+            <input
+              type="text"
+              value={word}
+              onChange={(e) => {
+                onChange(wordKey, e.target.value);
+                if (!effect) onChange(effectKey, "gradient");
+              }}
+              placeholder="Ex: resultados, transformação…"
+              className={inputClass}
+            />
+            <p className="mt-0.5 text-[10px] text-[var(--platform-text)]/30">
+              Pode ser uma palavra, uma frase ou o texto inteiro
+            </p>
+          </div>
+          <div>
+            <label className={labelClass}>Efeito visual</label>
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              {ACCENT_EFFECTS.map((ef) => (
+                <button
+                  key={ef.id}
+                  type="button"
+                  onClick={() => onChange(effectKey, ef.id)}
+                  className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                    effect === ef.id
+                      ? "border-[#22D3EE]/50 bg-[#22D3EE]/10 text-[#22D3EE]"
+                      : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                  }`}
+                >
+                  {ef.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -594,6 +686,13 @@ export function TemplateContentEditor() {
               variant="avatar"
               description="200 × 200 px · quadrado · PNG transparente"
             />
+            {state.logoUrl && (
+              <ImageFocalPointPicker
+                imageUrl={state.logoUrl}
+                value={str(content.logoObjectPosition) || "50% 50%"}
+                onChange={(pos) => handleContentChange("logoObjectPosition", pos)}
+              />
+            )}
 
             <div>
               <label className={labelClass}>Texto do rodapé</label>
@@ -653,6 +752,13 @@ export function TemplateContentEditor() {
                 placeholder="Ex: Cuidado emocional para viver com mais clareza"
                 className={inputClass}
               />
+              <AccentWordControl
+                toggleLabel="Adicionar efeito visual em trecho do título"
+                wordKey="heroTitleAccentWord"
+                effectKey="heroTitleAccentEffect"
+                content={content}
+                onChange={handleContentChange}
+              />
             </div>
 
             <div>
@@ -663,6 +769,13 @@ export function TemplateContentEditor() {
                 placeholder="Uma breve descrição do que você faz..."
                 rows={2}
                 className={`${inputClass} resize-none`}
+              />
+              <AccentWordControl
+                toggleLabel="Adicionar efeito visual em trecho do subtítulo"
+                wordKey="heroSubtitleAccentWord"
+                effectKey="heroSubtitleAccentEffect"
+                content={content}
+                onChange={handleContentChange}
               />
             </div>
 
@@ -774,8 +887,8 @@ export function TemplateContentEditor() {
                   </button>
 
                   {/* Imagem + posição */}
-                  <ServiceImageControl
-                    cardIndex={i}
+                  <ImageWithFocalControl
+                    uploadSlot={`service-${i}`}
                     imageUrl={card.imageUrl || ""}
                     objectPosition={card.imageObjectPosition || "50% 50%"}
                     onChangeUrl={(url) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { imageUrl: url } })}
@@ -813,6 +926,13 @@ export function TemplateContentEditor() {
                 onChange={(e) => handleContentChange("ctaTitle", e.target.value)}
                 placeholder="Ex: Vamos conversar?"
                 className={inputClass}
+              />
+              <AccentWordControl
+                toggleLabel="Adicionar efeito visual em trecho do título"
+                wordKey="ctaTitleAccentWord"
+                effectKey="ctaTitleAccentEffect"
+                content={content}
+                onChange={handleContentChange}
               />
             </div>
 
@@ -882,15 +1002,17 @@ export function TemplateContentEditor() {
           onToggle={toggleSection}
         >
           <div className="grid gap-4 md:grid-cols-2">
-            <ImageUpload
-              label="Sua foto ou imagem"
-              value={str(content.aboutImage)}
-              onChange={(url) => handleContentChange("aboutImage", url)}
-              slot="aboutImage"
-              variant="compact"
-              aspectRatio="3/4"
-              description="Foto profissional ou imagem representativa"
-            />
+            <div className="space-y-1">
+              <label className={labelClass}>Sua foto ou imagem</label>
+              <ImageWithFocalControl
+                uploadSlot="aboutImage"
+                imageUrl={str(content.aboutImage)}
+                objectPosition={str(content.aboutImageObjectPosition) || "50% 50%"}
+                onChangeUrl={(url) => handleContentChange("aboutImage", url)}
+                onChangePosition={(pos) => handleContentChange("aboutImageObjectPosition", pos)}
+                uploadLabel="Adicionar foto ou imagem"
+              />
+            </div>
 
             <div className="space-y-3">
               <div>

@@ -17,6 +17,7 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
     str(content.aboutBody) ||
     `${businessName || "Seu Negócio"} — atendimento personalizado com foco em resultado e acolhimento.`;
   const aboutImage = str(content.aboutImage);
+  const aboutImgPos = str(content.aboutImageObjectPosition) || "center center";
 
   return (
     <section
@@ -51,6 +52,7 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
                 aspectRatio: "3/4",
                 minHeight: deviceMode === "mobile" ? "60px" : "80px",
                 maxHeight: deviceMode === "mobile" ? "60px" : "80px",
+                objectPosition: aboutImgPos,
               }}
             />
           </div>
