@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Fragment } from "react";
 import { motion, type Variants } from "framer-motion";
 import { Monitor, Smartphone } from "lucide-react";
 import { useWizard } from "../wizard-context";
@@ -297,51 +297,63 @@ export function LivePreviewPanel() {
               <motion.div variants={itemVariants}>
                 <PreviewHeader deviceMode={deviceMode} />
               </motion.div>
-              {enabledSections.includes("hero") && (
-                <motion.div variants={itemVariants}>
-                  <PreviewHero deviceMode={deviceMode} />
-                </motion.div>
-              )}
-              {enabledSections.includes("services") && (
-                <>
-                  <PreviewDivider style={dividerStyle} />
-                  <motion.div variants={itemVariants}>
-                    <PreviewServices deviceMode={deviceMode} />
-                  </motion.div>
-                </>
-              )}
-              {enabledSections.includes("about") && (
-                <>
-                  <PreviewDivider style={dividerStyle} />
-                  <motion.div variants={itemVariants}>
-                    <PreviewAbout deviceMode={deviceMode} />
-                  </motion.div>
-                </>
-              )}
-              {hasTestimonials && (
-                <>
-                  <PreviewDivider style={dividerStyle} />
-                  <motion.div variants={itemVariants}>
-                    <PreviewTestimonials deviceMode={deviceMode} />
-                  </motion.div>
-                </>
-              )}
-              {enabledSections.includes("cta") && (
-                <>
-                  <PreviewDivider style={dividerStyle} />
-                  <motion.div variants={itemVariants}>
-                    <PreviewCta deviceMode={deviceMode} />
-                  </motion.div>
-                </>
-              )}
-              {enabledSections.includes("contact") && (
-                <>
-                  <PreviewDivider style={dividerStyle} />
-                  <motion.div variants={itemVariants}>
-                    <PreviewContact deviceMode={deviceMode} />
-                  </motion.div>
-                </>
-              )}
+              {enabledSections.map((sectionId) => {
+                switch (sectionId) {
+                  case "hero":
+                    return (
+                      <motion.div key="hero" variants={itemVariants}>
+                        <PreviewHero deviceMode={deviceMode} />
+                      </motion.div>
+                    );
+                  case "services":
+                    return (
+                      <Fragment key="services">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewServices deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  case "about":
+                    return (
+                      <Fragment key="about">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewAbout deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  case "testimonials":
+                    return hasTestimonials ? (
+                      <Fragment key="testimonials">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewTestimonials deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    ) : null;
+                  case "cta":
+                    return (
+                      <Fragment key="cta">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewCta deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  case "contact":
+                    return (
+                      <Fragment key="contact">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewContact deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  default:
+                    return null;
+                }
+              })}
               <div className="flex-1" />
               {/* Premium plan: floating CTA channels */}
               {floatingCtaEnabled && <PreviewFloatingCta />}

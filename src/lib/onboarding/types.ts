@@ -14,6 +14,8 @@ export type ServiceCardData = {
   iconName: string;
   icon?: string; // alias for iconName, used by some components
   imageUrl?: string; // optional image for the card
+  imageObjectPosition?: string; // CSS object-position for the image (e.g. "center top")
+  extraLines?: string[]; // extra text lines below the description
 };
 
 export type CtaTypeId = "whatsapp" | "email" | "instagram" | "linkedin" | "facebook";

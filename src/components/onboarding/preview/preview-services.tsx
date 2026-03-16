@@ -65,10 +65,13 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                       {card.description}
                     </p>
                   )}
+                  {card.extraLines?.map((line, li) => line ? (
+                    <p key={li} className="text-[6px] mt-0.5 truncate" style={{ color: "var(--preview-muted)" }}>{line}</p>
+                  ) : null)}
                 </div>
                 {card.imageUrl && (
                   <div className="h-7 w-9 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
-                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" style={{ objectPosition: card.imageObjectPosition || "center center" }} />
                   </div>
                 )}
               </div>
@@ -124,10 +127,13 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                       {card.description}
                     </p>
                   )}
+                  {card.extraLines?.map((line, li) => line ? (
+                    <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
+                  ) : null)}
                 </div>
                 {card.imageUrl && (
                   <div className="h-9 w-12 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
-                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" style={{ objectPosition: card.imageObjectPosition || "center center" }} />
                   </div>
                 )}
               </div>
@@ -184,10 +190,13 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                         {card.description}
                       </p>
                     )}
+                    {card.extraLines?.map((line, li) => line ? (
+                      <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
+                    ) : null)}
                   </div>
                   {card.imageUrl && (
                     <div className="h-8 w-10 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
-                      <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                      <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" style={{ objectPosition: card.imageObjectPosition || "center center" }} />
                     </div>
                   )}
                 </div>
@@ -219,7 +228,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
         >
           {card.imageUrl && (
             <div className="w-full overflow-hidden" style={{ height: isTall ? "36px" : "28px" }}>
-              <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+              <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" style={{ objectPosition: card.imageObjectPosition || "center center" }} />
             </div>
           )}
           <div className={`p-2 ${isTall ? "pb-3" : ""}`}>
@@ -239,6 +248,9 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                 {card.description}
               </p>
             )}
+            {card.extraLines?.map((line, li) => line ? (
+              <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
+            ) : null)}
           </div>
         </div>
       );
@@ -320,10 +332,13 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                       {card.description}
                     </p>
                   )}
+                  {card.extraLines?.map((line, li) => line ? (
+                    <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
+                  ) : null)}
                 </div>
                 {card.imageUrl ? (
                   <div className="h-12 w-14 shrink-0 overflow-hidden" style={{ borderRadius: "var(--preview-radius)" }}>
-                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" />
+                    <img src={card.imageUrl} alt={card.title} className="h-full w-full object-cover" style={{ objectPosition: card.imageObjectPosition || "center center" }} />
                   </div>
                 ) : (
                   <div
@@ -389,6 +404,9 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   {card.description}
                 </p>
               )}
+              {card.extraLines?.map((line, li) => line ? (
+                <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
+              ) : null)}
             </div>
           );
         })}

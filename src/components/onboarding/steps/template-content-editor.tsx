@@ -7,15 +7,191 @@ import { ImageUpload } from "../builders/image-upload";
 import { IconPickerInline } from "../builders/icon-picker";
 import { LinkDestinationSelect } from "../builders/link-destination-select";
 import { getTemplateBySlug } from "@/lib/onboarding/templates";
-import { MessageCircle, Instagram, Mail, Linkedin, Facebook, Check, Plus, Trash2 } from "lucide-react";
+import {
+  MessageCircle,
+  Instagram,
+  Mail,
+  Linkedin,
+  Facebook,
+  Check,
+  Plus,
+  Trash2,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown,
+} from "lucide-react";
+import { moveInArray } from "@/lib/onboarding/helpers";
 
 function str(v: unknown): string { return String(v ?? ""); }
 
 type Testimonial = { quote: string; author: string };
 
+/* ─── Helpers de layout ─── */
+
+const inputClass = "mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none";
+const labelClass = "text-xs font-medium text-[var(--platform-text)]/60";
+
+/* ─── Accordion section wrapper ─── */
+
+function AccordionSection({
+  id,
+  title,
+  subtitle,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  id: string;
+  title: string;
+  subtitle?: string;
+  isOpen: boolean;
+  onToggle: (id: string) => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden">
+      <button
+        type="button"
+        onClick={() => onToggle(id)}
+        className="flex w-full items-center justify-between px-5 py-4 text-left transition hover:bg-white/[0.03]"
+      >
+        <div>
+          <h3 className="text-sm font-semibold text-[var(--platform-text)]">{title}</h3>
+          {subtitle && <p className="text-xs text-[var(--platform-text)]/50">{subtitle}</p>}
+        </div>
+        <ChevronDown
+          size={16}
+          className={`shrink-0 text-[var(--platform-text)]/40 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+        />
+      </button>
+      {isOpen && <div className="border-t border-white/10 px-5 pb-5 pt-4">{children}</div>}
+    </div>
+  );
+}
+
+/* ─── Image position picker (3×3 grid) ─── */
+
+const IMAGE_POSITIONS = [
+  "left top",    "center top",    "right top",
+  "left center", "center center", "right center",
+  "left bottom", "center bottom", "right bottom",
+];
+
+function ImagePositionPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const current = value || "center center";
+  return (
+    <div>
+      <p className={labelClass}>Posição da imagem no card</p>
+      <div className="mt-2 inline-grid grid-cols-3 gap-1">
+        {IMAGE_POSITIONS.map((pos) => (
+          <button
+            key={pos}
+            type="button"
+            title={pos}
+            onClick={() => onChange(pos)}
+            className={`h-5 w-8 rounded-sm transition ${
+              current === pos
+                ? "bg-[#22D3EE]/80 ring-1 ring-[#22D3EE]"
+                : "bg-white/10 hover:bg-white/20"
+            }`}
+          />
+        ))}
+      </div>
+      <p className="mt-1 text-[10px] text-[var(--platform-text)]/30">{current}</p>
+    </div>
+  );
+}
+
+/* ─── Section reorder list ─── */
+
+const SECTION_LABELS: Record<string, { label: string; fixed?: boolean }> = {
+  hero:         { label: "Capa",            fixed: true },
+  services:     { label: "Serviços" },
+  about:        { label: "Sobre você" },
+  cta:          { label: "Call to Action" },
+  testimonials: { label: "Depoimentos" },
+  contact:      { label: "Contato",         fixed: true },
+};
+
+function SectionOrderCard() {
+  const { state, dispatch } = useWizard();
+  const sections = state.enabledSections;
+
+  function move(index: number, direction: "up" | "down") {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    const reordered = moveInArray(sections, index, targetIndex);
+    dispatch({ type: "REORDER_SECTIONS", sections: reordered });
+  }
+
+  return (
+    <div className="space-y-1.5">
+      {sections.map((id, index) => {
+        const meta = SECTION_LABELS[id];
+        const label = meta?.label ?? id;
+        const isFixed = meta?.fixed === true;
+        const canMoveUp = !isFixed && index > 1; // hero always at 0
+        const canMoveDown = !isFixed && index < sections.length - 2; // contact always last
+
+        return (
+          <div
+            key={id}
+            className="flex items-center gap-2 rounded-lg border border-white/8 bg-white/[0.02] px-3 py-2"
+          >
+            <span className="flex-1 text-sm text-[var(--platform-text)]">{label}</span>
+            {isFixed ? (
+              <span className="text-[10px] text-[var(--platform-text)]/30">fixo</span>
+            ) : (
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  disabled={!canMoveUp}
+                  onClick={() => move(index, "up")}
+                  className="flex h-6 w-6 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
+                >
+                  <ArrowUp size={12} />
+                </button>
+                <button
+                  type="button"
+                  disabled={!canMoveDown}
+                  onClick={() => move(index, "down")}
+                  className="flex h-6 w-6 items-center justify-center rounded text-[var(--platform-text)]/40 transition hover:bg-white/10 hover:text-[var(--platform-text)] disabled:cursor-not-allowed disabled:opacity-20"
+                >
+                  <ArrowDown size={12} />
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
+      <p className="text-[10px] text-[var(--platform-text)]/30">
+        As alterações refletem em tempo real no preview
+      </p>
+    </div>
+  );
+}
+
+/* ─── Main component ─── */
+
 export function TemplateContentEditor() {
   const { state, dispatch } = useWizard();
   const { selectedTemplateSlug, content, serviceCards } = state;
+
+  // Accordion state — default: first section open
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set(["contacts"]));
+  function toggleSection(id: string) {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   // Local testimonials state — synced to content.testimonialsJson
   const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
@@ -55,9 +231,6 @@ export function TemplateContentEditor() {
 
   const template = selectedTemplateSlug ? getTemplateBySlug(selectedTemplateSlug) : null;
 
-  // Apply template content defaults only when there is NO business segment set.
-  // When a business segment exists, lead-capture-step already filled the content and
-  // template-gallery re-applies it on template change — do not overwrite with template defaults.
   useEffect(() => {
     if (template && !state.businessSegment) {
       dispatch({ type: "UPDATE_CONTENT", key: "heroEyebrow", value: template.defaultContent.heroEyebrow });
@@ -69,7 +242,6 @@ export function TemplateContentEditor() {
       dispatch({ type: "UPDATE_CONTENT", key: "ctaDescription", value: template.defaultContent.ctaDescription });
       dispatch({ type: "UPDATE_CONTENT", key: "ctaButtonLabel", value: template.defaultContent.ctaButtonLabel });
 
-      // Apply service items
       const items = template.defaultContent.serviceItems;
       items.forEach((item, i) => {
         if (i < serviceCards.length) {
@@ -83,6 +255,26 @@ export function TemplateContentEditor() {
     dispatch({ type: "UPDATE_CONTENT", key, value });
   }
 
+  // Extra lines helpers
+  function addExtraLine(cardIndex: number) {
+    const card = serviceCards[cardIndex];
+    const current = card.extraLines ?? [];
+    dispatch({ type: "UPDATE_SERVICE_CARD", index: cardIndex, data: { extraLines: [...current, ""] } });
+  }
+
+  function updateExtraLine(cardIndex: number, lineIndex: number, value: string) {
+    const card = serviceCards[cardIndex];
+    const current = [...(card.extraLines ?? [])];
+    current[lineIndex] = value;
+    dispatch({ type: "UPDATE_SERVICE_CARD", index: cardIndex, data: { extraLines: current } });
+  }
+
+  function removeExtraLine(cardIndex: number, lineIndex: number) {
+    const card = serviceCards[cardIndex];
+    const current = (card.extraLines ?? []).filter((_, i) => i !== lineIndex);
+    dispatch({ type: "UPDATE_SERVICE_CARD", index: cardIndex, data: { extraLines: current } });
+  }
+
   // Registered social links for contact checkboxes
   const registeredLinks = useMemo(() => {
     const links: { type: string; label: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[] = [];
@@ -93,9 +285,6 @@ export function TemplateContentEditor() {
     if (str(content.social_facebook).trim()) links.push({ type: "facebook", label: "Facebook", Icon: Facebook });
     return links;
   }, [content.social_whatsapp, content.social_instagram, content.social_email, content.social_linkedin, content.social_facebook]);
-
-  const inputClass = "mt-1 w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none";
-  const labelClass = "text-xs font-medium text-[var(--platform-text)]/60";
 
   return (
     <div>
@@ -112,16 +301,28 @@ export function TemplateContentEditor() {
         </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-3">
 
-        {/* ─── 1. Seus canais de contato ──────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Seus canais de contato</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">
-            Preencha seus links — eles aparecem como opções nos botões e na seção de contato.
-          </p>
+        {/* ─── 0. Ordem das seções ─── */}
+        <AccordionSection
+          id="order"
+          title="Ordem das seções"
+          subtitle="Defina a sequência do conteúdo no seu site"
+          isOpen={openSections.has("order")}
+          onToggle={toggleSection}
+        >
+          <SectionOrderCard />
+        </AccordionSection>
 
-          <div className="mt-4 space-y-3">
+        {/* ─── 1. Canais de contato ─── */}
+        <AccordionSection
+          id="contacts"
+          title="Seus canais de contato"
+          subtitle="WhatsApp, Instagram, e-mail…"
+          isOpen={openSections.has("contacts")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-3">
             {/* WhatsApp */}
             <div>
               <label className={`flex items-center gap-1.5 ${labelClass}`}>
@@ -212,14 +413,17 @@ export function TemplateContentEditor() {
               </div>
             </div>
           </div>
-        </div>
+        </AccordionSection>
 
-        {/* ─── 2. Logo + Rodapé ──────────────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Identidade</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">Logo e rodapé do seu site</p>
-
-          <div className="mt-4 space-y-4">
+        {/* ─── 2. Identidade ─── */}
+        <AccordionSection
+          id="identity"
+          title="Identidade"
+          subtitle="Logo e rodapé do seu site"
+          isOpen={openSections.has("identity")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-4">
             <ImageUpload
               label="Logo do seu negócio"
               value={state.logoUrl}
@@ -240,14 +444,17 @@ export function TemplateContentEditor() {
               />
             </div>
           </div>
-        </div>
+        </AccordionSection>
 
-        {/* ─── 3. Hero ───────────────────────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Capa</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">A primeira coisa que seus visitantes vão ver</p>
-
-          <div className="mt-4 space-y-4">
+        {/* ─── 3. Capa (Hero) ─── */}
+        <AccordionSection
+          id="hero"
+          title="Capa"
+          subtitle="A primeira coisa que seus visitantes vão ver"
+          isOpen={openSections.has("hero")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-4">
             <ImageUpload
               label="Imagem da capa"
               value={state.heroImage}
@@ -311,14 +518,17 @@ export function TemplateContentEditor() {
               />
             </div>
           </div>
-        </div>
+        </AccordionSection>
 
-        {/* ─── 4. Serviços ───────────────────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Serviços</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">O que você oferece aos seus clientes</p>
-
-          <div className="mt-4 space-y-3">
+        {/* ─── 4. Serviços ─── */}
+        <AccordionSection
+          id="services"
+          title="Serviços"
+          subtitle="O que você oferece aos seus clientes"
+          isOpen={openSections.has("services")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-3">
             <div>
               <label className={labelClass}>Título da seção</label>
               <input
@@ -366,6 +576,35 @@ export function TemplateContentEditor() {
                     rows={1}
                     className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
                   />
+
+                  {/* Extra lines */}
+                  {(card.extraLines ?? []).map((line, li) => (
+                    <div key={li} className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={line}
+                        onChange={(e) => updateExtraLine(i, li, e.target.value)}
+                        placeholder={`Linha extra ${li + 1}`}
+                        className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeExtraLine(i, li)}
+                        className="text-[var(--platform-text)]/30 transition hover:text-red-400"
+                      >
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => addExtraLine(i)}
+                    className="flex items-center gap-1 text-[10px] text-[var(--platform-text)]/40 transition hover:text-[#22D3EE]"
+                  >
+                    <Plus size={10} /> Adicionar linha de texto
+                  </button>
+
+                  {/* Image upload + position */}
                   <ImageUpload
                     label="Imagem"
                     value={card.imageUrl || ""}
@@ -374,6 +613,12 @@ export function TemplateContentEditor() {
                     variant="compact"
                     description="Imagem para este serviço (opcional)"
                   />
+                  {card.imageUrl && (
+                    <ImagePositionPicker
+                      value={card.imageObjectPosition || "center center"}
+                      onChange={(pos) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { imageObjectPosition: pos } })}
+                    />
+                  )}
                 </div>
               ))}
               {serviceCards.length < 4 && (
@@ -387,14 +632,17 @@ export function TemplateContentEditor() {
               )}
             </div>
           </div>
-        </div>
+        </AccordionSection>
 
-        {/* ─── 5. CTA ────────────────────────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Call to Action</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">Convide seus visitantes a entrar em contato</p>
-
-          <div className="mt-4 space-y-4">
+        {/* ─── 5. CTA ─── */}
+        <AccordionSection
+          id="cta"
+          title="Call to Action"
+          subtitle="Convide seus visitantes a entrar em contato"
+          isOpen={openSections.has("cta")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-4">
             <div>
               <label className={labelClass}>Título</label>
               <input
@@ -417,7 +665,6 @@ export function TemplateContentEditor() {
               />
             </div>
 
-            {/* Button 1 (primary) */}
             <div>
               <label className={labelClass}>Texto do botão principal</label>
               <input
@@ -438,10 +685,8 @@ export function TemplateContentEditor() {
               />
             </div>
 
-            {/* Button 2 (secondary) */}
             <div className="border-t border-white/10 pt-4">
               <p className="text-xs font-medium text-[var(--platform-text)]/50 mb-3">Botão secundário (opcional)</p>
-
               <div className="space-y-3">
                 <div>
                   <label className={labelClass}>Texto</label>
@@ -453,7 +698,6 @@ export function TemplateContentEditor() {
                     className={inputClass}
                   />
                 </div>
-
                 <div>
                   <label className={labelClass}>Destino</label>
                   <LinkDestinationSelect
@@ -465,16 +709,17 @@ export function TemplateContentEditor() {
               </div>
             </div>
           </div>
-        </div>
+        </AccordionSection>
 
-        {/* ─── 6. Sobre ─────────────────────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Sobre você</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">
-            Conte um pouco sobre você e seu negócio — esta seção transmite confiança
-          </p>
-
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {/* ─── 6. Sobre ─── */}
+        <AccordionSection
+          id="about"
+          title="Sobre você"
+          subtitle="Conte um pouco sobre você e seu negócio"
+          isOpen={openSections.has("about")}
+          onToggle={toggleSection}
+        >
+          <div className="grid gap-4 md:grid-cols-2">
             <ImageUpload
               label="Sua foto ou imagem"
               value={str(content.aboutImage)}
@@ -509,16 +754,17 @@ export function TemplateContentEditor() {
               </div>
             </div>
           </div>
-        </div>
+        </AccordionSection>
 
-        {/* ─── 7. Contato (checkboxes) ───────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">Seção de Contato</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">
-            Escolha até 2 canais para exibir na seção de contato do site
-          </p>
-
-          <div className="mt-4 space-y-2">
+        {/* ─── 7. Seção de contato ─── */}
+        <AccordionSection
+          id="contact"
+          title="Seção de Contato"
+          subtitle="Escolha até 2 canais para exibir no site"
+          isOpen={openSections.has("contact")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-2">
             {registeredLinks.length === 0 ? (
               <p className="text-xs text-[var(--platform-text)]/40 italic">
                 Preencha seus canais acima para exibi-los na seção de contato
@@ -598,125 +844,132 @@ export function TemplateContentEditor() {
               </div>
             </label>
           )}
-        </div>
+        </AccordionSection>
 
-        {/* ─── 7. Depoimentos ───────────────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--platform-text)]">Depoimentos</h3>
-              <p className="text-xs text-[var(--platform-text)]/50">Adicione até 10 depoimentos de clientes</p>
+        {/* ─── 8. Depoimentos ─── */}
+        <AccordionSection
+          id="testimonials"
+          title="Depoimentos"
+          subtitle="Adicione até 10 depoimentos de clientes"
+          isOpen={openSections.has("testimonials")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-[var(--platform-text)]/50">{testimonials.length}/10 depoimentos</span>
+              {testimonials.length < 10 && (
+                <button
+                  type="button"
+                  onClick={addTestimonial}
+                  className="flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1.5 text-xs text-[var(--platform-text)]/60 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE]"
+                >
+                  <Plus size={12} /> Adicionar
+                </button>
+              )}
             </div>
-            {testimonials.length < 10 && (
+
+            {/* Variant selector */}
+            <div>
+              <label className={labelClass}>Estilo de exibição</label>
+              <select
+                value={str(content.testimonialsVariant) || "grid"}
+                onChange={(e) => handleContentChange("testimonialsVariant", e.target.value)}
+                className="mt-1 w-full rounded-lg border border-white/10 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] focus:border-[#22D3EE] focus:outline-none cursor-pointer"
+              >
+                <option value="grid">Grade (2 colunas)</option>
+                <option value="carousel">Carrossel (um por vez)</option>
+                <option value="split">Split (nome + citação)</option>
+              </select>
+            </div>
+
+            {testimonials.length === 0 ? (
               <button
                 type="button"
                 onClick={addTestimonial}
-                className="flex items-center gap-1 rounded-lg border border-white/10 px-2 py-1.5 text-xs text-[var(--platform-text)]/60 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE]"
+                className="w-full rounded-lg border border-dashed border-white/10 py-4 text-xs text-[var(--platform-text)]/30 transition hover:border-[#22D3EE]/20 hover:text-[#22D3EE]/50"
               >
-                <Plus size={12} /> Adicionar
+                + Adicionar primeiro depoimento
               </button>
+            ) : (
+              <>
+                {Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) > 1 && (
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() => setTestimonialPage((p) => Math.max(0, p - 1))}
+                      disabled={testimonialPage === 0}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-base text-[var(--platform-text)]/50 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE] disabled:cursor-not-allowed disabled:opacity-20"
+                    >
+                      ‹
+                    </button>
+                    <span className="text-[10px] text-[var(--platform-text)]/40">
+                      Página {testimonialPage + 1} de {Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setTestimonialPage((p) =>
+                          Math.min(Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) - 1, p + 1),
+                        )
+                      }
+                      disabled={testimonialPage >= Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) - 1}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-base text-[var(--platform-text)]/50 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE] disabled:cursor-not-allowed disabled:opacity-20"
+                    >
+                      ›
+                    </button>
+                  </div>
+                )}
+                <div className="space-y-3">
+                  {testimonials
+                    .slice(testimonialPage * TESTIMONIALS_PER_PAGE, (testimonialPage + 1) * TESTIMONIALS_PER_PAGE)
+                    .map((t, localIdx) => {
+                      const globalIdx = testimonialPage * TESTIMONIALS_PER_PAGE + localIdx;
+                      return (
+                        <div key={globalIdx} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-medium text-[var(--platform-text)]/50">
+                              Depoimento {globalIdx + 1}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => removeTestimonial(globalIdx)}
+                              className="text-[var(--platform-text)]/30 transition hover:text-red-400"
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          </div>
+                          <textarea
+                            value={t.quote}
+                            onChange={(e) => updateTestimonialField(globalIdx, "quote", e.target.value)}
+                            placeholder="O que o cliente disse sobre você..."
+                            rows={2}
+                            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
+                          />
+                          <input
+                            type="text"
+                            value={t.author}
+                            onChange={(e) => updateTestimonialField(globalIdx, "author", e.target.value)}
+                            placeholder="Nome do cliente"
+                            className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                          />
+                        </div>
+                      );
+                    })}
+                </div>
+              </>
             )}
           </div>
+        </AccordionSection>
 
-          {/* Variant selector */}
-          <div className="mt-3">
-            <label className={labelClass}>Estilo de exibição</label>
-            <select
-              value={str(content.testimonialsVariant) || "grid"}
-              onChange={(e) => handleContentChange("testimonialsVariant", e.target.value)}
-              className="mt-1 w-full rounded-lg border border-white/10 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] focus:border-[#22D3EE] focus:outline-none cursor-pointer"
-            >
-              <option value="grid">Grade (2 colunas)</option>
-              <option value="carousel">Carrossel (um por vez)</option>
-              <option value="split">Split (nome + citação)</option>
-            </select>
-          </div>
-
-          {testimonials.length === 0 ? (
-            <button
-              type="button"
-              onClick={addTestimonial}
-              className="mt-4 w-full rounded-lg border border-dashed border-white/10 py-4 text-xs text-[var(--platform-text)]/30 transition hover:border-[#22D3EE]/20 hover:text-[#22D3EE]/50"
-            >
-              + Adicionar primeiro depoimento
-            </button>
-          ) : (
-            <>
-              {/* Pagination controls — only when > 1 page */}
-              {Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) > 1 && (
-                <div className="mt-3 flex items-center justify-between">
-                  <button
-                    type="button"
-                    onClick={() => setTestimonialPage((p) => Math.max(0, p - 1))}
-                    disabled={testimonialPage === 0}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-base text-[var(--platform-text)]/50 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE] disabled:cursor-not-allowed disabled:opacity-20"
-                  >
-                    ‹
-                  </button>
-                  <span className="text-[10px] text-[var(--platform-text)]/40">
-                    Página {testimonialPage + 1} de {Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE)}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setTestimonialPage((p) =>
-                        Math.min(Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) - 1, p + 1),
-                      )
-                    }
-                    disabled={testimonialPage >= Math.ceil(testimonials.length / TESTIMONIALS_PER_PAGE) - 1}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 text-base text-[var(--platform-text)]/50 transition hover:border-[#22D3EE]/30 hover:text-[#22D3EE] disabled:cursor-not-allowed disabled:opacity-20"
-                  >
-                    ›
-                  </button>
-                </div>
-              )}
-              <div className="mt-3 space-y-3">
-                {testimonials
-                  .slice(testimonialPage * TESTIMONIALS_PER_PAGE, (testimonialPage + 1) * TESTIMONIALS_PER_PAGE)
-                  .map((t, localIdx) => {
-                    const globalIdx = testimonialPage * TESTIMONIALS_PER_PAGE + localIdx;
-                    return (
-                      <div key={globalIdx} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-medium text-[var(--platform-text)]/50">
-                            Depoimento {globalIdx + 1}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => removeTestimonial(globalIdx)}
-                            className="text-[var(--platform-text)]/30 transition hover:text-red-400"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
-                        <textarea
-                          value={t.quote}
-                          onChange={(e) => updateTestimonialField(globalIdx, "quote", e.target.value)}
-                          placeholder="O que o cliente disse sobre você..."
-                          rows={2}
-                          className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
-                        />
-                        <input
-                          type="text"
-                          value={t.author}
-                          onChange={(e) => updateTestimonialField(globalIdx, "author", e.target.value)}
-                          placeholder="Nome do cliente"
-                          className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
-                        />
-                      </div>
-                    );
-                  })}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* ─── 8. SEO ────────────────────────────────────── */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
-          <h3 className="text-sm font-semibold text-[var(--platform-text)]">SEO</h3>
-          <p className="text-xs text-[var(--platform-text)]/50">Ajude seu site a aparecer no Google</p>
-
-          <div className="mt-4 space-y-4">
+        {/* ─── 9. SEO ─── */}
+        <AccordionSection
+          id="seo"
+          title="SEO"
+          subtitle="Ajude seu site a aparecer no Google"
+          isOpen={openSections.has("seo")}
+          onToggle={toggleSection}
+        >
+          <div className="space-y-4">
             <div className="rounded-lg border border-[#22D3EE]/20 bg-[#22D3EE]/5 p-3">
               <p className="text-xs text-[#22D3EE]/80">
                 SEO ajuda seu site a aparecer no Google. Preencha para melhorar seu posicionamento.
@@ -755,7 +1008,8 @@ export function TemplateContentEditor() {
               />
             </div>
           </div>
-        </div>
+        </AccordionSection>
+
       </div>
 
       {/* Navigation */}
