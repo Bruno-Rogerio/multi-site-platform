@@ -1,7 +1,7 @@
 -- ============================================================
 -- SEED — Clientes de teste: Camila (Básico) + Rafael (Premium)
 -- Rode no SQL Editor do Supabase (Dashboard → SQL Editor)
--- Domínios locais: camila.localtest.me | rafael.localtest.me
+-- Acesso em produção: camila.bsph.com.br | rafael.bsph.com.br
 -- ============================================================
 
 begin;
@@ -24,7 +24,7 @@ values
   (
     'c0ca0001-0000-4000-8000-000000000001',
     'Camila Ribeiro Nutrição',
-    'camila.localtest.me',
+    'camila.bsph.com.br',
     'landing',
     '{
       "selectedPlan": "basico",
@@ -53,7 +53,7 @@ values
   (
     'fa0a0001-0000-4000-8000-000000000001',
     'Rafael Martins | Consultor de Negócios',
-    'rafael.localtest.me',
+    'rafael.bsph.com.br',
     'pro',
     '{
       "selectedPlan": "premium-full",
@@ -502,7 +502,7 @@ commit;
 --    set site_id = 'fa0a0001-0000-4000-8000-000000000001'
 --    where email = 'rafael@teste.com';
 --
--- 3. Acesse localmente em:
---    http://camila.localtest.me:3000
---    http://rafael.localtest.me:3000
+-- 3. Acesse em produção:
+--    https://camila.bsph.com.br
+--    https://rafael.bsph.com.br
 -- ============================================================
