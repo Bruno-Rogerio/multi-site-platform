@@ -6,6 +6,7 @@ import {
   BookOpen, ImageIcon, CalendarDays, ChevronUp, ChevronDown, ChevronRight, AlertTriangle,
 } from "lucide-react";
 
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 import { AdminImageUpload } from "@/components/admin/admin-image-upload";
 import { AdminLinkSelect } from "@/components/admin/admin-link-select";
 import { validateImageForSlot } from "@/components/admin/image-validation";
@@ -133,6 +134,7 @@ const SECTION_META: Record<string, { label: string; description: string; Icon: R
 };
 
 const INPUT_CLS = "mt-1 w-full rounded-xl border border-white/15 bg-[#0B1020] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/25 outline-none transition focus:border-[#22D3EE]";
+const PLATFORM_PALETTE = ["#3B82F6", "#7C5CFF", "#22D3EE", "#EAF0FF"];
 const LABEL_CLS = "text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60";
 
 /* ─── Component ──────────────────────────────────────────── */
@@ -388,26 +390,47 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   /* ─── Section field renderers ─── */
 
   function renderHeroFields(section: Section) {
-    const textFields = [
-      { key: "eyebrow", label: "Eyebrow", placeholder: "Ex: Psicóloga em São Paulo" },
-      { key: "title", label: "Título", placeholder: "Título principal" },
-      { key: "subtitle", label: "Subtítulo", placeholder: "Descrição curta do negócio" },
-      { key: "ctaLabel", label: "Texto do botão", placeholder: "Ex: Agendar conversa" },
-    ];
     return (
       <div className="mt-4 space-y-4">
         <div className="grid gap-3 md:grid-cols-2">
-          {textFields.map(({ key, label, placeholder }) => (
-            <div key={key}>
-              <label className={LABEL_CLS}>{label}</label>
-              <input
-                value={asString(section.content[key])}
-                placeholder={placeholder}
-                onChange={(e) => updateContent(section.id, key, e.target.value)}
-                className={INPUT_CLS}
-              />
-            </div>
-          ))}
+          <div>
+            <label className={LABEL_CLS}>Eyebrow</label>
+            <input
+              value={asString(section.content.eyebrow)}
+              placeholder="Ex: Psicóloga em São Paulo"
+              onChange={(e) => updateContent(section.id, "eyebrow", e.target.value)}
+              className={INPUT_CLS}
+            />
+          </div>
+          <div>
+            <label className={LABEL_CLS}>Texto do botão</label>
+            <input
+              value={asString(section.content.ctaLabel)}
+              placeholder="Ex: Agendar conversa"
+              onChange={(e) => updateContent(section.id, "ctaLabel", e.target.value)}
+              className={INPUT_CLS}
+            />
+          </div>
+        </div>
+        <div>
+          <label className={LABEL_CLS}>Título</label>
+          <RichTextEditor
+            value={asString(section.content.title)}
+            onChange={(html) => updateContent(section.id, "title", html)}
+            placeholder="Título principal"
+            paletteColors={PLATFORM_PALETTE}
+            singleLine
+          />
+        </div>
+        <div>
+          <label className={LABEL_CLS}>Subtítulo</label>
+          <RichTextEditor
+            value={asString(section.content.subtitle)}
+            onChange={(html) => updateContent(section.id, "subtitle", html)}
+            placeholder="Descrição curta do negócio"
+            paletteColors={PLATFORM_PALETTE}
+            minHeight="3rem"
+          />
         </div>
 
         <div>
@@ -503,18 +526,20 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                   </button>
                 </div>
 
-                <div className="mt-2 grid gap-2 md:grid-cols-2">
-                  <input
+                <div className="mt-2 space-y-2">
+                  <RichTextEditor
                     value={card.title}
+                    onChange={(html) => updateCard(index, { title: html })}
                     placeholder="Nome do serviço"
-                    onChange={(e) => updateCard(index, { title: e.target.value })}
-                    className={INPUT_CLS}
+                    paletteColors={PLATFORM_PALETTE}
+                    singleLine
                   />
-                  <input
+                  <RichTextEditor
                     value={card.description}
+                    onChange={(html) => updateCard(index, { description: html })}
                     placeholder="Descrição curta"
-                    onChange={(e) => updateCard(index, { description: e.target.value })}
-                    className={INPUT_CLS}
+                    paletteColors={PLATFORM_PALETTE}
+                    minHeight="2.5rem"
                   />
                 </div>
 
@@ -591,26 +616,47 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
   }
 
   function renderCtaFields(section: Section) {
-    const textFields = [
-      { key: "title", label: "Título", placeholder: "Ex: Vamos conversar?" },
-      { key: "description", label: "Descrição", placeholder: "Texto de apoio do CTA" },
-      { key: "buttonLabel", label: "Texto do botão", placeholder: "Ex: Entrar em contato" },
-      { key: "secondaryLabel", label: "Botão secundário (texto)", placeholder: "Opcional" },
-    ];
     return (
       <div className="mt-4 space-y-4">
         <div className="grid gap-3 md:grid-cols-2">
-          {textFields.map(({ key, label, placeholder }) => (
-            <div key={key}>
-              <label className={LABEL_CLS}>{label}</label>
-              <input
-                value={asString(section.content[key])}
-                placeholder={placeholder}
-                onChange={(e) => updateContent(section.id, key, e.target.value)}
-                className={INPUT_CLS}
-              />
-            </div>
-          ))}
+          <div>
+            <label className={LABEL_CLS}>Texto do botão</label>
+            <input
+              value={asString(section.content.buttonLabel)}
+              placeholder="Ex: Entrar em contato"
+              onChange={(e) => updateContent(section.id, "buttonLabel", e.target.value)}
+              className={INPUT_CLS}
+            />
+          </div>
+          <div>
+            <label className={LABEL_CLS}>Botão secundário (texto)</label>
+            <input
+              value={asString(section.content.secondaryLabel)}
+              placeholder="Opcional"
+              onChange={(e) => updateContent(section.id, "secondaryLabel", e.target.value)}
+              className={INPUT_CLS}
+            />
+          </div>
+        </div>
+        <div>
+          <label className={LABEL_CLS}>Título</label>
+          <RichTextEditor
+            value={asString(section.content.title)}
+            onChange={(html) => updateContent(section.id, "title", html)}
+            placeholder="Ex: Vamos conversar?"
+            paletteColors={PLATFORM_PALETTE}
+            singleLine
+          />
+        </div>
+        <div>
+          <label className={LABEL_CLS}>Descrição</label>
+          <RichTextEditor
+            value={asString(section.content.description)}
+            onChange={(html) => updateContent(section.id, "description", html)}
+            placeholder="Texto de apoio do CTA"
+            paletteColors={PLATFORM_PALETTE}
+            minHeight="3rem"
+          />
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
@@ -660,21 +706,22 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
       <div className="mt-4 space-y-4">
         <div>
           <label className={LABEL_CLS}>Título</label>
-          <input
+          <RichTextEditor
             value={asString(section.content.title)}
+            onChange={(html) => updateContent(section.id, "title", html)}
             placeholder="Ex: Sobre mim"
-            onChange={(e) => updateContent(section.id, "title", e.target.value)}
-            className={INPUT_CLS}
+            paletteColors={PLATFORM_PALETTE}
+            singleLine
           />
         </div>
         <div>
           <label className={LABEL_CLS}>Texto</label>
-          <textarea
-            rows={5}
+          <RichTextEditor
             value={asString(section.content.body)}
+            onChange={(html) => updateContent(section.id, "body", html)}
             placeholder="Descreva seu negócio, sua história ou diferenciais..."
-            onChange={(e) => updateContent(section.id, "body", e.target.value)}
-            className={INPUT_CLS}
+            paletteColors={PLATFORM_PALETTE}
+            minHeight="8rem"
           />
         </div>
         <AdminImageUpload

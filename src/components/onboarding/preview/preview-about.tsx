@@ -3,6 +3,10 @@
 import { useWizard } from "../wizard-context";
 
 function str(v: unknown): string { return String(v ?? ""); }
+function richTitle(v: unknown): string {
+  const raw = String(v ?? "");
+  return raw.replace(/^<p>([\s\S]*)<\/p>$/, "$1").replace(/<\/p><p>/g, " ").trim();
+}
 
 interface PreviewAboutProps {
   deviceMode: "desktop" | "mobile";
@@ -12,9 +16,9 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
   const { state } = useWizard();
   const { content, fontFamily, businessName } = state;
 
-  const title = str(content.aboutTitle) || `Sobre ${businessName || "Seu Negócio"}`;
-  const body =
-    str(content.aboutBody) ||
+  const titleHtml = richTitle(content.aboutTitle) || `Sobre ${businessName || "Seu Negócio"}`;
+  const bodyHtml =
+    richTitle(content.aboutBody) ||
     `${businessName || "Seu Negócio"} — atendimento personalizado com foco em resultado e acolhimento.`;
   const aboutImage = str(content.aboutImage);
   const aboutImgPos = str(content.aboutImageObjectPosition) || "center center";
@@ -46,7 +50,7 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
           >
             <img
               src={aboutImage}
-              alt={title}
+              alt="Sobre"
               className="w-full object-cover"
               style={{
                 aspectRatio: "3/4",
@@ -62,15 +66,13 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
               className="mb-1.5 h-[2px] w-7 rounded-full"
               style={{ background: "linear-gradient(90deg, var(--preview-primary), var(--preview-accent))" }}
             />
-            <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-              {title}
-            </h2>
+            <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}
+              dangerouslySetInnerHTML={{ __html: titleHtml }} />
             <p
               className="mt-1 text-[7px] leading-relaxed line-clamp-4"
               style={{ color: "var(--preview-muted)" }}
-            >
-              {body}
-            </p>
+              dangerouslySetInnerHTML={{ __html: bodyHtml }}
+            />
           </div>
         </div>
       ) : (
@@ -88,15 +90,13 @@ export function PreviewAbout({ deviceMode }: PreviewAboutProps) {
             className="mb-2 h-[2px] w-7 rounded-full"
             style={{ background: "linear-gradient(90deg, var(--preview-primary), var(--preview-accent))" }}
           />
-          <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-            {title}
-          </h2>
+          <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}
+            dangerouslySetInnerHTML={{ __html: titleHtml }} />
           <p
             className="mt-1 text-[7px] leading-relaxed line-clamp-4"
             style={{ color: "var(--preview-muted)" }}
-          >
-            {body}
-          </p>
+            dangerouslySetInnerHTML={{ __html: bodyHtml }}
+          />
         </div>
       )}
     </section>

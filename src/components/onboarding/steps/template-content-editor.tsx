@@ -19,9 +19,9 @@ import {
   ChevronDown,
   ArrowUp,
   ArrowDown,
-  Sparkles,
 } from "lucide-react";
 import { moveInArray } from "@/lib/onboarding/helpers";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 function str(v: unknown): string { return String(v ?? ""); }
 
@@ -273,95 +273,6 @@ function ImageFocalPointPicker({
   );
 }
 
-/* ─── Efeito de destaque em texto (word accent) ─── */
-
-const ACCENT_EFFECTS = [
-  { id: "gradient",   label: "Gradiente" },
-  { id: "neon",       label: "Neon" },
-  { id: "underline",  label: "Sublinhado" },
-  { id: "highlight",  label: "Destaque" },
-  { id: "bold-accent",label: "Negrito" },
-] as const;
-
-function AccentWordControl({
-  toggleLabel,
-  wordKey,
-  effectKey,
-  content,
-  onChange,
-}: {
-  toggleLabel: string;
-  wordKey: string;
-  effectKey: string;
-  content: Record<string, unknown>;
-  onChange: (key: string, value: string) => void;
-}) {
-  const word = str(content[wordKey]);
-  const effect = str(content[effectKey]) || "gradient";
-  const [open, setOpen] = useState(!!word);
-
-  function handleToggle() {
-    if (open && word) {
-      // fechar e limpar
-      onChange(wordKey, "");
-      onChange(effectKey, "");
-    }
-    setOpen((o) => !o);
-  }
-
-  return (
-    <div className="mt-2">
-      <button
-        type="button"
-        onClick={handleToggle}
-        className="flex items-center gap-1.5 text-[11px] text-[var(--platform-text)]/40 transition hover:text-[#22D3EE]"
-      >
-        <Sparkles size={11} />
-        {open ? "Remover efeito visual" : toggleLabel}
-      </button>
-      {open && (
-        <div className="mt-2 rounded-lg border border-white/8 bg-white/[0.02] p-3 space-y-3">
-          <div>
-            <label className={labelClass}>Trecho a destacar</label>
-            <input
-              type="text"
-              value={word}
-              onChange={(e) => {
-                onChange(wordKey, e.target.value);
-                if (!effect) onChange(effectKey, "gradient");
-              }}
-              placeholder="Ex: resultados, transformação…"
-              className={inputClass}
-            />
-            <p className="mt-0.5 text-[10px] text-[var(--platform-text)]/30">
-              Pode ser uma palavra, uma frase ou o texto inteiro
-            </p>
-          </div>
-          <div>
-            <label className={labelClass}>Efeito visual</label>
-            <div className="mt-1.5 flex flex-wrap gap-2">
-              {ACCENT_EFFECTS.map((ef) => (
-                <button
-                  key={ef.id}
-                  type="button"
-                  onClick={() => onChange(effectKey, ef.id)}
-                  className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
-                    effect === ef.id
-                      ? "border-[#22D3EE]/50 bg-[#22D3EE]/10 text-[#22D3EE]"
-                      : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
-                  }`}
-                >
-                  {ef.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 /* ─── Section reorder list ─── */
 
 const SECTION_LABELS: Record<string, { label: string; fixed?: boolean }> = {
@@ -508,6 +419,12 @@ export function TemplateContentEditor() {
   function handleContentChange(key: string, value: string) {
     dispatch({ type: "UPDATE_CONTENT", key, value });
   }
+
+  const paletteColors = [
+    state.customColors?.primary,
+    state.customColors?.accent,
+    state.customColors?.text,
+  ].filter((c): c is string => Boolean(c));
 
   // Extra lines helpers
   function addExtraLine(cardIndex: number) {
@@ -745,37 +662,23 @@ export function TemplateContentEditor() {
 
             <div>
               <label className={labelClass}>Título principal</label>
-              <input
-                type="text"
+              <RichTextEditor
                 value={str(content.heroTitle)}
-                onChange={(e) => handleContentChange("heroTitle", e.target.value)}
+                onChange={(html) => handleContentChange("heroTitle", html)}
                 placeholder="Ex: Cuidado emocional para viver com mais clareza"
-                className={inputClass}
-              />
-              <AccentWordControl
-                toggleLabel="Adicionar efeito visual em trecho do título"
-                wordKey="heroTitleAccentWord"
-                effectKey="heroTitleAccentEffect"
-                content={content}
-                onChange={handleContentChange}
+                paletteColors={paletteColors}
+                singleLine
               />
             </div>
 
             <div>
               <label className={labelClass}>Subtítulo</label>
-              <textarea
+              <RichTextEditor
                 value={str(content.heroSubtitle)}
-                onChange={(e) => handleContentChange("heroSubtitle", e.target.value)}
+                onChange={(html) => handleContentChange("heroSubtitle", html)}
                 placeholder="Uma breve descrição do que você faz..."
-                rows={2}
-                className={`${inputClass} resize-none`}
-              />
-              <AccentWordControl
-                toggleLabel="Adicionar efeito visual em trecho do subtítulo"
-                wordKey="heroSubtitleAccentWord"
-                effectKey="heroSubtitleAccentEffect"
-                content={content}
-                onChange={handleContentChange}
+                paletteColors={paletteColors}
+                minHeight="4rem"
               />
             </div>
 
@@ -844,19 +747,19 @@ export function TemplateContentEditor() {
                     selectedIcon={card.iconName || card.icon || ""}
                     onSelect={(icon) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { iconName: icon, icon } })}
                   />
-                  <input
-                    type="text"
+                  <RichTextEditor
                     value={card.title}
-                    onChange={(e) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { title: e.target.value } })}
+                    onChange={(html) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { title: html } })}
                     placeholder={`Serviço ${i + 1}`}
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                    paletteColors={paletteColors}
+                    singleLine
                   />
-                  <textarea
+                  <RichTextEditor
                     value={card.description || ""}
-                    onChange={(e) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { description: e.target.value } })}
+                    onChange={(html) => dispatch({ type: "UPDATE_SERVICE_CARD", index: i, data: { description: html } })}
                     placeholder="Descrição breve (opcional)"
-                    rows={1}
-                    className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
+                    paletteColors={paletteColors}
+                    minHeight="3rem"
                   />
 
                   {/* Extra lines */}
@@ -920,30 +823,23 @@ export function TemplateContentEditor() {
           <div className="space-y-4">
             <div>
               <label className={labelClass}>Título</label>
-              <input
-                type="text"
+              <RichTextEditor
                 value={str(content.ctaTitle)}
-                onChange={(e) => handleContentChange("ctaTitle", e.target.value)}
+                onChange={(html) => handleContentChange("ctaTitle", html)}
                 placeholder="Ex: Vamos conversar?"
-                className={inputClass}
-              />
-              <AccentWordControl
-                toggleLabel="Adicionar efeito visual em trecho do título"
-                wordKey="ctaTitleAccentWord"
-                effectKey="ctaTitleAccentEffect"
-                content={content}
-                onChange={handleContentChange}
+                paletteColors={paletteColors}
+                singleLine
               />
             </div>
 
             <div>
               <label className={labelClass}>Descrição</label>
-              <textarea
+              <RichTextEditor
                 value={str(content.ctaDescription)}
-                onChange={(e) => handleContentChange("ctaDescription", e.target.value)}
+                onChange={(html) => handleContentChange("ctaDescription", html)}
                 placeholder="Uma frase convidativa..."
-                rows={2}
-                className={`${inputClass} resize-none`}
+                paletteColors={paletteColors}
+                minHeight="4rem"
               />
             </div>
 
@@ -1017,23 +913,23 @@ export function TemplateContentEditor() {
             <div className="space-y-3">
               <div>
                 <label className={labelClass}>Título da seção</label>
-                <input
-                  type="text"
+                <RichTextEditor
                   value={str(content.aboutTitle)}
-                  onChange={(e) => handleContentChange("aboutTitle", e.target.value)}
+                  onChange={(html) => handleContentChange("aboutTitle", html)}
                   placeholder={`Sobre ${state.businessName || "você"}`}
-                  className={inputClass}
+                  paletteColors={paletteColors}
+                  singleLine
                 />
               </div>
 
               <div>
                 <label className={labelClass}>Texto sobre você</label>
-                <textarea
+                <RichTextEditor
                   value={str(content.aboutBody)}
-                  onChange={(e) => handleContentChange("aboutBody", e.target.value)}
+                  onChange={(html) => handleContentChange("aboutBody", html)}
                   placeholder="Conte sua história, sua experiência e o que te motiva..."
-                  rows={5}
-                  className={`${inputClass} resize-none`}
+                  paletteColors={paletteColors}
+                  minHeight="8rem"
                 />
               </div>
             </div>

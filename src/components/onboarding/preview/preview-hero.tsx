@@ -1,9 +1,13 @@
 "use client";
 
 import { useWizard } from "../wizard-context";
-import { renderAccentedText } from "./accent-text";
 
 function str(v: unknown): string { return String(v ?? ""); }
+
+function richTitle(v: unknown): string {
+  const raw = String(v ?? "");
+  return raw.replace(/^<p>([\s\S]*)<\/p>$/, "$1").replace(/<\/p><p>/g, " ").trim();
+}
 
 interface PreviewHeroProps {
   deviceMode: "desktop" | "mobile";
@@ -14,17 +18,6 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
   const { content, fontFamily, buttonStyle, heroVariant, heroImage } = state;
   const heroImgPos = str(content.heroImageObjectPosition) || "center center";
 
-  const titleNode = renderAccentedText(
-    str(content.heroTitle) || "Seu título principal aqui",
-    str(content.heroTitleAccentWord),
-    str(content.heroTitleAccentEffect) || "gradient",
-  );
-  const subtitleNode = renderAccentedText(
-    str(content.heroSubtitle),
-    str(content.heroSubtitleAccentWord),
-    str(content.heroSubtitleAccentEffect) || "gradient",
-  );
-
   const buttonRadius =
     buttonStyle === "pill"
       ? "9999px"
@@ -34,6 +27,8 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
 
   const eyebrow = str(content.heroEyebrow);
   const ctaLabel = str(content.heroCtaLabel) || "Saiba mais";
+  const heroTitleHtml = richTitle(content.heroTitle) || "Seu título principal aqui";
+  const heroSubtitleHtml = richTitle(content.heroSubtitle);
 
   // ── split: grid text + image ──
   if (heroVariant === "split") {
@@ -61,13 +56,13 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
                 {eyebrow}
               </p>
             )}
-            <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}>
-              {titleNode}
-            </h1>
-            {str(content.heroSubtitle) && (
-              <p className="mt-1 text-[8px] leading-relaxed" style={{ color: "var(--preview-muted)" }}>
-                {subtitleNode}
-              </p>
+            <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}
+              dangerouslySetInnerHTML={{ __html: heroTitleHtml }}
+            />
+            {heroSubtitleHtml && (
+              <p className="mt-1 text-[8px] leading-relaxed" style={{ color: "var(--preview-muted)" }}
+                dangerouslySetInnerHTML={{ __html: heroSubtitleHtml }}
+              />
             )}
             <span
               className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"
@@ -141,13 +136,13 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
               {eyebrow}
             </p>
           )}
-          <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}>
-            {titleNode}
-          </h1>
-          {str(content.heroSubtitle) && (
-            <p className="mt-1 text-[8px] mx-auto max-w-[80%] leading-relaxed" style={{ color: "var(--preview-muted)" }}>
-              {subtitleNode}
-            </p>
+          <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}
+            dangerouslySetInnerHTML={{ __html: heroTitleHtml }}
+          />
+          {heroSubtitleHtml && (
+            <p className="mt-1 text-[8px] mx-auto max-w-[80%] leading-relaxed" style={{ color: "var(--preview-muted)" }}
+              dangerouslySetInnerHTML={{ __html: heroSubtitleHtml }}
+            />
           )}
           <span
             className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"
@@ -185,13 +180,12 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
         <h1
           className={`relative font-bold leading-tight border-l-[3px] pl-2 ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`}
           style={{ color: "var(--preview-text)", borderColor: "var(--preview-primary)" }}
-        >
-          {titleNode}
-        </h1>
-        {str(content.heroSubtitle) && (
-          <p className="mt-1 text-[8px] leading-relaxed" style={{ color: "var(--preview-muted)" }}>
-            {subtitleNode}
-          </p>
+          dangerouslySetInnerHTML={{ __html: heroTitleHtml }}
+        />
+        {heroSubtitleHtml && (
+          <p className="mt-1 text-[8px] leading-relaxed" style={{ color: "var(--preview-muted)" }}
+            dangerouslySetInnerHTML={{ __html: heroSubtitleHtml }}
+          />
         )}
         <span
           className="mt-2 inline-block text-[8px] font-semibold underline underline-offset-2 cursor-default"
@@ -242,13 +236,13 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
               {eyebrow}
             </p>
           )}
-          <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-base"}`} style={{ color: "var(--preview-text)" }}>
-            {titleNode}
-          </h1>
-          {str(content.heroSubtitle) && (
-            <p className="mt-1 text-[8px] mx-auto max-w-[90%] leading-relaxed" style={{ color: "var(--preview-muted)" }}>
-              {subtitleNode}
-            </p>
+          <h1 className={`font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-base"}`} style={{ color: "var(--preview-text)" }}
+            dangerouslySetInnerHTML={{ __html: heroTitleHtml }}
+          />
+          {heroSubtitleHtml && (
+            <p className="mt-1 text-[8px] mx-auto max-w-[90%] leading-relaxed" style={{ color: "var(--preview-muted)" }}
+              dangerouslySetInnerHTML={{ __html: heroSubtitleHtml }}
+            />
           )}
           <span
             className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"
@@ -290,13 +284,13 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
               {eyebrow}
             </p>
           )}
-          <h1 className={`font-bold leading-tight text-white ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`}>
-            {titleNode}
-          </h1>
-          {str(content.heroSubtitle) && (
-            <p className="mt-1 text-[8px] mx-auto max-w-[80%] leading-relaxed text-white/70">
-              {subtitleNode}
-            </p>
+          <h1 className={`font-bold leading-tight text-white ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`}
+            dangerouslySetInnerHTML={{ __html: heroTitleHtml }}
+          />
+          {heroSubtitleHtml && (
+            <p className="mt-1 text-[8px] mx-auto max-w-[80%] leading-relaxed text-white/70"
+              dangerouslySetInnerHTML={{ __html: heroSubtitleHtml }}
+            />
           )}
           <span
             className="mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default bg-white"
@@ -346,13 +340,13 @@ export function PreviewHero({ deviceMode }: PreviewHeroProps) {
           <div className="mb-2 h-[1px] w-6" style={{ backgroundColor: "var(--preview-accent)" }} />
         </>
       )}
-      <h1 className={`relative font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}>
-        {titleNode}
-      </h1>
-      {str(content.heroSubtitle) && (
-        <p className="relative mt-1 text-[8px] leading-relaxed" style={{ color: "var(--preview-muted)" }}>
-          {subtitleNode}
-        </p>
+      <h1 className={`relative font-bold leading-tight ${deviceMode === "mobile" ? "text-sm" : "text-lg"}`} style={{ color: "var(--preview-text)" }}
+        dangerouslySetInnerHTML={{ __html: heroTitleHtml }}
+      />
+      {heroSubtitleHtml && (
+        <p className="relative mt-1 text-[8px] leading-relaxed" style={{ color: "var(--preview-muted)" }}
+          dangerouslySetInnerHTML={{ __html: heroSubtitleHtml }}
+        />
       )}
       <span
         className="relative mt-3 inline-block px-3 py-1.5 text-[8px] font-semibold cursor-default"

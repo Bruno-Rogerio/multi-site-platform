@@ -147,3 +147,52 @@ body {
 .bg-grain {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
 }
+
+/* ─── Rich text editor content ─── */
+
+.rich-editor-content p {
+  margin: 0;
+}
+.rich-editor-content p + p {
+  margin-top: 0.25em;
+}
+
+/* ─── Accent effects (work in editor context and preview context) ─── */
+
+[data-accent-effect="gradient"] {
+  background: linear-gradient(
+    90deg,
+    var(--preview-primary, var(--platform-primary, #3b82f6)),
+    var(--preview-accent, var(--platform-accent, #22d3ee))
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-accent-effect="neon"] {
+  color: var(--preview-primary, var(--platform-primary, #22d3ee)) !important;
+  text-shadow:
+    0 0 6px var(--preview-primary, var(--platform-primary, #22d3ee)),
+    0 0 18px var(--preview-primary, var(--platform-primary, #22d3ee));
+}
+
+[data-accent-effect="underline"] {
+  -webkit-text-fill-color: unset !important;
+  border-bottom: 2px solid var(--preview-accent, var(--platform-accent, #22d3ee));
+  padding-bottom: 1px;
+}
+
+[data-accent-effect="highlight"] {
+  -webkit-text-fill-color: white !important;
+  background: var(--preview-primary, var(--platform-primary, #3b82f6));
+  color: white;
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+[data-accent-effect="bold-accent"] {
+  -webkit-text-fill-color: unset !important;
+  font-weight: 700;
+  color: var(--preview-primary, var(--platform-primary, #3b82f6));
+}

@@ -4,6 +4,10 @@ import { useWizard } from "../wizard-context";
 import * as LucideIcons from "lucide-react";
 
 function str(v: unknown): string { return String(v ?? ""); }
+function richTitle(v: unknown): string {
+  const raw = String(v ?? "");
+  return raw.replace(/^<p>([\s\S]*)<\/p>$/, "$1").replace(/<\/p><p>/g, " ").trim();
+}
 
 interface PreviewServicesProps {
   deviceMode: "desktop" | "mobile";
@@ -18,7 +22,7 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
   const { state, maxServiceCards } = useWizard();
   const { content, serviceCards, fontFamily, servicesVariant } = state;
 
-  const title = str(content.servicesTitle) || "Serviços";
+  const titleHtml = richTitle(content.servicesTitle) || "Serviços";
   const cards = serviceCards.slice(0, maxServiceCards);
 
   const getIcon = (card: typeof cards[0]) => {
@@ -38,9 +42,8 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           background: "radial-gradient(ellipse 80% 60% at 0% 100%, color-mix(in srgb, var(--preview-primary) 8%, transparent), transparent)",
         }}
       >
-        <h2 className="text-[10px] font-bold mb-2" style={{ color: "var(--preview-text)" }}>
-          {title}
-        </h2>
+        <h2 className="text-[10px] font-bold mb-2" style={{ color: "var(--preview-text)" }}
+          dangerouslySetInnerHTML={{ __html: titleHtml }} />
         <div className="divide-y" style={{ borderColor: "color-mix(in srgb, var(--preview-primary) 18%, transparent)" }}>
           {cards.map((card, index) => {
             const Icon = getIcon(card);
@@ -57,13 +60,11 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: "var(--preview-accent)" }} />
                 )}
                 <div className="flex-1 min-w-0">
-                  <span className="text-[8px] font-medium" style={{ color: "var(--preview-text)" }}>
-                    {card.title || `Serviço ${index + 1}`}
-                  </span>
-                  {card.description && (
-                    <p className="text-[6px] mt-0.5 truncate" style={{ color: "var(--preview-muted)" }}>
-                      {card.description}
-                    </p>
+                  <span className="text-[8px] font-medium" style={{ color: "var(--preview-text)" }}
+                    dangerouslySetInnerHTML={{ __html: richTitle(card.title) || `Serviço ${index + 1}` }} />
+                  {richTitle(card.description) && (
+                    <p className="text-[6px] mt-0.5 truncate" style={{ color: "var(--preview-muted)" }}
+                      dangerouslySetInnerHTML={{ __html: richTitle(card.description) }} />
                   )}
                   {card.extraLines?.map((line, li) => line ? (
                     <p key={li} className="text-[6px] mt-0.5 truncate" style={{ color: "var(--preview-muted)" }}>{line}</p>
@@ -92,9 +93,8 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           background: "radial-gradient(ellipse 70% 50% at 100% 0%, color-mix(in srgb, var(--preview-accent) 7%, transparent), transparent)",
         }}
       >
-        <h2 className="text-[10px] font-bold text-center mb-3" style={{ color: "var(--preview-text)" }}>
-          {title}
-        </h2>
+        <h2 className="text-[10px] font-bold text-center mb-3" style={{ color: "var(--preview-text)" }}
+          dangerouslySetInnerHTML={{ __html: titleHtml }} />
         <div className="space-y-2">
           {cards.map((card, index) => {
             const Icon = getIcon(card);
@@ -119,13 +119,11 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   </div>
                 )}
                 <div className={`flex-1 min-w-0 ${isReversed ? "text-right" : ""}`}>
-                  <h3 className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}>
-                    {card.title || `Serviço ${index + 1}`}
-                  </h3>
-                  {card.description && (
-                    <p className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>
-                      {card.description}
-                    </p>
+                  <h3 className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}
+                    dangerouslySetInnerHTML={{ __html: richTitle(card.title) || `Serviço ${index + 1}` }} />
+                  {richTitle(card.description) && (
+                    <p className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}
+                      dangerouslySetInnerHTML={{ __html: richTitle(card.description) }} />
                   )}
                   {card.extraLines?.map((line, li) => line ? (
                     <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
@@ -154,9 +152,8 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           background: "radial-gradient(ellipse 60% 80% at 50% 100%, color-mix(in srgb, var(--preview-primary) 8%, transparent), transparent)",
         }}
       >
-        <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
-          {title}
-        </h2>
+        <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}
+          dangerouslySetInnerHTML={{ __html: titleHtml }} />
         <div className="relative ml-0.5">
           {/* Timeline line with gradient */}
           <div
@@ -181,14 +178,12 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   <div className="flex-1 min-w-0 pt-0.5">
                     <div className="flex items-center gap-1">
                       {Icon && <Icon size={9} style={{ color: "var(--preview-primary)" }} />}
-                      <span className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}>
-                        {card.title || `Passo ${index + 1}`}
-                      </span>
+                      <span className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}
+                        dangerouslySetInnerHTML={{ __html: richTitle(card.title) || `Passo ${index + 1}` }} />
                     </div>
-                    {card.description && (
-                      <p className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>
-                        {card.description}
-                      </p>
+                    {richTitle(card.description) && (
+                      <p className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}
+                        dangerouslySetInnerHTML={{ __html: richTitle(card.description) }} />
                     )}
                     {card.extraLines?.map((line, li) => line ? (
                       <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
@@ -240,13 +235,11 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                 <Icon size={isTall ? 12 : 9} style={{ color: "var(--preview-primary)" }} />
               </div>
             )}
-            <h3 className={`font-semibold ${isTall ? "text-[9px]" : "text-[8px]"}`} style={{ color: "var(--preview-text)" }}>
-              {card.title || `Serviço ${index + 1}`}
-            </h3>
-            {card.description && (
-              <p className={`text-[6px] mt-0.5 ${isTall ? "" : "line-clamp-1"}`} style={{ color: "var(--preview-muted)" }}>
-                {card.description}
-              </p>
+            <h3 className={`font-semibold ${isTall ? "text-[9px]" : "text-[8px]"}`} style={{ color: "var(--preview-text)" }}
+              dangerouslySetInnerHTML={{ __html: richTitle(card.title) || `Serviço ${index + 1}` }} />
+            {richTitle(card.description) && (
+              <p className={`text-[6px] mt-0.5 ${isTall ? "" : "line-clamp-1"}`} style={{ color: "var(--preview-muted)" }}
+                dangerouslySetInnerHTML={{ __html: richTitle(card.description) }} />
             )}
             {card.extraLines?.map((line, li) => line ? (
               <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
@@ -264,9 +257,8 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           background: "radial-gradient(ellipse 80% 55% at 100% 50%, color-mix(in srgb, var(--preview-accent) 7%, transparent), transparent)",
         }}
       >
-        <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
-          {title}
-        </h2>
+        <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}
+          dangerouslySetInnerHTML={{ __html: titleHtml }} />
         {deviceMode === "mobile" ? (
           <div className="space-y-2">
             {cards.map((card, i) => renderCard(card, i, i % 3 === 0))}
@@ -297,9 +289,8 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
           background: "radial-gradient(ellipse 60% 60% at 100% 50%, color-mix(in srgb, var(--preview-primary) 7%, transparent), transparent)",
         }}
       >
-        <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
-          {title}
-        </h2>
+        <h2 className="text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}
+          dangerouslySetInnerHTML={{ __html: titleHtml }} />
         <div className="space-y-2">
           {cards.map((card, index) => {
             const Icon = getIcon(card);
@@ -324,13 +315,11 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                       <Icon size={8} style={{ color: "var(--preview-primary)" }} />
                     </div>
                   )}
-                  <h3 className="text-[8px] font-semibold leading-tight" style={{ color: "var(--preview-text)" }}>
-                    {card.title || `Serviço ${index + 1}`}
-                  </h3>
-                  {card.description && (
-                    <p className="text-[6px] mt-0.5 line-clamp-2" style={{ color: "var(--preview-muted)" }}>
-                      {card.description}
-                    </p>
+                  <h3 className="text-[8px] font-semibold leading-tight" style={{ color: "var(--preview-text)" }}
+                    dangerouslySetInnerHTML={{ __html: richTitle(card.title) || `Serviço ${index + 1}` }} />
+                  {richTitle(card.description) && (
+                    <p className="text-[6px] mt-0.5 line-clamp-2" style={{ color: "var(--preview-muted)" }}
+                      dangerouslySetInnerHTML={{ __html: richTitle(card.description) }} />
                   )}
                   {card.extraLines?.map((line, li) => line ? (
                     <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>
@@ -370,9 +359,8 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
         className="pointer-events-none absolute -right-4 top-0 h-12 w-12 rounded-full opacity-[0.12] blur-xl"
         style={{ background: "var(--preview-accent)" }}
       />
-      <h2 className="relative text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}>
-        {title}
-      </h2>
+      <h2 className="relative text-[10px] font-bold mb-3" style={{ color: "var(--preview-text)" }}
+        dangerouslySetInnerHTML={{ __html: titleHtml }} />
       <div className={`relative grid gap-2 ${deviceMode === "mobile" ? "grid-cols-1" : "grid-cols-2"}`}>
         {cards.map((card, index) => {
           const Icon = getIcon(card);
@@ -396,13 +384,11 @@ export function PreviewServices({ deviceMode }: PreviewServicesProps) {
                   <Icon size={10} style={{ color: "var(--preview-primary)" }} />
                 </div>
               )}
-              <h3 className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}>
-                {card.title || `Serviço ${index + 1}`}
-              </h3>
-              {card.description && (
-                <p className="text-[6px] mt-0.5 line-clamp-2" style={{ color: "var(--preview-muted)" }}>
-                  {card.description}
-                </p>
+              <h3 className="text-[8px] font-semibold" style={{ color: "var(--preview-text)" }}
+                dangerouslySetInnerHTML={{ __html: richTitle(card.title) || `Serviço ${index + 1}` }} />
+              {richTitle(card.description) && (
+                <p className="text-[6px] mt-0.5 line-clamp-2" style={{ color: "var(--preview-muted)" }}
+                  dangerouslySetInnerHTML={{ __html: richTitle(card.description) }} />
               )}
               {card.extraLines?.map((line, li) => line ? (
                 <p key={li} className="text-[6px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>{line}</p>

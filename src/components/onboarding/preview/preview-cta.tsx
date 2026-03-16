@@ -1,9 +1,13 @@
 "use client";
 
 import { useWizard } from "../wizard-context";
-import { renderAccentedText } from "./accent-text";
 
 function str(v: unknown): string { return String(v ?? ""); }
+
+function richTitle(v: unknown): string {
+  const raw = String(v ?? "");
+  return raw.replace(/^<p>([\s\S]*)<\/p>$/, "$1").replace(/<\/p><p>/g, " ").trim();
+}
 
 interface PreviewCtaProps {
   deviceMode: "desktop" | "mobile";
@@ -20,9 +24,8 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
       ? "0px"
       : "6px";
 
-  const title = str(content.ctaTitle) || "Vamos conversar?";
-  const titleNode = renderAccentedText(title, str(content.ctaTitleAccentWord), str(content.ctaTitleAccentEffect) || "gradient");
-  const description = str(content.ctaDescription);
+  const titleHtml = richTitle(content.ctaTitle) || "Vamos conversar?";
+  const description = richTitle(content.ctaDescription);
   const buttonLabel = str(content.ctaButtonLabel) || "Entrar em contato";
   const secondaryLabel = str(content.ctaSecondaryLabel) || "Saiba mais";
 
@@ -40,13 +43,12 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           }}
         >
           <div className="flex-1 min-w-0">
-            <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-              {titleNode}
-            </h2>
+            <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}
+              dangerouslySetInnerHTML={{ __html: titleHtml }}
+            />
             {description && (
-              <p className="text-[7px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}>
-                {description}
-              </p>
+              <p className="text-[7px] mt-0.5 line-clamp-1" style={{ color: "var(--preview-muted)" }}
+                dangerouslySetInnerHTML={{ __html: description }} />
             )}
           </div>
           <span
@@ -89,13 +91,12 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
             boxShadow: "0 2px 12px color-mix(in srgb, var(--preview-primary) 10%, transparent), inset 0 1px 0 color-mix(in srgb, white 8%, transparent)",
           }}
         >
-          <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-            {titleNode}
-          </h2>
+          <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}
+            dangerouslySetInnerHTML={{ __html: titleHtml }}
+          />
           {description && (
-            <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
-              {description}
-            </p>
+            <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}
+              dangerouslySetInnerHTML={{ __html: description }} />
           )}
           <span
             className="mt-2 inline-block px-2 py-1 text-[7px] font-semibold cursor-default"
@@ -127,9 +128,11 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           {/* White orbs */}
           <div className="pointer-events-none absolute -right-3 top-1/2 h-10 w-10 -translate-y-1/2 rounded-full bg-white opacity-[0.15] blur-lg" />
           <div className="relative flex-1 min-w-0">
-            <h2 className="text-[10px] font-bold text-white">{titleNode}</h2>
+            <h2 className="text-[10px] font-bold text-white"
+              dangerouslySetInnerHTML={{ __html: titleHtml }}
+            />
             {description && (
-              <p className="text-[7px] mt-0.5 text-white/70 line-clamp-1">{description}</p>
+              <p className="text-[7px] mt-0.5 text-white/70 line-clamp-1" dangerouslySetInnerHTML={{ __html: description }} />
             )}
           </div>
           <span
@@ -160,9 +163,11 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
         {/* White orbs */}
         <div className="pointer-events-none absolute -right-4 -top-4 h-12 w-12 rounded-full bg-white opacity-[0.14] blur-xl" />
         <div className="pointer-events-none absolute -bottom-4 -left-2 h-10 w-10 rounded-full bg-white opacity-[0.10] blur-lg" />
-        <h2 className="relative text-[10px] font-bold text-white">{titleNode}</h2>
+        <h2 className="relative text-[10px] font-bold text-white"
+          dangerouslySetInnerHTML={{ __html: titleHtml }}
+        />
         {description && (
-          <p className="relative text-[7px] mt-0.5 mx-auto max-w-[80%] text-white/70">{description}</p>
+          <p className="relative text-[7px] mt-0.5 mx-auto max-w-[80%] text-white/70" dangerouslySetInnerHTML={{ __html: description }} />
         )}
         <span
           className="relative mt-2 inline-block px-2 py-1 text-[7px] font-semibold cursor-default bg-white"
@@ -193,13 +198,12 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           className="pointer-events-none absolute -right-3 bottom-0 h-8 w-8 rounded-full opacity-[0.12] blur-md"
           style={{ background: "var(--preview-accent)" }}
         />
-        <h2 className="relative text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-          {titleNode}
-        </h2>
+        <h2 className="relative text-[10px] font-bold" style={{ color: "var(--preview-text)" }}
+          dangerouslySetInnerHTML={{ __html: titleHtml }}
+        />
         {description && (
-          <p className="relative text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
-            {description}
-          </p>
+          <p className="relative text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}
+            dangerouslySetInnerHTML={{ __html: description }} />
         )}
         <div className="relative mt-2 flex justify-center gap-2">
           <span
@@ -234,13 +238,12 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
         background: "radial-gradient(ellipse 60% 80% at 50% 100%, color-mix(in srgb, var(--preview-primary) 6%, transparent), transparent)",
       }}
     >
-      <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}>
-        {titleNode}
-      </h2>
+      <h2 className="text-[10px] font-bold" style={{ color: "var(--preview-text)" }}
+        dangerouslySetInnerHTML={{ __html: titleHtml }}
+      />
       {description && (
-        <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}>
-          {description}
-        </p>
+        <p className="text-[7px] mt-0.5 mx-auto max-w-[80%]" style={{ color: "var(--preview-muted)" }}
+          dangerouslySetInnerHTML={{ __html: description }} />
       )}
       <span
         className="mt-2 inline-block px-2 py-1 text-[7px] font-semibold cursor-default"
