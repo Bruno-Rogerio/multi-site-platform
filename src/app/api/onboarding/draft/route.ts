@@ -474,12 +474,18 @@ export async function POST(request: Request) {
     .update({ theme_settings: themeSettings })
     .eq("id", site.id);
 
+  // Helper: use enabledSections order if available, otherwise fallback
+  const secOrder = (type: string, fallback: number) => {
+    const idx = payload.enabledSections?.indexOf(type);
+    return idx != null && idx >= 0 ? idx + 1 : fallback;
+  };
+
   const sectionInserts = [
     {
       page_id: page.id,
       type: "hero",
       variant: mapHeroVariant(payload.heroStyle),
-      order: 1,
+      order: secOrder("hero", 1),
       content: {
         eyebrow: content.heroEyebrow?.trim() || (city ? `${segment} em ${city}` : segment),
         title: content.heroTitle?.trim() || `${businessName}: cuidado profissional para ${audience}`,
@@ -495,7 +501,7 @@ export async function POST(request: Request) {
       page_id: page.id,
       type: "services",
       variant: mapServicesVariant(payload.servicesStyle),
-      order: 2,
+      order: secOrder("services", 2),
       content: {
         title: content.servicesTitle?.trim() || "Como posso ajudar",
         items: serviceCards
@@ -510,7 +516,7 @@ export async function POST(request: Request) {
       page_id: page.id,
       type: "cta",
       variant: mapCtaVariant(payload.ctaStyle),
-      order: 3,
+      order: secOrder("cta", 3),
       content: {
         title: content.ctaTitle?.trim() || "Vamos conversar?",
         description: content.ctaDescription?.trim() || "Me chame para entender seu momento e definir proximos passos.",
@@ -524,7 +530,7 @@ export async function POST(request: Request) {
       page_id: page.id,
       type: "about",
       variant: "default",
-      order: 4,
+      order: secOrder("about", 4),
       content: {
         title: content.aboutTitle?.trim() || `Sobre ${businessName}`,
         body:
@@ -538,7 +544,7 @@ export async function POST(request: Request) {
           page_id: page.id,
           type: "testimonials" as const,
           variant: content.testimonialsVariant?.trim() || "grid",
-          order: 5,
+          order: secOrder("testimonials", 5),
           content: {
             title: "Depoimentos",
             items: testimonials,

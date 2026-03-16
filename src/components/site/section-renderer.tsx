@@ -1193,15 +1193,28 @@ export function SectionRenderer({
                 <p className="mt-3 max-w-xl text-base opacity-70" dangerouslySetInnerHTML={{ __html: description }} />
               )}
             </div>
-            <a
-              href={buttonHref}
-              target={linkTarget(buttonHref)}
-              rel={linkRel(buttonHref)}
-              className={`inline-flex shrink-0 bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold shadow-lg transition hover:brightness-110 ${buttonStyleClassName}`}
-              style={{ color: "var(--site-button-text)" }}
-            >
-              {buttonLabel}
-            </a>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
+              <a
+                href={buttonHref}
+                target={linkTarget(buttonHref)}
+                rel={linkRel(buttonHref)}
+                className={`inline-flex shrink-0 bg-[var(--site-primary)] px-6 py-3.5 text-sm font-semibold shadow-lg transition hover:brightness-110 ${buttonStyleClassName}`}
+                style={{ color: "var(--site-button-text)" }}
+              >
+                {buttonLabel}
+              </a>
+              {secondaryLabel && secondaryHref && (
+                <a
+                  href={secondaryHref}
+                  target={linkTarget(secondaryHref)}
+                  rel={linkRel(secondaryHref)}
+                  className={`mt-3 inline-flex border-2 border-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--site-primary)]/10 ${buttonStyleClassName}`}
+                  style={{ color: "var(--site-primary)" }}
+                >
+                  {secondaryLabel}
+                </a>
+              )}
+            </div>
           </div>
         </section>
       );
@@ -1248,6 +1261,17 @@ export function SectionRenderer({
               >
                 {buttonLabel}
               </a>
+              {secondaryLabel && secondaryHref && (
+                <a
+                  href={secondaryHref}
+                  target={linkTarget(secondaryHref)}
+                  rel={linkRel(secondaryHref)}
+                  className={`mt-3 inline-flex border-2 border-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--site-primary)]/10 ${buttonStyleClassName}`}
+                  style={{ color: "var(--site-primary)" }}
+                >
+                  {secondaryLabel}
+                </a>
+              )}
             </div>
           </div>
         </section>
@@ -1280,15 +1304,27 @@ export function SectionRenderer({
                 <p className="mt-3 max-w-xl text-base text-white/80" dangerouslySetInnerHTML={{ __html: description }} />
               )}
             </div>
-            <a
-              href={buttonHref}
-              target={linkTarget(buttonHref)}
-              rel={linkRel(buttonHref)}
-              className={`inline-flex shrink-0 bg-white px-6 py-3.5 text-sm font-semibold shadow-lg transition hover:bg-white/90 ${buttonStyleClassName}`}
-              style={{ color: "var(--site-primary)" }}
-            >
-              {buttonLabel}
-            </a>
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center">
+              <a
+                href={buttonHref}
+                target={linkTarget(buttonHref)}
+                rel={linkRel(buttonHref)}
+                className={`inline-flex shrink-0 bg-white px-6 py-3.5 text-sm font-semibold shadow-lg transition hover:bg-white/90 ${buttonStyleClassName}`}
+                style={{ color: "var(--site-primary)" }}
+              >
+                {buttonLabel}
+              </a>
+              {secondaryLabel && secondaryHref && (
+                <a
+                  href={secondaryHref}
+                  target={linkTarget(secondaryHref)}
+                  rel={linkRel(secondaryHref)}
+                  className={`relative mt-2 inline-flex border-2 border-white/70 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 ${buttonStyleClassName}`}
+                >
+                  {secondaryLabel}
+                </a>
+              )}
+            </div>
           </div>
         </section>
       );
@@ -1327,6 +1363,16 @@ export function SectionRenderer({
             >
               {buttonLabel}
             </a>
+            {secondaryLabel && secondaryHref && (
+              <a
+                href={secondaryHref}
+                target={linkTarget(secondaryHref)}
+                rel={linkRel(secondaryHref)}
+                className={`relative mt-3 inline-flex border-2 border-white/70 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10 ${buttonStyleClassName}`}
+              >
+                {secondaryLabel}
+              </a>
+            )}
           </div>
         </section>
       );
@@ -1416,6 +1462,17 @@ export function SectionRenderer({
           >
             {buttonLabel}
           </a>
+          {secondaryLabel && secondaryHref && (
+            <a
+              href={secondaryHref}
+              target={linkTarget(secondaryHref)}
+              rel={linkRel(secondaryHref)}
+              className={`mt-3 inline-flex border-2 border-[var(--site-primary)] px-5 py-2.5 text-sm font-semibold transition hover:bg-[var(--site-primary)]/10 ${buttonStyleClassName}`}
+              style={{ color: "var(--site-primary)" }}
+            >
+              {secondaryLabel}
+            </a>
+          )}
         </div>
       </section>
     );

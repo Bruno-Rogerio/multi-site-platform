@@ -27,7 +27,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
   const titleHtml = richTitle(content.ctaTitle) || "Vamos conversar?";
   const description = richTitle(content.ctaDescription);
   const buttonLabel = str(content.ctaButtonLabel) || "Entrar em contato";
-  const secondaryLabel = str(content.ctaSecondaryLabel) || "Saiba mais";
+  const secondaryLabel = str(content.ctaSecondaryLabel);
 
   // ── banner: flex row, text left, button right ──
   if (ctaVariant === "banner") {
@@ -51,12 +51,22 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
                 dangerouslySetInnerHTML={{ __html: description }} />
             )}
           </div>
-          <span
-            className="px-2 py-1 text-[7px] font-semibold cursor-default shrink-0"
-            style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
-          >
-            {buttonLabel}
-          </span>
+          <div className="flex items-center gap-1 shrink-0">
+            <span
+              className="px-2 py-1 text-[7px] font-semibold cursor-default shrink-0"
+              style={{ backgroundColor: "var(--preview-primary)", borderRadius: buttonRadius, color: "var(--preview-button-text)" }}
+            >
+              {buttonLabel}
+            </span>
+            {secondaryLabel && (
+              <span
+                className="px-2 py-1 text-[6px] font-semibold cursor-default"
+                style={{ color: "var(--preview-primary)", border: "1px solid var(--preview-primary)", borderRadius: buttonRadius }}
+              >
+                {secondaryLabel}
+              </span>
+            )}
+          </div>
         </div>
       </section>
     );
@@ -104,6 +114,14 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
           >
             {buttonLabel}
           </span>
+          {secondaryLabel && (
+            <span
+              className="mt-1 inline-block px-2 py-1 text-[6px] font-semibold cursor-default"
+              style={{ color: "var(--preview-primary)", border: "1px solid var(--preview-primary)", borderRadius: buttonRadius }}
+            >
+              {secondaryLabel}
+            </span>
+          )}
         </div>
       </section>
     );
@@ -135,12 +153,22 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
               <p className="text-[7px] mt-0.5 text-white/70 line-clamp-1" dangerouslySetInnerHTML={{ __html: description }} />
             )}
           </div>
-          <span
-            className="relative px-2 py-1 text-[7px] font-semibold cursor-default shrink-0 bg-white"
-            style={{ color: "var(--preview-primary)", borderRadius: buttonRadius }}
-          >
-            {buttonLabel}
-          </span>
+          <div className="flex items-center gap-1 shrink-0">
+            <span
+              className="relative px-2 py-1 text-[7px] font-semibold cursor-default shrink-0 bg-white"
+              style={{ color: "var(--preview-primary)", borderRadius: buttonRadius }}
+            >
+              {buttonLabel}
+            </span>
+            {secondaryLabel && (
+              <span
+                className="px-2 py-1 text-[6px] font-semibold cursor-default"
+                style={{ color: "var(--preview-primary)", border: "1px solid var(--preview-primary)", borderRadius: buttonRadius }}
+              >
+                {secondaryLabel}
+              </span>
+            )}
+          </div>
         </div>
       </section>
     );
@@ -175,6 +203,14 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
         >
           {buttonLabel}
         </span>
+        {secondaryLabel && (
+          <span
+            className="mt-1 inline-block px-2 py-1 text-[6px] font-semibold cursor-default"
+            style={{ color: "var(--preview-primary)", border: "1px solid var(--preview-primary)", borderRadius: buttonRadius }}
+          >
+            {secondaryLabel}
+          </span>
+        )}
       </section>
     );
   }
@@ -220,7 +256,7 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
               borderRadius: buttonRadius,
             }}
           >
-            {secondaryLabel}
+            {secondaryLabel || "Saiba mais"}
           </span>
         </div>
       </section>
@@ -255,6 +291,14 @@ export function PreviewCta({ deviceMode }: PreviewCtaProps) {
       >
         {buttonLabel}
       </span>
+      {secondaryLabel && (
+        <span
+          className="mt-1 inline-block px-2 py-1 text-[6px] font-semibold cursor-default"
+          style={{ color: "var(--preview-primary)", border: "1px solid var(--preview-primary)", borderRadius: buttonRadius }}
+        >
+          {secondaryLabel}
+        </span>
+      )}
     </section>
   );
 }
