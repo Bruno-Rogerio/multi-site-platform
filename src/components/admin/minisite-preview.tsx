@@ -156,7 +156,10 @@ export function MiniSitePreview({
         <style>{`
           .preview-mobile section { min-height: 0 !important; }
           .preview-mobile [class*="md:grid-cols-"] { grid-template-columns: 1fr !important; }
+          .preview-mobile [class*="sm:grid-cols-"] { grid-template-columns: 1fr !important; }
+          .preview-mobile [class*="lg:grid-cols-"] { grid-template-columns: 1fr !important; }
           .preview-mobile [class*="md:flex-row"] { flex-direction: column !important; }
+          .preview-mobile [class*="sm:flex-row"] { flex-direction: column !important; }
           .preview-mobile [class*="md:py-28"] { padding-top: 3rem !important; padding-bottom: 3rem !important; }
           .preview-mobile [class*="md:py-24"] { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
           .preview-mobile [class*="md:py-20"] { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
