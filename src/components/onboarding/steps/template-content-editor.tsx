@@ -999,22 +999,20 @@ export function TemplateContentEditor() {
             <label className="mt-4 flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 px-3 py-2.5 transition hover:bg-white/[0.03]">
               <div
                 className={`relative h-5 w-9 rounded-full transition ${
-                  str(content.floatingButtonsEnabled) !== "false" ? "bg-[#22D3EE]" : "bg-white/10"
+                  state.floatingCtaEnabled ? "bg-[#22D3EE]" : "bg-white/10"
                 }`}
               >
                 <div
                   className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${
-                    str(content.floatingButtonsEnabled) !== "false" ? "translate-x-4" : "translate-x-0.5"
+                    state.floatingCtaEnabled ? "translate-x-4" : "translate-x-0.5"
                   }`}
                 />
               </div>
               <input
                 type="checkbox"
                 className="hidden"
-                checked={str(content.floatingButtonsEnabled) !== "false"}
-                onChange={(e) =>
-                  handleContentChange("floatingButtonsEnabled", e.target.checked ? "true" : "false")
-                }
+                checked={state.floatingCtaEnabled}
+                onChange={(e) => dispatch({ type: "SET_FLOATING_CTA", enabled: e.target.checked })}
               />
               <div>
                 <p className="text-xs font-medium text-[var(--platform-text)]">Botões flutuantes de contato</p>
