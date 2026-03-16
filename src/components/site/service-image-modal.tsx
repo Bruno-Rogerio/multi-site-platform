@@ -8,9 +8,10 @@ interface ServiceImageModalProps {
   alt: string;
   className?: string;
   style?: React.CSSProperties;
+  imgStyle?: React.CSSProperties;
 }
 
-export function ServiceImageModal({ src, alt, className, style }: ServiceImageModalProps) {
+export function ServiceImageModal({ src, alt, className, style, imgStyle }: ServiceImageModalProps) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export function ServiceImageModal({ src, alt, className, style }: ServiceImageMo
         aria-label={`Ampliar foto: ${alt}`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={alt} className={className} />
+        <img src={src} alt={alt} className={className} style={imgStyle} />
         <span className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all duration-200 group-hover:bg-black/30">
           <ZoomIn size={20} className="text-white opacity-0 drop-shadow transition-opacity duration-200 group-hover:opacity-100" />
         </span>

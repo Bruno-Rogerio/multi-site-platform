@@ -3,6 +3,12 @@
 import { useState, useRef } from "react";
 import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
 
+const POSITION_GRID = [
+  ["left top",    "center top",    "right top"],
+  ["left center", "center center", "right center"],
+  ["left bottom", "center bottom", "right bottom"],
+] as const;
+
 interface AdminImageUploadProps {
   label: string;
   currentUrl: string;
@@ -11,6 +17,8 @@ interface AdminImageUploadProps {
   disabled?: boolean;
   recommendedText?: string;
   aspectRatio?: string;
+  objectPosition?: string;
+  onPositionChange?: (pos: string) => void;
 }
 
 export function AdminImageUpload({
@@ -21,6 +29,8 @@ export function AdminImageUpload({
   disabled = false,
   recommendedText,
   aspectRatio = "16/9",
+  objectPosition = "center center",
+  onPositionChange,
 }: AdminImageUploadProps) {
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,7 +74,7 @@ export function AdminImageUpload({
             src={currentUrl}
             alt={label}
             className="w-full object-cover"
-            style={{ aspectRatio }}
+            style={{ aspectRatio, objectPosition }}
           />
           <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 transition group-hover:opacity-100">
             <button
@@ -85,6 +95,31 @@ export function AdminImageUpload({
             </button>
           </div>
         </div>
+
+        {/* Position picker — only when position change is enabled */}
+        {onPositionChange && (
+          <div className="mt-2 flex items-center gap-3">
+            <span className="text-[10px] text-[var(--platform-text)]/40">Posição</span>
+            <div className="inline-grid grid-cols-3 gap-0.5">
+              {POSITION_GRID.map((row, ri) =>
+                row.map((pos, ci) => (
+                  <button
+                    key={`${ri}-${ci}`}
+                    type="button"
+                    title={pos}
+                    onClick={() => onPositionChange(pos)}
+                    className={`h-4 w-4 rounded-sm transition ${
+                      objectPosition === pos
+                        ? "bg-[#22D3EE]"
+                        : "bg-white/15 hover:bg-white/30"
+                    }`}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
         {recommendedText && (
           <p className="mt-1 text-[11px] text-[var(--platform-text)]/45">{recommendedText}</p>
         )}

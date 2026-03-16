@@ -27,7 +27,7 @@ function asStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string");
 }
 
-type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string; extraLines?: string[] };
+type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string; imageObjectPosition?: string; extraLines?: string[] };
 
 function asCards(value: unknown): ServiceCard[] {
   if (!Array.isArray(value)) return [];
@@ -42,6 +42,7 @@ function asCards(value: unknown): ServiceCard[] {
       description: typeof rec.description === "string" ? rec.description : "",
       iconName: typeof rec.iconName === "string" ? rec.iconName : "",
       imageUrl: typeof rec.imageUrl === "string" ? rec.imageUrl : "",
+      imageObjectPosition: typeof rec.imageObjectPosition === "string" ? rec.imageObjectPosition : "center center",
       extraLines: Array.isArray(rec.extraLines) ? (rec.extraLines as unknown[]).filter((l): l is string => typeof l === "string" && l.trim() !== "") : [],
     });
   }
@@ -615,6 +616,7 @@ export function SectionRenderer({
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
+                  style={{ objectPosition: asString(section.content.imageObjectPosition, "center center") }}
                 />
               </div>
             )}
@@ -674,6 +676,7 @@ export function SectionRenderer({
                           src={card.imageUrl}
                           alt={card.title}
                           className="h-full w-full object-cover"
+                          imgStyle={{ objectPosition: card.imageObjectPosition ?? "center center" }}
                         />
                       </div>
                     )}
@@ -716,6 +719,7 @@ export function SectionRenderer({
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
+                  style={{ objectPosition: asString(section.content.imageObjectPosition, "center center") }}
                 />
               </div>
             )}
@@ -740,6 +744,7 @@ export function SectionRenderer({
                         alt={card.title}
                         className="w-full object-cover"
                         style={{ height: isTall ? "160px" : "120px" }}
+                        imgStyle={{ objectPosition: card.imageObjectPosition ?? "center center" }}
                       />
                     )}
                     <div className={`px-5 ${isTall ? "py-8" : "py-5"}`}>
@@ -804,6 +809,7 @@ export function SectionRenderer({
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
+                  style={{ objectPosition: asString(section.content.imageObjectPosition, "center center") }}
                 />
               </div>
             )}
@@ -854,6 +860,7 @@ export function SectionRenderer({
                           src={card.imageUrl}
                           alt={card.title}
                           className="h-full w-full object-cover"
+                          imgStyle={{ objectPosition: card.imageObjectPosition ?? "center center" }}
                         />
                       </div>
                     )}
@@ -896,6 +903,7 @@ export function SectionRenderer({
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
+                  style={{ objectPosition: asString(section.content.imageObjectPosition, "center center") }}
                 />
               </div>
             )}
@@ -959,6 +967,7 @@ export function SectionRenderer({
                           src={card.imageUrl}
                           alt={card.title}
                           className="h-full w-full object-cover"
+                          imgStyle={{ objectPosition: card.imageObjectPosition ?? "center center" }}
                         />
                       </div>
                     )}
@@ -998,6 +1007,7 @@ export function SectionRenderer({
                   width={1200}
                   height={600}
                   className="aspect-[2/1] h-auto w-full object-cover"
+                  style={{ objectPosition: asString(section.content.imageObjectPosition, "center center") }}
                 />
               </div>
             )}
@@ -1052,6 +1062,7 @@ export function SectionRenderer({
                           src={card.imageUrl}
                           alt={card.title}
                           className="h-full w-full object-cover"
+                          imgStyle={{ objectPosition: card.imageObjectPosition ?? "center center" }}
                         />
                       </div>
                     ) : (

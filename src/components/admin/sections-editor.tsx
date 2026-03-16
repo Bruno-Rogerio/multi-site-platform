@@ -21,7 +21,7 @@ type SectionsEditorProps = { sites: SiteOption[]; defaultSiteId: string | null; 
 type LoadState = "idle" | "loading" | "saving";
 type StatusMessage = { type: "error" | "success"; message: string } | null;
 type SectionSnapshots = Record<string, string>;
-type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string; extraLines?: string[] };
+type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string; imageObjectPosition?: string; extraLines?: string[] };
 
 /* ─── Helpers ────────────────────────────────────────────── */
 
@@ -37,6 +37,7 @@ function asCards(content: Record<string, unknown>): ServiceCard[] {
       description: typeof item?.description === "string" ? item.description : "",
       iconName: typeof item?.iconName === "string" ? item.iconName : "",
       imageUrl: typeof item?.imageUrl === "string" ? item.imageUrl : "",
+      imageObjectPosition: typeof item?.imageObjectPosition === "string" ? item.imageObjectPosition : "center center",
       extraLines: Array.isArray(item?.extraLines) ? (item.extraLines as unknown[]).filter((l): l is string => typeof l === "string") : [],
     }));
   }
@@ -433,6 +434,8 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
           disabled={uploadingSectionId === section.id}
           recommendedText={mediaPresets.hero.recommendedText}
           aspectRatio="16/9"
+          objectPosition={asString(section.content.imageObjectPosition, "center center")}
+          onPositionChange={(pos) => updateContent(section.id, "imageObjectPosition", pos)}
         />
       </div>
     );
@@ -478,6 +481,8 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
           disabled={uploadingSectionId === section.id}
           recommendedText={mediaPresets.services.recommendedText}
           aspectRatio="4/3"
+          objectPosition={asString(section.content.imageObjectPosition, "center center")}
+          onPositionChange={(pos) => updateContent(section.id, "imageObjectPosition", pos)}
         />
 
         <div>
@@ -565,6 +570,8 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
                     onRemove={() => updateCard(index, { imageUrl: "" })}
                     disabled={uploadingSectionId === section.id}
                     aspectRatio="4/3"
+                    objectPosition={card.imageObjectPosition ?? "center center"}
+                    onPositionChange={(pos) => updateCard(index, { imageObjectPosition: pos })}
                   />
                 </div>
               </div>
@@ -641,6 +648,8 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
           disabled={uploadingSectionId === section.id}
           recommendedText={mediaPresets.cta.recommendedText}
           aspectRatio="16/9"
+          objectPosition={asString(section.content.imageObjectPosition, "center center")}
+          onPositionChange={(pos) => updateContent(section.id, "imageObjectPosition", pos)}
         />
       </div>
     );
@@ -679,6 +688,8 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform" }: Sect
           onRemove={() => updateContent(section.id, "imageUrl", "")}
           disabled={uploadingSectionId === section.id}
           aspectRatio="3/4"
+          objectPosition={asString(section.content.imageObjectPosition, "center center")}
+          onPositionChange={(pos) => updateContent(section.id, "imageObjectPosition", pos)}
         />
       </div>
     );
