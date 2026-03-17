@@ -5,23 +5,13 @@ import { motion, type Variants } from "framer-motion";
 import { Monitor, Smartphone } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { PreviewHeader } from "./preview-header";
-import { PreviewHero } from "./preview-hero";
-import { PreviewServices } from "./preview-services";
-import { PreviewCta } from "./preview-cta";
-import { PreviewAbout } from "./preview-about";
-import { PreviewContact } from "./preview-contact";
 import { PreviewFloatingCta } from "./preview-floating-cta";
-import { PreviewTestimonials } from "./preview-testimonials";
-import { PreviewFaq } from "./preview-faq";
-import { PreviewBlog } from "./preview-blog";
-import { PreviewGallery } from "./preview-gallery";
-import { PreviewEvents } from "./preview-events";
-import { getPaletteById, getPaletteStyleVars, getContrastTextColor } from "@/lib/onboarding/palettes";
-import * as LucideIcons from "lucide-react";
+import { SectionRenderer } from "@/components/site/section-renderer";
+import { buildSiteStyles, buttonStyleClasses } from "@/components/site/site-shell";
+import { getPaletteById, getSiteStyleVars, getContrastTextColor } from "@/lib/onboarding/palettes";
+import { wizardToPreviewSite, wizardToPreviewSections } from "./wizard-to-preview-site";
 
 type DeviceMode = "desktop" | "mobile";
-
-function str(v: unknown): string { return String(v ?? ""); }
 
 // Map font families to Google Fonts URLs
 const GOOGLE_FONTS_MAP: Record<string, string> = {
@@ -101,28 +91,28 @@ function PreviewDivider({ style }: { style: string }) {
     return (
       <div className="w-full overflow-hidden" style={{ height: "10px", marginTop: "-1px" }}>
         <svg viewBox="0 0 100 10" preserveAspectRatio="none" className="w-full h-full">
-          <path d="M0,5 C25,0 75,10 100,5 L100,10 L0,10 Z" fill="var(--preview-primary)" opacity="0.06" />
+          <path d="M0,5 C25,0 75,10 100,5 L100,10 L0,10 Z" fill="var(--site-primary)" opacity="0.06" />
         </svg>
       </div>
     );
   }
   if (style === "diagonal") {
     return (
-      <div className="w-full" style={{ height: "8px", background: "var(--preview-primary)", opacity: 0.04, clipPath: "polygon(0 0, 100% 40%, 100% 100%, 0 100%)" }} />
+      <div className="w-full" style={{ height: "8px", background: "var(--site-primary)", opacity: 0.04, clipPath: "polygon(0 0, 100% 40%, 100% 100%, 0 100%)" }} />
     );
   }
   if (style === "curve") {
     return (
       <div className="w-full overflow-hidden" style={{ height: "10px", marginTop: "-1px" }}>
         <svg viewBox="0 0 100 10" preserveAspectRatio="none" className="w-full h-full">
-          <ellipse cx="50" cy="0" rx="60" ry="10" fill="var(--preview-primary)" opacity="0.05" />
+          <ellipse cx="50" cy="0" rx="60" ry="10" fill="var(--site-primary)" opacity="0.05" />
         </svg>
       </div>
     );
   }
   if (style === "line") {
     return (
-      <div className="mx-3 h-px" style={{ background: "linear-gradient(to right, transparent, var(--preview-primary)30, transparent)" }} />
+      <div className="mx-3 h-px" style={{ background: "linear-gradient(to right, transparent, color-mix(in srgb, var(--site-primary) 30%, transparent), transparent)" }} />
     );
   }
   return null;
@@ -131,23 +121,7 @@ function PreviewDivider({ style }: { style: string }) {
 export function LivePreviewPanel() {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const { state } = useWizard();
-  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content } = state;
-  const hasTestimonials = (() => {
-    // Check premium array format
-    if (Array.isArray(content.testimonials)) {
-      return (content.testimonials as Array<Record<string, unknown>>).some(
-        (t) => String(t?.text ?? "").trim() && String(t?.name ?? "").trim()
-      );
-    }
-    // Check old JSON format
-    try {
-      const parsed = JSON.parse(str(content.testimonialsJson) || "[]");
-      return Array.isArray(parsed) && parsed.some((t) => t?.quote?.trim() && t?.author?.trim());
-    } catch {
-      return false;
-    }
-  })();
-
+  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle } = state;
 
   const palette = paletteId ? getPaletteById(paletteId) : null;
   const { container: containerVariants, item: itemVariants } = getMotionVariants(motionStyle);
@@ -169,50 +143,52 @@ export function LivePreviewPanel() {
     document.head.appendChild(link);
   }, [fontFamily]);
 
+  // Build preview site + sections from wizard state
+  const previewSite = useMemo(() => wizardToPreviewSite(state), [state]);
+  const previewSections = useMemo(() => wizardToPreviewSections(state), [state]);
+
+  // Button style class
+  const buttonStyleClass = buttonStyleClasses[state.buttonStyle ?? "rounded"];
+
+  // CSS variables for the preview container
+  // Combines --site-* vars (for SectionRenderer) and --preview-* vars (for PreviewHeader compat)
   const previewStyles = useMemo(() => {
-    // Color vars — use custom colors when paletteId is "custom", otherwise use palette
-    let colorVars: Record<string, string>;
     let primaryHex: string;
+    let bgHex: string;
+    let textHex: string;
+    let accentHex: string;
+
     if (paletteId === "custom") {
       primaryHex = customColors.primary;
-      colorVars = {
-        "--preview-bg": customColors.background,
-        "--preview-text": customColors.text,
-        "--preview-primary": primaryHex,
-        "--preview-accent": customColors.accent,
-        "--preview-muted": `${customColors.text}99`,
-      };
+      bgHex = customColors.background;
+      textHex = customColors.text;
+      accentHex = customColors.accent;
     } else if (palette) {
       primaryHex = palette.primary;
-      colorVars = {
-        "--preview-bg": palette.background,
-        "--preview-text": palette.text,
-        "--preview-primary": primaryHex,
-        "--preview-accent": palette.accent,
-        "--preview-muted": `${palette.text}99`,
-      };
+      bgHex = palette.background;
+      textHex = palette.text;
+      accentHex = palette.accent;
     } else {
       primaryHex = "#3B82F6";
-      colorVars = {
-        "--preview-bg": "#0B1020",
-        "--preview-text": "#EAF0FF",
-        "--preview-primary": primaryHex,
-        "--preview-accent": "#22D3EE",
-        "--preview-muted": "rgba(234, 240, 255, 0.6)",
-      };
+      bgHex = "#0B1020";
+      textHex = "#EAF0FF";
+      accentHex = "#22D3EE";
     }
-    // Auto-contrast text for elements with primary as background (buttons, solid header)
-    colorVars["--preview-button-text"] = getContrastTextColor(primaryHex);
 
-    // Style vars derived from palette
-    const styleVars = palette ? getPaletteStyleVars(palette) : {
-      "--preview-radius": "12px",
-      "--preview-spacing": "16px",
-      "--preview-shadow": "none",
+    const siteStyles = buildSiteStyles(previewSite.themeSettings);
+
+    // --preview-* aliases so PreviewHeader still works unchanged
+    const previewAliases = {
+      "--preview-bg": bgHex,
+      "--preview-text": textHex,
+      "--preview-primary": primaryHex,
+      "--preview-accent": accentHex,
+      "--preview-muted": `${textHex}99`,
+      "--preview-button-text": getContrastTextColor(primaryHex),
     };
 
-    return { ...colorVars, ...styleVars } as React.CSSProperties;
-  }, [palette, paletteId, customColors]);
+    return { ...siteStyles, ...previewAliases } as React.CSSProperties;
+  }, [palette, paletteId, customColors, previewSite.themeSettings]);
 
   return (
     <div className="flex flex-col h-[600px]">
@@ -278,117 +254,40 @@ export function LivePreviewPanel() {
             </div>
           )}
 
-          {/* Preview content — unified motion.div path (no-op variants for motion-none) */}
+          {/* Preview content */}
           <div
             style={previewStyles}
             className="h-[calc(100%-32px)] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10"
           >
             <motion.div
               className="min-h-full flex flex-col"
-              style={{ backgroundColor: "var(--preview-bg)" }}
+              style={{ backgroundColor: "var(--site-background)" }}
               initial="hidden"
               animate="visible"
               variants={containerVariants}
               key={motionStyle}
             >
+              {/* Header — kept as dedicated preview component (simpler, optimised for small canvas) */}
               <motion.div variants={itemVariants}>
                 <PreviewHeader deviceMode={deviceMode} />
               </motion.div>
-              {enabledSections.map((sectionId) => {
-                switch (sectionId) {
-                  case "hero":
-                    return (
-                      <motion.div key="hero" variants={itemVariants}>
-                        <PreviewHero deviceMode={deviceMode} />
-                      </motion.div>
-                    );
-                  case "services":
-                    return (
-                      <Fragment key="services">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewServices deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  case "about":
-                    return (
-                      <Fragment key="about">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewAbout deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  case "testimonials":
-                    return hasTestimonials ? (
-                      <Fragment key="testimonials">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewTestimonials deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    ) : null;
-                  case "cta":
-                    return (
-                      <Fragment key="cta">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewCta deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  case "contact":
-                    return (
-                      <Fragment key="contact">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewContact deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  case "faq":
-                    return (
-                      <Fragment key="faq">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewFaq deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  case "blog":
-                    return (
-                      <Fragment key="blog">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewBlog deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  case "gallery":
-                    return (
-                      <Fragment key="gallery">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewGallery deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  case "events":
-                    return (
-                      <Fragment key="events">
-                        <PreviewDivider style={dividerStyle} />
-                        <motion.div variants={itemVariants}>
-                          <PreviewEvents deviceMode={deviceMode} />
-                        </motion.div>
-                      </Fragment>
-                    );
-                  default:
-                    return null;
-                }
-              })}
+
+              {/* Sections — rendered by real SectionRenderer for full fidelity */}
+              {previewSections.map((section) => (
+                <Fragment key={section.id}>
+                  <PreviewDivider style={dividerStyle} />
+                  <motion.div variants={itemVariants}>
+                    <SectionRenderer
+                      section={section}
+                      site={previewSite}
+                      buttonStyleClassName={buttonStyleClass}
+                      maxEventsPreview={3}
+                    />
+                  </motion.div>
+                </Fragment>
+              ))}
+
               <div className="flex-1" />
-              {/* Floating contact buttons */}
               {floatingCtaEnabled && <PreviewFloatingCta />}
             </motion.div>
           </div>
