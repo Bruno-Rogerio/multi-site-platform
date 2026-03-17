@@ -802,24 +802,6 @@ function ContactContentEditor() {
     dispatch({ type: "UPDATE_CONTENT", key, value });
   }
 
-  // Pre-fill social fields from ctaConfig when this tab first opens
-  useEffect(() => {
-    const mappings = [
-      { ctaId: "whatsapp",  contentKey: "social_whatsapp",  clean: (v: string) => v.replace(/\D/g, "") },
-      { ctaId: "instagram", contentKey: "social_instagram",  clean: (v: string) => v.replace(/^@/, "") },
-      { ctaId: "email",     contentKey: "social_email",      clean: (v: string) => v },
-      { ctaId: "linkedin",  contentKey: "social_linkedin",   clean: (v: string) => v },
-      { ctaId: "facebook",  contentKey: "social_facebook",   clean: (v: string) => v },
-    ];
-    for (const { ctaId, contentKey, clean } of mappings) {
-      const existingVal = (content as Record<string, unknown>)[contentKey];
-      const ctaVal = (ctaConfig as Record<string, { label: string; url: string } | undefined>)[ctaId]?.url;
-      if (!existingVal && ctaVal) {
-        set(contentKey, clean(ctaVal));
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="space-y-4">
@@ -960,8 +942,28 @@ function SeoContentEditor() {
 /* ─── Main step ─── */
 
 export function ContentEditorStep() {
-  const { state } = useWizard();
-  const { content, enabledSections } = state;
+  const { state, dispatch } = useWizard();
+  const { content, enabledSections, ctaConfig } = state;
+
+  // Pre-fill social_* fields from ctaConfig on first mount so LinkDestinationSelect
+  // shows contact channels immediately (before the Contact tab is ever opened)
+  useEffect(() => {
+    const mappings = [
+      { ctaId: "whatsapp",  contentKey: "social_whatsapp",  clean: (v: string) => v.replace(/\D/g, "") },
+      { ctaId: "instagram", contentKey: "social_instagram",  clean: (v: string) => v.replace(/^@/, "") },
+      { ctaId: "email",     contentKey: "social_email",      clean: (v: string) => v },
+      { ctaId: "linkedin",  contentKey: "social_linkedin",   clean: (v: string) => v },
+      { ctaId: "facebook",  contentKey: "social_facebook",   clean: (v: string) => v },
+    ];
+    for (const { ctaId, contentKey, clean } of mappings) {
+      const existingVal = (content as Record<string, unknown>)[contentKey];
+      const ctaVal = (ctaConfig as Record<string, { label: string; url: string } | undefined>)[ctaId]?.url;
+      if (!existingVal && ctaVal) {
+        dispatch({ type: "UPDATE_CONTENT", key: contentKey, value: clean(ctaVal) });
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Build active tabs dynamically from enabledSections
   const activeTabs = SECTION_TAB_ORDER.filter(id =>
