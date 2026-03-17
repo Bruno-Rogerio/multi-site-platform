@@ -134,7 +134,12 @@ export function SiteShell({ site, children }: SiteShellProps) {
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
             <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
               {logoImg}
-              <p className="text-lg font-bold">{site.name}</p>
+              <div>
+                <p className="text-lg font-bold leading-tight">{site.name}</p>
+                {site.themeSettings.slogan && (
+                  <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                )}
+              </div>
             </a>
             <div className="flex items-center gap-3">
               <nav className="hidden items-center gap-5 md:flex">
@@ -159,7 +164,12 @@ export function SiteShell({ site, children }: SiteShellProps) {
             <div className="flex w-full items-center justify-between md:justify-center md:gap-3">
               <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
                 {logoImg}
-                <p className="text-lg font-bold">{site.name}</p>
+                <div>
+                  <p className="text-lg font-bold leading-tight">{site.name}</p>
+                  {site.themeSettings.slogan && (
+                    <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                  )}
+                </div>
               </a>
               <MobileNav links={navLinks} />
             </div>
@@ -181,7 +191,12 @@ export function SiteShell({ site, children }: SiteShellProps) {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
           <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
             {logoImg}
-            <p className="text-lg font-bold">{site.name}</p>
+            <div>
+              <p className="text-lg font-bold leading-tight">{site.name}</p>
+              {site.themeSettings.slogan && (
+                <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+              )}
+            </div>
           </a>
           <div className="flex items-center gap-3">
             {desktopNav}

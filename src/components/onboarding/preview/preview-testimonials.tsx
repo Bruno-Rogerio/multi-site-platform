@@ -34,10 +34,22 @@ const cardBorder = "1px solid color-mix(in srgb, var(--preview-primary) 25%, tra
 
 export function PreviewTestimonials({ deviceMode }: PreviewTestimonialsProps) {
   const { state } = useWizard();
-  const { content, fontFamily } = state;
+  const { content, fontFamily, testimonialsVariant } = state;
 
-  const testimonials = parseTestimonials(str(content.testimonialsJson));
-  const variant = str(content.testimonialsVariant) || "grid";
+  // Support both formats: testimonialsJson (old basic format) and testimonials array (premium)
+  function getTestimonials(): Testimonial[] {
+    // Try new premium array format first
+    if (Array.isArray(content.testimonials)) {
+      const items = (content.testimonials as Array<Record<string, unknown>>)
+        .map(item => ({ quote: String(item.text ?? ""), author: String(item.name ?? "") }))
+        .filter(item => item.quote.trim() && item.author.trim());
+      if (items.length > 0) return items;
+    }
+    // Fall back to JSON string format
+    return parseTestimonials(str(content.testimonialsJson));
+  }
+  const testimonials = getTestimonials();
+  const variant = testimonialsVariant || "grid";
 
   // Carousel state — always declared (hooks can't be conditional)
   const [current, setCurrent] = useState(0);

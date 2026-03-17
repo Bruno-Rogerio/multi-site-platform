@@ -19,30 +19,37 @@ type BlogSectionProps = {
   variant?: string;
 };
 
-function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
+function BlogDrawer({ post, onClose }: { post: BlogPost; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 py-8" onClick={onClose}>
+    <>
+      {/* Backdrop */}
       <div
-        className="relative w-full max-w-2xl rounded-2xl border shadow-2xl"
-        style={{ backgroundColor: "var(--site-bg, #fff)", borderColor: "var(--site-border)" }}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      {/* Drawer */}
+      <div
+        className="fixed inset-y-0 right-0 z-50 flex w-full max-w-lg flex-col overflow-y-auto shadow-2xl"
+        style={{ backgroundColor: "var(--site-bg, #fff)", borderLeft: "1px solid var(--site-border)" }}
       >
-        <button
-          onClick={onClose}
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full transition hover:opacity-70"
-          style={{ backgroundColor: "color-mix(in srgb, var(--site-text) 10%, transparent)", color: "var(--site-text)" }}
-        >
-          <X size={16} />
-        </button>
+        <div className="flex items-center justify-between border-b p-4" style={{ borderColor: "var(--site-border)" }}>
+          <h2 className="text-base font-bold leading-tight pr-4" style={{ color: "var(--site-text)" }}>{post.title}</h2>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition hover:opacity-70"
+            style={{ backgroundColor: "color-mix(in srgb, var(--site-text) 10%, transparent)", color: "var(--site-text)" }}
+          >
+            <X size={16} />
+          </button>
+        </div>
         {post.imageUrl && (
-          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-t-2xl">
+          <div className="relative aspect-[16/9] w-full overflow-hidden">
             <Image src={post.imageUrl} alt={post.title} fill className="object-cover" />
           </div>
         )}
-        <div className="p-6">
-          <h2 className="text-2xl font-black leading-tight" style={{ color: "var(--site-text)" }}>{post.title}</h2>
+        <div className="flex-1 p-6">
           {post.excerpt && (
-            <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--site-text)", opacity: 0.7 }}>{post.excerpt}</p>
+            <p className="text-base leading-relaxed font-medium" style={{ color: "var(--site-text)", opacity: 0.75 }}>{post.excerpt}</p>
           )}
           {post.body && (
             <div
@@ -53,7 +60,7 @@ function BlogModal({ post, onClose }: { post: BlogPost; onClose: () => void }) {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -143,7 +150,7 @@ export function BlogSection({ title = "Blog", subtitle, posts = [], variant = "g
             ))}
           </div>
         </div>
-        {openPost && <BlogModal post={openPost} onClose={() => setOpenPost(null)} />}
+        {openPost && <BlogDrawer post={openPost} onClose={() => setOpenPost(null)} />}
       </section>
     );
   }
@@ -167,7 +174,7 @@ export function BlogSection({ title = "Blog", subtitle, posts = [], variant = "g
             )}
           </div>
         </div>
-        {openPost && <BlogModal post={openPost} onClose={() => setOpenPost(null)} />}
+        {openPost && <BlogDrawer post={openPost} onClose={() => setOpenPost(null)} />}
       </section>
     );
   }
@@ -184,7 +191,7 @@ export function BlogSection({ title = "Blog", subtitle, posts = [], variant = "g
           {posts.map((post, i) => <PostCard key={i} post={post} />)}
         </div>
       </div>
-      {openPost && <BlogModal post={openPost} onClose={() => setOpenPost(null)} />}
+      {openPost && <BlogDrawer post={openPost} onClose={() => setOpenPost(null)} />}
     </section>
   );
 }

@@ -12,6 +12,10 @@ import { PreviewAbout } from "./preview-about";
 import { PreviewContact } from "./preview-contact";
 import { PreviewFloatingCta } from "./preview-floating-cta";
 import { PreviewTestimonials } from "./preview-testimonials";
+import { PreviewFaq } from "./preview-faq";
+import { PreviewBlog } from "./preview-blog";
+import { PreviewGallery } from "./preview-gallery";
+import { PreviewEvents } from "./preview-events";
 import { getPaletteById, getPaletteStyleVars, getContrastTextColor } from "@/lib/onboarding/palettes";
 import * as LucideIcons from "lucide-react";
 
@@ -129,6 +133,13 @@ export function LivePreviewPanel() {
   const { state } = useWizard();
   const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle, dividerStyle, enabledSections, content } = state;
   const hasTestimonials = (() => {
+    // Check premium array format
+    if (Array.isArray(content.testimonials)) {
+      return (content.testimonials as Array<Record<string, unknown>>).some(
+        (t) => String(t?.text ?? "").trim() && String(t?.name ?? "").trim()
+      );
+    }
+    // Check old JSON format
     try {
       const parsed = JSON.parse(str(content.testimonialsJson) || "[]");
       return Array.isArray(parsed) && parsed.some((t) => t?.quote?.trim() && t?.author?.trim());
@@ -333,6 +344,42 @@ export function LivePreviewPanel() {
                         <PreviewDivider style={dividerStyle} />
                         <motion.div variants={itemVariants}>
                           <PreviewContact deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  case "faq":
+                    return (
+                      <Fragment key="faq">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewFaq deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  case "blog":
+                    return (
+                      <Fragment key="blog">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewBlog deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  case "gallery":
+                    return (
+                      <Fragment key="gallery">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewGallery deviceMode={deviceMode} />
+                        </motion.div>
+                      </Fragment>
+                    );
+                  case "events":
+                    return (
+                      <Fragment key="events">
+                        <PreviewDivider style={dividerStyle} />
+                        <motion.div variants={itemVariants}>
+                          <PreviewEvents deviceMode={deviceMode} />
                         </motion.div>
                       </Fragment>
                     );

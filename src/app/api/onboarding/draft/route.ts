@@ -402,6 +402,14 @@ export async function POST(request: Request) {
     } catch { /* ignore parse error */ }
   }
 
+  // Fallback: premium wizard saves as content.testimonials array (name/role/text/stars)
+  if (!testimonials && Array.isArray(content.testimonials)) {
+    testimonials = (content.testimonials as Array<Record<string, unknown>>)
+      .map(item => ({ quote: String(item.text ?? ""), author: String(item.name ?? "") }))
+      .filter(item => item.quote.trim().length > 0 && item.author.trim().length > 0);
+    if (testimonials.length === 0) testimonials = null;
+  }
+
   // Parse contact selected links (max 2 channels user chose for contact section)
   let contactSelectedLinks: string[] | null = null;
   if (content.contactSelectedLinks) {
@@ -478,6 +486,7 @@ export async function POST(request: Request) {
   (themeSettings as Record<string, unknown>).seoTitle = content.seoTitle?.trim() || "";
   (themeSettings as Record<string, unknown>).seoDescription = content.seoDescription?.trim() || "";
   (themeSettings as Record<string, unknown>).footerText = content.footerText?.trim() || "";
+  (themeSettings as Record<string, unknown>).slogan = content.slogan?.trim() || "";
   (themeSettings as Record<string, unknown>).whatsappUrl = whatsappUrl;
 
   // Save all configured social links so admin panel can reference them

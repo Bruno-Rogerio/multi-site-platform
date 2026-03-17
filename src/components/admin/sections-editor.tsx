@@ -405,6 +405,32 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
   function renderHeroFields(section: Section) {
     return (
       <div className="mt-4 space-y-4">
+        {/* Layout */}
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {[
+              { id: "centered", label: "Centralizado" },
+              { id: "minimal", label: "Minimal" },
+              { id: "split", label: "Split" },
+              { id: "card", label: "Card" },
+              { id: "centered-gradient", label: "Gradiente" },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  (section.variant ?? "centered") === id
+                    ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div>
             <label className={LABEL_CLS}>Eyebrow</label>
@@ -495,6 +521,32 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
 
     return (
       <div className="mt-4 space-y-4">
+        {/* Layout */}
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {[
+              { id: "default", label: "Grid" },
+              { id: "minimal-list", label: "Lista" },
+              { id: "masonry", label: "Masonry" },
+              { id: "columns", label: "Colunas" },
+              { id: "steps", label: "Passos" },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  (section.variant ?? "default") === id
+                    ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div>
           <label className={LABEL_CLS}>Título da seção</label>
           <input
@@ -631,6 +683,32 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
   function renderCtaFields(section: Section) {
     return (
       <div className="mt-4 space-y-4">
+        {/* Layout */}
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {[
+              { id: "banner", label: "Banner" },
+              { id: "centered", label: "Centralizado" },
+              { id: "banner-gradient", label: "Banner Gradiente" },
+              { id: "centered-gradient", label: "Centr. Gradiente" },
+              { id: "double", label: "Duplo" },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  (section.variant ?? "banner") === id
+                    ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div>
             <label className={LABEL_CLS}>Texto do botão</label>
@@ -710,6 +788,31 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
           objectPosition={asString(section.content.imageObjectPosition, "center center")}
           onPositionChange={(pos) => updateContent(section.id, "imageObjectPosition", pos)}
         />
+
+        {section.variant === "double" && (
+          <>
+            <div>
+              <label className={LABEL_CLS}>Texto do segundo botão</label>
+              <input
+                value={asString(section.content.secondaryLabel)}
+                placeholder="Ex: Saiba mais"
+                onChange={(e) => updateContent(section.id, "secondaryLabel", e.target.value)}
+                className={INPUT_CLS}
+              />
+            </div>
+            <div>
+              <label className={LABEL_CLS}>Link do segundo botão</label>
+              <div className="mt-1">
+                <AdminLinkSelect
+                  value={asString(section.content.secondaryHref)}
+                  onChange={(url) => updateContent(section.id, "secondaryHref", url)}
+                  placeholder="Escolha o destino"
+                  defaultSocials={defaultSocials}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     );
   }
@@ -943,6 +1046,30 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
 
     return (
       <div className="mt-4 space-y-4">
+        {/* Layout */}
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {[
+              { id: "accordion", label: "Acordeão" },
+              { id: "numbered", label: "Numerado" },
+              { id: "two-col", label: "Duas colunas" },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  (section.variant ?? "accordion") === id
+                    ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className={LABEL_CLS}>Título</label>
@@ -1001,18 +1128,18 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
   }
 
   function renderBlogFields(section: Section) {
-    const posts: Array<{ title: string; excerpt: string; imageUrl?: string; link?: string }> =
+    const posts: Array<{ title: string; excerpt: string; imageUrl?: string; link?: string; body?: string }> =
       Array.isArray(section.content.posts)
-        ? (section.content.posts as Array<{ title: string; excerpt: string; imageUrl?: string; link?: string }>)
+        ? (section.content.posts as Array<{ title: string; excerpt: string; imageUrl?: string; link?: string; body?: string }>)
         : [];
 
-    function updatePost(index: number, patch: Partial<{ title: string; excerpt: string; imageUrl: string; link: string }>) {
+    function updatePost(index: number, patch: Partial<{ title: string; excerpt: string; imageUrl: string; link: string; body: string }>) {
       const updated = posts.map((p, i) => (i === index ? { ...p, ...patch } : p));
       updateContent(section.id, "posts", updated);
     }
 
     function addPost() {
-      updateContent(section.id, "posts", [...posts, { title: "", excerpt: "", imageUrl: "", link: "" }]);
+      updateContent(section.id, "posts", [...posts, { title: "", excerpt: "", imageUrl: "", link: "", body: "" }]);
     }
 
     function removePost(index: number) {
@@ -1021,6 +1148,30 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
 
     return (
       <div className="mt-4 space-y-4">
+        {/* Layout */}
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {[
+              { id: "grid", label: "Grade" },
+              { id: "list", label: "Lista" },
+              { id: "magazine", label: "Magazine" },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  (section.variant ?? "grid") === id
+                    ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className={LABEL_CLS}>Título</label>
@@ -1044,6 +1195,16 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
               </div>
               <input value={post.title} placeholder="Título do artigo" onChange={(e) => updatePost(i, { title: e.target.value })} className={INPUT_CLS} />
               <textarea value={post.excerpt} placeholder="Resumo do artigo..." rows={2} onChange={(e) => updatePost(i, { excerpt: e.target.value })} className={INPUT_CLS + " resize-none"} />
+              <div>
+                <label className={LABEL_CLS}>Conteúdo completo (opcional — abre em painel ao clicar)</label>
+                <textarea
+                  value={(post as Record<string, unknown>).body as string ?? ""}
+                  placeholder="Conteúdo completo do artigo..."
+                  rows={3}
+                  onChange={(e) => updatePost(i, { body: e.target.value })}
+                  className={INPUT_CLS + " resize-none"}
+                />
+              </div>
               <input value={post.link ?? ""} placeholder="Link (opcional)" onChange={(e) => updatePost(i, { link: e.target.value })} className={INPUT_CLS} />
               <AdminImageUpload
                 label="Imagem de capa"
@@ -1175,6 +1336,30 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
 
     return (
       <div className="mt-4 space-y-4">
+        {/* Layout */}
+        <div>
+          <label className={LABEL_CLS}>Layout</label>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {[
+              { id: "timeline", label: "Timeline" },
+              { id: "cards", label: "Cards" },
+              { id: "list", label: "Lista" },
+            ].map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => updateSection(section.id, (cur) => ({ ...cur, variant: id }))}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  (section.variant ?? "timeline") === id
+                    ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                    : "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <label className={LABEL_CLS}>Título</label>

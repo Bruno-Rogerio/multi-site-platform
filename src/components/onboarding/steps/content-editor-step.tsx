@@ -107,6 +107,44 @@ function Textarea({
   );
 }
 
+/* ─── Variant bar ─── */
+
+type VariantOption = { id: string; name: string };
+
+function VariantBar({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: VariantOption[];
+  value: string;
+  onChange: (id: string) => void;
+}) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5">
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--platform-text)]/40">{label}</p>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map(opt => (
+          <button
+            key={opt.id}
+            type="button"
+            onClick={() => onChange(opt.id)}
+            className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition ${
+              value === opt.id
+                ? "border-[#22D3EE] bg-[#22D3EE]/10 text-[#22D3EE]"
+                : "border-white/10 text-[var(--platform-text)]/50 hover:border-white/20 hover:text-[var(--platform-text)]"
+            }`}
+          >
+            {opt.name}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Focal point picker ─── */
 
 function parsePos(val: string): { x: number; y: number } {
@@ -470,6 +508,12 @@ function TestimonialsContentEditor() {
 
   return (
     <div className="space-y-4">
+      <VariantBar
+        label="Layout"
+        options={[{ id: "grid", name: "Grade" }, { id: "carousel", name: "Carrossel" }, { id: "quotes", name: "Citações" }]}
+        value={state.testimonialsVariant || "grid"}
+        onChange={id => dispatch({ type: "SET_TESTIMONIALS_VARIANT", variant: id })}
+      />
       <div className="flex items-center justify-between">
         <p className="text-xs font-medium text-[var(--platform-text)]/60">
           {testimonials.length} depoimento{testimonials.length !== 1 ? "s" : ""}
@@ -554,6 +598,12 @@ function BlogContentEditor() {
 
   return (
     <div className="space-y-4">
+      <VariantBar
+        label="Layout"
+        options={[{ id: "grid", name: "Grade" }, { id: "list", name: "Lista" }, { id: "magazine", name: "Magazine" }]}
+        value={state.blogVariant || "grid"}
+        onChange={id => dispatch({ type: "SET_BLOG_VARIANT", variant: id })}
+      />
       <Input label="Título da seção" value={String(content.blogTitle ?? "Blog")} onChange={setTitle} placeholder="Ex: Artigos e novidades" />
 
       <div className="border-t border-white/10 pt-4">
@@ -627,6 +677,12 @@ function GalleryContentEditor() {
 
   return (
     <div className="space-y-4">
+      <VariantBar
+        label="Layout"
+        options={[{ id: "grid", name: "Grade" }, { id: "masonry", name: "Masonry" }, { id: "carousel", name: "Carrossel" }]}
+        value={state.galleryVariant || "grid"}
+        onChange={id => dispatch({ type: "SET_GALLERY_VARIANT", variant: id })}
+      />
       <Input label="Título da seção" value={String(content.galleryTitle ?? "Galeria")} onChange={setTitle} placeholder="Ex: Meu portfólio" />
 
       <div className="border-t border-white/10 pt-4">
@@ -683,6 +739,12 @@ function FaqContentEditor() {
 
   return (
     <div className="space-y-4">
+      <VariantBar
+        label="Layout"
+        options={[{ id: "accordion", name: "Acordeão" }, { id: "numbered", name: "Numerado" }, { id: "two-col", name: "Duas colunas" }]}
+        value={state.faqVariant || "accordion"}
+        onChange={id => dispatch({ type: "SET_FAQ_VARIANT", variant: id })}
+      />
       <Input label="Título da seção" value={String(content.faqTitle ?? "Perguntas frequentes")} onChange={setTitle} placeholder="Ex: Dúvidas comuns" />
 
       <div className="border-t border-white/10 pt-4">
@@ -739,6 +801,12 @@ function EventsContentEditor() {
 
   return (
     <div className="space-y-4">
+      <VariantBar
+        label="Layout"
+        options={[{ id: "timeline", name: "Timeline" }, { id: "cards", name: "Cards" }, { id: "list", name: "Lista" }]}
+        value={state.eventsVariant || "timeline"}
+        onChange={id => dispatch({ type: "SET_EVENTS_VARIANT", variant: id })}
+      />
       <Input label="Título da seção" value={String(content.eventsTitle ?? "Agenda")} onChange={setTitle} placeholder="Ex: Próximos eventos" />
 
       <div className="border-t border-white/10 pt-4">
@@ -789,6 +857,12 @@ function CtaContentEditor() {
 
   return (
     <div className="space-y-4">
+      <VariantBar
+        label="Layout do CTA"
+        options={[{ id: "banner", name: "Banner" }, { id: "centered", name: "Centralizado" }, { id: "banner-gradient", name: "Banner Gradiente" }, { id: "centered-gradient", name: "Centr. Gradiente" }, { id: "double", name: "Duplo" }]}
+        value={ctaVariant || "banner"}
+        onChange={id => dispatch({ type: "SET_CTA_VARIANT", variant: id })}
+      />
       <div>
         <label className="text-xs font-medium text-[var(--platform-text)]/60">Título</label>
         <RichTextEditor

@@ -29,6 +29,7 @@ export type ThemeSettings = {
   headerStyle?: "blur" | "solid" | "minimal";
   dividerStyle?: "wave" | "diagonal" | "curve" | "line" | "none";
   motionStyle?: string;
+  slogan?: string;
   seoTitle?: string;
   seoDescription?: string;
   footerText?: string;
