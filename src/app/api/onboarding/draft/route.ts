@@ -369,7 +369,7 @@ export async function POST(request: Request) {
   const whatsappUrl = socialWhatsapp ? `https://wa.me/${socialWhatsapp}` : "";
 
   // Parse service cards if sent as JSON
-  type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string; extraLines?: string[] };
+  type ServiceCard = { title: string; description: string; iconName: string; imageUrl?: string; imageObjectPosition?: string; extraLines?: string[] };
   let serviceCards: ServiceCard[] | null = null;
   if (content.serviceCardsJson) {
     try {
@@ -426,6 +426,26 @@ export async function POST(request: Request) {
   }
   if (content.social_facebook?.trim()) {
     socialLinks.push({ type: "facebook", url: `https://facebook.com/${content.social_facebook.trim()}`, label: "Facebook", icon: "Facebook" });
+  }
+
+  // Supplement social links from ctaConfig (builder-premium flow: contacts set in section-canvas, not filled in contact tab)
+  const ctaToSocial: Record<string, { label: string; icon: string; buildUrl: (v: string) => string }> = {
+    whatsapp:  { label: "WhatsApp", icon: "MessageCircle", buildUrl: v => `https://wa.me/${v.replace(/\D/g, "")}` },
+    instagram: { label: "Instagram", icon: "Instagram",   buildUrl: v => `https://instagram.com/${v.replace(/^@/, "")}` },
+    email:     { label: "E-mail",    icon: "Mail",         buildUrl: v => `mailto:${v}` },
+    linkedin:  { label: "LinkedIn",  icon: "Linkedin",     buildUrl: v => `https://linkedin.com/${v}` },
+    facebook:  { label: "Facebook",  icon: "Facebook",     buildUrl: v => `https://facebook.com/${v}` },
+  };
+  for (const [ctaId, config] of Object.entries(ctaConfig)) {
+    const mapping = ctaToSocial[ctaId];
+    if (!mapping || !config?.url?.trim()) continue;
+    const alreadyHas = socialLinks.some(l => l.type === ctaId);
+    if (!alreadyHas) {
+      const cleanVal = ctaId === "whatsapp" ? config.url.trim().replace(/\D/g, "") : config.url.trim().replace(/^@/, "");
+      if (cleanVal) {
+        socialLinks.push({ type: ctaId, url: mapping.buildUrl(config.url.trim()), label: mapping.label, icon: mapping.icon });
+      }
+    }
   }
 
   // Resolve CTA button link from user's channel config
@@ -496,6 +516,7 @@ export async function POST(request: Request) {
         ctaLabel: heroCtaLabel,
         ctaHref,
         imageUrl: heroImageUrl,
+        imageObjectPosition: content.heroImageObjectPosition?.trim() || "50% 50%",
       },
     },
     {
@@ -511,7 +532,7 @@ export async function POST(request: Request) {
           ? serviceCards.map((c) => c.title).filter(Boolean)
           : toItems(content.servicesItems?.trim() || payload.businessHighlights || ""),
         cards: serviceCards
-          ? serviceCards.map((c) => ({ title: c.title, description: c.description || "", iconName: c.iconName || "", imageUrl: c.imageUrl || "", extraLines: c.extraLines ?? [] })).filter((c) => c.title)
+          ? serviceCards.map((c) => ({ title: c.title, description: c.description || "", iconName: c.iconName || "", imageUrl: c.imageUrl || "", imageObjectPosition: c.imageObjectPosition || "50% 50%", extraLines: c.extraLines ?? [] })).filter((c) => c.title)
           : toItems(content.servicesItems?.trim() || payload.businessHighlights || "").map((t) => ({ title: t, description: "", iconName: "", imageUrl: "" })),
       },
     },
@@ -540,6 +561,7 @@ export async function POST(request: Request) {
           content.aboutBody?.trim() ||
           `${businessName} — ${segment}${city ? ` em ${city}` : ""}. Atendimento personalizado com foco em resultado e acolhimento.`,
         imageUrl: content.aboutImage?.trim() || "",
+        imageObjectPosition: content.aboutImageObjectPosition?.trim() || "50% 50%",
       },
     },
     ...(testimonials && testimonials.length > 0

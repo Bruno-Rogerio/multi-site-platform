@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { Mail, Building2, Globe, ChevronRight, Check, X, Loader2 } from "lucide-react";
+import { Mail, Building2, Globe, ChevronRight, Check, X, Loader2, LogIn } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { validateEmail } from "@/lib/onboarding/validation";
 import { validateSubdomain } from "@/lib/onboarding/validation";
 import { BUSINESS_TYPES, getTemplateForBusinessType, getDefaultContentForBusinessType } from "@/lib/onboarding/business-types";
 
 type SubdomainStatus = "idle" | "checking" | "available" | "taken" | "invalid";
+type EmailAccountStatus = "idle" | "free" | "draft" | "active";
 
 function useSubdomainCheck(subdomain: string) {
   const [status, setStatus] = useState<SubdomainStatus>("idle");
@@ -62,6 +63,34 @@ function useSubdomainCheck(subdomain: string) {
   return { status, message };
 }
 
+function useEmailAccountCheck(email: string, isEmailValid: boolean) {
+  const [status, setStatus] = useState<EmailAccountStatus>("idle");
+  const lastChecked = useRef("");
+
+  useEffect(() => {
+    if (!isEmailValid || !email) {
+      setStatus("idle");
+      return;
+    }
+    if (email === lastChecked.current) return;
+
+    const timeout = setTimeout(async () => {
+      lastChecked.current = email;
+      try {
+        const res = await fetch(`/api/onboarding/check-email?email=${encodeURIComponent(email)}`);
+        const data = await res.json();
+        setStatus(data.status ?? "free");
+      } catch {
+        setStatus("free");
+      }
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [email, isEmailValid]);
+
+  return status;
+}
+
 export function LeadCaptureStep() {
   const { state, dispatch } = useWizard();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -75,6 +104,7 @@ export function LeadCaptureStep() {
   const { status: subdomainStatus, message: subdomainMessage } = useSubdomainCheck(subdomain);
 
   const emailValidation = email ? validateEmail(email) : { valid: false };
+  const emailAccountStatus = useEmailAccountCheck(email, emailValidation.valid);
 
   const canSubmit =
     emailValidation.valid &&
@@ -172,6 +202,44 @@ export function LeadCaptureStep() {
           />
           {email && !emailValidation.valid && (
             <p className="mt-1 text-xs text-red-400">Informe um e-mail válido</p>
+          )}
+          {emailAccountStatus === "draft" && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 rounded-lg border border-amber-400/30 bg-amber-500/10 px-3 py-2.5"
+            >
+              <p className="text-xs font-semibold text-amber-300">Você tem um site em criação</p>
+              <p className="mt-0.5 text-xs text-amber-300/70">
+                Já existe um rascunho associado a este e-mail. Faça login para continuar de onde parou.
+              </p>
+              <a
+                href={`/login?return=/admin`}
+                className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-amber-300 hover:underline"
+              >
+                <LogIn size={12} />
+                Entrar na minha conta
+              </a>
+            </motion.div>
+          )}
+          {emailAccountStatus === "active" && (
+            <motion.div
+              initial={{ opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 rounded-lg border border-emerald-400/30 bg-emerald-500/10 px-3 py-2.5"
+            >
+              <p className="text-xs font-semibold text-emerald-300">Você já tem uma conta ativa</p>
+              <p className="mt-0.5 text-xs text-emerald-300/70">
+                Este e-mail já está cadastrado. Faça login para acessar seu painel.
+              </p>
+              <a
+                href="/login"
+                className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-300 hover:underline"
+              >
+                <LogIn size={12} />
+                Fazer login
+              </a>
+            </motion.div>
           )}
         </div>
 

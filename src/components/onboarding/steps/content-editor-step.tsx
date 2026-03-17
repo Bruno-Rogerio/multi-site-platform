@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
@@ -16,11 +16,13 @@ import {
   Search,
   Plus,
   Trash2,
+  Check,
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { ImageUpload } from "../builders/image-upload";
 import { IconPickerInline } from "../builders/icon-picker";
+import { LinkDestinationSelect } from "../builders/link-destination-select";
 
 /* ─── Tab metadata ─── */
 
@@ -104,6 +106,92 @@ function Textarea({
   );
 }
 
+/* ─── Focal point picker ─── */
+
+function parsePos(val: string): { x: number; y: number } {
+  if (!val) return { x: 50, y: 50 };
+  const named = (s: string) => {
+    if (s === "left" || s === "top") return 0;
+    if (s === "right" || s === "bottom") return 100;
+    if (s === "center") return 50;
+    const n = parseFloat(s);
+    return isNaN(n) ? 50 : n;
+  };
+  const parts = val.trim().split(/\s+/);
+  return { x: named(parts[0] ?? "50%"), y: named(parts[1] ?? "50%") };
+}
+
+function FocalPointPicker({
+  imageUrl,
+  value,
+  onChange,
+}: {
+  imageUrl: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+  const pos = parsePos(value);
+
+  function updateFromClient(clientX: number, clientY: number) {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const x = Math.round(Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100)));
+    const y = Math.round(Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100)));
+    onChange(`${x}% ${y}%`);
+  }
+
+  function handleMouseDown(e: React.MouseEvent) {
+    e.preventDefault();
+    dragging.current = true;
+    updateFromClient(e.clientX, e.clientY);
+    const onMove = (ev: MouseEvent) => { if (dragging.current) updateFromClient(ev.clientX, ev.clientY); };
+    const onUp = () => { dragging.current = false; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    const t = e.touches[0];
+    updateFromClient(t.clientX, t.clientY);
+    const onMove = (ev: TouchEvent) => { const t2 = ev.touches[0]; if (t2) updateFromClient(t2.clientX, t2.clientY); };
+    const onEnd = () => { window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd); };
+    window.addEventListener("touchmove", onMove, { passive: true });
+    window.addEventListener("touchend", onEnd);
+  }
+
+  return (
+    <div className="mt-2">
+      <p className="mb-1 text-[10px] text-[var(--platform-text)]/40">Posição — arraste para reposicionar</p>
+      <div
+        ref={containerRef}
+        onMouseDown={handleMouseDown}
+        onTouchStart={handleTouchStart}
+        className="relative h-24 w-full overflow-hidden rounded-lg cursor-crosshair select-none"
+        style={{ border: "1px solid rgba(255,255,255,0.12)" }}
+      >
+        <img
+          src={imageUrl}
+          alt="focal point"
+          draggable={false}
+          className="pointer-events-none h-full w-full object-cover"
+          style={{ objectPosition: value || "50% 50%" }}
+        />
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute top-0 bottom-0 w-px" style={{ left: `${pos.x}%`, background: "rgba(255,255,255,0.35)" }} />
+          <div className="absolute left-0 right-0 h-px" style={{ top: `${pos.y}%`, background: "rgba(255,255,255,0.35)" }} />
+        </div>
+        <div
+          className="pointer-events-none absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white"
+          style={{ left: `${pos.x}%`, top: `${pos.y}%`, background: "rgba(34,211,238,0.5)", boxShadow: "0 0 0 1.5px rgba(0,0,0,0.6)" }}
+        />
+        <div className="pointer-events-none absolute bottom-1 right-1.5 rounded bg-black/50 px-1.5 py-0.5 text-[9px] text-white/70">arraste</div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Section editors ─── */
 
 function HeroContentEditor() {
@@ -125,13 +213,28 @@ function HeroContentEditor() {
         variant="compact"
         description="1920 × 800 px · máx. 5 MB"
       />
+      {heroImage && (
+        <FocalPointPicker
+          imageUrl={heroImage}
+          value={String(content.heroImageObjectPosition ?? "50% 50%")}
+          onChange={v => set("heroImageObjectPosition", v)}
+        />
+      )}
       <div className="border-t border-white/10 pt-4 space-y-4">
         <Input label="Slogan" value={String(content.slogan ?? "")} onChange={v => set("slogan", v)} placeholder="Ex: Cuidando da sua saúde emocional" hint="Aparece no header, abaixo do nome" />
         <Input label="Eyebrow (pequeno texto acima)" value={String(content.heroEyebrow ?? "")} onChange={v => set("heroEyebrow", v)} placeholder="Ex: Psicologia online" />
         <Input label="Título principal" value={String(content.heroTitle ?? "")} onChange={v => set("heroTitle", v)} placeholder="Ex: Cuidado emocional para viver com mais clareza" />
         <Textarea label="Subtítulo" value={String(content.heroSubtitle ?? "")} onChange={v => set("heroSubtitle", v)} placeholder="Uma breve descrição do que você faz..." />
         <Input label="Texto do botão" value={String(content.heroCtaLabel ?? "")} onChange={v => set("heroCtaLabel", v)} placeholder="Ex: Agendar sessão" />
-        <Input label="Link do botão" value={String(content.heroCtaUrl ?? "")} onChange={v => set("heroCtaUrl", v)} placeholder="#contato ou https://wa.me/..." hint="Use #contato para rolar até a seção de contato" />
+        <div>
+          <label className="text-xs font-medium text-[var(--platform-text)]/60">Link do botão</label>
+          <LinkDestinationSelect
+            value={String(content.heroCtaUrl ?? "")}
+            onChange={v => set("heroCtaUrl", v)}
+            content={content as Record<string, string>}
+            placeholder="#contato ou canal de contato"
+          />
+        </div>
       </div>
     </div>
   );
@@ -215,6 +318,13 @@ function ServicesContentEditor() {
                 slot={`serviceCard-${index}`}
                 variant="thumbnail"
               />
+              {card.imageUrl && (
+                <FocalPointPicker
+                  imageUrl={card.imageUrl}
+                  value={(card as Record<string, string>).objectPosition ?? "50% 50%"}
+                  onChange={v => handleServiceChange(index, "objectPosition", v)}
+                />
+              )}
             </div>
           ))}
         </div>
@@ -241,6 +351,13 @@ function AboutContentEditor() {
         variant="compact"
         description="400 × 400 px recomendado"
       />
+      {content.aboutImage && (
+        <FocalPointPicker
+          imageUrl={String(content.aboutImage)}
+          value={String(content.aboutImageObjectPosition ?? "50% 50%")}
+          onChange={v => set("aboutImageObjectPosition", v)}
+        />
+      )}
       <div className="border-t border-white/10 pt-4 space-y-4">
         <Input label="Título da seção" value={String(content.aboutTitle ?? "Sobre mim")} onChange={v => set("aboutTitle", v)} placeholder="Ex: Quem sou eu" />
         <Textarea label="Seu texto" value={String(content.aboutBody ?? "")} onChange={v => set("aboutBody", v)} placeholder="Conte um pouco sobre você, sua história, diferenciais e como pode ajudar seus clientes..." rows={6} />
@@ -578,26 +695,70 @@ function CtaContentEditor() {
       <Input label="Título" value={String(content.ctaTitle ?? "")} onChange={v => set("ctaTitle", v)} placeholder="Ex: Vamos conversar?" />
       <Textarea label="Descrição" value={String(content.ctaDescription ?? "")} onChange={v => set("ctaDescription", v)} placeholder="Uma frase convidativa para seus visitantes entrarem em contato..." />
       <Input label="Texto do botão principal" value={String(content.ctaButtonLabel ?? "")} onChange={v => set("ctaButtonLabel", v)} placeholder="Ex: Falar no WhatsApp" />
-      <Input label="Link do botão" value={String(content.ctaButtonUrl ?? "")} onChange={v => set("ctaButtonUrl", v)} placeholder="#contato ou https://wa.me/..." hint="Use #contato para rolar até a seção de contato" />
+      <div>
+        <label className="text-xs font-medium text-[var(--platform-text)]/60">Link do botão</label>
+        <LinkDestinationSelect
+          value={String(content.ctaButtonUrl ?? "")}
+          onChange={v => set("ctaButtonUrl", v)}
+          content={content as Record<string, string>}
+          placeholder="Escolha o destino do botão"
+        />
+      </div>
 
       {ctaVariant === "double" && (
         <div className="border-t border-white/10 pt-4 space-y-4">
           <p className="text-xs font-medium text-[var(--platform-text)]/60">Segundo botão (outline)</p>
           <Input label="Texto do segundo botão" value={String(content.ctaSecondaryLabel ?? "")} onChange={v => set("ctaSecondaryLabel", v)} placeholder="Ex: Saiba mais" />
-          <Input label="Link do segundo botão" value={String(content.ctaSecondaryUrl ?? "")} onChange={v => set("ctaSecondaryUrl", v)} placeholder="Ex: /sobre ou https://exemplo.com" />
+          <div>
+            <label className="text-xs font-medium text-[var(--platform-text)]/60">Link do segundo botão</label>
+            <LinkDestinationSelect
+              value={String(content.ctaSecondaryUrl ?? "")}
+              onChange={v => set("ctaSecondaryUrl", v)}
+              content={content as Record<string, string>}
+              placeholder="Escolha o destino"
+            />
+          </div>
         </div>
       )}
     </div>
   );
 }
 
+const CTA_LABEL_MAP: Record<string, string> = {
+  whatsapp: "WhatsApp",
+  instagram: "Instagram",
+  email: "E-mail",
+  linkedin: "LinkedIn",
+  facebook: "Facebook",
+  phone: "Telefone",
+};
+
 function ContactContentEditor() {
   const { state, dispatch } = useWizard();
-  const { content, logoUrl } = state;
+  const { content, logoUrl, selectedCtaTypes, ctaConfig, floatingCtaEnabled, floatingCtaChannels } = state;
 
   function set(key: string, value: string) {
     dispatch({ type: "UPDATE_CONTENT", key, value });
   }
+
+  // Pre-fill social fields from ctaConfig when this tab first opens
+  useEffect(() => {
+    const mappings = [
+      { ctaId: "whatsapp",  contentKey: "social_whatsapp",  clean: (v: string) => v.replace(/\D/g, "") },
+      { ctaId: "instagram", contentKey: "social_instagram",  clean: (v: string) => v.replace(/^@/, "") },
+      { ctaId: "email",     contentKey: "social_email",      clean: (v: string) => v },
+      { ctaId: "linkedin",  contentKey: "social_linkedin",   clean: (v: string) => v },
+      { ctaId: "facebook",  contentKey: "social_facebook",   clean: (v: string) => v },
+    ];
+    for (const { ctaId, contentKey, clean } of mappings) {
+      const existingVal = (content as Record<string, unknown>)[contentKey];
+      const ctaVal = (ctaConfig as Record<string, { label: string; url: string } | undefined>)[ctaId]?.url;
+      if (!existingVal && ctaVal) {
+        set(contentKey, clean(ctaVal));
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -615,12 +776,66 @@ function ContactContentEditor() {
       </div>
       <div className="border-t border-white/10 pt-4 space-y-3">
         <p className="text-xs font-medium text-[var(--platform-text)]/60">Informações de contato (preencha os que você usa)</p>
-        <Input label="WhatsApp" value={String(content.whatsapp ?? "")} onChange={v => set("whatsapp", v)} placeholder="Ex: 11999999999" />
-        <Input label="Email" value={String(content.email ?? "")} onChange={v => set("email", v)} placeholder="contato@exemplo.com" type="email" />
-        <Input label="Instagram" value={String(content.instagram ?? "")} onChange={v => set("instagram", v)} placeholder="@seuperfil" />
-        <Input label="LinkedIn" value={String(content.linkedin ?? "")} onChange={v => set("linkedin", v)} placeholder="linkedin.com/in/seuperfil" />
-        <Input label="Facebook" value={String(content.facebook ?? "")} onChange={v => set("facebook", v)} placeholder="facebook.com/suapagina" />
+        <Input label="WhatsApp" value={String((content as Record<string, unknown>).social_whatsapp ?? "")} onChange={v => set("social_whatsapp", v)} placeholder="Ex: 11999999999" />
+        <Input label="Email" value={String((content as Record<string, unknown>).social_email ?? "")} onChange={v => set("social_email", v)} placeholder="contato@exemplo.com" type="email" />
+        <Input label="Instagram" value={String((content as Record<string, unknown>).social_instagram ?? "")} onChange={v => set("social_instagram", v)} placeholder="@seuperfil" />
+        <Input label="LinkedIn" value={String((content as Record<string, unknown>).social_linkedin ?? "")} onChange={v => set("social_linkedin", v)} placeholder="linkedin.com/in/seuperfil" />
+        <Input label="Facebook" value={String((content as Record<string, unknown>).social_facebook ?? "")} onChange={v => set("social_facebook", v)} placeholder="facebook.com/suapagina" />
       </div>
+
+      {/* Floating CTA toggles */}
+      {selectedCtaTypes.length > 0 && (
+        <div className="border-t border-white/10 pt-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-xs font-medium text-[var(--platform-text)]/60">Botão flutuante de contato</p>
+              <p className="text-[10px] text-[var(--platform-text)]/35">Aparece fixo no canto do site</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => dispatch({ type: "SET_FLOATING_CTA", enabled: !floatingCtaEnabled })}
+              className={`relative h-5 w-9 rounded-full transition ${floatingCtaEnabled ? "bg-[#22D3EE]" : "bg-white/10"}`}
+            >
+              <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${floatingCtaEnabled ? "left-4" : "left-0.5"}`} />
+            </button>
+          </div>
+          {floatingCtaEnabled && (
+            <div>
+              <p className="mb-2 text-[10px] text-[var(--platform-text)]/40">Canais exibidos no botão ({floatingCtaChannels.length}/2)</p>
+              <div className="flex flex-wrap gap-2">
+                {selectedCtaTypes.map(ctaId => {
+                  const isInFloating = floatingCtaChannels.includes(ctaId);
+                  const canAdd = isInFloating || floatingCtaChannels.length < 2;
+                  return (
+                    <button
+                      key={ctaId}
+                      type="button"
+                      onClick={() => {
+                        if (isInFloating) {
+                          dispatch({ type: "SET_FLOATING_CTA_CHANNELS", channels: floatingCtaChannels.filter(id => id !== ctaId) });
+                        } else if (canAdd) {
+                          dispatch({ type: "SET_FLOATING_CTA_CHANNELS", channels: [...floatingCtaChannels, ctaId] });
+                        }
+                      }}
+                      className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition ${
+                        isInFloating
+                          ? "border-[#22D3EE]/50 bg-[#22D3EE]/10 text-[#22D3EE]"
+                          : canAdd
+                          ? "border-white/10 text-[var(--platform-text)]/60 hover:border-white/20"
+                          : "border-white/5 text-[var(--platform-text)]/30 cursor-not-allowed"
+                      }`}
+                    >
+                      {CTA_LABEL_MAP[ctaId] ?? ctaId}
+                      {isInFloating && <Check size={10} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="border-t border-white/10 pt-4">
         <Input label="Texto do rodapé" value={String(content.footerText ?? "")} onChange={v => set("footerText", v)} placeholder="© 2025 Seu Nome. Todos os direitos reservados." />
       </div>

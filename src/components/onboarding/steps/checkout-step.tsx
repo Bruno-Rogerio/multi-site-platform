@@ -71,6 +71,7 @@ export function CheckoutStep() {
             description: c.description || "",
             iconName: c.iconName || c.icon || "",
             imageUrl: c.imageUrl || "",
+            imageObjectPosition: (c as Record<string, unknown>).objectPosition as string || "50% 50%",
           }))
         ),
         contactSelectedLinks: JSON.stringify(state.contactSelectedLinks),
