@@ -321,7 +321,7 @@ function ServicesContentEditor() {
               {card.imageUrl && (
                 <FocalPointPicker
                   imageUrl={card.imageUrl}
-                  value={(card as Record<string, string>).objectPosition ?? "50% 50%"}
+                  value={(card as unknown as Record<string, string>).objectPosition ?? "50% 50%"}
                   onChange={v => handleServiceChange(index, "objectPosition", v)}
                 />
               )}
