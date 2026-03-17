@@ -351,7 +351,7 @@ function AboutContentEditor() {
         variant="compact"
         description="400 × 400 px recomendado"
       />
-      {content.aboutImage && (
+      {!!content.aboutImage && (
         <FocalPointPicker
           imageUrl={String(content.aboutImage)}
           value={String(content.aboutImageObjectPosition ?? "50% 50%")}
