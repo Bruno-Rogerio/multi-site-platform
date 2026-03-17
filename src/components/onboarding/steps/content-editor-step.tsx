@@ -23,6 +23,7 @@ import { StepNavigation } from "../step-navigation";
 import { ImageUpload } from "../builders/image-upload";
 import { IconPickerInline } from "../builders/icon-picker";
 import { LinkDestinationSelect } from "../builders/link-destination-select";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 /* ─── Tab metadata ─── */
 
@@ -197,6 +198,7 @@ function FocalPointPicker({
 function HeroContentEditor() {
   const { state, dispatch } = useWizard();
   const { content, heroImage } = state;
+  const paletteColors = [state.customColors?.primary, state.customColors?.accent, state.customColors?.text].filter(Boolean) as string[];
 
   function set(key: string, value: string) {
     dispatch({ type: "UPDATE_CONTENT", key, value });
@@ -223,8 +225,26 @@ function HeroContentEditor() {
       <div className="border-t border-white/10 pt-4 space-y-4">
         <Input label="Slogan" value={String(content.slogan ?? "")} onChange={v => set("slogan", v)} placeholder="Ex: Cuidando da sua saúde emocional" hint="Aparece no header, abaixo do nome" />
         <Input label="Eyebrow (pequeno texto acima)" value={String(content.heroEyebrow ?? "")} onChange={v => set("heroEyebrow", v)} placeholder="Ex: Psicologia online" />
-        <Input label="Título principal" value={String(content.heroTitle ?? "")} onChange={v => set("heroTitle", v)} placeholder="Ex: Cuidado emocional para viver com mais clareza" />
-        <Textarea label="Subtítulo" value={String(content.heroSubtitle ?? "")} onChange={v => set("heroSubtitle", v)} placeholder="Uma breve descrição do que você faz..." />
+        <div>
+          <label className="text-xs font-medium text-[var(--platform-text)]/60">Título principal</label>
+          <RichTextEditor
+            value={String(content.heroTitle ?? "")}
+            onChange={v => set("heroTitle", v)}
+            placeholder="Ex: Cuidado emocional para viver com mais clareza"
+            paletteColors={paletteColors}
+            singleLine
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-[var(--platform-text)]/60">Subtítulo</label>
+          <RichTextEditor
+            value={String(content.heroSubtitle ?? "")}
+            onChange={v => set("heroSubtitle", v)}
+            placeholder="Uma breve descrição do que você faz..."
+            paletteColors={paletteColors}
+            minHeight="4rem"
+          />
+        </div>
         <Input label="Texto do botão" value={String(content.heroCtaLabel ?? "")} onChange={v => set("heroCtaLabel", v)} placeholder="Ex: Agendar sessão" />
         <div>
           <label className="text-xs font-medium text-[var(--platform-text)]/60">Link do botão</label>
@@ -243,6 +263,7 @@ function HeroContentEditor() {
 function ServicesContentEditor() {
   const { state, dispatch } = useWizard();
   const { content, serviceCards } = state;
+  const paletteColors = [state.customColors?.primary, state.customColors?.accent, state.customColors?.text].filter(Boolean) as string[];
 
   function setTitle(v: string) {
     dispatch({ type: "UPDATE_CONTENT", key: "servicesTitle", value: v });
@@ -286,13 +307,15 @@ function ServicesContentEditor() {
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[#22D3EE]/20 text-xs font-bold text-[#22D3EE]">
                   {index + 1}
                 </span>
-                <input
-                  type="text"
-                  value={card.title}
-                  onChange={e => handleServiceChange(index, "title", e.target.value)}
-                  placeholder="Título do serviço"
-                  className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
-                />
+                <div className="flex-1">
+                  <RichTextEditor
+                    value={card.title}
+                    onChange={v => handleServiceChange(index, "title", v)}
+                    placeholder="Título do serviço"
+                    paletteColors={paletteColors}
+                    singleLine
+                  />
+                </div>
               </div>
 
               <div>
@@ -303,12 +326,12 @@ function ServicesContentEditor() {
                 />
               </div>
 
-              <textarea
+              <RichTextEditor
                 value={card.description}
-                onChange={e => handleServiceChange(index, "description", e.target.value)}
+                onChange={v => handleServiceChange(index, "description", v)}
                 placeholder="Descrição breve..."
-                rows={2}
-                className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none"
+                paletteColors={paletteColors}
+                minHeight="3rem"
               />
 
               <ImageUpload
@@ -336,6 +359,7 @@ function ServicesContentEditor() {
 function AboutContentEditor() {
   const { state, dispatch } = useWizard();
   const { content } = state;
+  const paletteColors = [state.customColors?.primary, state.customColors?.accent, state.customColors?.text].filter(Boolean) as string[];
 
   function set(key: string, value: string) {
     dispatch({ type: "UPDATE_CONTENT", key, value });
@@ -359,8 +383,26 @@ function AboutContentEditor() {
         />
       )}
       <div className="border-t border-white/10 pt-4 space-y-4">
-        <Input label="Título da seção" value={String(content.aboutTitle ?? "Sobre mim")} onChange={v => set("aboutTitle", v)} placeholder="Ex: Quem sou eu" />
-        <Textarea label="Seu texto" value={String(content.aboutBody ?? "")} onChange={v => set("aboutBody", v)} placeholder="Conte um pouco sobre você, sua história, diferenciais e como pode ajudar seus clientes..." rows={6} />
+        <div>
+          <label className="text-xs font-medium text-[var(--platform-text)]/60">Título da seção</label>
+          <RichTextEditor
+            value={String(content.aboutTitle ?? "Sobre mim")}
+            onChange={v => set("aboutTitle", v)}
+            placeholder="Ex: Quem sou eu"
+            paletteColors={paletteColors}
+            singleLine
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-[var(--platform-text)]/60">Seu texto</label>
+          <RichTextEditor
+            value={String(content.aboutBody ?? "")}
+            onChange={v => set("aboutBody", v)}
+            placeholder="Conte um pouco sobre você, sua história, diferenciais e como pode ajudar seus clientes..."
+            paletteColors={paletteColors}
+            minHeight="8rem"
+          />
+        </div>
       </div>
     </div>
   );
@@ -685,6 +727,7 @@ function EventsContentEditor() {
 function CtaContentEditor() {
   const { state, dispatch } = useWizard();
   const { content, ctaVariant } = state;
+  const paletteColors = [state.customColors?.primary, state.customColors?.accent, state.customColors?.text].filter(Boolean) as string[];
 
   function set(key: string, value: string) {
     dispatch({ type: "UPDATE_CONTENT", key, value });
@@ -692,8 +735,26 @@ function CtaContentEditor() {
 
   return (
     <div className="space-y-4">
-      <Input label="Título" value={String(content.ctaTitle ?? "")} onChange={v => set("ctaTitle", v)} placeholder="Ex: Vamos conversar?" />
-      <Textarea label="Descrição" value={String(content.ctaDescription ?? "")} onChange={v => set("ctaDescription", v)} placeholder="Uma frase convidativa para seus visitantes entrarem em contato..." />
+      <div>
+        <label className="text-xs font-medium text-[var(--platform-text)]/60">Título</label>
+        <RichTextEditor
+          value={String(content.ctaTitle ?? "")}
+          onChange={v => set("ctaTitle", v)}
+          placeholder="Ex: Vamos conversar?"
+          paletteColors={paletteColors}
+          singleLine
+        />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-[var(--platform-text)]/60">Descrição</label>
+        <RichTextEditor
+          value={String(content.ctaDescription ?? "")}
+          onChange={v => set("ctaDescription", v)}
+          placeholder="Uma frase convidativa para seus visitantes entrarem em contato..."
+          paletteColors={paletteColors}
+          minHeight="4rem"
+        />
+      </div>
       <Input label="Texto do botão principal" value={String(content.ctaButtonLabel ?? "")} onChange={v => set("ctaButtonLabel", v)} placeholder="Ex: Falar no WhatsApp" />
       <div>
         <label className="text-xs font-medium text-[var(--platform-text)]/60">Link do botão</label>
