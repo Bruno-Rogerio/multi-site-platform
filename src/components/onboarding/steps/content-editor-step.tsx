@@ -348,6 +348,49 @@ function ServicesContentEditor() {
                   onChange={v => handleServiceChange(index, "objectPosition", v)}
                 />
               )}
+              {/* Extra lines */}
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <p className="text-[10px] text-[var(--platform-text)]/40">Linhas extras (bullets abaixo da descrição)</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const lines = (card as unknown as Record<string, unknown>).extraLines as string[] ?? [];
+                      dispatch({ type: "UPDATE_SERVICE_CARD", index, data: { extraLines: [...lines, ""] } });
+                    }}
+                    className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-[#22D3EE] border border-[#22D3EE]/30 hover:bg-[#22D3EE]/10 transition"
+                  >
+                    <Plus size={10} />
+                    Adicionar linha
+                  </button>
+                </div>
+                {((card as unknown as Record<string, unknown>).extraLines as string[] ?? []).map((line, li) => (
+                  <div key={li} className="mb-1 flex items-center gap-1.5">
+                    <span className="text-[#22D3EE]/60 text-xs">•</span>
+                    <input
+                      type="text"
+                      value={line}
+                      onChange={e => {
+                        const lines = [...((card as unknown as Record<string, unknown>).extraLines as string[] ?? [])];
+                        lines[li] = e.target.value;
+                        dispatch({ type: "UPDATE_SERVICE_CARD", index, data: { extraLines: lines } });
+                      }}
+                      placeholder="Ex: Atendimento presencial e online"
+                      className="flex-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 text-xs text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const lines = ((card as unknown as Record<string, unknown>).extraLines as string[] ?? []).filter((_, idx) => idx !== li);
+                        dispatch({ type: "UPDATE_SERVICE_CARD", index, data: { extraLines: lines } });
+                      }}
+                      className="flex h-5 w-5 items-center justify-center rounded text-red-400/60 hover:text-red-400 hover:bg-red-400/10 transition"
+                    >
+                      <Trash2 size={10} />
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
@@ -491,7 +534,8 @@ function TestimonialsContentEditor() {
 function BlogContentEditor() {
   const { state, dispatch } = useWizard();
   const { content } = state;
-  const posts = (content.blogPosts as Array<{ title: string; excerpt: string; imageUrl: string; link: string }>) ?? [];
+  const posts = (content.blogPosts as Array<{ title: string; excerpt: string; imageUrl: string; link: string; body: string }>) ?? [];
+  const paletteColors = [state.customColors?.primary, state.customColors?.accent, state.customColors?.text].filter(Boolean) as string[];
 
   function setTitle(v: string) { dispatch({ type: "UPDATE_CONTENT", key: "blogTitle", value: v }); }
 
@@ -501,7 +545,7 @@ function BlogContentEditor() {
   }
 
   function add() {
-    dispatch({ type: "SET_CONTENT_ARRAY", key: "blogPosts", value: [...posts, { title: "", excerpt: "", imageUrl: "", link: "" }] });
+    dispatch({ type: "SET_CONTENT_ARRAY", key: "blogPosts", value: [...posts, { title: "", excerpt: "", imageUrl: "", link: "", body: "" }] });
   }
 
   function remove(index: number) {
@@ -543,6 +587,16 @@ function BlogContentEditor() {
                 </div>
               </div>
               <textarea value={p.excerpt} onChange={e => update(i, "excerpt", e.target.value)} placeholder="Resumo do post..." rows={2} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none resize-none" />
+              <div>
+                <p className="mb-1 text-[10px] text-[var(--platform-text)]/40">Conteúdo completo (aparece em modal ao clicar)</p>
+                <RichTextEditor
+                  value={p.body ?? ""}
+                  onChange={v => update(i, "body", v)}
+                  placeholder="Escreva o conteúdo completo do post..."
+                  paletteColors={paletteColors}
+                  minHeight="6rem"
+                />
+              </div>
             </div>
           ))}
         </div>

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
-import { heroVariants, servicesVariants, ctaVariants } from "@/lib/onboarding/section-styles";
+import { heroVariants, servicesVariants, ctaVariants, testimonialsVariants, galleryVariants, faqVariants, blogVariants, eventsVariants } from "@/lib/onboarding/section-styles";
 import { ctaTypes } from "@/lib/onboarding/cta-types";
 import type { CtaTypeId } from "@/lib/onboarding/types";
 import * as LucideIcons from "lucide-react";
@@ -27,21 +27,21 @@ type SectionMeta = {
   accent: string;
   removable: boolean;
   variants?: { id: string; name: string; description: string; premium: boolean }[];
-  variantKey?: keyof { heroVariant: string; servicesVariant: string; ctaVariant: string };
-  variantAction?: "SET_HERO_VARIANT" | "SET_SERVICES_VARIANT" | "SET_CTA_VARIANT";
+  variantKey?: keyof { heroVariant: string; servicesVariant: string; ctaVariant: string; testimonialsVariant: string; galleryVariant: string; faqVariant: string; blogVariant: string; eventsVariant: string };
+  variantAction?: "SET_HERO_VARIANT" | "SET_SERVICES_VARIANT" | "SET_CTA_VARIANT" | "SET_TESTIMONIALS_VARIANT" | "SET_GALLERY_VARIANT" | "SET_FAQ_VARIANT" | "SET_BLOG_VARIANT" | "SET_EVENTS_VARIANT";
 };
 
 const SECTION_META: Record<string, SectionMeta> = {
   hero:         { id: "hero",         label: "Hero",        emoji: "🎯", accent: "#22D3EE", removable: false, variants: heroVariants,     variantKey: "heroVariant",     variantAction: "SET_HERO_VARIANT" },
   services:     { id: "services",     label: "Serviços",    emoji: "🧩", accent: "#7C5CFF", removable: true,  variants: servicesVariants, variantKey: "servicesVariant", variantAction: "SET_SERVICES_VARIANT" },
   about:        { id: "about",        label: "Sobre mim",   emoji: "👤", accent: "#3B82F6", removable: true },
-  testimonials: { id: "testimonials", label: "Depoimentos", emoji: "⭐", accent: "#F59E0B", removable: true },
+  testimonials: { id: "testimonials", label: "Depoimentos", emoji: "⭐", accent: "#F59E0B", removable: true, variants: testimonialsVariants, variantKey: "testimonialsVariant", variantAction: "SET_TESTIMONIALS_VARIANT" },
   cta:          { id: "cta",          label: "CTA",         emoji: "📣", accent: "#10B981", removable: true,  variants: ctaVariants,      variantKey: "ctaVariant",      variantAction: "SET_CTA_VARIANT" },
   contact:      { id: "contact",      label: "Contato",     emoji: "📞", accent: "#22D3EE", removable: false },
-  blog:         { id: "blog",         label: "Blog",        emoji: "📝", accent: "#EC4899", removable: true },
-  gallery:      { id: "gallery",      label: "Galeria",     emoji: "🖼️", accent: "#6366F1", removable: true },
-  faq:          { id: "faq",          label: "FAQ",         emoji: "❓", accent: "#F59E0B", removable: true },
-  events:       { id: "events",       label: "Agenda",      emoji: "📅", accent: "#10B981", removable: true },
+  blog:         { id: "blog",         label: "Blog",        emoji: "📝", accent: "#EC4899", removable: true, variants: blogVariants, variantKey: "blogVariant", variantAction: "SET_BLOG_VARIANT" },
+  gallery:      { id: "gallery",      label: "Galeria",     emoji: "🖼️", accent: "#6366F1", removable: true, variants: galleryVariants, variantKey: "galleryVariant", variantAction: "SET_GALLERY_VARIANT" },
+  faq:          { id: "faq",          label: "FAQ",         emoji: "❓", accent: "#F59E0B", removable: true, variants: faqVariants, variantKey: "faqVariant", variantAction: "SET_FAQ_VARIANT" },
+  events:       { id: "events",       label: "Agenda",      emoji: "📅", accent: "#10B981", removable: true, variants: eventsVariants, variantKey: "eventsVariant", variantAction: "SET_EVENTS_VARIANT" },
 };
 
 const ALL_ADDABLE = ["services", "about", "testimonials", "cta", "blog", "gallery", "faq", "events"];
@@ -139,6 +139,11 @@ function SectionBlock({
     if (meta.variantAction === "SET_HERO_VARIANT") dispatch({ type: "SET_HERO_VARIANT", variant: id });
     if (meta.variantAction === "SET_SERVICES_VARIANT") dispatch({ type: "SET_SERVICES_VARIANT", variant: id });
     if (meta.variantAction === "SET_CTA_VARIANT") dispatch({ type: "SET_CTA_VARIANT", variant: id });
+    if (meta.variantAction === "SET_TESTIMONIALS_VARIANT") dispatch({ type: "SET_TESTIMONIALS_VARIANT", variant: id });
+    if (meta.variantAction === "SET_GALLERY_VARIANT") dispatch({ type: "SET_GALLERY_VARIANT", variant: id });
+    if (meta.variantAction === "SET_FAQ_VARIANT") dispatch({ type: "SET_FAQ_VARIANT", variant: id });
+    if (meta.variantAction === "SET_BLOG_VARIANT") dispatch({ type: "SET_BLOG_VARIANT", variant: id });
+    if (meta.variantAction === "SET_EVENTS_VARIANT") dispatch({ type: "SET_EVENTS_VARIANT", variant: id });
   }
 
   return (

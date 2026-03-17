@@ -32,6 +32,36 @@ export const ctaVariants: SectionVariant[] = [
   { id: "double", name: "Duplo", description: "Duas opções de ação", premium: true },
 ];
 
+export const testimonialsVariants: SectionVariant[] = [
+  { id: "grid", name: "Grade", description: "Cards em grade organizada", premium: false },
+  { id: "carousel", name: "Carrossel", description: "Deslize entre depoimentos", premium: false },
+  { id: "quotes", name: "Citações", description: "Estilo aspas destacadas", premium: true },
+];
+
+export const galleryVariants: SectionVariant[] = [
+  { id: "grid", name: "Grade", description: "Grade uniforme de imagens", premium: false },
+  { id: "masonry", name: "Masonry", description: "Layout dinâmico escalonado", premium: false },
+  { id: "carousel", name: "Carrossel", description: "Deslize pelas fotos", premium: true },
+];
+
+export const faqVariants: SectionVariant[] = [
+  { id: "accordion", name: "Acordeão", description: "Clique para expandir", premium: false },
+  { id: "numbered", name: "Numerado", description: "Números grandes coloridos", premium: false },
+  { id: "two-col", name: "Duas colunas", description: "Layout em grid de duas colunas", premium: true },
+];
+
+export const blogVariants: SectionVariant[] = [
+  { id: "grid", name: "Grade", description: "Cards em grade 3 colunas", premium: false },
+  { id: "list", name: "Lista", description: "Cards horizontais empilhados", premium: false },
+  { id: "magazine", name: "Magazine", description: "Primeiro post em destaque", premium: true },
+];
+
+export const eventsVariants: SectionVariant[] = [
+  { id: "timeline", name: "Timeline", description: "Linha do tempo vertical", premium: false },
+  { id: "cards", name: "Cards", description: "Cards com destaque de data", premium: false },
+  { id: "list", name: "Lista", description: "Linhas compactas", premium: true },
+];
+
 export const motionStyles: SectionVariant[] = [
   { id: "motion-none", name: "Sem animação", description: "Minimalista e direto", premium: false },
   { id: "motion-fade", name: "Fade simples", description: "Transição suave de opacidade", premium: false },

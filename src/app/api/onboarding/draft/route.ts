@@ -46,6 +46,11 @@ type OnboardingDraftPayload = {
   floatingCtaEnabled?: boolean;
   floatingCtaChannels?: string[];
   enabledSections?: string[];
+  testimonialsVariant?: string;
+  galleryVariant?: string;
+  faqVariant?: string;
+  blogVariant?: string;
+  eventsVariant?: string;
 };
 
 function normalizeSubdomain(input: string): string {
@@ -568,7 +573,7 @@ export async function POST(request: Request) {
       ? [{
           page_id: page.id,
           type: "testimonials" as const,
-          variant: content.testimonialsVariant?.trim() || "grid",
+          variant: (payload.testimonialsVariant as string) || "grid",
           order: secOrder("testimonials", 5),
           content: {
             title: "Depoimentos",
@@ -580,7 +585,7 @@ export async function POST(request: Request) {
       ? [{
           page_id: page.id,
           type: "faq" as const,
-          variant: "accordion",
+          variant: (payload.faqVariant as string) || "accordion",
           order: testimonials && testimonials.length > 0 ? 6 : 5,
           content: {
             title: "Perguntas frequentes",
@@ -626,7 +631,7 @@ export async function POST(request: Request) {
       extraInserts.push({
         page_id: page.id,
         type: "blog",
-        variant: "default",
+        variant: (payload.blogVariant as string) || "grid",
         order: 0, // será recalculado abaixo
         content: {
           title: (rawContent?.blogTitle as string) || "Blog",
@@ -638,7 +643,7 @@ export async function POST(request: Request) {
       extraInserts.push({
         page_id: page.id,
         type: "gallery",
-        variant: "default",
+        variant: (payload.galleryVariant as string) || "grid",
         order: 0,
         content: {
           title: (rawContent?.galleryTitle as string) || "Galeria",
@@ -650,7 +655,7 @@ export async function POST(request: Request) {
       extraInserts.push({
         page_id: page.id,
         type: "events",
-        variant: "default",
+        variant: (payload.eventsVariant as string) || "timeline",
         order: 0,
         content: {
           title: (rawContent?.eventsTitle as string) || "Agenda",

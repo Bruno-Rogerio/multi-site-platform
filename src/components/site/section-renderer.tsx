@@ -1708,7 +1708,7 @@ export function SectionRenderer({
     const items = Array.isArray(section.content.items)
       ? (section.content.items as Array<{ question: string; answer: string }>)
       : [];
-    return <FaqSection title={title} subtitle={subtitle} items={items} />;
+    return <FaqSection title={title} subtitle={subtitle} items={items} variant={section.variant} />;
   }
 
   // ─── BLOG ────────────────────────────────────────────────
@@ -1716,9 +1716,9 @@ export function SectionRenderer({
     const title = asString(section.content.title, "Blog");
     const subtitle = asString(section.content.subtitle);
     const posts = Array.isArray(section.content.posts)
-      ? (section.content.posts as Array<{ title: string; excerpt: string; imageUrl?: string; link?: string }>)
+      ? (section.content.posts as Array<{ title: string; excerpt: string; imageUrl?: string; link?: string; body?: string }>)
       : [];
-    return <BlogSection title={title} subtitle={subtitle} posts={posts} />;
+    return <BlogSection title={title} subtitle={subtitle} posts={posts} variant={section.variant} />;
   }
 
   // ─── GALLERY ─────────────────────────────────────────────
@@ -1743,6 +1743,7 @@ export function SectionRenderer({
         title={title}
         subtitle={subtitle}
         events={events}
+        variant={section.variant}
         maxItems={maxEventsPreview}
         viewAllHref={maxEventsPreview ? "/agenda" : undefined}
       />

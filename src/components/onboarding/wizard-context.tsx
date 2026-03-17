@@ -48,6 +48,11 @@ const initialState: WizardState = {
   heroVariant: "centered",
   servicesVariant: "default",
   ctaVariant: "banner",
+  testimonialsVariant: "grid",
+  galleryVariant: "grid",
+  faqVariant: "accordion",
+  blogVariant: "grid",
+  eventsVariant: "timeline",
   motionStyle: "motion-fade",
   headerStyle: "blur" as const,
   dividerStyle: "wave" as const,
@@ -130,6 +135,11 @@ const FREE_VARIANTES_DEFAULTS = {
   heroVariant: "centered",
   servicesVariant: "default",
   ctaVariant: "banner",
+  testimonialsVariant: "grid",
+  galleryVariant: "grid",
+  faqVariant: "accordion",
+  blogVariant: "grid",
+  eventsVariant: "timeline",
   motionStyle: "motion-fade",
   headerStyle: "blur" as const,
   dividerStyle: "wave" as const,
@@ -192,6 +202,17 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_CTA_VARIANT":
       return { ...state, ctaVariant: action.variant };
+
+    case "SET_TESTIMONIALS_VARIANT":
+      return { ...state, testimonialsVariant: action.variant };
+    case "SET_GALLERY_VARIANT":
+      return { ...state, galleryVariant: action.variant };
+    case "SET_FAQ_VARIANT":
+      return { ...state, faqVariant: action.variant };
+    case "SET_BLOG_VARIANT":
+      return { ...state, blogVariant: action.variant };
+    case "SET_EVENTS_VARIANT":
+      return { ...state, eventsVariant: action.variant };
 
     case "SET_MOTION_STYLE":
       return { ...state, motionStyle: action.style };
