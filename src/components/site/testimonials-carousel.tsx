@@ -35,6 +35,8 @@ export function TestimonialsCarousel({
 
   const t = testimonials[current];
 
+  if (!t) return null;
+
   return (
     <section id="testimonials" className="w-full py-16 md:py-20">
       <div className={containerClass}>

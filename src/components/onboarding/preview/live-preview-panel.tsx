@@ -1,15 +1,45 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
+import { motion, type Variants } from "framer-motion";
 import { Monitor, Smartphone } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { SectionRenderer } from "@/components/site/section-renderer";
 import { buildSiteStyles, buttonStyleClasses } from "@/components/site/site-shell";
-import { getPaletteById, getSiteStyleVars, getContrastTextColor } from "@/lib/onboarding/palettes";
+import { getPaletteById, getContrastTextColor } from "@/lib/onboarding/palettes";
 import { wizardToPreviewSite, wizardToPreviewSections } from "./wizard-to-preview-site";
 import Image from "next/image";
 
 type DeviceMode = "desktop" | "mobile";
+
+type MotionVariants = { container: Variants; item: Variants };
+
+function getMotionVariants(style: string): MotionVariants {
+  switch (style) {
+    case "motion-fade":
+      return {
+        container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.14 } } },
+        item: { hidden: { opacity: 0, y: 6 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } },
+      };
+    case "motion-reveal":
+      return {
+        container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.12 } } },
+        item: { hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } },
+      };
+    case "motion-parallax":
+      return {
+        container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.16 } } },
+        item: { hidden: { opacity: 0, y: 28, scale: 0.95 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.65, ease: [0.25, 0.1, 0.25, 1] } } },
+      };
+    case "motion-vivid":
+      return {
+        container: { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.09 } } },
+        item: { hidden: { opacity: 0, x: -16, scale: 0.91 }, visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.35, type: "spring", stiffness: 220, damping: 18 } } },
+      };
+    default:
+      return { container: { hidden: {}, visible: {} }, item: { hidden: {}, visible: {} } };
+  }
+}
 
 // Map font families to Google Fonts URLs
 const GOOGLE_FONTS_MAP: Record<string, string> = {
@@ -24,7 +54,8 @@ const GOOGLE_FONTS_MAP: Record<string, string> = {
 export function LivePreviewPanel() {
   const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
   const { state } = useWizard();
-  const { paletteId, customColors, floatingCtaEnabled, fontFamily } = state;
+  const { paletteId, customColors, floatingCtaEnabled, fontFamily, motionStyle } = state;
+  const { container: containerVariants, item: itemVariants } = getMotionVariants(motionStyle);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -284,20 +315,25 @@ export function LivePreviewPanel() {
             </div>
 
             {/* Sections */}
-            <div
+            <motion.div
               className={`${isMobile ? "preview-mobile" : ""} overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1`}
               style={{ ...siteStyles, ...previewAliases }}
+              initial="hidden"
+              animate="visible"
+              variants={containerVariants}
+              key={motionStyle}
             >
               {previewSections.map((section) => (
-                <SectionRenderer
-                  key={section.id}
-                  section={section}
-                  site={previewSite}
-                  buttonStyleClassName={btnClass}
-                  maxEventsPreview={3}
-                />
+                <motion.div key={section.id} variants={itemVariants}>
+                  <SectionRenderer
+                    section={section}
+                    site={previewSite}
+                    buttonStyleClassName={btnClass}
+                    maxEventsPreview={3}
+                  />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             {/* Mini footer */}
             <div
