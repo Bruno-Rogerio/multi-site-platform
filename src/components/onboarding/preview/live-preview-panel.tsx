@@ -317,8 +317,9 @@ export function LivePreviewPanel() {
 
             {/* Sections — scroll container is a plain div; motion.div only animates */}
             <div
-              className={`${isMobile ? "preview-mobile" : ""} overflow-y-auto scrollbar-thin scrollbar-thumb-white/10`}
-              style={{ ...siteStyles, ...previewAliases, flex: 1, minHeight: 0 }}
+              className={`${isMobile ? "preview-mobile" : ""} overflow-y-scroll scrollbar-thin scrollbar-thumb-white/10`}
+              style={{ ...siteStyles, ...previewAliases, flex: 1 }}
+              onWheel={(e) => e.stopPropagation()}
             >
               <motion.div
                 initial="hidden"

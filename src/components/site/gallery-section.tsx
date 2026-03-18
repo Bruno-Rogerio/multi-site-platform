@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 
 type GalleryImage = {
@@ -23,7 +23,18 @@ export function GallerySection({
   images = [],
   variant = "grid",
 }: GallerySectionProps) {
+  const isCarousel = variant === "carousel";
+  const isMasonry = variant === "masonry";
+
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+
+  useEffect(() => {
+    if (!isCarousel || carouselPaused || images.length <= 1) return;
+    const t = setInterval(() => setCarouselIndex(i => (i + 1) % images.length), 4000);
+    return () => clearInterval(t);
+  }, [isCarousel, carouselPaused, images.length]);
 
   if (images.length === 0) return null;
 
@@ -35,11 +46,8 @@ export function GallerySection({
     setLightboxIndex((cur) => (cur === null ? null : (cur + 1) % images.length));
   }
 
-  const isCarousel = variant === "carousel";
-  const isMasonry = variant === "masonry";
-
   return (
-    <section id="gallery" className="py-16 px-4 sm:px-6 lg:px-8">
+    <section id="gallery" className="py-10 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-10 text-center">
@@ -96,13 +104,18 @@ export function GallerySection({
 
         {/* Carousel */}
         {isCarousel && (
-          <div className="relative overflow-hidden rounded-[var(--site-radius,16px)] border" style={{ borderColor: "var(--site-border)" }}>
+          <div
+            className="relative overflow-hidden rounded-[var(--site-radius,16px)] border"
+            style={{ borderColor: "var(--site-border)" }}
+            onMouseEnter={() => setCarouselPaused(true)}
+            onMouseLeave={() => setCarouselPaused(false)}
+          >
             <div
               className="flex transition-transform duration-300"
-              style={{ transform: `translateX(-${(lightboxIndex ?? 0) * 100}%)` }}
+              style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
             >
               {images.map((img, i) => (
-                <div key={i} className="relative min-w-full aspect-[16/9]">
+                <div key={i} className="relative min-w-full aspect-[4/3]">
                   <Image
                     src={img.url}
                     alt={img.alt || `Imagem ${i + 1}`}
@@ -121,14 +134,14 @@ export function GallerySection({
               <>
                 <button
                   type="button"
-                  onClick={() => setLightboxIndex(((lightboxIndex ?? 0) - 1 + images.length) % images.length)}
+                  onClick={() => setCarouselIndex((carouselIndex - 1 + images.length) % images.length)}
                   className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60"
                 >
                   <ChevronLeft size={20} />
                 </button>
                 <button
                   type="button"
-                  onClick={() => setLightboxIndex(((lightboxIndex ?? 0) + 1) % images.length)}
+                  onClick={() => setCarouselIndex((carouselIndex + 1) % images.length)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white hover:bg-black/60"
                 >
                   <ChevronRight size={20} />
@@ -138,11 +151,11 @@ export function GallerySection({
                     <button
                       key={i}
                       type="button"
-                      onClick={() => setLightboxIndex(i)}
+                      onClick={() => setCarouselIndex(i)}
                       className="h-1.5 rounded-full transition-all"
                       style={{
-                        width: (lightboxIndex ?? 0) === i ? "20px" : "6px",
-                        backgroundColor: (lightboxIndex ?? 0) === i ? "var(--site-primary)" : "rgba(255,255,255,0.5)",
+                        width: carouselIndex === i ? "20px" : "6px",
+                        backgroundColor: carouselIndex === i ? "var(--site-primary)" : "rgba(255,255,255,0.5)",
                       }}
                     />
                   ))}

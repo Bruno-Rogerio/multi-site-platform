@@ -656,6 +656,7 @@ function BlogContentEditor() {
 }
 
 function GalleryContentEditor() {
+  const MAX_GALLERY_IMAGES = 10;
   const { state, dispatch } = useWizard();
   const { content } = state;
   const images = (content.galleryImages as Array<{ url: string; alt: string; caption: string }>) ?? [];
@@ -688,10 +689,20 @@ function GalleryContentEditor() {
       <div className="border-t border-white/10 pt-4">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-medium text-[var(--platform-text)]/60">{images.length} image{images.length !== 1 ? "ns" : "m"}</p>
-          <button type="button" onClick={add} className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-[var(--platform-text)]/60 transition hover:bg-white/[0.08]">
-            <Plus size={12} />
-            Adicionar
-          </button>
+          <div className="flex items-center gap-2">
+            {images.length >= MAX_GALLERY_IMAGES && (
+              <span className="text-[10px] text-[var(--platform-text)]/40">Máximo de {MAX_GALLERY_IMAGES} fotos</span>
+            )}
+            <button
+              type="button"
+              onClick={add}
+              disabled={images.length >= MAX_GALLERY_IMAGES}
+              className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-[var(--platform-text)]/60 transition hover:bg-white/[0.08] disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Plus size={12} />
+              Adicionar imagem
+            </button>
+          </div>
         </div>
 
         {images.length === 0 && (
