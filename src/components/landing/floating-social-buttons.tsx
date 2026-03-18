@@ -19,20 +19,25 @@ export function FloatingSocialButtons({ branding }: Props) {
     })
     .filter(Boolean);
 
-  if (buttons.length === 0) return null;
+  const FALLBACK_BUTTONS = [
+    { type: "whatsapp", href: "https://wa.me/5511915194173", icon: "💬", label: "WhatsApp" },
+    { type: "email", href: "mailto:contato@bsph.com.br", icon: "✉️", label: "E-mail" },
+  ];
+
+  const finalButtons = buttons.length > 0 ? buttons : FALLBACK_BUTTONS;
 
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
-      {buttons.map((btn) => (
+      {finalButtons.map((btn) => (
         <a
-          key={btn!.type}
-          href={btn!.href}
+          key={btn.type}
+          href={btn.href}
           target="_blank"
           rel="noopener noreferrer"
-          title={btn!.label}
+          title={btn.label}
           className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 bg-[#12182B]/90 text-xl shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-sm transition hover:scale-110 hover:border-[#22D3EE]/50 hover:bg-[#22D3EE]/10"
         >
-          {btn!.icon}
+          {btn.icon}
         </a>
       ))}
     </div>

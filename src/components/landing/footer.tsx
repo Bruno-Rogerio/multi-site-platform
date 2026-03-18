@@ -135,14 +135,22 @@ export function Footer({ brandElement, branding }: FooterProps) {
             )}
 
             {/* Contact */}
-            {branding?.contact_email && (
+            <div className="mt-4 flex flex-col gap-1">
               <a
-                href={`mailto:${branding.contact_email}`}
-                className="mt-4 block text-sm text-[#EAF0FF]/40 transition hover:text-[#22D3EE]"
+                href={`mailto:${branding?.contact_email || "contato@bsph.com.br"}`}
+                className="text-sm text-[#EAF0FF]/40 transition hover:text-[#22D3EE]"
               >
-                {branding.contact_email}
+                {branding?.contact_email || "contato@bsph.com.br"}
               </a>
-            )}
+              <a
+                href="https://wa.me/5511915194173"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#EAF0FF]/40 transition hover:text-[#22D3EE]"
+              >
+                WhatsApp: (11) 91519-4173
+              </a>
+            </div>
           </div>
 
           {/* Produto */}
