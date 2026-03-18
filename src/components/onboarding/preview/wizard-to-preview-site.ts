@@ -128,7 +128,7 @@ function buildSection(
         order,
         content: {
           title: str(content.aboutTitle),
-          body: str(content.aboutDescription),
+          body: str(content.aboutBody),
           imageUrl: str(content.aboutImage),
         },
       };
@@ -178,14 +178,6 @@ function buildSection(
     }
 
     case "cta": {
-      const primaryCtaType = state.selectedCtaTypes[0];
-      const ctaConf = primaryCtaType
-        ? state.ctaConfig[primaryCtaType]
-        : undefined;
-      const secondaryCtaType = state.selectedCtaTypes[1];
-      const secondaryConf = secondaryCtaType
-        ? state.ctaConfig[secondaryCtaType]
-        : undefined;
       return {
         id: "cta",
         type: "cta",
@@ -193,14 +185,11 @@ function buildSection(
         variant: state.ctaVariant || "centered",
         content: {
           title: str(content.ctaTitle) || "Vamos conversar?",
-          description: str(content.ctaSubtitle),
-          buttonLabel:
-            ctaConf?.label ||
-            str(content.ctaButtonLabel) ||
-            "Entrar em contato",
-          buttonHref: ctaConf?.url || "#contact",
-          secondaryLabel: secondaryConf?.label || "",
-          secondaryHref: secondaryConf?.url || "",
+          description: str(content.ctaDescription),
+          buttonLabel: str(content.ctaButtonLabel) || "Entrar em contato",
+          buttonHref: str(content.ctaButtonUrl) || "#contact",
+          secondaryLabel: str(content.ctaSecondaryLabel),
+          secondaryHref: str(content.ctaSecondaryUrl),
         },
       };
     }

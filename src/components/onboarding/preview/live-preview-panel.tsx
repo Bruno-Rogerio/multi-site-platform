@@ -8,6 +8,7 @@ import { SectionRenderer } from "@/components/site/section-renderer";
 import { buildSiteStyles, buttonStyleClasses } from "@/components/site/site-shell";
 import { getPaletteById, getContrastTextColor } from "@/lib/onboarding/palettes";
 import { wizardToPreviewSite, wizardToPreviewSections } from "./wizard-to-preview-site";
+import { PreviewFloatingCta } from "./preview-floating-cta";
 import Image from "next/image";
 
 type DeviceMode = "desktop" | "mobile";
@@ -333,6 +334,7 @@ export function LivePreviewPanel() {
                   />
                 </motion.div>
               ))}
+              {floatingCtaEnabled && <PreviewFloatingCta />}
             </motion.div>
 
             {/* Mini footer */}
