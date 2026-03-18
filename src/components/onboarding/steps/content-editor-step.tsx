@@ -1036,6 +1036,11 @@ function SeoContentEditor() {
   const metaTitleLen = String(content.seoTitle ?? "").length;
   const metaDescLen = String(content.seoDescription ?? "").length;
 
+  // Strip HTML tags for the Google preview fallback (heroTitle/heroSubtitle are rich text)
+  function stripHtml(html: unknown): string {
+    return String(html ?? "").replace(/<[^>]*>/g, "").trim();
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-[#22D3EE]/20 bg-[#22D3EE]/5 p-3">
@@ -1067,10 +1072,10 @@ function SeoContentEditor() {
             {state.preferredSubdomain || "seusite"}.{process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN || "bsph.com.br"}
           </p>
           <p className="text-sm text-blue-700 font-medium truncate mt-0.5">
-            {String(content.seoTitle || content.heroTitle || "Título do seu site")}
+            {String(content.seoTitle) || stripHtml(content.heroTitle) || state.businessName || "Título do seu site"}
           </p>
           <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">
-            {String(content.seoDescription || content.heroSubtitle || "Descrição do seu site aparece aqui...")}
+            {String(content.seoDescription) || stripHtml(content.heroSubtitle) || "Descrição do seu site aparece aqui..."}
           </p>
         </div>
       </div>
