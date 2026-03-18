@@ -315,27 +315,30 @@ export function LivePreviewPanel() {
               </span>
             </div>
 
-            {/* Sections */}
-            <motion.div
-              className={`${isMobile ? "preview-mobile" : ""} overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 flex-1`}
-              style={{ ...siteStyles, ...previewAliases }}
-              initial="hidden"
-              animate="visible"
-              variants={containerVariants}
-              key={motionStyle}
+            {/* Sections — scroll container is a plain div; motion.div only animates */}
+            <div
+              className={`${isMobile ? "preview-mobile" : ""} overflow-y-auto scrollbar-thin scrollbar-thumb-white/10`}
+              style={{ ...siteStyles, ...previewAliases, flex: 1, minHeight: 0 }}
             >
-              {previewSections.map((section) => (
-                <motion.div key={section.id} variants={itemVariants}>
-                  <SectionRenderer
-                    section={section}
-                    site={previewSite}
-                    buttonStyleClassName={btnClass}
-                    maxEventsPreview={3}
-                  />
-                </motion.div>
-              ))}
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+                key={motionStyle}
+              >
+                {previewSections.map((section) => (
+                  <motion.div key={section.id} variants={itemVariants}>
+                    <SectionRenderer
+                      section={section}
+                      site={previewSite}
+                      buttonStyleClassName={btnClass}
+                      maxEventsPreview={3}
+                    />
+                  </motion.div>
+                ))}
+              </motion.div>
               {floatingCtaEnabled && <PreviewFloatingCta />}
-            </motion.div>
+            </div>
 
             {/* Mini footer */}
             <div
