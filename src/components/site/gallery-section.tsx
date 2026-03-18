@@ -51,12 +51,14 @@ export function GallerySection({
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-10 text-center">
-          <h2
-            className="text-3xl font-black tracking-tight"
-            style={{ color: "var(--site-text)" }}
-          >
-            {title}
-          </h2>
+          {title && (
+            <h2
+              className="text-3xl font-black tracking-tight"
+              style={{ color: "var(--site-text)" }}
+            >
+              {title}
+            </h2>
+          )}
           {subtitle && (
             <p
               className="mt-3 text-base leading-relaxed"

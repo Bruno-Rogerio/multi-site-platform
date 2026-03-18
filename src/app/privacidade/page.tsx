@@ -36,8 +36,8 @@ export default async function PrivacidadePage() {
           <h2>1. Controlador dos dados</h2>
           <p>
             O controlador dos dados pessoais tratados nesta plataforma é a empresa responsável pela BuildSphere. Para fins de contato referente à proteção de dados, utilize o e-mail:{" "}
-            <a href="mailto:contato@raizaconvento.com.br" className="text-[#22D3EE] hover:underline">
-              contato@raizaconvento.com.br
+            <a href="mailto:contato@bsph.com.br" className="text-[#22D3EE] hover:underline">
+              contato@bsph.com.br
             </a>{" "}
             (Encarregado / DPO).
           </p>
@@ -145,11 +145,22 @@ export default async function PrivacidadePage() {
 
           <h2>10. Encarregado de proteção de dados (DPO)</h2>
           <p>
-            Nosso Encarregado (DPO) pode ser contatado pelo e-mail:{" "}
-            <a href="mailto:contato@raizaconvento.com.br" className="text-[#22D3EE] hover:underline">
-              contato@raizaconvento.com.br
-            </a>
+            Nosso Encarregado (DPO) pode ser contatado pelos canais abaixo:
           </p>
+          <ul>
+            <li>
+              E-mail:{" "}
+              <a href="mailto:contato@bsph.com.br" className="text-[#22D3EE] hover:underline">
+                contato@bsph.com.br
+              </a>
+            </li>
+            <li>
+              WhatsApp:{" "}
+              <a href="https://wa.me/5511915194173" className="text-[#22D3EE] hover:underline" target="_blank" rel="noreferrer">
+                +55 (11) 91519-4173
+              </a>
+            </li>
+          </ul>
 
           <h2>11. Alterações nesta política</h2>
           <p>

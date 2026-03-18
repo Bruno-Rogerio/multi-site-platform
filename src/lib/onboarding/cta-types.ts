@@ -52,6 +52,38 @@ export const ctaTypes: CtaTypeDefinition[] = [
     urlPrefix: "https://facebook.com/",
     description: "Link para sua página no Facebook",
   },
+  {
+    id: "youtube",
+    label: "YouTube",
+    icon: "Youtube",
+    placeholder: "@seucanal",
+    urlPrefix: "https://youtube.com/",
+    description: "Link para seu canal no YouTube",
+  },
+  {
+    id: "tiktok",
+    label: "TikTok",
+    icon: "Music2",
+    placeholder: "@seuperfil",
+    urlPrefix: "https://tiktok.com/",
+    description: "Link para seu perfil no TikTok",
+  },
+  {
+    id: "pinterest",
+    label: "Pinterest",
+    icon: "Pin",
+    placeholder: "seuperfil",
+    urlPrefix: "https://pinterest.com/",
+    description: "Link para seu perfil no Pinterest",
+  },
+  {
+    id: "telegram",
+    label: "Telegram",
+    icon: "Send",
+    placeholder: "seuperfil",
+    urlPrefix: "https://t.me/",
+    description: "Link para seu canal ou perfil no Telegram",
+  },
 ];
 
 export const BASIC_CTA_LIMIT = 2;

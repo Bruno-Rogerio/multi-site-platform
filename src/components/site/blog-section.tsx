@@ -121,7 +121,7 @@ export function BlogSection({ title = "Blog", subtitle, posts = [], variant = "g
       <section id="blog" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--site-text)" }}>{title}</h2>
+            {title && <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--site-text)" }}>{title}</h2>}
             {subtitle && <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--site-text)", opacity: 0.6 }}>{subtitle}</p>}
           </div>
           <div className="space-y-4">
@@ -162,7 +162,7 @@ export function BlogSection({ title = "Blog", subtitle, posts = [], variant = "g
       <section id="blog" className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--site-text)" }}>{title}</h2>
+            {title && <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--site-text)" }}>{title}</h2>}
             {subtitle && <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--site-text)", opacity: 0.6 }}>{subtitle}</p>}
           </div>
           <div className="space-y-6">
@@ -184,7 +184,7 @@ export function BlogSection({ title = "Blog", subtitle, posts = [], variant = "g
     <section id="blog" className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="mb-10 text-center">
-          <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--site-text)" }}>{title}</h2>
+          {title && <h2 className="text-3xl font-black tracking-tight" style={{ color: "var(--site-text)" }}>{title}</h2>}
           {subtitle && <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--site-text)", opacity: 0.6 }}>{subtitle}</p>}
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

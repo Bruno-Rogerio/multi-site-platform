@@ -512,8 +512,8 @@ export function SectionRenderer({
 
   // ─── ABOUT ──────────────────────────────────────────────
   if (section.type === "about") {
-    const titlePlainAbout = asString(section.content.title, "Sobre");
-    const title = richHtml(section.content.title, "Sobre");
+    const titlePlainAbout = asString(section.content.title, "");
+    const title = richHtml(section.content.title, "");
     const body = richHtml(section.content.body);
     const aboutImageUrl = asString(section.content.imageUrl);
 
@@ -553,7 +553,7 @@ export function SectionRenderer({
               </div>
               <div>
                 <SectionEyebrow label="Sobre" />
-                <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+                {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
                 {body && (
                   <p className="mt-5 whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
                 )}
@@ -562,7 +562,7 @@ export function SectionRenderer({
           ) : (
             <>
               <SectionEyebrow label="Sobre" />
-              <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+              {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
               {body && (
                 <p className="mt-5 max-w-3xl whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
               )}
@@ -575,8 +575,8 @@ export function SectionRenderer({
 
   // ─── SERVICES ───────────────────────────────────────────
   if (section.type === "services") {
-    const titlePlainServices = asString(section.content.title, "Serviços");
-    const title = richHtml(section.content.title, "Serviços");
+    const titlePlainServices = asString(section.content.title, "");
+    const title = richHtml(section.content.title, "");
     const cards = asCards(section.content.cards);
     const items = asStringArray(section.content.items);
     const imageUrl = asString(section.content.imageUrl);
@@ -597,7 +597,7 @@ export function SectionRenderer({
         >
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Serviços" />
-            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -700,7 +700,7 @@ export function SectionRenderer({
           />
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Serviços" />
-            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -787,7 +787,7 @@ export function SectionRenderer({
           <div className={`relative ${containerClass}`}>
             <div className="text-center">
               <SectionEyebrow label="Serviços" />
-              <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+              {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
             </div>
             {imageUrl && (
               <div
@@ -880,7 +880,7 @@ export function SectionRenderer({
           />
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Como funciona" />
-            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -982,7 +982,7 @@ export function SectionRenderer({
         >
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Serviços" />
-            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -1090,7 +1090,7 @@ export function SectionRenderer({
         />
         <div className={`relative ${containerClass}`}>
           <SectionEyebrow label="Serviços" />
-          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+          {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
           {imageUrl && (
             <div
               className="mt-6 overflow-hidden"
@@ -1471,7 +1471,7 @@ export function SectionRenderer({
 
   // ─── TESTIMONIALS ───────────────────────────────────────
   if (section.type === "testimonials") {
-    const title = asString(section.content.title, "Depoimentos");
+    const title = asString(section.content.title, "");
     const testimonials = asTestimonials(section.content.items);
 
     /* ── CAROUSEL ── */
@@ -1499,7 +1499,7 @@ export function SectionRenderer({
           />
           <div className={`relative ${containerClass}`}>
             <SectionEyebrow label="Depoimentos" />
-            <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
             <div className="mt-6 divide-y divide-[var(--site-border)]">
               {testimonials.map((testimonial, i) => (
                 <div
@@ -1556,7 +1556,7 @@ export function SectionRenderer({
         />
         <div className={`relative ${containerClass}`}>
           <SectionEyebrow label="Depoimentos" />
-          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+          {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
           <StaggeredCards className="mt-6 grid gap-5 sm:grid-cols-2">
             {testimonials.map((testimonial, i) => (
               <article
@@ -1599,7 +1599,7 @@ export function SectionRenderer({
 
   // ─── CONTACT ────────────────────────────────────────────
   if (section.type === "contact") {
-    const title = asString(section.content.title, "Contato");
+    const title = asString(section.content.title, "");
     const subtitle = asString(section.content.subtitle);
     const socialLinks = asSocialLinks(section.content.socialLinks);
     const legacyLinks: SocialLink[] = [];
@@ -1645,7 +1645,7 @@ export function SectionRenderer({
         />
         <div className={`relative ${containerClass} text-center`}>
           <SectionEyebrow label="Contato" />
-          <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />
+          {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
           {subtitle && <p className="mt-3 text-base opacity-70">{subtitle}</p>}
           {allLinks.length > 0 && (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -1703,7 +1703,7 @@ export function SectionRenderer({
 
   // ─── FAQ ─────────────────────────────────────────────────
   if (section.type === "faq") {
-    const title = asString(section.content.title, "Perguntas frequentes");
+    const title = asString(section.content.title, "");
     const subtitle = asString(section.content.subtitle);
     const items = Array.isArray(section.content.items)
       ? (section.content.items as Array<{ question: string; answer: string }>)
@@ -1713,7 +1713,7 @@ export function SectionRenderer({
 
   // ─── BLOG ────────────────────────────────────────────────
   if (section.type === "blog") {
-    const title = asString(section.content.title, "Blog");
+    const title = asString(section.content.title, "");
     const subtitle = asString(section.content.subtitle);
     const posts = Array.isArray(section.content.posts)
       ? (section.content.posts as Array<{ title: string; excerpt: string; imageUrl?: string; link?: string; body?: string }>)
@@ -1723,7 +1723,7 @@ export function SectionRenderer({
 
   // ─── GALLERY ─────────────────────────────────────────────
   if (section.type === "gallery") {
-    const title = asString(section.content.title, "Galeria");
+    const title = asString(section.content.title, "");
     const subtitle = asString(section.content.subtitle);
     const images = Array.isArray(section.content.images)
       ? (section.content.images as Array<{ url: string; alt: string; caption?: string }>)
@@ -1733,7 +1733,7 @@ export function SectionRenderer({
 
   // ─── EVENTS ──────────────────────────────────────────────
   if (section.type === "events") {
-    const title = asString(section.content.title, "Eventos");
+    const title = asString(section.content.title, "");
     const subtitle = asString(section.content.subtitle);
     const events = Array.isArray(section.content.events)
       ? (section.content.events as Array<{ title: string; date: string; time?: string; location?: string; description?: string }>)

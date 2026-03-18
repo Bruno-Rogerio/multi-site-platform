@@ -18,7 +18,7 @@ export type ServiceCardData = {
   extraLines?: string[]; // extra text lines below the description
 };
 
-export type CtaTypeId = "whatsapp" | "email" | "instagram" | "linkedin" | "facebook";
+export type CtaTypeId = "whatsapp" | "email" | "instagram" | "linkedin" | "facebook" | "youtube" | "tiktok" | "pinterest" | "telegram";
 
 export type CtaConfig = {
   type: CtaTypeId;

@@ -27,7 +27,7 @@ export function FaqSection({ title = "Perguntas frequentes", subtitle, items = [
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl font-black" style={{ color: "var(--site-text)" }}>{title}</h2>
+            {title && <h2 className="text-3xl font-black" style={{ color: "var(--site-text)" }}>{title}</h2>}
             {subtitle && <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--site-text)", opacity: 0.6 }}>{subtitle}</p>}
           </div>
           <div className="space-y-6">
@@ -92,7 +92,7 @@ export function FaqSection({ title = "Perguntas frequentes", subtitle, items = [
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <div className="mb-10 text-center">
-            <h2 className="text-3xl font-black" style={{ color: "var(--site-text)" }}>{title}</h2>
+            {title && <h2 className="text-3xl font-black" style={{ color: "var(--site-text)" }}>{title}</h2>}
             {subtitle && <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--site-text)", opacity: 0.6 }}>{subtitle}</p>}
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -162,7 +162,7 @@ export function FaqSection({ title = "Perguntas frequentes", subtitle, items = [
     <section className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-3xl">
         <div className="mb-10 text-center">
-          <h2 className="text-3xl font-black" style={{ color: "var(--site-text)" }}>{title}</h2>
+          {title && <h2 className="text-3xl font-black" style={{ color: "var(--site-text)" }}>{title}</h2>}
           {subtitle && <p className="mt-3 text-base leading-relaxed" style={{ color: "var(--site-text)", opacity: 0.6 }}>{subtitle}</p>}
         </div>
         <div className="space-y-3">

@@ -12,6 +12,10 @@ const CTA_ICONS: Record<string, string> = {
   instagram: "Instagram",
   linkedin: "Linkedin",
   facebook: "Facebook",
+  youtube: "Youtube",
+  tiktok: "Music2",
+  pinterest: "Pin",
+  telegram: "Send",
 };
 
 const CTA_LABELS: Record<string, string> = {
@@ -20,6 +24,10 @@ const CTA_LABELS: Record<string, string> = {
   instagram: "Instagram",
   linkedin: "LinkedIn",
   facebook: "Facebook",
+  youtube: "YouTube",
+  tiktok: "TikTok",
+  pinterest: "Pinterest",
+  telegram: "Telegram",
 };
 
 export function wizardToPreviewSite(state: WizardState): Site {
@@ -178,6 +186,7 @@ function buildSection(
     }
 
     case "cta": {
+      const isDouble = state.ctaVariant === "double";
       return {
         id: "cta",
         type: "cta",
@@ -188,17 +197,19 @@ function buildSection(
           description: str(content.ctaDescription),
           buttonLabel: str(content.ctaButtonLabel) || "Entrar em contato",
           buttonHref: str(content.ctaButtonUrl) || "#contact",
-          secondaryLabel: str(content.ctaSecondaryLabel),
-          secondaryHref: str(content.ctaSecondaryUrl),
+          secondaryLabel: isDouble ? str(content.ctaSecondaryLabel) : "",
+          secondaryHref: isDouble ? str(content.ctaSecondaryUrl) : "",
         },
       };
     }
 
     case "contact": {
-      const socialLinks = state.contactSelectedLinks
+      const channels = state.contactSelectedLinks.length > 0
+        ? state.contactSelectedLinks
+        : state.selectedCtaTypes;
+      const socialLinks = channels
         .map((type) => {
-          const conf =
-            state.ctaConfig[type as keyof typeof state.ctaConfig];
+          const conf = state.ctaConfig[type as keyof typeof state.ctaConfig];
           if (!conf?.url) return null;
           return {
             type,

@@ -133,11 +133,22 @@ export default async function TermosPage() {
 
           <h2>13. Contato</h2>
           <p>
-            Dúvidas, solicitações ou reclamações relacionadas a estes Termos podem ser enviadas para:{" "}
-            <a href="mailto:contato@raizaconvento.com.br" className="text-[#22D3EE] hover:underline">
-              contato@raizaconvento.com.br
-            </a>
+            Dúvidas, solicitações ou reclamações relacionadas a estes Termos podem ser enviadas pelos canais abaixo:
           </p>
+          <ul>
+            <li>
+              E-mail:{" "}
+              <a href="mailto:contato@bsph.com.br" className="text-[#22D3EE] hover:underline">
+                contato@bsph.com.br
+              </a>
+            </li>
+            <li>
+              WhatsApp:{" "}
+              <a href="https://wa.me/5511915194173" className="text-[#22D3EE] hover:underline" target="_blank" rel="noreferrer">
+                +55 (11) 91519-4173
+              </a>
+            </li>
+          </ul>
         </div>
       </main>
     </div>
