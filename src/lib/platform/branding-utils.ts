@@ -85,19 +85,18 @@ export function buildSocialUrl(type: string, value: string): string {
   }
 }
 
-export const SOCIAL_META: Record<string, { label: string; placeholder: string; emoji: string }> = {
-  instagram: { label: "Instagram", placeholder: "@seuperfil ou handle", emoji: "📸" },
-  facebook: { label: "Facebook", placeholder: "URL da página", emoji: "📘" },
-  twitter: { label: "X (Twitter)", placeholder: "@seuperfil", emoji: "🐦" },
-  linkedin: { label: "LinkedIn", placeholder: "URL do perfil/empresa", emoji: "💼" },
-  youtube: { label: "YouTube", placeholder: "URL do canal", emoji: "▶️" },
-  tiktok: { label: "TikTok", placeholder: "@seuperfil", emoji: "🎵" },
-  pinterest: { label: "Pinterest", placeholder: "URL do perfil", emoji: "📌" },
-  threads: { label: "Threads", placeholder: "@seuperfil", emoji: "🧵" },
-  whatsapp: { label: "WhatsApp", placeholder: "5511999999999 (com DDI)", emoji: "💬" },
-  telegram: { label: "Telegram", placeholder: "@username ou link de grupo", emoji: "✈️" },
-  discord: { label: "Discord", placeholder: "Link do servidor (discord.gg/...)", emoji: "🎮" },
-  snapchat: { label: "Snapchat", placeholder: "@username", emoji: "👻" },
-  kwai: { label: "Kwai", placeholder: "URL do perfil", emoji: "🎬" },
-  twitch: { label: "Twitch", placeholder: "username", emoji: "🟣" },
+export const SOCIAL_META: Record<string, { label: string; placeholder: string; emoji: string; prefix: string }> = {
+  instagram: { label: "Instagram", placeholder: "seuperfil", emoji: "📸", prefix: "instagram.com/" },
+  facebook: { label: "Facebook", placeholder: "suapagina", emoji: "📘", prefix: "facebook.com/" },
+  twitter: { label: "X (Twitter)", placeholder: "seuperfil", emoji: "🐦", prefix: "x.com/" },
+  linkedin: { label: "LinkedIn", placeholder: "in/seuperfil", emoji: "💼", prefix: "linkedin.com/" },
+  youtube: { label: "YouTube", placeholder: "seucanal", emoji: "▶️", prefix: "youtube.com/@" },
+  tiktok: { label: "TikTok", placeholder: "seuperfil", emoji: "🎵", prefix: "tiktok.com/@" },
+  pinterest: { label: "Pinterest", placeholder: "seuperfil", emoji: "📌", prefix: "pinterest.com/" },
+  threads: { label: "Threads", placeholder: "seuperfil", emoji: "🧵", prefix: "threads.net/@" },
+  telegram: { label: "Telegram", placeholder: "username", emoji: "✈️", prefix: "t.me/" },
+  discord: { label: "Discord", placeholder: "discord.gg/...", emoji: "🎮", prefix: "" },
+  snapchat: { label: "Snapchat", placeholder: "username", emoji: "👻", prefix: "snapchat.com/add/" },
+  kwai: { label: "Kwai", placeholder: "URL do perfil", emoji: "🎬", prefix: "" },
+  twitch: { label: "Twitch", placeholder: "username", emoji: "🟣", prefix: "twitch.tv/" },
 };

@@ -5,30 +5,52 @@ type Props = {
   branding: PlatformBrandingSettings;
 };
 
+type Button = { type: string; href: string; icon: string; label: string };
+
 function getIcon(type: string): string {
   return SOCIAL_META[type]?.emoji ?? "💬";
 }
 
 export function FloatingSocialButtons({ branding }: Props) {
-  const buttons = [branding.floating_button_1, branding.floating_button_2]
+  const configured = [branding.floating_button_1, branding.floating_button_2]
     .filter(Boolean)
-    .map((type) => {
-      const value = branding[`social_${type}` as keyof PlatformBrandingSettings] as string;
-      if (!value) return null;
-      return { type, href: buildSocialUrl(type, value), icon: getIcon(type), label: SOCIAL_META[type]?.label ?? type };
-    })
-    .filter(Boolean);
+    .reduce<Button[]>((acc, type) => {
+      let value: string;
+      let href: string;
+      let icon: string;
+      let label: string;
 
-  const FALLBACK_BUTTONS = [
+      if (type === "whatsapp") {
+        value = branding.contact_whatsapp;
+        href = value ? `https://wa.me/${value.replace(/\D/g, "")}` : "";
+        icon = "💬";
+        label = "WhatsApp";
+      } else if (type === "email") {
+        value = branding.contact_email;
+        href = value ? `mailto:${value}` : "";
+        icon = "✉️";
+        label = "E-mail";
+      } else {
+        value = branding[`social_${type}` as keyof PlatformBrandingSettings] as string ?? "";
+        href = buildSocialUrl(type, value);
+        icon = getIcon(type);
+        label = SOCIAL_META[type]?.label ?? type;
+      }
+
+      if (href) acc.push({ type, href, icon, label });
+      return acc;
+    }, []);
+
+  const FALLBACK: Button[] = [
     { type: "whatsapp", href: "https://wa.me/5511915194173", icon: "💬", label: "WhatsApp" },
     { type: "email", href: "mailto:contato@bsph.com.br", icon: "✉️", label: "E-mail" },
   ];
 
-  const finalButtons = buttons.length > 0 ? buttons : FALLBACK_BUTTONS;
+  const buttons = configured.length > 0 ? configured : FALLBACK;
 
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col gap-3">
-      {finalButtons.map((btn) => (
+      {buttons.map((btn) => (
         <a
           key={btn.type}
           href={btn.href}
