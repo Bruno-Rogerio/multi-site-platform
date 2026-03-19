@@ -17,6 +17,7 @@ import {
   Plus,
   Trash2,
   Check,
+  BarChart2,
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
@@ -31,6 +32,7 @@ const TAB_META: Record<string, { label: string; icon: React.ReactNode }> = {
   hero:         { label: "Capa",        icon: <Sparkles size={13} /> },
   services:     { label: "Serviços",    icon: <Layers size={13} /> },
   about:        { label: "Sobre",       icon: <User size={13} /> },
+  stats:        { label: "Números",     icon: <BarChart2 size={13} /> },
   testimonials: { label: "Depoimentos", icon: <Star size={13} /> },
   blog:         { label: "Blog",        icon: <FileText size={13} /> },
   gallery:      { label: "Galeria",     icon: <ImageIcon size={13} /> },
@@ -42,7 +44,7 @@ const TAB_META: Record<string, { label: string; icon: React.ReactNode }> = {
 };
 
 const SECTION_TAB_ORDER = [
-  "hero", "services", "about", "testimonials",
+  "hero", "services", "about", "stats", "testimonials",
   "blog", "gallery", "faq", "events",
   "cta", "contact", "seo",
 ];
@@ -313,6 +315,19 @@ function ServicesContentEditor() {
 
   return (
     <div className="space-y-4">
+      <VariantBar
+        label="Layout"
+        options={[
+          { id: "default", name: "Grade" },
+          { id: "minimal-list", name: "Lista" },
+          { id: "masonry", name: "Masonry" },
+          { id: "columns", name: "Colunas" },
+          { id: "steps", name: "Passos" },
+          { id: "numbered", name: "Numerado" },
+        ]}
+        value={state.servicesVariant || "default"}
+        onChange={id => dispatch({ type: "SET_SERVICES_VARIANT", variant: id })}
+      />
       <Input label="Título da seção" value={String(content.servicesTitle ?? "Serviços")} onChange={setTitle} placeholder="Ex: O que ofereço" />
 
       <div className="border-t border-white/10 pt-4">
@@ -363,6 +378,14 @@ function ServicesContentEditor() {
                   onSelect={iconName => handleServiceChange(index, "iconName", iconName)}
                 />
               </div>
+
+              <Input
+                label="Tag / destaque (opcional)"
+                value={(card as unknown as Record<string, string>).tag ?? ""}
+                onChange={v => handleServiceChange(index, "tag", v)}
+                placeholder="Ex: Mais popular, Novidade, Destaque"
+                hint="Aparece como badge no card"
+              />
 
               <RichTextEditor
                 value={card.description}
@@ -463,6 +486,14 @@ function AboutContentEditor() {
           onChange={v => set("aboutImageObjectPosition", v)}
         />
       )}
+      {!!content.aboutImage && (
+        <VariantBar
+          label="Estilo da imagem"
+          options={[{ id: "default", name: "Retangular" }, { id: "circular", name: "Circular" }]}
+          value={String(content.aboutImageStyle ?? "default")}
+          onChange={id => set("aboutImageStyle", id)}
+        />
+      )}
       <div className="border-t border-white/10 pt-4 space-y-4">
         <div>
           <label className="text-xs font-medium text-[var(--platform-text)]/60">Título da seção</label>
@@ -483,6 +514,105 @@ function AboutContentEditor() {
             paletteColors={paletteColors}
             minHeight="8rem"
           />
+        </div>
+        <div className="border-t border-white/10 pt-4 space-y-3">
+          <p className="text-xs font-medium text-[var(--platform-text)]/60">Destaque numérico (opcional)</p>
+          <div className="grid grid-cols-2 gap-3">
+            <Input
+              label="Número / valor"
+              value={String(content.aboutHighlightValue ?? "")}
+              onChange={v => set("aboutHighlightValue", v)}
+              placeholder="Ex: 8, 500+, 15 anos"
+            />
+            <Input
+              label="Legenda"
+              value={String(content.aboutHighlightLabel ?? "")}
+              onChange={v => set("aboutHighlightLabel", v)}
+              placeholder="Ex: Anos de experiência"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatsContentEditor() {
+  const { state, dispatch } = useWizard();
+  const { content } = state;
+  const items = (content.statsItems as Array<{ value: string; label: string }>) ?? [];
+
+  function updateItem(index: number, field: "value" | "label", value: string) {
+    const updated = items.map((item, i) => i === index ? { ...item, [field]: value } : item);
+    dispatch({ type: "SET_CONTENT_ARRAY", key: "statsItems", value: updated });
+  }
+
+  function addItem() {
+    dispatch({ type: "SET_CONTENT_ARRAY", key: "statsItems", value: [...items, { value: "", label: "" }] });
+  }
+
+  function removeItem(index: number) {
+    dispatch({ type: "SET_CONTENT_ARRAY", key: "statsItems", value: items.filter((_, i) => i !== index) });
+  }
+
+  return (
+    <div className="space-y-4">
+      <Input
+        label="Título da seção (opcional)"
+        value={String(content.statsTitle ?? "")}
+        onChange={v => dispatch({ type: "UPDATE_CONTENT", key: "statsTitle", value: v })}
+        placeholder="Ex: Números que falam por mim"
+      />
+      <VariantBar
+        label="Estilo"
+        options={[{ id: "default", name: "Cards" }, { id: "minimal", name: "Simples" }]}
+        value={String(content.statsVariant ?? "default")}
+        onChange={id => dispatch({ type: "UPDATE_CONTENT", key: "statsVariant", value: id })}
+      />
+
+      <div className="border-t border-white/10 pt-4">
+        <div className="mb-3 flex items-center justify-between">
+          <p className="text-xs font-medium text-[var(--platform-text)]/60">{items.length} item{items.length !== 1 ? "s" : ""}</p>
+          <button
+            type="button"
+            onClick={addItem}
+            className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-[var(--platform-text)]/60 transition hover:bg-white/[0.08]"
+          >
+            <Plus size={12} />
+            Adicionar
+          </button>
+        </div>
+        <div className="space-y-2">
+          {items.map((item, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <div className="flex-1 grid grid-cols-2 gap-2">
+                <input
+                  value={item.value}
+                  onChange={e => updateItem(i, "value", e.target.value)}
+                  placeholder="Ex: 500+"
+                  className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+                <input
+                  value={item.label}
+                  onChange={e => updateItem(i, "label", e.target.value)}
+                  placeholder="Ex: Clientes atendidos"
+                  className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                />
+              </div>
+              {items.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeItem(i)}
+                  className="flex h-7 w-7 items-center justify-center rounded-full bg-red-500/10 text-red-400 transition hover:bg-red-500/20"
+                >
+                  <Trash2 size={11} />
+                </button>
+              )}
+            </div>
+          ))}
+          {items.length === 0 && (
+            <p className="text-xs text-[var(--platform-text)]/40 text-center py-3">Clique em &quot;Adicionar&quot; para inserir seus números</p>
+          )}
         </div>
       </div>
     </div>
@@ -510,7 +640,13 @@ function TestimonialsContentEditor() {
     <div className="space-y-4">
       <VariantBar
         label="Layout"
-        options={[{ id: "grid", name: "Grade" }, { id: "carousel", name: "Carrossel" }, { id: "quotes", name: "Citações" }]}
+        options={[
+          { id: "grid", name: "Grade" },
+          { id: "carousel", name: "Carrossel" },
+          { id: "quotes", name: "Citações" },
+          { id: "bar", name: "Barra" },
+          { id: "elegant", name: "Elegante" },
+        ]}
         value={state.testimonialsVariant || "grid"}
         onChange={id => dispatch({ type: "SET_TESTIMONIALS_VARIANT", variant: id })}
       />
@@ -870,7 +1006,14 @@ function CtaContentEditor() {
     <div className="space-y-4">
       <VariantBar
         label="Layout do CTA"
-        options={[{ id: "banner", name: "Banner" }, { id: "centered", name: "Centralizado" }, { id: "banner-gradient", name: "Banner Gradiente" }, { id: "centered-gradient", name: "Centr. Gradiente" }, { id: "double", name: "Duplo" }]}
+        options={[
+          { id: "banner", name: "Banner" },
+          { id: "centered", name: "Centralizado" },
+          { id: "banner-gradient", name: "Banner Gradiente" },
+          { id: "centered-gradient", name: "Centr. Gradiente" },
+          { id: "double", name: "Duplo" },
+          { id: "bar", name: "Faixa" },
+        ]}
         value={ctaVariant || "banner"}
         onChange={id => dispatch({ type: "SET_CTA_VARIANT", variant: id })}
       />
@@ -1167,6 +1310,7 @@ export function ContentEditorStep() {
             {activeTab === "hero"         && <HeroContentEditor />}
             {activeTab === "services"     && <ServicesContentEditor />}
             {activeTab === "about"        && <AboutContentEditor />}
+            {activeTab === "stats"        && <StatsContentEditor />}
             {activeTab === "testimonials" && <TestimonialsContentEditor />}
             {activeTab === "blog"         && <BlogContentEditor />}
             {activeTab === "gallery"      && <GalleryContentEditor />}

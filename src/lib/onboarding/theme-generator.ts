@@ -13,7 +13,7 @@ export interface GeneratedTheme {
   fontFamily: string;
   buttonStyle: "rounded" | "pill" | "square";
   motionStyle: string;
-  headerStyle: "blur" | "solid" | "minimal";
+  headerStyle: "blur" | "solid" | "minimal" | "gradient" | "dark";
   dividerStyle: "wave" | "diagonal" | "curve" | "line" | "none";
   "--site-radius": string;
   "--site-spacing": string;
@@ -97,7 +97,7 @@ const PERSONALITY_PRESETS: Record<
     radius: string;
     spacing: string;
     shadow: string;
-    headerStyle: "blur" | "solid" | "minimal";
+    headerStyle: "blur" | "solid" | "minimal" | "gradient" | "dark";
     dividerStyle: "wave" | "diagonal" | "curve" | "line" | "none";
   }
 > = {

@@ -16,6 +16,7 @@ export type ServiceCardData = {
   imageUrl?: string; // optional image for the card
   imageObjectPosition?: string; // CSS object-position for the image (e.g. "center top")
   extraLines?: string[]; // extra text lines below the description
+  tag?: string;
 };
 
 export type CtaTypeId = "whatsapp" | "email" | "instagram" | "linkedin" | "facebook" | "youtube" | "tiktok" | "pinterest" | "telegram";
@@ -62,7 +63,7 @@ export type WizardState = {
   blogVariant: string;
   eventsVariant: string;
   motionStyle: string;
-  headerStyle: "blur" | "solid" | "minimal";
+  headerStyle: "blur" | "solid" | "minimal" | "gradient" | "dark";
   dividerStyle: "wave" | "diagonal" | "curve" | "line" | "none";
   enabledSections: string[];
   sectionColors: Record<string, SectionColorOverride>;
@@ -144,7 +145,7 @@ export type WizardAction =
   | { type: "SET_BLOG_VARIANT"; variant: string }
   | { type: "SET_EVENTS_VARIANT"; variant: string }
   | { type: "SET_MOTION_STYLE"; style: string }
-  | { type: "SET_HEADER_STYLE"; style: "blur" | "solid" | "minimal" }
+  | { type: "SET_HEADER_STYLE"; style: "blur" | "solid" | "minimal" | "gradient" | "dark" }
   | { type: "SET_DIVIDER_STYLE"; style: "wave" | "diagonal" | "curve" | "line" | "none" }
   | { type: "ADD_SECTION"; sectionType: string }
   | { type: "REMOVE_SECTION"; sectionType: string }

@@ -224,9 +224,16 @@ export function MiniSitePreview({
                 backgroundColor:
                   (theme.headerStyle ?? "blur") === "solid"
                     ? theme.backgroundColor
+                    : (theme.headerStyle ?? "blur") === "gradient"
+                    ? theme.primaryColor  // gradient handled via background property below
+                    : (theme.headerStyle ?? "blur") === "dark"
+                    ? "#0B1020"
                     : (theme.headerStyle ?? "blur") === "minimal"
                     ? "transparent"
                     : `${theme.backgroundColor}cc`,
+                ...((theme.headerStyle ?? "blur") === "gradient" && {
+                  background: `linear-gradient(135deg, ${theme.primaryColor}, ${theme.accentColor})`,
+                }),
                 borderBottom: `1px solid var(--site-border, rgba(234,240,255,0.16))`,
                 backdropFilter: (theme.headerStyle ?? "blur") === "blur" ? "blur(8px)" : undefined,
                 fontFamily: theme.fontFamily,

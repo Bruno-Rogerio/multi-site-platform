@@ -59,6 +59,7 @@ const SECTION_OPTIONS: {
   { id: "hero",         label: "Hero",             description: "Banner principal",        emoji: "🎯", mandatory: true },
   { id: "services",     label: "Serviços",          description: "O que você oferece",       emoji: "🧩", defaultOn: true },
   { id: "about",        label: "Sobre mim",         description: "Sua história",            emoji: "👤", defaultOn: true },
+  { id: "stats",        label: "Números",            description: "Estatísticas e conquistas", emoji: "📊", defaultOn: false },
   { id: "testimonials", label: "Depoimentos",        description: "O que clientes dizem",    emoji: "⭐", defaultOn: true },
   { id: "cta",          label: "CTA",               description: "Chamada para ação",       emoji: "📣", defaultOn: true },
   { id: "contact",      label: "Contato",           description: "Formas de falar com você", emoji: "📞", mandatory: true },

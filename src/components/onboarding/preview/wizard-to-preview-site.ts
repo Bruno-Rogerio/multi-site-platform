@@ -134,10 +134,14 @@ function buildSection(
         id: "about",
         type: "about",
         order,
+        variant: str(content.aboutImageStyle) || "default",
         content: {
           title: str(content.aboutTitle),
           body: str(content.aboutBody),
           imageUrl: str(content.aboutImage),
+          imageObjectPosition: str(content.aboutImageObjectPosition),
+          highlightValue: str(content.aboutHighlightValue),
+          highlightLabel: str(content.aboutHighlightLabel),
         },
       };
 
@@ -278,6 +282,22 @@ function buildSection(
         content: {
           title: str(content.eventsTitle) || "Eventos",
           events: Array.isArray(content.events) ? content.events : [],
+        },
+      };
+
+    case "stats":
+      return {
+        id: "stats",
+        type: "stats",
+        order,
+        variant: str(content.statsVariant) || "default",
+        content: {
+          title: str(content.statsTitle),
+          items: Array.isArray(content.statsItems)
+            ? (content.statsItems as Array<{ value: string; label: string }>).filter(
+                (i) => i.value || i.label
+              )
+            : [],
         },
       };
 

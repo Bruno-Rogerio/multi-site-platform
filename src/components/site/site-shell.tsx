@@ -127,6 +127,64 @@ export function SiteShell({ site, children }: SiteShellProps) {
   );
 
   const renderHeader = () => {
+    // ── gradient: linear gradient from primary to accent ──
+    if (headerStyle === "gradient") {
+      return (
+        <header className="sticky top-0 z-20" style={{ background: "linear-gradient(135deg, var(--site-primary), var(--site-accent))", color: "var(--site-button-text)" }}>
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
+            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
+              {logoImg}
+              <div>
+                <p className="text-lg font-bold leading-tight">{site.name}</p>
+                {site.themeSettings.slogan && (
+                  <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                )}
+              </div>
+            </a>
+            <div className="flex items-center gap-3">
+              <nav className="hidden items-center gap-5 md:flex">
+                {navLinks.map((link) => (
+                  <a key={link.href} href={link.href} className="text-sm opacity-70 transition hover:opacity-100">
+                    {link.label}
+                  </a>
+                ))}
+              </nav>
+              <MobileNav links={navLinks} />
+            </div>
+          </div>
+        </header>
+      );
+    }
+
+    // ── dark: always dark background ──
+    if (headerStyle === "dark") {
+      return (
+        <header className="sticky top-0 z-20 border-b border-white/10" style={{ backgroundColor: "#0B1020", color: "#EAF0FF" }}>
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
+            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
+              {logoImg}
+              <div>
+                <p className="text-lg font-bold leading-tight" style={{ color: "var(--site-primary)" }}>{site.name}</p>
+                {site.themeSettings.slogan && (
+                  <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                )}
+              </div>
+            </a>
+            <div className="flex items-center gap-3">
+              <nav className="hidden items-center gap-5 md:flex">
+                {navLinks.map((link) => (
+                  <a key={link.href} href={link.href} className="text-sm opacity-70 transition hover:opacity-100" style={{ color: "#EAF0FF" }}>
+                    {link.label}
+                  </a>
+                ))}
+              </nav>
+              <MobileNav links={navLinks} />
+            </div>
+          </div>
+        </header>
+      );
+    }
+
     // ── solid: bg na cor primária, texto branco ──
     if (headerStyle === "solid") {
       return (

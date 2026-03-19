@@ -4,6 +4,7 @@ export type SectionType =
   | "hero"
   | "about"
   | "services"
+  | "stats"
   | "cta"
   | "testimonials"
   | "contact"
@@ -26,7 +27,7 @@ export type ThemeSettings = {
   "--site-radius"?: string;
   "--site-spacing"?: string;
   "--site-shadow"?: string;
-  headerStyle?: "blur" | "solid" | "minimal";
+  headerStyle?: "blur" | "solid" | "minimal" | "gradient" | "dark";
   dividerStyle?: "wave" | "diagonal" | "curve" | "line" | "none";
   motionStyle?: string;
   slogan?: string;

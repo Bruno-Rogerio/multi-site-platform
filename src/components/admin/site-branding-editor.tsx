@@ -55,9 +55,11 @@ const BUTTON_STYLES = [
 ] as const;
 
 const HEADER_STYLES = [
-  { value: "blur", label: "Vidro (blur)", desc: "Fundo desfocado com transparência" },
-  { value: "solid", label: "Sólido", desc: "Cor de fundo opaca" },
-  { value: "minimal", label: "Minimalista", desc: "Linha fina, quase invisível" },
+  { value: "blur",     label: "Vidro",     desc: "blur" },
+  { value: "solid",    label: "Sólido",    desc: "cor primária" },
+  { value: "minimal",  label: "Minimal",   desc: "transparente" },
+  { value: "gradient", label: "Gradiente", desc: "primary → accent" },
+  { value: "dark",     label: "Escuro",    desc: "sempre dark" },
 ] as const;
 
 const DIVIDER_STYLES = [
@@ -466,28 +468,73 @@ export function SiteBrandingEditor({
           <label className="text-xs font-semibold uppercase tracking-wide text-[var(--platform-text)]/60">
             Estilo do cabeçalho
           </label>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+          <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
             {HEADER_STYLES.map((s) => {
               const isActive = asString(themeSettings.headerStyle) === s.value;
+              const primaryColor = asString(themeSettings.primaryColor) || "#3B82F6";
+              const accentColor = asString(themeSettings.accentColor) || "#22D3EE";
+              const previewBg =
+                s.value === "blur"
+                  ? (() => {
+                      const m = primaryColor.match(/\w\w/g);
+                      const rgb = m ? m.map((h) => parseInt(h, 16)).join(",") : "59,130,246";
+                      return `rgba(${rgb},0.18)`;
+                    })()
+                  : s.value === "solid"
+                  ? primaryColor
+                  : s.value === "minimal"
+                  ? "transparent"
+                  : s.value === "gradient"
+                  ? `linear-gradient(135deg, ${primaryColor}, ${accentColor})`
+                  : "#0B1020"; // dark
               return (
                 <button
                   key={s.value}
                   type="button"
                   onClick={() => set("headerStyle", s.value)}
-                  className={`rounded-xl border p-3 text-left transition ${
+                  className={`rounded-xl border p-0 overflow-hidden text-left transition ${
                     isActive
-                      ? "border-[#22D3EE]/60 bg-[#22D3EE]/10"
-                      : "border-white/10 hover:border-white/20 hover:bg-white/5"
+                      ? "border-[#22D3EE] ring-1 ring-[#22D3EE]/40"
+                      : "border-white/10 hover:border-white/25"
                   }`}
                 >
-                  <p
-                    className={`text-sm font-semibold ${isActive ? "text-[#22D3EE]" : "text-[var(--platform-text)]"}`}
+                  {/* Mini preview strip */}
+                  <div
+                    className="flex h-8 w-full items-center justify-between px-2.5"
+                    style={{
+                      background: previewBg,
+                      backdropFilter: s.value === "blur" ? "blur(8px)" : undefined,
+                    }}
                   >
-                    {s.label}
-                  </p>
-                  <p className="mt-0.5 text-[11px] text-[var(--platform-text)]/45">
-                    {s.desc}
-                  </p>
+                    <div
+                      className="h-2 w-10 rounded-full"
+                      style={{
+                        backgroundColor:
+                          s.value === "solid" || s.value === "gradient" || s.value === "dark"
+                            ? "rgba(255,255,255,0.7)"
+                            : primaryColor,
+                      }}
+                    />
+                    <div
+                      className="h-4 w-10 rounded"
+                      style={{
+                        backgroundColor:
+                          s.value === "solid" || s.value === "gradient" || s.value === "dark"
+                            ? "rgba(255,255,255,0.2)"
+                            : primaryColor,
+                        opacity: 0.6,
+                      }}
+                    />
+                  </div>
+                  {/* Label */}
+                  <div className="px-2.5 py-1.5">
+                    <p
+                      className={`text-[11px] font-semibold ${isActive ? "text-[#22D3EE]" : "text-[var(--platform-text)]/70"}`}
+                    >
+                      {s.label}
+                    </p>
+                    <p className="text-[10px] text-[var(--platform-text)]/35">{s.desc}</p>
+                  </div>
                 </button>
               );
             })}

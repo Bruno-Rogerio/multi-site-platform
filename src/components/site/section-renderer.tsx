@@ -35,7 +35,7 @@ function asStringArray(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === "string");
 }
 
-type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string; imageObjectPosition?: string; extraLines?: string[] };
+type ServiceCard = { title: string; description?: string; iconName?: string; imageUrl?: string; imageObjectPosition?: string; extraLines?: string[]; tag?: string };
 
 function asCards(value: unknown): ServiceCard[] {
   if (!Array.isArray(value)) return [];
@@ -52,6 +52,7 @@ function asCards(value: unknown): ServiceCard[] {
       imageUrl: typeof rec.imageUrl === "string" ? rec.imageUrl : "",
       imageObjectPosition: typeof rec.imageObjectPosition === "string" ? rec.imageObjectPosition : "center center",
       extraLines: Array.isArray(rec.extraLines) ? (rec.extraLines as unknown[]).filter((l): l is string => typeof l === "string" && l.trim() !== "") : [],
+      tag: typeof rec.tag === "string" ? rec.tag : undefined,
     });
   }
   return result;
@@ -516,6 +517,9 @@ export function SectionRenderer({
     const title = richHtml(section.content.title, "");
     const body = richHtml(section.content.body);
     const aboutImageUrl = asString(section.content.imageUrl);
+    const highlightValue = asString(section.content.highlightValue);
+    const highlightLabel = asString(section.content.highlightLabel);
+    const isCircular = section.variant === "circular" || asString(section.content.imageStyle) === "circular";
 
     return (
       <section
@@ -533,10 +537,10 @@ export function SectionRenderer({
         />
         <div className={`relative ${containerClass}`}>
           {aboutImageUrl ? (
-            <div className="grid items-start gap-10 md:grid-cols-[340px_1fr]">
+            <div className={`grid items-start gap-10 ${isCircular ? "md:grid-cols-[auto_1fr] items-center" : "md:grid-cols-[340px_1fr]"}`}>
               <div
-                className="overflow-hidden"
-                style={{
+                className={isCircular ? "flex justify-center" : "overflow-hidden"}
+                style={isCircular ? undefined : {
                   borderRadius: cardRadius,
                   border: "1px solid color-mix(in srgb, var(--site-primary) 16%, var(--site-border))",
                   boxShadow:
@@ -546,15 +550,22 @@ export function SectionRenderer({
                 <Image
                   src={aboutImageUrl}
                   alt={titlePlainAbout}
-                  width={360}
-                  height={480}
-                  className="aspect-[3/4] h-auto w-full object-cover"
+                  width={isCircular ? 192 : 360}
+                  height={isCircular ? 192 : 480}
+                  className={isCircular ? "w-48 h-48 rounded-full object-cover" : "aspect-[3/4] h-auto w-full object-cover"}
+                  style={isCircular ? { border: "3px solid color-mix(in srgb, var(--site-primary) 40%, transparent)" } : undefined}
                 />
               </div>
               <div>
                 <SectionEyebrow label={asString(section.content.title) || "Sobre"} />
                 {body && (
                   <p className="mt-5 whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
+                )}
+                {highlightValue && (
+                  <div className="mt-4 inline-flex flex-col items-center rounded-xl border-2 px-5 py-3" style={{ borderColor: "var(--site-primary)" }}>
+                    <span className="text-4xl font-black" style={{ color: "var(--site-primary)" }}>{highlightValue}</span>
+                    {highlightLabel && <span className="text-xs font-semibold uppercase tracking-[0.12em] opacity-60 mt-0.5">{highlightLabel}</span>}
+                  </div>
                 )}
               </div>
             </div>
@@ -563,6 +574,12 @@ export function SectionRenderer({
               <SectionEyebrow label={asString(section.content.title) || "Sobre"} />
               {body && (
                 <p className="mt-5 max-w-3xl whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
+              )}
+              {highlightValue && (
+                <div className="mt-4 inline-flex flex-col items-center rounded-xl border-2 px-5 py-3" style={{ borderColor: "var(--site-primary)" }}>
+                  <span className="text-4xl font-black" style={{ color: "var(--site-primary)" }}>{highlightValue}</span>
+                  {highlightLabel && <span className="text-xs font-semibold uppercase tracking-[0.12em] opacity-60 mt-0.5">{highlightLabel}</span>}
+                </div>
               )}
             </>
           )}
@@ -642,6 +659,11 @@ export function SectionRenderer({
                       />
                     )}
                     <div className="flex-1">
+                      {card.tag && (
+                        <span className="mb-2 inline-block rounded-full border border-[var(--site-accent)]/40 bg-[var(--site-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--site-accent)]">
+                          {card.tag}
+                        </span>
+                      )}
                       <span className="text-base font-medium" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
                         <p className="mt-1 text-sm opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
@@ -745,6 +767,11 @@ export function SectionRenderer({
                           <Icon size={20} className="text-[var(--site-primary)]" />
                         </div>
                       )}
+                      {card.tag && (
+                        <span className="mb-2 inline-block rounded-full border border-[var(--site-accent)]/40 bg-[var(--site-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--site-accent)]">
+                          {card.tag}
+                        </span>
+                      )}
                       <h3 className="text-base font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
                         <p className="mt-2 text-sm leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
@@ -820,6 +847,11 @@ export function SectionRenderer({
                       </div>
                     )}
                     <div className={`flex-1 ${isReversed ? "text-right" : ""}`}>
+                      {card.tag && (
+                        <span className="mb-2 inline-block rounded-full border border-[var(--site-accent)]/40 bg-[var(--site-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--site-accent)]">
+                          {card.tag}
+                        </span>
+                      )}
                       <h3 className="text-base font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
                         <p className="mt-1 text-sm leading-relaxed opacity-60" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
@@ -919,6 +951,11 @@ export function SectionRenderer({
                       {index + 1}
                     </span>
                     <div className="flex-1 pt-1">
+                      {card.tag && (
+                        <span className="mb-2 inline-block rounded-full border border-[var(--site-accent)]/40 bg-[var(--site-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--site-accent)]">
+                          {card.tag}
+                        </span>
+                      )}
                       <div className="flex items-center gap-2">
                         {Icon && (
                           <Icon size={16} className="text-[var(--site-primary)]" />
@@ -956,6 +993,40 @@ export function SectionRenderer({
                 );
               })}
             </ol>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── SERVICES NUMBERED ── */
+    if (variant === "numbered") {
+      return (
+        <section id="services" className="relative w-full py-16 md:py-24 overflow-hidden">
+          <div className={`relative ${containerClass}`}>
+            <SectionEyebrow label={asString(section.content.title) || "Serviços"} />
+            <div className="mt-8 divide-y divide-[var(--site-border)]">
+              {effectiveCards.map((card, i) => (
+                <div key={i} className="flex items-start gap-6 py-6">
+                  <span
+                    className="shrink-0 text-5xl font-black leading-none tabular-nums"
+                    style={{ color: "var(--site-primary)", opacity: 0.25, minWidth: "3.5rem" }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    {card.tag && (
+                      <span className="mb-2 inline-block rounded-full border border-[var(--site-accent)]/40 bg-[var(--site-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--site-accent)]">
+                        {card.tag}
+                      </span>
+                    )}
+                    <h3 className="text-xl font-bold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
+                    {card.description && (
+                      <p className="mt-1 text-sm leading-relaxed opacity-70" dangerouslySetInnerHTML={{ __html: richHtml(card.description) }} />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       );
@@ -1011,6 +1082,11 @@ export function SectionRenderer({
                         >
                           <Icon size={22} className="text-[var(--site-primary)]" />
                         </div>
+                      )}
+                      {card.tag && (
+                        <span className="mb-2 inline-block rounded-full border border-[var(--site-accent)]/40 bg-[var(--site-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--site-accent)]">
+                          {card.tag}
+                        </span>
                       )}
                       <h3 className="text-xl font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                       {card.description && (
@@ -1118,6 +1194,11 @@ export function SectionRenderer({
                     >
                       <Icon size={22} className="text-[var(--site-primary)]" />
                     </div>
+                  )}
+                  {card.tag && (
+                    <span className="mb-2 inline-block rounded-full border border-[var(--site-accent)]/40 bg-[var(--site-accent)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[var(--site-accent)]">
+                      {card.tag}
+                    </span>
                   )}
                   <h3 className="text-base font-semibold" dangerouslySetInnerHTML={{ __html: richHtml(card.title) }} />
                   {card.description && (
@@ -1413,6 +1494,31 @@ export function SectionRenderer({
       );
     }
 
+    /* ── CTA BAR ── */
+    if (variant === "bar") {
+      return (
+        <section id="cta" className="w-full">
+          <div
+            className="flex flex-col items-center justify-between gap-4 px-6 py-5 sm:flex-row sm:px-10"
+            style={{ background: `linear-gradient(135deg, var(--site-primary), var(--site-accent))` }}
+          >
+            <div>
+              <p className="font-bold text-white text-lg" dangerouslySetInnerHTML={{ __html: title }} />
+              {description && <p className="text-sm text-white/70" dangerouslySetInnerHTML={{ __html: description }} />}
+            </div>
+            <a
+              href={buttonHref}
+              target={linkTarget(buttonHref)}
+              rel={linkRel(buttonHref)}
+              className={`shrink-0 px-6 py-2.5 text-sm font-bold text-white border-2 border-white/60 hover:bg-white/10 transition ${buttonStyleClassName}`}
+            >
+              {buttonLabel}
+            </a>
+          </div>
+        </section>
+      );
+    }
+
     /* ── CTA DEFAULT ── */
     return (
       <section
@@ -1522,6 +1628,55 @@ export function SectionRenderer({
                       {testimonial.quote}
                     </p>
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── TESTIMONIALS BAR ── */
+    if (variant === "bar") {
+      return (
+        <section id="testimonials" className="relative w-full py-16 md:py-20 overflow-hidden">
+          <div className={`relative ${containerClass}`}>
+            <SectionEyebrow label={asString(section.content.title) || "Depoimentos"} />
+            <div className="mt-8 space-y-4">
+              {testimonials.map((t, i) => (
+                <div key={i} className="flex gap-5 rounded-xl border border-[var(--site-border)] bg-[var(--site-surface)] p-5" style={{ borderRadius: cardRadius }}>
+                  <div className="w-1 shrink-0 rounded-full self-stretch" style={{ background: "linear-gradient(180deg, var(--site-primary), var(--site-accent))" }} />
+                  <div className="flex-1">
+                    <p className="text-base leading-relaxed opacity-80">{t.quote}</p>
+                    <p className="mt-3 text-sm font-semibold" style={{ color: "var(--site-primary)" }}>— {t.author}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    /* ── TESTIMONIALS ELEGANT ── */
+    if (variant === "elegant") {
+      return (
+        <section id="testimonials" className="relative w-full py-16 md:py-20 overflow-hidden">
+          <div className={`relative ${containerClass}`}>
+            <SectionEyebrow label={asString(section.content.title) || "Depoimentos"} />
+            <div className="mt-8 grid gap-6 sm:grid-cols-2">
+              {testimonials.map((t, i) => (
+                <div key={i} className="relative overflow-hidden rounded-xl border border-[var(--site-border)] bg-[var(--site-surface)] p-8" style={{ borderRadius: cardRadius }}>
+                  {/* Decorative large quote */}
+                  <span
+                    className="pointer-events-none absolute -top-4 left-4 select-none font-serif leading-none"
+                    style={{ fontSize: "9rem", color: "var(--site-primary)", opacity: 0.07 }}
+                    aria-hidden="true"
+                  >
+                    &ldquo;
+                  </span>
+                  <p className="relative text-base leading-relaxed opacity-80">{t.quote}</p>
+                  <p className="relative mt-4 text-sm font-semibold" style={{ color: "var(--site-accent)" }}>— {t.author}</p>
                 </div>
               ))}
             </div>
@@ -1736,6 +1891,47 @@ export function SectionRenderer({
         maxItems={maxEventsPreview}
         viewAllHref={maxEventsPreview ? "/agenda" : undefined}
       />
+    );
+  }
+
+  // ─── STATS ────────────────────────────────────────────────
+  if (section.type === "stats") {
+    const statsTitle = asString(section.content.title);
+    const statsItems = Array.isArray(section.content.items)
+      ? (section.content.items as Array<{ value: string; label: string }>)
+      : [];
+    const statsVariant = section.variant ?? "default";
+
+    return (
+      <section id="stats" className="w-full py-12 md:py-16">
+        <div className={`relative ${containerClass}`}>
+          {statsTitle && <SectionEyebrow label={statsTitle} />}
+          <div
+            className={`mt-6 grid gap-6 ${
+              statsItems.length <= 2
+                ? "grid-cols-2"
+                : statsItems.length === 3
+                ? "grid-cols-3"
+                : "grid-cols-2 md:grid-cols-4"
+            }`}
+          >
+            {statsItems.map((item, i) => (
+              <div
+                key={i}
+                className={`flex flex-col items-center rounded-xl border border-[var(--site-border)] bg-[var(--site-surface)] px-4 py-6 text-center ${
+                  statsVariant === "minimal" ? "border-transparent bg-transparent" : ""
+                }`}
+                style={{ borderRadius: cardRadius }}
+              >
+                <span className="text-4xl font-black leading-none md:text-5xl" style={{ color: "var(--site-primary)" }}>
+                  {item.value}
+                </span>
+                <span className="mt-2 text-sm font-medium opacity-60">{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     );
   }
 

@@ -58,6 +58,74 @@ export function PreviewHeader({ deviceMode }: PreviewHeaderProps) {
     </div>
   );
 
+  // ── gradient: linear gradient from primary to accent ──
+  if (headerStyle === "gradient") {
+    return (
+      <header
+        className="sticky top-0 z-10 px-3 py-2"
+        style={{
+          background: "linear-gradient(135deg, var(--preview-primary), var(--preview-accent))",
+          color: "var(--preview-button-text)",
+          fontFamily: fontFamily || "Inter",
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 min-w-0">
+            {logoUrl && (
+              <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded-sm object-cover shrink-0" style={{ objectPosition: str(content.logoObjectPosition) || "center center" }} />
+            )}
+            <div className="text-xs font-bold truncate leading-tight">
+              {businessName || "Seu Negócio"}
+            </div>
+          </div>
+          {deviceMode === "desktop" ? (
+            <nav className="flex items-center gap-3">
+              {navItems.map((item) => (
+                <span key={item} className="text-[8px]" style={{ opacity: 0.7 }}>{item}</span>
+              ))}
+            </nav>
+          ) : (
+            <Menu size={14} />
+          )}
+        </div>
+      </header>
+    );
+  }
+
+  // ── dark: always dark background ──
+  if (headerStyle === "dark") {
+    return (
+      <header
+        className="sticky top-0 z-10 px-3 py-2"
+        style={{
+          backgroundColor: "#0B1020",
+          color: "#EAF0FF",
+          fontFamily: fontFamily || "Inter",
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 min-w-0">
+            {logoUrl && (
+              <img src={logoUrl} alt="Logo" className="h-5 w-5 rounded-sm object-cover shrink-0" style={{ objectPosition: str(content.logoObjectPosition) || "center center" }} />
+            )}
+            <div className="text-xs font-bold truncate leading-tight" style={{ color: "var(--preview-primary)" }}>
+              {businessName || "Seu Negócio"}
+            </div>
+          </div>
+          {deviceMode === "desktop" ? (
+            <nav className="flex items-center gap-3">
+              {navItems.map((item) => (
+                <span key={item} className="text-[8px]" style={{ color: "rgba(234,240,255,0.6)" }}>{item}</span>
+              ))}
+            </nav>
+          ) : (
+            <Menu size={14} style={{ color: "#EAF0FF" }} />
+          )}
+        </div>
+      </header>
+    );
+  }
+
   // ── solid: bg opaco na cor primária, texto auto-contrastado ──
   if (headerStyle === "solid") {
     return (
