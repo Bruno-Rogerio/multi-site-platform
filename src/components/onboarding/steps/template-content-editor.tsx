@@ -276,6 +276,7 @@ function ImageFocalPointPicker({
 const SECTION_META_BASIC: Record<string, { label: string; emoji: string; accent: string; fixed?: boolean }> = {
   hero:         { label: "Capa",           emoji: "🎯", accent: "#22D3EE", fixed: true },
   services:     { label: "Serviços",       emoji: "🧩", accent: "#7C5CFF" },
+  stats:        { label: "Números",        emoji: "📊", accent: "#22D3EE" },
   about:        { label: "Sobre você",     emoji: "👤", accent: "#3B82F6" },
   cta:          { label: "Call to Action", emoji: "📣", accent: "#10B981" },
   testimonials: { label: "Depoimentos",    emoji: "⭐", accent: "#F59E0B" },
@@ -431,6 +432,10 @@ export function TemplateContentEditor() {
       dispatch({ type: "UPDATE_CONTENT", key: "ctaDescription", value: template.defaultContent.ctaDescription });
       dispatch({ type: "UPDATE_CONTENT", key: "ctaButtonLabel", value: template.defaultContent.ctaButtonLabel });
 
+      if (template.defaultContent.statsItems && template.defaultContent.statsItems.length > 0) {
+        dispatch({ type: "SET_CONTENT_ARRAY", key: "statsItems", value: template.defaultContent.statsItems });
+      }
+
       const items = template.defaultContent.serviceItems;
       items.forEach((item, i) => {
         if (i < serviceCards.length) {
@@ -442,6 +447,14 @@ export function TemplateContentEditor() {
 
   function handleContentChange(key: string, value: string) {
     dispatch({ type: "UPDATE_CONTENT", key, value });
+  }
+
+  // Stats helpers
+  const statsItems = (state.content.statsItems as Array<{ value: string; label: string }>) ?? [];
+
+  function updateStatsItem(index: number, field: "value" | "label", value: string) {
+    const updated = statsItems.map((item, i) => i === index ? { ...item, [field]: value } : item);
+    dispatch({ type: "SET_CONTENT_ARRAY", key: "statsItems", value: updated });
   }
 
   const paletteColors = [
@@ -949,7 +962,39 @@ export function TemplateContentEditor() {
           </div>
         </AccordionSection>
 
-        {/* ─── 6. Sobre ─── */}
+        {/* ─── 6. Stats ─── */}
+        {statsItems.length > 0 && (
+          <section className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-[#22D3EE]">
+                📊 Números em destaque
+              </h3>
+            </div>
+            <p className="mb-3 text-[11px] text-[var(--platform-text)]/50">
+              Estatísticas que aparecem no seu site para transmitir credibilidade.
+            </p>
+            <div className="space-y-2">
+              {statsItems.map((item, i) => (
+                <div key={i} className="grid grid-cols-2 gap-2">
+                  <input
+                    value={item.value}
+                    onChange={e => updateStatsItem(i, "value", e.target.value)}
+                    placeholder="Ex: 500+"
+                    className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                  />
+                  <input
+                    value={item.label}
+                    onChange={e => updateStatsItem(i, "label", e.target.value)}
+                    placeholder="Ex: Clientes atendidos"
+                    className="rounded-lg border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-[var(--platform-text)] placeholder:text-[var(--platform-text)]/30 focus:border-[#22D3EE] focus:outline-none"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ─── 7. Sobre ─── */}
         <AccordionSection
           id="about"
           title="Sobre você"
@@ -996,7 +1041,7 @@ export function TemplateContentEditor() {
           </div>
         </AccordionSection>
 
-        {/* ─── 7. Seção de contato ─── */}
+        {/* ─── 8. Seção de contato ─── */}
         <AccordionSection
           id="contact"
           title="Seção de Contato"
@@ -1064,7 +1109,7 @@ export function TemplateContentEditor() {
           </div>
         </AccordionSection>
 
-        {/* ─── 8. Depoimentos ─── */}
+        {/* ─── 9. Depoimentos ─── */}
         <AccordionSection
           id="testimonials"
           title="Depoimentos"
@@ -1179,7 +1224,7 @@ export function TemplateContentEditor() {
           </div>
         </AccordionSection>
 
-        {/* ─── 9. SEO ─── */}
+        {/* ─── 10. SEO ─── */}
         <AccordionSection
           id="seo"
           title="SEO"

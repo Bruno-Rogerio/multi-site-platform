@@ -36,7 +36,8 @@
       "Bash(cd \"C:\\\\Users\\\\raiza\\\\OneDrive\\\\Área de Trabalho\\\\multi-site-platform\" && ls node_modules/@tiptap/react/src/ && node_modules/@tiptap/react/package.json | grep main)",
       "Bash(cd \"C:\\\\Users\\\\raiza\\\\OneDrive\\\\Área de Trabalho\\\\multi-site-platform\" && node_modules/.bin/next build 2>&1 | grep -E \"error|Error|warning\" | head -20)",
       "Bash(cd \"C:\\\\Users\\\\raiza\\\\OneDrive\\\\Área de Trabalho\\\\multi-site-platform\" && node_modules/.bin/next build 2>&1 | head -40)",
-      "Bash(cd \"C:\\\\Users\\\\raiza\\\\OneDrive\\\\Área de Trabalho\\\\multi-site-platform\" && node -e \"console.log\\(require\\('./node_modules/@tiptap/react/package.json'\\).version\\)\")"
+      "Bash(cd \"C:\\\\Users\\\\raiza\\\\OneDrive\\\\Área de Trabalho\\\\multi-site-platform\" && node -e \"console.log\\(require\\('./node_modules/@tiptap/react/package.json'\\).version\\)\")",
+      "Bash(find \"/c/Users/raiza/OneDrive/Área de Trabalho/multi-site-platform\" -path \"*/lib/onboarding/plans.ts\" -o -path \"*/lib/onboarding/business-types.ts\" 2>/dev/null | head -5)"
     ]
   }
 }

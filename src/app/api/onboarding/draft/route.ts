@@ -515,6 +515,12 @@ export async function POST(request: Request) {
     return idx != null && idx >= 0 ? idx + 1 : fallback;
   };
 
+  // Parse statsItems from template content
+  const payloadContentRaw = payload.content as Record<string, unknown> | undefined;
+  const templateStatsItems = Array.isArray(payloadContentRaw?.statsItems)
+    ? (payloadContentRaw!.statsItems as Array<{ value: string; label: string }>)
+    : undefined;
+
   const sectionInserts = [
     {
       page_id: page.id,
@@ -550,11 +556,23 @@ export async function POST(request: Request) {
           : toItems(content.servicesItems?.trim() || payload.businessHighlights || "").map((t) => ({ title: t, description: "", iconName: "", imageUrl: "" })),
       },
     },
+    ...(templateStatsItems && templateStatsItems.length > 0
+      ? [{
+          page_id: page.id,
+          type: "stats" as const,
+          variant: "default",
+          order: secOrder("stats", 3),
+          content: {
+            title: "",
+            items: templateStatsItems,
+          },
+        }]
+      : []),
     {
       page_id: page.id,
       type: "cta",
       variant: mapCtaVariant(payload.ctaStyle),
-      order: secOrder("cta", 3),
+      order: secOrder("cta", templateStatsItems && templateStatsItems.length > 0 ? 4 : 3),
       content: {
         title: content.ctaTitle?.trim() || "Vamos conversar?",
         description: content.ctaDescription?.trim() || "Me chame para entender seu momento e definir proximos passos.",

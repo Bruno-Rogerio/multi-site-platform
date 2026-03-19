@@ -6,7 +6,7 @@ import { classifyHost, resolveRequestHostname } from "@/lib/tenant/host";
 import type { Section, SectionType } from "@/lib/tenant/types";
 
 const VALID_SECTION_TYPES: SectionType[] = [
-  "hero", "about", "services", "cta", "testimonials", "contact", "faq", "blog", "gallery", "events",
+  "hero", "about", "services", "stats", "cta", "testimonials", "contact", "faq", "blog", "gallery", "events",
 ];
 
 function buildDefaultContent(type: SectionType): Record<string, unknown> {
@@ -15,6 +15,7 @@ function buildDefaultContent(type: SectionType): Record<string, unknown> {
     case "about":        return { title: "Sobre", body: "", imageUrl: "" };
     case "services":     return { title: "Serviços", cards: [], imageUrl: "" };
     case "cta":          return { title: "Vamos conversar?", description: "", buttonLabel: "Entrar em contato", buttonHref: "" };
+    case "stats":        return { title: "", items: [] };
     case "testimonials": return { title: "Depoimentos", items: [] };
     case "contact":      return { title: "Contato", subtitle: "", socialLinks: [] };
     case "faq":          return { title: "Perguntas Frequentes", items: [] };

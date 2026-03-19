@@ -24,6 +24,7 @@ export type TemplatePreset = {
     ctaTitle: string;
     ctaDescription: string;
     ctaButtonLabel: string;
+    statsItems?: Array<{ value: string; label: string }>;
   };
   previewColors: { bg: string; primary: string; accent: string; text: string };
 };
@@ -60,6 +61,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Dê o primeiro passo",
       ctaDescription: "A mudança começa com uma conversa. Agende sua primeira sessão.",
       ctaButtonLabel: "Falar comigo",
+      statsItems: [
+        { value: "200+", label: "Pacientes atendidos" },
+        { value: "4.9★", label: "Avaliação média" },
+        { value: "8 anos", label: "De experiência" },
+      ],
     },
     previewColors: { bg: "#F8FAFC", primary: "#2563EB", accent: "#A78BFA", text: "#0F172A" },
   },
@@ -95,6 +101,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Vamos criar juntos?",
       ctaDescription: "Entre em contato e vamos planejar algo incrível.",
       ctaButtonLabel: "Iniciar projeto",
+      statsItems: [
+        { value: "500+", label: "Sessões realizadas" },
+        { value: "4.9★", label: "Avaliação" },
+        { value: "7 anos", label: "Atuando no mercado" },
+      ],
     },
     previewColors: { bg: "#0C0C0C", primary: "#F0E6D3", accent: "#FF4444", text: "#F0F0F0" },
   },
@@ -130,6 +141,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Pronto para mudar de patamar?",
       ctaDescription: "Agende uma conversa estratégica gratuita e descubra seu próximo passo.",
       ctaButtonLabel: "Quero evoluir",
+      statsItems: [
+        { value: "300+", label: "Clientes transformados" },
+        { value: "4.8★", label: "Satisfação" },
+        { value: "5 anos", label: "De mentoria" },
+      ],
     },
     previewColors: { bg: "#0B1020", primary: "#3B82F6", accent: "#22D3EE", text: "#EAF0FF" },
   },
@@ -165,6 +181,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Precisando de orientação jurídica?",
       ctaDescription: "Agende uma consulta e proteja seus interesses com especialistas.",
       ctaButtonLabel: "Agendar consulta",
+      statsItems: [
+        { value: "20+", label: "Anos de atuação" },
+        { value: "500+", label: "Casos encerrados" },
+        { value: "4.9★", label: "Avaliação" },
+      ],
     },
     previewColors: { bg: "#FAFAFA", primary: "#1B2A4A", accent: "#B8962E", text: "#1B2A4A" },
   },
@@ -200,6 +221,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Sua saúde começa hoje",
       ctaDescription: "Agende sua primeira consulta e receba um plano feito só para você.",
       ctaButtonLabel: "Falar comigo",
+      statsItems: [
+        { value: "400+", label: "Pacientes atendidos" },
+        { value: "4.9★", label: "Avaliação" },
+        { value: "6 anos", label: "De experiência" },
+      ],
     },
     previewColors: { bg: "#F0FDFA", primary: "#0D9488", accent: "#14B8A6", text: "#134E4A" },
   },
@@ -235,6 +261,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Vamos resolver isso juntos?",
       ctaDescription: "Me conta o problema, eu te mostro como resolver.",
       ctaButtonLabel: "Iniciar conversa",
+      statsItems: [
+        { value: "50+", label: "Projetos entregues" },
+        { value: "4.9★", label: "Satisfação" },
+        { value: "10 anos", label: "Em tecnologia" },
+      ],
     },
     previewColors: { bg: "#0D1117", primary: "#00E5FF", accent: "#7C3AED", text: "#E6EDF3" },
   },
@@ -270,6 +301,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Leve a música ao seu evento",
       ctaDescription: "Entre em contato para verificar disponibilidade e montar seu projeto.",
       ctaButtonLabel: "Fazer proposta",
+      statsItems: [
+        { value: "200+", label: "Eventos realizados" },
+        { value: "4.9★", label: "Avaliação" },
+        { value: "12 anos", label: "De carreira" },
+      ],
     },
     previewColors: { bg: "#111827", primary: "#7C5CFF", accent: "#38BDF8", text: "#EEF2FF" },
   },
@@ -305,6 +341,11 @@ export const templatePresets: TemplatePreset[] = [
       ctaTitle: "Bora começar?",
       ctaDescription: "Agende sua aula experimental gratuita e sinta a diferença.",
       ctaButtonLabel: "Agendar agora",
+      statsItems: [
+        { value: "500+", label: "Alunos treinados" },
+        { value: "4.9★", label: "Avaliação" },
+        { value: "8 anos", label: "De experiência" },
+      ],
     },
     previewColors: { bg: "#111827", primary: "#F59E0B", accent: "#F97316", text: "#FFFBEB" },
   },

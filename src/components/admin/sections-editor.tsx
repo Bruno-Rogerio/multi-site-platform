@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Layout, Grid3X3, Megaphone, User, Mail, Plus, Trash2, Save, Quote, HelpCircle, Monitor, X,
-  BookOpen, ImageIcon, CalendarDays, GripVertical, ChevronRight, AlertTriangle,
+  BookOpen, ImageIcon, CalendarDays, GripVertical, ChevronRight, AlertTriangle, BarChart2,
 } from "lucide-react";
 
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
@@ -123,6 +123,7 @@ function buildChannelUrl(type: string, raw: string): string {
 const SECTION_META: Record<string, { label: string; description: string; Icon: React.ComponentType<{ size?: number; className?: string }> }> = {
   hero:         { label: "Destaque",           description: "Primeira impressão: título, subtítulo e botão de ação.",   Icon: Layout },
   services:     { label: "Serviços",           description: "Lista o que você oferece com cards e ícones.",             Icon: Grid3X3 },
+  stats:        { label: "Números",            description: "Estatísticas e conquistas em destaque.",                   Icon: BarChart2 },
   cta:          { label: "Chamada para ação",  description: "Convite direto para o cliente entrar em contato.",         Icon: Megaphone },
   about:        { label: "Sobre",              description: "Conte a sua história e diferenciais.",                     Icon: User },
   contact:      { label: "Contato",            description: "Canais de contato: WhatsApp, e-mail, redes sociais.",      Icon: Mail },
@@ -140,7 +141,7 @@ const LABEL_CLS = "text-xs font-semibold uppercase tracking-wide text-[var(--pla
 // Sections fixed at top/bottom for clients (cannot be moved or deleted)
 const FIXED_SECTION_TYPES: Set<Section["type"]> = new Set(["hero", "contact"]);
 // Sections allowed in basic plan
-const BASIC_PLAN_SECTION_TYPES: Section["type"][] = ["hero", "services", "about", "cta", "testimonials", "contact"];
+const BASIC_PLAN_SECTION_TYPES: Section["type"][] = ["hero", "services", "stats", "about", "cta", "testimonials", "contact"];
 
 /* ─── Component ──────────────────────────────────────────── */
 
