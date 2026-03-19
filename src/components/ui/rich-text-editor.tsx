@@ -71,6 +71,7 @@ const ACCENT_EFFECTS = [
   { id: "underline", label: "Sub" },
   { id: "highlight", label: "Dest" },
   { id: "bold-accent", label: "Neg" },
+  { id: "stroke", label: "Cont" },
 ] as const;
 
 const SIZE_PRESETS = [

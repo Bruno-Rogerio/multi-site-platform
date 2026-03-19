@@ -157,13 +157,14 @@ body {
   margin-top: 0.25em;
 }
 
-/* ─── Accent effects (work in editor context and preview context) ─── */
+/* ─── Accent effects (work in editor, wizard preview, and real tenant sites) ─── */
+/* Fallback chain: wizard preview var → tenant site var → platform var → hardcoded */
 
 [data-accent-effect="gradient"] {
   background: linear-gradient(
     90deg,
-    var(--preview-primary, var(--platform-primary, #3b82f6)),
-    var(--preview-accent, var(--platform-accent, #22d3ee))
+    var(--preview-primary, var(--site-primary, var(--platform-primary, #3b82f6))),
+    var(--preview-accent, var(--site-accent, var(--platform-accent, #22d3ee)))
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -171,21 +172,21 @@ body {
 }
 
 [data-accent-effect="neon"] {
-  color: var(--preview-primary, var(--platform-primary, #22d3ee)) !important;
+  color: var(--preview-primary, var(--site-primary, var(--platform-primary, #22d3ee))) !important;
   text-shadow:
-    0 0 6px var(--preview-primary, var(--platform-primary, #22d3ee)),
-    0 0 18px var(--preview-primary, var(--platform-primary, #22d3ee));
+    0 0 6px var(--preview-primary, var(--site-primary, var(--platform-primary, #22d3ee))),
+    0 0 18px var(--preview-primary, var(--site-primary, var(--platform-primary, #22d3ee)));
 }
 
 [data-accent-effect="underline"] {
   -webkit-text-fill-color: unset !important;
-  border-bottom: 2px solid var(--preview-accent, var(--platform-accent, #22d3ee));
+  border-bottom: 2px solid var(--preview-accent, var(--site-accent, var(--platform-accent, #22d3ee)));
   padding-bottom: 1px;
 }
 
 [data-accent-effect="highlight"] {
   -webkit-text-fill-color: white !important;
-  background: var(--preview-primary, var(--platform-primary, #3b82f6));
+  background: var(--preview-primary, var(--site-primary, var(--platform-primary, #3b82f6)));
   color: white;
   padding: 0 4px;
   border-radius: 3px;
@@ -194,5 +195,12 @@ body {
 [data-accent-effect="bold-accent"] {
   -webkit-text-fill-color: unset !important;
   font-weight: 700;
-  color: var(--preview-primary, var(--platform-primary, #3b82f6));
+  color: var(--preview-primary, var(--site-primary, var(--platform-primary, #3b82f6)));
+}
+
+[data-accent-effect="stroke"] {
+  -webkit-text-stroke: 2px var(--preview-primary, var(--site-primary, var(--platform-primary, #3b82f6)));
+  -webkit-text-fill-color: transparent !important;
+  color: transparent;
+  font-weight: 700;
 }

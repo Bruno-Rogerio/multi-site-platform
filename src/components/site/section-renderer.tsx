@@ -552,8 +552,7 @@ export function SectionRenderer({
                 />
               </div>
               <div>
-                <SectionEyebrow label="Sobre" />
-                {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+                <SectionEyebrow label={asString(section.content.title) || "Sobre"} />
                 {body && (
                   <p className="mt-5 whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
                 )}
@@ -561,8 +560,7 @@ export function SectionRenderer({
             </div>
           ) : (
             <>
-              <SectionEyebrow label="Sobre" />
-              {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+              <SectionEyebrow label={asString(section.content.title) || "Sobre"} />
               {body && (
                 <p className="mt-5 max-w-3xl whitespace-pre-line text-base leading-relaxed opacity-80" dangerouslySetInnerHTML={{ __html: body }} />
               )}
@@ -596,8 +594,7 @@ export function SectionRenderer({
           }}
         >
           <div className={`relative ${containerClass}`}>
-            <SectionEyebrow label="Serviços" />
-            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+            <SectionEyebrow label={asString(section.content.title) || "Serviços"} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -699,8 +696,7 @@ export function SectionRenderer({
             style={{ background: "var(--site-primary)" }}
           />
           <div className={`relative ${containerClass}`}>
-            <SectionEyebrow label="Serviços" />
-            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+            <SectionEyebrow label={asString(section.content.title) || "Serviços"} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -786,8 +782,7 @@ export function SectionRenderer({
         >
           <div className={`relative ${containerClass}`}>
             <div className="text-center">
-              <SectionEyebrow label="Serviços" />
-              {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+              <SectionEyebrow label={asString(section.content.title) || "Serviços"} />
             </div>
             {imageUrl && (
               <div
@@ -879,8 +874,7 @@ export function SectionRenderer({
             style={{ background: "var(--site-accent)" }}
           />
           <div className={`relative ${containerClass}`}>
-            <SectionEyebrow label="Como funciona" />
-            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+            <SectionEyebrow label={asString(section.content.title) || "Como funciona"} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -981,8 +975,7 @@ export function SectionRenderer({
           }}
         >
           <div className={`relative ${containerClass}`}>
-            <SectionEyebrow label="Serviços" />
-            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+            <SectionEyebrow label={asString(section.content.title) || "Serviços"} />
             {imageUrl && (
               <div
                 className="mt-6 overflow-hidden"
@@ -1089,8 +1082,7 @@ export function SectionRenderer({
           style={{ background: "var(--site-accent)" }}
         />
         <div className={`relative ${containerClass}`}>
-          <SectionEyebrow label="Serviços" />
-          {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+          <SectionEyebrow label={asString(section.content.title) || "Serviços"} />
           {imageUrl && (
             <div
               className="mt-6 overflow-hidden"
@@ -1498,8 +1490,7 @@ export function SectionRenderer({
             style={{ background: "var(--site-primary)" }}
           />
           <div className={`relative ${containerClass}`}>
-            <SectionEyebrow label="Depoimentos" />
-            {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+            <SectionEyebrow label={asString(section.content.title) || "Depoimentos"} />
             <div className="mt-6 divide-y divide-[var(--site-border)]">
               {testimonials.map((testimonial, i) => (
                 <div
@@ -1555,8 +1546,7 @@ export function SectionRenderer({
           style={{ background: "var(--site-primary)" }}
         />
         <div className={`relative ${containerClass}`}>
-          <SectionEyebrow label="Depoimentos" />
-          {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+          <SectionEyebrow label={asString(section.content.title) || "Depoimentos"} />
           <StaggeredCards className="mt-6 grid gap-5 sm:grid-cols-2">
             {testimonials.map((testimonial, i) => (
               <article
@@ -1644,8 +1634,7 @@ export function SectionRenderer({
           style={{ background: "var(--site-accent)" }}
         />
         <div className={`relative ${containerClass} text-center`}>
-          <SectionEyebrow label="Contato" />
-          {title && <h2 className="text-3xl font-bold" dangerouslySetInnerHTML={{ __html: title }} />}
+          <SectionEyebrow label={asString(section.content.title) || "Contato"} />
           {subtitle && <p className="mt-3 text-base opacity-70">{subtitle}</p>}
           {allLinks.length > 0 && (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
