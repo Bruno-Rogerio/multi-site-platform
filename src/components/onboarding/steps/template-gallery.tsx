@@ -138,6 +138,22 @@ export function TemplateGallery() {
       for (const [key, value] of Object.entries(mockArrays)) {
         dispatch({ type: "SET_CONTENT_ARRAY", key, value: value as unknown[] });
       }
+
+      // Enable sections that have mock content (they default to off)
+      const CONTENT_KEY_TO_SECTION: Record<string, string> = {
+        blogPosts: "blog",
+        galleryImages: "gallery",
+        faqItems: "faq",
+        events: "events",
+        statsItems: "stats",
+      };
+      const currentSections = state.enabledSections;
+      for (const [key] of Object.entries(mockArrays)) {
+        const sectionId = CONTENT_KEY_TO_SECTION[key];
+        if (sectionId && !currentSections.includes(sectionId)) {
+          dispatch({ type: "ADD_SECTION", sectionType: sectionId });
+        }
+      }
     }
   }
 
