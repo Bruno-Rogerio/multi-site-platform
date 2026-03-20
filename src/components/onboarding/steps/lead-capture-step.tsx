@@ -170,21 +170,18 @@ export function LeadCaptureStep() {
         dispatch({ type: "SET_CONTENT_ARRAY", key, value: value as unknown[] });
       }
 
-      // Enable sections that have mock content (they default to off)
-      const CONTENT_KEY_TO_SECTION: Record<string, string> = {
-        blogPosts: "blog",
-        galleryImages: "gallery",
-        faqItems: "faq",
-        events: "events",
-        statsItems: "stats",
-      };
-      const currentSections = state.enabledSections;
-      for (const [key] of Object.entries(mockArrays)) {
-        const sectionId = CONTENT_KEY_TO_SECTION[key];
-        if (sectionId && !currentSections.includes(sectionId)) {
-          dispatch({ type: "ADD_SECTION", sectionType: sectionId });
-        }
+      // Personalize content with the client's business name
+      const name = businessName.trim();
+      dispatch({ type: "UPDATE_CONTENT", key: "aboutTitle", value: `Sobre ${name}` });
+      if (defaultContent.heroEyebrow) {
+        dispatch({ type: "UPDATE_CONTENT", key: "slogan", value: defaultContent.heroEyebrow });
       }
+
+      // Set all sections in optimal display order (premium preview — plan not yet chosen)
+      dispatch({
+        type: "REORDER_SECTIONS",
+        sections: ["hero", "services", "stats", "about", "testimonials", "gallery", "blog", "faq", "events", "cta", "contact"],
+      });
 
       dispatch({ type: "NEXT_STEP" });
     } catch {
