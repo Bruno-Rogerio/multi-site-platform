@@ -28,7 +28,7 @@ export const BUSINESS_TYPES: BusinessType[] = [
   {
     id: "beleza-estetica",
     label: "Beleza e Estética",
-    templateSlug: "essencia",
+    templateSlug: "veludo",
     defaultContent: {
       heroEyebrow: "Realce sua beleza",
       heroTitle: "Beleza que eleva a autoestima",
@@ -62,7 +62,7 @@ export const BUSINESS_TYPES: BusinessType[] = [
   {
     id: "yoga-meditacao",
     label: "Yoga e Meditação",
-    templateSlug: "broto",
+    templateSlug: "templo",
     defaultContent: {
       heroEyebrow: "Equilíbrio e paz interior",
       heroTitle: "Encontre seu centro",
@@ -113,7 +113,7 @@ export const BUSINESS_TYPES: BusinessType[] = [
   {
     id: "design-criacao",
     label: "Design e Criação",
-    templateSlug: "quadro",
+    templateSlug: "cromo",
     defaultContent: {
       heroEyebrow: "Design com propósito",
       heroTitle: "Visualmente impecável",

@@ -50,6 +50,13 @@ const GOOGLE_FONTS_MAP: Record<string, string> = {
   "Montserrat": "Montserrat:wght@400;500;600;700",
   "Lora": "Lora:wght@400;500;600;700",
   "Sora": "Sora:wght@400;500;600;700",
+  "DM Sans": "DM+Sans:wght@400;500;600;700",
+  "Space Grotesk": "Space+Grotesk:wght@400;500;600;700",
+  "Merriweather": "Merriweather:wght@400;700",
+  "Cormorant Garamond": "Cormorant+Garamond:wght@400;500;600;700",
+  "EB Garamond": "EB+Garamond:wght@400;500;600;700",
+  "Fraunces": "Fraunces:wght@400;500;600;700",
+  "Plus Jakarta Sans": "Plus+Jakarta+Sans:wght@400;500;600;700",
 };
 
 export function LivePreviewPanel() {
