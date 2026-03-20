@@ -1902,31 +1902,85 @@ export function SectionRenderer({
       : [];
     const statsVariant = section.variant ?? "default";
 
+    const cols =
+      statsItems.length <= 2
+        ? "grid-cols-2"
+        : statsItems.length === 3
+        ? "grid-cols-3"
+        : "grid-cols-2 md:grid-cols-4";
+
+    // ── banner: fundo na cor primária, separadores finos, números brancos ──
+    if (statsVariant === "banner") {
+      return (
+        <section id="stats" className="w-full py-12 md:py-16" style={{ backgroundColor: "var(--site-primary)" }}>
+          <div className={`relative ${containerClass}`}>
+            {statsTitle && (
+              <p className="mb-8 text-center text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: "var(--site-button-text)", opacity: 0.6 }}>
+                {statsTitle}
+              </p>
+            )}
+            <div className={`grid ${cols} gap-px`} style={{ backgroundColor: "color-mix(in srgb, var(--site-button-text) 20%, transparent)" }}>
+              {statsItems.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col items-center px-4 py-6 text-center min-w-0"
+                  style={{ backgroundColor: "var(--site-primary)" }}
+                >
+                  <span className="text-3xl font-black leading-none md:text-4xl break-words w-full" style={{ color: "var(--site-button-text)" }}>
+                    {item.value}
+                  </span>
+                  <span className="mt-2 text-xs font-medium leading-tight" style={{ color: "var(--site-button-text)", opacity: 0.65 }}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── accent: linha sólida no topo, layout editorial, sem card ──
+    if (statsVariant === "accent") {
+      return (
+        <section id="stats" className="w-full py-12 md:py-16">
+          <div className={`relative ${containerClass}`}>
+            {statsTitle && <SectionEyebrow label={statsTitle} />}
+            <div className={`mt-6 grid gap-8 ${cols}`}>
+              {statsItems.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col min-w-0 pt-5 overflow-hidden"
+                  style={{ borderTop: "3px solid var(--site-primary)" }}
+                >
+                  <span className="text-3xl font-black leading-none md:text-4xl break-words" style={{ color: "var(--site-primary)" }}>
+                    {item.value}
+                  </span>
+                  <span className="mt-2 text-sm font-medium opacity-60 leading-tight">{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── default: cards glassmorphism (com fix de overflow) ──
     return (
       <section id="stats" className="w-full py-12 md:py-16">
         <div className={`relative ${containerClass}`}>
           {statsTitle && <SectionEyebrow label={statsTitle} />}
-          <div
-            className={`mt-6 grid gap-6 ${
-              statsItems.length <= 2
-                ? "grid-cols-2"
-                : statsItems.length === 3
-                ? "grid-cols-3"
-                : "grid-cols-2 md:grid-cols-4"
-            }`}
-          >
+          <div className={`mt-6 grid gap-4 ${cols}`}>
             {statsItems.map((item, i) => (
               <div
                 key={i}
-                className={`flex flex-col items-center rounded-xl border border-[var(--site-border)] bg-[var(--site-surface)] px-4 py-6 text-center ${
-                  statsVariant === "minimal" ? "border-transparent bg-transparent" : ""
-                }`}
+                className="flex flex-col items-center border border-[var(--site-border)] bg-[var(--site-surface)] px-3 py-6 text-center min-w-0 overflow-hidden"
                 style={{ borderRadius: cardRadius }}
               >
-                <span className="text-4xl font-black leading-none md:text-5xl" style={{ color: "var(--site-primary)" }}>
+                <span className="text-2xl font-black leading-none md:text-3xl break-words w-full" style={{ color: "var(--site-primary)" }}>
                   {item.value}
                 </span>
-                <span className="mt-2 text-sm font-medium opacity-60">{item.label}</span>
+                <span className="mt-2 text-xs font-medium opacity-60 leading-tight">{item.label}</span>
               </div>
             ))}
           </div>

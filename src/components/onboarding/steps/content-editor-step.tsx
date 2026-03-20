@@ -565,7 +565,7 @@ function StatsContentEditor() {
       />
       <VariantBar
         label="Estilo"
-        options={[{ id: "default", name: "Cards" }, { id: "minimal", name: "Simples" }]}
+        options={[{ id: "default", name: "Cards" }, { id: "banner", name: "Faixa" }, { id: "accent", name: "Destaque" }]}
         value={String(content.statsVariant ?? "default")}
         onChange={id => dispatch({ type: "UPDATE_CONTENT", key: "statsVariant", value: id })}
       />
