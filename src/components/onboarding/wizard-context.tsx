@@ -161,6 +161,7 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
     case "SET_PLAN":
       return {
         ...initialState,
+        // Preserve business identity
         businessName: state.businessName,
         businessSegment: state.businessSegment,
         businessCity: state.businessCity,
@@ -169,6 +170,11 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         preferredSubdomain: state.preferredSubdomain,
         ownerEmail: state.ownerEmail,
         leadId: state.leadId,
+        // Preserve seeded content and sections from lead-capture
+        content: state.content,
+        serviceCards: state.serviceCards,
+        enabledSections: state.enabledSections,
+        selectedTemplateSlug: state.selectedTemplateSlug,
         selectedPlan: action.plan,
         currentStep: state.currentStep,
       };
