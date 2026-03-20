@@ -480,3 +480,103 @@ export function getMockArrayContentForSegment(segmentId: string): Record<string,
     statsItems: content.statsItems,
   };
 }
+
+type ServiceCard = { title: string; description: string; iconName: string };
+
+const SERVICE_CARDS: Record<string, ServiceCard[]> = {
+  "saude-terapia": [
+    { title: "Consulta Individual", description: "Sessão de acompanhamento personalizado e confidencial", iconName: "Heart" },
+    { title: "Terapia Online", description: "Atendimento remoto com a mesma qualidade e sigilo", iconName: "Monitor" },
+    { title: "Grupo Terapêutico", description: "Encontros em grupo com dinâmicas especializadas", iconName: "Users" },
+    { title: "Avaliação Psicológica", description: "Laudos e relatórios técnicos com embasamento científico", iconName: "FileText" },
+  ],
+  "beleza-estetica": [
+    { title: "Procedimentos Faciais", description: "Limpeza de pele, peeling e tratamentos rejuvenescedores", iconName: "Smile" },
+    { title: "Cabelo & Coloração", description: "Cortes, tintura e tratamentos capilares especializados", iconName: "Scissors" },
+    { title: "Estética Corporal", description: "Massagens, drenagem linfática e modelagem corporal", iconName: "Star" },
+    { title: "Manicure & Pedicure", description: "Cuidados completos e duradouros para mãos e pés", iconName: "Heart" },
+  ],
+  "nutricao-alimentacao": [
+    { title: "Consulta Nutricional", description: "Avaliação detalhada e plano alimentar personalizado", iconName: "User" },
+    { title: "Dieta Personalizada", description: "Cardápio adaptado ao seu estilo de vida e objetivos", iconName: "Leaf" },
+    { title: "Acompanhamento Online", description: "Suporte contínuo e ajustes via plataforma digital", iconName: "Monitor" },
+    { title: "Nutrição Esportiva", description: "Suporte nutricional para quem treina e busca performance", iconName: "Zap" },
+  ],
+  "yoga-meditacao": [
+    { title: "Aulas de Yoga", description: "Práticas para todos os níveis, presencial ou online", iconName: "Heart" },
+    { title: "Meditação Guiada", description: "Técnicas para reduzir o estresse e cultivar a presença", iconName: "Smile" },
+    { title: "Respiração Consciente", description: "Pranayama para equilíbrio energético e vitalidade", iconName: "Activity" },
+    { title: "Retiro & Workshop", description: "Imersões transformadoras individuais e em grupo", iconName: "Users" },
+  ],
+  "fitness-academia": [
+    { title: "Personal Training", description: "Treinos personalizados para o seu objetivo e ritmo", iconName: "Target" },
+    { title: "Avaliação Física", description: "Análise completa do condicionamento e composição corporal", iconName: "Activity" },
+    { title: "Treino Funcional", description: "Movimentos integrados que melhoram seu desempenho", iconName: "Zap" },
+    { title: "Consultoria Online", description: "Planilhas de treino e acompanhamento remoto", iconName: "Monitor" },
+  ],
+  "servicos-gerais": [
+    { title: "Instalação & Montagem", description: "Serviços rápidos, seguros e com garantia", iconName: "Wrench" },
+    { title: "Manutenção Preventiva", description: "Revisões periódicas para evitar problemas maiores", iconName: "Settings" },
+    { title: "Reformas & Reparos", description: "Soluções completas para sua casa ou empresa", iconName: "Shield" },
+    { title: "Consultoria Técnica", description: "Avaliação detalhada e orçamento sem compromisso", iconName: "FileText" },
+  ],
+  "design-criacao": [
+    { title: "Identidade Visual", description: "Logo, paleta de cores e tipografia para sua marca", iconName: "Star" },
+    { title: "Design Gráfico", description: "Materiais impressos e digitais de alto impacto", iconName: "Award" },
+    { title: "Social Media", description: "Artes e conteúdo visual otimizado para redes sociais", iconName: "Users" },
+    { title: "Branding Estratégico", description: "Posicionamento visual que conecta marca e público", iconName: "TrendingUp" },
+  ],
+  "fotografia-arte": [
+    { title: "Ensaio Fotográfico", description: "Portraits, books e ensaios temáticos personalizados", iconName: "Camera" },
+    { title: "Fotografia de Eventos", description: "Casamentos, aniversários e eventos corporativos", iconName: "Users" },
+    { title: "Fotografia de Produto", description: "Imagens profissionais para e-commerce e catálogos", iconName: "Star" },
+    { title: "Edição & Tratamento", description: "Retoque e edição profissional com entrega rápida", iconName: "Monitor" },
+  ],
+  "musica-entretenimento": [
+    { title: "Aulas de Instrumento", description: "Metodologia personalizada para todos os níveis", iconName: "Music" },
+    { title: "Produção Musical", description: "Gravação, mixagem e masterização profissional", iconName: "Mic" },
+    { title: "Shows & Eventos", description: "Apresentações ao vivo e animação de celebrações", iconName: "Users" },
+    { title: "Trilhas & Jingles", description: "Identidade sonora personalizada para marcas e projetos", iconName: "Star" },
+  ],
+  "coaching-desenvolvimento": [
+    { title: "Coaching Individual", description: "Sessões focadas nos seus objetivos pessoais e profissionais", iconName: "Target" },
+    { title: "Liderança & Carreira", description: "Desenvolvimento de habilidades executivas e de equipe", iconName: "TrendingUp" },
+    { title: "Workshop em Grupo", description: "Dinâmicas para equipes, líderes e organizações", iconName: "Users" },
+    { title: "Mentoria Estratégica", description: "Acompanhamento personalizado para conquista de metas", iconName: "Lightbulb" },
+  ],
+  "educacao-cursos": [
+    { title: "Aula Particular", description: "Ensino individualizado focado nas dificuldades específicas", iconName: "User" },
+    { title: "Curso Online", description: "Aprendizado no seu ritmo, com suporte e material completo", iconName: "Monitor" },
+    { title: "Workshop Presencial", description: "Prática intensa com resultados visíveis e rápidos", iconName: "Users" },
+    { title: "Preparatório & Concurso", description: "Material, estratégia e treino focado em aprovação", iconName: "Target" },
+  ],
+  "tecnologia-ti": [
+    { title: "Desenvolvimento Web", description: "Sites, sistemas e aplicações sob medida para seu negócio", iconName: "Monitor" },
+    { title: "Aplicativos Mobile", description: "Apps iOS e Android com experiência profissional", iconName: "Zap" },
+    { title: "Suporte & TI", description: "Manutenção, configuração e suporte técnico ágil", iconName: "Settings" },
+    { title: "Consultoria Digital", description: "Estratégia e transformação tecnológica para empresas", iconName: "TrendingUp" },
+  ],
+  "juridico-advocacia": [
+    { title: "Consultoria Jurídica", description: "Orientação especializada para suas questões legais", iconName: "Scale" },
+    { title: "Elaboração de Contratos", description: "Documentos seguros, claros e personalizados", iconName: "FileText" },
+    { title: "Acompanhamento Processual", description: "Representação e defesa dos seus direitos em juízo", iconName: "Shield" },
+    { title: "Direito Empresarial", description: "Assessoria completa para empresas e empreendedores", iconName: "Briefcase" },
+  ],
+  "financas-contabilidade": [
+    { title: "Contabilidade Empresarial", description: "Gestão contábil completa, organizada e em dia", iconName: "FileText" },
+    { title: "Planejamento Tributário", description: "Reduza legalmente a carga de impostos da sua empresa", iconName: "TrendingUp" },
+    { title: "Declaração de IR", description: "Imposto de renda feito com segurança e dentro do prazo", iconName: "Shield" },
+    { title: "Consultoria Financeira", description: "Estratégias para crescimento e saúde financeira", iconName: "DollarSign" },
+  ],
+  "outro": [
+    { title: "Serviço Principal", description: "Nosso principal trabalho com qualidade e dedicação", iconName: "Star" },
+    { title: "Consultoria", description: "Orientação especializada para suas necessidades", iconName: "User" },
+    { title: "Suporte & Atendimento", description: "Sempre disponível para ajudar e resolver sua demanda", iconName: "Heart" },
+    { title: "Resultado Garantido", description: "Comprometimento com a excelência em cada projeto", iconName: "Shield" },
+  ],
+};
+
+/** Retorna os cards de serviço pré-preenchidos para um segmento de negócio. */
+export function getMockServiceCardsForSegment(segmentId: string): ServiceCard[] {
+  return SERVICE_CARDS[segmentId] ?? SERVICE_CARDS["outro"];
+}

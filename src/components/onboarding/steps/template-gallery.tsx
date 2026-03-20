@@ -6,7 +6,7 @@ import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { templatePresets, getTemplateBySlug, type TemplatePreset } from "@/lib/onboarding/templates";
 import { getTemplateForBusinessType, getDefaultContentForBusinessType } from "@/lib/onboarding/business-types";
-import { getMockArrayContentForSegment } from "@/lib/onboarding/segment-mock-content";
+import { getMockArrayContentForSegment, getMockServiceCardsForSegment } from "@/lib/onboarding/segment-mock-content";
 
 function TemplateCard({
   template,
@@ -138,6 +138,9 @@ export function TemplateGallery() {
       for (const [key, value] of Object.entries(mockArrays)) {
         dispatch({ type: "SET_CONTENT_ARRAY", key, value: value as unknown[] });
       }
+
+      // Re-apply segment-specific service cards
+      dispatch({ type: "SET_SERVICE_CARDS", cards: getMockServiceCardsForSegment(state.businessSegment) });
 
       // Personalize content with the client's business name
       const name = state.businessName.trim();

@@ -7,7 +7,7 @@ import { useWizard } from "../wizard-context";
 import { validateEmail } from "@/lib/onboarding/validation";
 import { validateSubdomain } from "@/lib/onboarding/validation";
 import { BUSINESS_TYPES, getTemplateForBusinessType, getDefaultContentForBusinessType } from "@/lib/onboarding/business-types";
-import { getMockArrayContentForSegment } from "@/lib/onboarding/segment-mock-content";
+import { getMockArrayContentForSegment, getMockServiceCardsForSegment } from "@/lib/onboarding/segment-mock-content";
 
 type SubdomainStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 type EmailAccountStatus = "idle" | "free" | "draft" | "active";
@@ -169,6 +169,9 @@ export function LeadCaptureStep() {
       for (const [key, value] of Object.entries(mockArrays)) {
         dispatch({ type: "SET_CONTENT_ARRAY", key, value: value as unknown[] });
       }
+
+      // Seed segment-specific service cards
+      dispatch({ type: "SET_SERVICE_CARDS", cards: getMockServiceCardsForSegment(businessType) });
 
       // Personalize content with the client's business name
       const name = businessName.trim();

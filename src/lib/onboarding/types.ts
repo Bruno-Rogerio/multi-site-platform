@@ -176,4 +176,5 @@ export type WizardAction =
   | { type: "SET_LEAD_ID"; leadId: string }
   | { type: "RESET_WIZARD" }
   | { type: "REORDER_SECTIONS"; sections: string[] }
-  | { type: "SET_CONTENT_ARRAY"; key: string; value: unknown[] };
+  | { type: "SET_CONTENT_ARRAY"; key: string; value: unknown[] }
+  | { type: "SET_SERVICE_CARDS"; cards: ServiceCardData[] };

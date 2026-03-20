@@ -121,9 +121,9 @@ export function VisualIdentityStep() {
   }
 
   function toggleSection(id: string) {
-    setSelectedSections(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
-    );
+    const isOn = selectedSections.includes(id);
+    setSelectedSections(prev => isOn ? prev.filter(s => s !== id) : [...prev, id]);
+    dispatch({ type: isOn ? "REMOVE_SECTION" : "ADD_SECTION", sectionType: id });
   }
 
   function handleContinue() {

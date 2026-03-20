@@ -370,6 +370,9 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
     case "SET_CONTENT_ARRAY":
       return { ...state, content: { ...state.content, [action.key]: action.value } };
 
+    case "SET_SERVICE_CARDS":
+      return { ...state, serviceCards: action.cards };
+
     case "UPDATE_CONTENT":
       return { ...state, content: { ...state.content, [action.key]: action.value } };
 
