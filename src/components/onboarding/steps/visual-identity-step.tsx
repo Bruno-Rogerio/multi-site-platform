@@ -122,8 +122,19 @@ export function VisualIdentityStep() {
 
   function toggleSection(id: string) {
     const isOn = selectedSections.includes(id);
-    setSelectedSections(prev => isOn ? prev.filter(s => s !== id) : [...prev, id]);
-    dispatch({ type: isOn ? "REMOVE_SECTION" : "ADD_SECTION", sectionType: id });
+    const newSelected = isOn
+      ? selectedSections.filter(s => s !== id)
+      : [...selectedSections, id];
+    setSelectedSections(newSelected);
+
+    if (isOn) {
+      dispatch({ type: "REMOVE_SECTION", sectionType: id });
+    } else {
+      // Re-insert maintaining canonical SECTION_OPTIONS order so section appears in the right spot in preview
+      const canonicalOrder = SECTION_OPTIONS.map(s => s.id);
+      const reordered = canonicalOrder.filter(s => newSelected.includes(s));
+      dispatch({ type: "REORDER_SECTIONS", sections: reordered });
+    }
   }
 
   function handleContinue() {

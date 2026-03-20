@@ -62,6 +62,12 @@ export const eventsVariants: SectionVariant[] = [
   { id: "list", name: "Lista", description: "Linhas compactas", premium: true },
 ];
 
+export const statsVariants: SectionVariant[] = [
+  { id: "default", name: "Cards", description: "Cards glassmorphism com número em destaque", premium: false },
+  { id: "banner", name: "Faixa", description: "Fundo na cor da marca, números em contraste", premium: false },
+  { id: "accent", name: "Destaque", description: "Linha sólida no topo, estilo editorial", premium: false },
+];
+
 export const motionStyles: SectionVariant[] = [
   { id: "motion-none", name: "Sem animação", description: "Minimalista e direto", premium: false },
   { id: "motion-fade", name: "Fade simples", description: "Transição suave de opacidade", premium: false },

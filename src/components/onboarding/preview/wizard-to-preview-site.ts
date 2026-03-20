@@ -290,7 +290,7 @@ function buildSection(
         id: "stats",
         type: "stats",
         order,
-        variant: str(content.statsVariant) || "default",
+        variant: state.statsVariant || "default",
         content: {
           title: str(content.statsTitle),
           items: Array.isArray(content.statsItems)

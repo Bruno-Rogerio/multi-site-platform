@@ -62,6 +62,7 @@ export type WizardState = {
   faqVariant: string;
   blogVariant: string;
   eventsVariant: string;
+  statsVariant: string;
   motionStyle: string;
   headerStyle: "blur" | "solid" | "minimal" | "gradient" | "dark";
   dividerStyle: "wave" | "diagonal" | "curve" | "line" | "none";
@@ -144,6 +145,7 @@ export type WizardAction =
   | { type: "SET_FAQ_VARIANT"; variant: string }
   | { type: "SET_BLOG_VARIANT"; variant: string }
   | { type: "SET_EVENTS_VARIANT"; variant: string }
+  | { type: "SET_STATS_VARIANT"; variant: string }
   | { type: "SET_MOTION_STYLE"; style: string }
   | { type: "SET_HEADER_STYLE"; style: "blur" | "solid" | "minimal" | "gradient" | "dark" }
   | { type: "SET_DIVIDER_STYLE"; style: "wave" | "diagonal" | "curve" | "line" | "none" }
