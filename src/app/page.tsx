@@ -268,7 +268,7 @@ export default async function PlatformLandingPage() {
               </AnimatedSection>
 
               {/* Card 4: Blog + Galeria + Eventos (col-span-2) */}
-              <AnimatedSection delay={0.16} className="col-span-2">
+              <AnimatedSection delay={0.16} className="col-span-2 row-span-2 md:row-span-1">
                 <div className="group relative h-full overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(135deg,rgba(124,92,255,0.08),rgba(34,211,238,0.05))] p-6 transition-all duration-500 hover:border-[#7C5CFF]/40">
                   <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(124,92,255,0.12),transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   <div className="relative flex h-full flex-col justify-between">
