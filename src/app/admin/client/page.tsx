@@ -243,18 +243,18 @@ export default async function ClientAdminPage() {
       )}
 
       {/* Analytics cards */}
-      <div className="mb-5 grid grid-cols-3 gap-3">
+      <div className="mb-5 grid grid-cols-3 gap-2 sm:gap-3">
         {[
-          { label: "Visitas hoje",       value: viewsToday, period: "nas últimas 24h" },
-          { label: "Visitas esta semana", value: viewsWeek,  period: "últimos 7 dias" },
-          { label: "Visitas este mês",   value: viewsMonth, period: "últimos 30 dias" },
+          { label: "Visitas hoje",        value: viewsToday, period: "últimas 24h" },
+          { label: "Esta semana",         value: viewsWeek,  period: "últimos 7 dias" },
+          { label: "Este mês",            value: viewsMonth, period: "últimos 30 dias" },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-white/10 bg-[#12182B] p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart2 size={14} className="text-[#22D3EE]" />
-              <p className="text-[11px] text-[var(--platform-text)]/50">{stat.label}</p>
+          <div key={stat.label} className="rounded-2xl border border-white/10 bg-[#12182B] p-3 sm:p-4">
+            <div className="mb-1.5 flex items-center gap-1.5 sm:mb-2 sm:gap-2">
+              <BarChart2 size={13} className="shrink-0 text-[#22D3EE]" />
+              <p className="truncate text-[10px] text-[var(--platform-text)]/50 sm:text-[11px]">{stat.label}</p>
             </div>
-            <p className="text-2xl font-bold text-[var(--platform-text)]">{stat.value.toLocaleString("pt-BR")}</p>
+            <p className="text-xl font-bold text-[var(--platform-text)] sm:text-2xl">{stat.value.toLocaleString("pt-BR")}</p>
             <p className="mt-0.5 text-[10px] text-[var(--platform-text)]/35">{stat.period}</p>
           </div>
         ))}

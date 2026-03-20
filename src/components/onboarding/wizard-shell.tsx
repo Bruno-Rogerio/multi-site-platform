@@ -65,7 +65,7 @@ function WizardContent() {
   const showPreview = currentStepId !== "plan-selection" && currentStepId !== "lead-capture" && currentStepId !== "finalizar";
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-24 xl:pb-0">
       {/* Background orbs */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
         <div className="absolute left-[5%] top-[10%] h-[400px] w-[400px] rounded-full bg-[#22D3EE]/8 blur-[100px]" />

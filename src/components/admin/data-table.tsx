@@ -84,13 +84,13 @@ export function DataTable<T>({
           paginated.map((row, rowIdx) => (
             <div
               key={keyExtractor(row)}
-              className={`grid border-b border-white/5 transition hover:bg-white/[0.02] md:grid-cols-none ${rowIdx === paginated.length - 1 ? "rounded-b-xl" : ""}`}
+              className={`flex flex-col border-b border-white/5 transition hover:bg-white/[0.02] md:grid ${rowIdx === paginated.length - 1 ? "rounded-b-xl" : ""}`}
               style={{ gridTemplateColumns: columns.map(() => "1fr").join(" ") }}
             >
               {columns.map((col) => (
-                <div key={col.key} className={`px-4 py-3 text-sm text-[var(--platform-text)] ${col.className ?? ""}`}>
+                <div key={col.key} className={`px-4 py-2 text-sm text-[var(--platform-text)] md:py-3 ${col.className ?? ""}`}>
                   {/* Mobile label */}
-                  <span className="mr-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--platform-text)]/40 md:hidden">
+                  <span className="mr-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--platform-text)]/40 md:hidden">
                     {col.label}:{" "}
                   </span>
                   {col.render(row)}

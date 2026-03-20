@@ -131,13 +131,13 @@ export function SiteShell({ site, children }: SiteShellProps) {
     if (headerStyle === "gradient") {
       return (
         <header className="sticky top-0 z-20" style={{ background: "linear-gradient(135deg, var(--site-primary), var(--site-accent))", color: "var(--site-button-text)" }}>
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+            <a href="/" className="flex min-w-0 items-center gap-3 transition hover:opacity-90">
               {logoImg}
-              <div>
-                <p className="text-lg font-bold leading-tight">{site.name}</p>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold leading-tight">{site.name}</p>
                 {site.themeSettings.slogan && (
-                  <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                  <p className="truncate text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
                 )}
               </div>
             </a>
@@ -160,13 +160,13 @@ export function SiteShell({ site, children }: SiteShellProps) {
     if (headerStyle === "dark") {
       return (
         <header className="sticky top-0 z-20 border-b border-white/10" style={{ backgroundColor: "#0B1020", color: "#EAF0FF" }}>
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+            <a href="/" className="flex min-w-0 items-center gap-3 transition hover:opacity-90">
               {logoImg}
-              <div>
-                <p className="text-lg font-bold leading-tight" style={{ color: "var(--site-primary)" }}>{site.name}</p>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold leading-tight" style={{ color: "var(--site-primary)" }}>{site.name}</p>
                 {site.themeSettings.slogan && (
-                  <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                  <p className="truncate text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
                 )}
               </div>
             </a>
@@ -189,13 +189,13 @@ export function SiteShell({ site, children }: SiteShellProps) {
     if (headerStyle === "solid") {
       return (
         <header className="sticky top-0 z-20" style={{ backgroundColor: "var(--site-primary)", color: "var(--site-button-text)" }}>
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
+          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+            <a href="/" className="flex min-w-0 items-center gap-3 transition hover:opacity-90">
               {logoImg}
-              <div>
-                <p className="text-lg font-bold leading-tight">{site.name}</p>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold leading-tight">{site.name}</p>
                 {site.themeSettings.slogan && (
-                  <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                  <p className="truncate text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
                 )}
               </div>
             </a>
@@ -218,14 +218,14 @@ export function SiteShell({ site, children }: SiteShellProps) {
     if (headerStyle === "minimal") {
       return (
         <header className="sticky top-0 z-20 border-b border-[var(--site-border)] bg-[var(--site-background)]">
-          <div className="mx-auto flex w-full max-w-7xl flex-col items-center px-6 py-4 gap-1">
+          <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-1 px-4 py-4 sm:px-6">
             <div className="flex w-full items-center justify-between md:justify-center md:gap-3">
-              <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
+              <a href="/" className="flex min-w-0 items-center gap-3 transition hover:opacity-90">
                 {logoImg}
-                <div>
-                  <p className="text-lg font-bold leading-tight">{site.name}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-lg font-bold leading-tight">{site.name}</p>
                   {site.themeSettings.slogan && (
-                    <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                    <p className="truncate text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
                   )}
                 </div>
               </a>
@@ -246,13 +246,13 @@ export function SiteShell({ site, children }: SiteShellProps) {
     // ── blur (padrão): sticky + backdrop-blur ──
     return (
       <header className="sticky top-0 z-20 border-b border-[var(--site-border)] bg-[var(--site-background)]/90 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-          <a href="/" className="flex items-center gap-3 hover:opacity-90 transition">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+          <a href="/" className="flex min-w-0 items-center gap-3 transition hover:opacity-90">
             {logoImg}
-            <div>
-              <p className="text-lg font-bold leading-tight">{site.name}</p>
+            <div className="min-w-0">
+              <p className="truncate text-lg font-bold leading-tight">{site.name}</p>
               {site.themeSettings.slogan && (
-                <p className="text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
+                <p className="truncate text-xs leading-tight opacity-60">{String(site.themeSettings.slogan)}</p>
               )}
             </div>
           </a>

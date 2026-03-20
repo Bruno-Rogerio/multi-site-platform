@@ -49,22 +49,22 @@ export function AdminTopbar({ email, role, userId }: AdminTopbarProps) {
   return (
     <header className="flex items-center justify-between border-b border-white/10 bg-[#0B1020]/80 px-6 py-3 backdrop-blur-sm">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-sm pl-12 md:pl-0">
+      <nav className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden text-sm pl-10 md:pl-0">
         {breadcrumbs.map((crumb, index) => {
           const isLast = index === breadcrumbs.length - 1;
           return (
-            <span key={crumb.href} className="flex items-center gap-2">
+            <span key={crumb.href} className={`flex shrink-0 items-center gap-1.5 ${isLast ? "min-w-0" : ""}`}>
               {index > 0 && (
                 <span className="text-[var(--platform-text)]/30">/</span>
               )}
               {isLast ? (
-                <span className="font-medium text-[var(--platform-text)]">
+                <span className="truncate font-medium text-[var(--platform-text)]">
                   {crumb.label}
                 </span>
               ) : (
                 <Link
                   href={crumb.href}
-                  className="text-[var(--platform-text)]/50 transition hover:text-[var(--platform-text)]"
+                  className="whitespace-nowrap text-[var(--platform-text)]/50 transition hover:text-[var(--platform-text)]"
                 >
                   {crumb.label}
                 </Link>
@@ -91,7 +91,7 @@ export function AdminTopbar({ email, role, userId }: AdminTopbarProps) {
             {role === "admin" ? <Shield size={10} /> : <User size={10} />}
             {role === "admin" ? "Admin" : "Cliente"}
           </span>
-          <span className="text-xs text-[var(--platform-text)]/60 max-w-[160px] truncate">
+          <span className="max-w-[160px] truncate text-xs text-[var(--platform-text)]/60 lg:max-w-[220px]">
             {email}
           </span>
         </div>

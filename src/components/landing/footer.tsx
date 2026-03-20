@@ -108,7 +108,7 @@ export function Footer({ brandElement, branding }: FooterProps) {
 
       {/* ── LINKS GRID ── */}
       <div className="relative mx-auto max-w-7xl px-5 pb-8 pt-12 md:px-8 md:pb-10 md:pt-14">
-        <div className="grid gap-12 md:grid-cols-[2fr_1fr_1fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] md:gap-12">
 
           {/* Brand column */}
           <div>

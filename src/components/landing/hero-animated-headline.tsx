@@ -101,8 +101,8 @@ export function HeroAnimatedHeadline() {
         >
           <span>Feito para</span>
           <span
-            className="relative inline-block overflow-hidden font-bold"
-            style={{ height: "1.4em", minWidth: "220px" }}
+            className="relative inline-block min-w-[160px] overflow-hidden font-bold sm:min-w-[220px]"
+            style={{ height: "1.4em" }}
           >
             <AnimatePresence mode="wait" initial={false}>
               <motion.span
