@@ -6,6 +6,7 @@ import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { templatePresets, getTemplateBySlug, type TemplatePreset } from "@/lib/onboarding/templates";
 import { getTemplateForBusinessType, getDefaultContentForBusinessType } from "@/lib/onboarding/business-types";
+import { getMockArrayContentForSegment } from "@/lib/onboarding/segment-mock-content";
 
 function TemplateCard({
   template,
@@ -130,6 +131,12 @@ export function TemplateGallery() {
       const defaultContent = getDefaultContentForBusinessType(state.businessSegment);
       for (const [key, value] of Object.entries(defaultContent)) {
         dispatch({ type: "UPDATE_CONTENT", key, value });
+      }
+
+      // Re-apply contextual mock content (arrays)
+      const mockArrays = getMockArrayContentForSegment(state.businessSegment);
+      for (const [key, value] of Object.entries(mockArrays)) {
+        dispatch({ type: "SET_CONTENT_ARRAY", key, value: value as unknown[] });
       }
     }
   }
