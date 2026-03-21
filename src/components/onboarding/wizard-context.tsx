@@ -177,6 +177,7 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
         serviceCards: state.serviceCards,
         enabledSections: state.enabledSections,
         selectedTemplateSlug: state.selectedTemplateSlug,
+        heroImage: state.heroImage,
         selectedPlan: action.plan,
         currentStep: state.currentStep,
       };

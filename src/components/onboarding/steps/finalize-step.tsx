@@ -441,35 +441,42 @@ export function FinalizeStep() {
   if (phase === "creating") {
     return (
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.35 }}
-        className="mx-auto flex w-full max-w-lg flex-col items-center py-16 text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#06080F]"
       >
-        {/* Animated ring */}
-        <div className="relative flex h-20 w-20 items-center justify-center">
-          <div className="absolute inset-0 rounded-full bg-[#22D3EE]/10 animate-ping" style={{ animationDuration: "1.5s" }} />
-          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[#22D3EE]/10">
-            <Loader2 size={36} className="animate-spin text-[#22D3EE]" />
-          </div>
+        {/* Background orbs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute left-[10%] top-[15%] h-[400px] w-[400px] rounded-full bg-[#22D3EE]/8 blur-[120px]" />
+          <div className="absolute right-[5%] bottom-[10%] h-[500px] w-[500px] rounded-full bg-[#7C5CFF]/8 blur-[140px]" />
         </div>
-        <p className="mt-6 text-xl font-bold text-[#EAF0FF]">Construindo seu site…</p>
-        <p className="mt-2 text-sm text-[#EAF0FF]/50 max-w-xs">
-          Estamos montando as seções, configurando o visual e preparando sua demonstração.
-        </p>
-        <div className="mt-8 flex flex-col items-center gap-2">
-          {["Configurando visual", "Criando seções", "Gerando demonstração"].map((step, i) => (
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.5, duration: 0.3 }}
-              className="flex items-center gap-2 text-xs text-[#EAF0FF]/40"
-            >
-              <div className="h-1.5 w-1.5 rounded-full bg-[#22D3EE]/60" />
-              {step}
-            </motion.div>
-          ))}
+        <div className="relative z-10 flex flex-col items-center px-6 text-center">
+          {/* Animated ring */}
+          <div className="relative flex h-20 w-20 items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-[#22D3EE]/10 animate-ping" style={{ animationDuration: "1.5s" }} />
+            <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[#22D3EE]/10">
+              <Loader2 size={36} className="animate-spin text-[#22D3EE]" />
+            </div>
+          </div>
+          <p className="mt-6 text-xl font-bold text-[#EAF0FF]">Construindo seu site…</p>
+          <p className="mt-2 text-sm text-[#EAF0FF]/50 max-w-xs">
+            Estamos montando as seções, configurando o visual e preparando sua demonstração.
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-2">
+            {["Configurando visual", "Criando seções", "Gerando demonstração"].map((step, i) => (
+              <motion.div
+                key={step}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.5, duration: 0.3 }}
+                className="flex items-center gap-2 text-xs text-[#EAF0FF]/40"
+              >
+                <div className="h-1.5 w-1.5 rounded-full bg-[#22D3EE]/60" />
+                {step}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </motion.div>
     );
