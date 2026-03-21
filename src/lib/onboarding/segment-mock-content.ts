@@ -16,9 +16,9 @@ type MockSectionContent = {
   statsItems: StatsItem[];
 };
 
-/** Gera URL de imagem placeholder consistente por seed */
-function pic(seed: string, w = 600, h = 600): string {
-  return `https://picsum.photos/seed/${seed}/${w}/${h}`;
+/** Gera URL de imagem placeholder via loremflickr com keywords relevantes */
+function img(keywords: string, w: number, h: number, lock: number): string {
+  return `https://loremflickr.com/${w}/${h}/${keywords}?lock=${lock}`;
 }
 
 const MOCK_CONTENT: Record<string, MockSectionContent> = {
@@ -30,14 +30,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "O atendimento é coberto por plano de saúde?", answer: "Depende do plano e da modalidade. Entre em contato para verificar as opções disponíveis e formas de pagamento acessíveis." },
     ],
     blogPosts: [
-      { title: "5 sinais de que você pode se beneficiar de terapia", excerpt: "Artigo · Saúde Mental", imageUrl: pic("saude-blog1", 800, 450), link: "" },
-      { title: "A importância do autocuidado no dia a dia", excerpt: "Artigo · Bem-estar", imageUrl: pic("saude-blog2", 800, 450), link: "" },
-      { title: "Como lidar com a ansiedade de forma saudável", excerpt: "Artigo · Ansiedade", imageUrl: pic("saude-blog3", 800, 450), link: "" },
+      { title: "5 sinais de que você pode se beneficiar de terapia", excerpt: "Artigo · Saúde Mental", imageUrl: img("therapy,counseling,mental,health", 800, 450, 201), link: "" },
+      { title: "A importância do autocuidado no dia a dia", excerpt: "Artigo · Bem-estar", imageUrl: img("wellness,mindfulness,calm,relax", 800, 450, 202), link: "" },
+      { title: "Como lidar com a ansiedade de forma saudável", excerpt: "Artigo · Ansiedade", imageUrl: img("meditation,peaceful,anxiety,calm", 800, 450, 203), link: "" },
     ],
     galleryImages: [
-      { url: pic("saude-gal1"), alt: "Ambiente de atendimento", caption: "Espaço acolhedor e reservado" },
-      { url: pic("saude-gal2"), alt: "Sessão de terapia", caption: "Atendimento humanizado" },
-      { url: pic("saude-gal3"), alt: "Consultório", caption: "Ambiente tranquilo e seguro" },
+      { url: img("clinic,therapy,office,interior", 600, 600, 301), alt: "Ambiente de atendimento", caption: "Espaço acolhedor e reservado" },
+      { url: img("consultation,healthcare,doctor,patient", 600, 600, 302), alt: "Sessão de terapia", caption: "Atendimento humanizado" },
+      { url: img("office,peaceful,interior,wellness", 600, 600, 303), alt: "Consultório", caption: "Ambiente tranquilo e seguro" },
     ],
     events: [
       { title: "Roda de Conversa: Ansiedade e Autoconhecimento", date: "2026-04-10", time: "19:00", location: "Online (Zoom)", description: "Um espaço aberto para trocar experiências e aprender ferramentas para lidar com a ansiedade no cotidiano." },
@@ -60,14 +60,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Os produtos utilizados são hipoalergênicos?", answer: "Trabalhamos com marcas reconhecidas e produtos de alta qualidade. Para clientes com pele sensível, realizamos teste prévio antes do procedimento." },
     ],
     blogPosts: [
-      { title: "Cuidados essenciais com a pele no inverno", excerpt: "Artigo · Skincare", imageUrl: pic("beleza-blog1", 800, 450), link: "" },
-      { title: "Os tratamentos mais procurados em 2026", excerpt: "Artigo · Tendências", imageUrl: pic("beleza-blog2", 800, 450), link: "" },
-      { title: "Hidratação profunda: dicas de profissional", excerpt: "Artigo · Cuidados", imageUrl: pic("beleza-blog3", 800, 450), link: "" },
+      { title: "Cuidados essenciais com a pele no inverno", excerpt: "Artigo · Skincare", imageUrl: img("skincare,skin,face,beauty", 800, 450, 211), link: "" },
+      { title: "Os tratamentos mais procurados em 2026", excerpt: "Artigo · Tendências", imageUrl: img("beauty,treatment,cosmetics,spa", 800, 450, 212), link: "" },
+      { title: "Hidratação profunda: dicas de profissional", excerpt: "Artigo · Cuidados", imageUrl: img("hydration,skincare,moisturizer,skin", 800, 450, 213), link: "" },
     ],
     galleryImages: [
-      { url: pic("beleza-gal1"), alt: "Tratamento facial", caption: "Procedimento de limpeza de pele" },
-      { url: pic("beleza-gal2"), alt: "Ambiente do estúdio", caption: "Espaço confortável e higienizado" },
-      { url: pic("beleza-gal3"), alt: "Resultado de tratamento", caption: "Cuidado com resultados visíveis" },
+      { url: img("facial,beauty,treatment,spa", 600, 600, 311), alt: "Tratamento facial", caption: "Procedimento de limpeza de pele" },
+      { url: img("salon,beauty,interior,studio", 600, 600, 312), alt: "Ambiente do estúdio", caption: "Espaço confortável e higienizado" },
+      { url: img("manicure,nails,beauty,hands", 600, 600, 313), alt: "Resultado de tratamento", caption: "Cuidado com resultados visíveis" },
     ],
     events: [
       { title: "Dia de Beleza com Desconto Especial", date: "2026-04-05", time: "09:00", location: "Estúdio", description: "Pacotes promocionais com até 30% de desconto para novos clientes. Vagas limitadas." },
@@ -90,14 +90,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Atende casos de reeducação alimentar?", answer: "Sim, a reeducação alimentar é um dos focos principais. Atendo diferentes objetivos: emagrecimento, ganho de massa, saúde digestiva e outros." },
     ],
     blogPosts: [
-      { title: "O que realmente importa para emagrecer com saúde", excerpt: "Artigo · Emagrecimento", imageUrl: pic("nutricao-blog1", 800, 450), link: "" },
-      { title: "Alimentos que aumentam a energia no dia a dia", excerpt: "Artigo · Alimentação", imageUrl: pic("nutricao-blog2", 800, 450), link: "" },
-      { title: "Como montar um prato equilibrado em minutos", excerpt: "Artigo · Praticidade", imageUrl: pic("nutricao-blog3", 800, 450), link: "" },
+      { title: "O que realmente importa para emagrecer com saúde", excerpt: "Artigo · Emagrecimento", imageUrl: img("food,healthy,diet,weight", 800, 450, 221), link: "" },
+      { title: "Alimentos que aumentam a energia no dia a dia", excerpt: "Artigo · Alimentação", imageUrl: img("vegetables,fruits,nutrition,food", 800, 450, 222), link: "" },
+      { title: "Como montar um prato equilibrado em minutos", excerpt: "Artigo · Praticidade", imageUrl: img("meal,plate,food,healthy", 800, 450, 223), link: "" },
     ],
     galleryImages: [
-      { url: pic("nutricao-gal1"), alt: "Alimentos saudáveis", caption: "Alimentação colorida e nutritiva" },
-      { url: pic("nutricao-gal2"), alt: "Consultório de nutrição", caption: "Atendimento personalizado" },
-      { url: pic("nutricao-gal3"), alt: "Preparo de refeição saudável", caption: "Receitas práticas e saborosas" },
+      { url: img("salad,vegetables,healthy,food", 600, 600, 321), alt: "Alimentos saudáveis", caption: "Alimentação colorida e nutritiva" },
+      { url: img("nutrition,office,consultation,professional", 600, 600, 322), alt: "Consultório de nutrição", caption: "Atendimento personalizado" },
+      { url: img("cooking,kitchen,meal,healthy", 600, 600, 323), alt: "Preparo de refeição saudável", caption: "Receitas práticas e saborosas" },
     ],
     events: [
       { title: "Palestra: Alimentação Saudável sem Sofrimento", date: "2026-04-08", time: "19:00", location: "Online", description: "Como criar uma relação mais leve e positiva com a comida, sem dietas extremas." },
@@ -120,14 +120,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Com que frequência devo praticar?", answer: "O ideal é de 2 a 3 vezes por semana para sentir resultados consistentes. Mas qualquer frequência já traz benefícios reais para o bem-estar." },
     ],
     blogPosts: [
-      { title: "Yoga para iniciantes: por onde começar", excerpt: "Artigo · Iniciantes", imageUrl: pic("yoga-blog1", 800, 450), link: "" },
-      { title: "Meditação em 5 minutos: técnica para o dia a dia", excerpt: "Artigo · Meditação", imageUrl: pic("yoga-blog2", 800, 450), link: "" },
-      { title: "Como o yoga melhorou minha qualidade de sono", excerpt: "Artigo · Bem-estar", imageUrl: pic("yoga-blog3", 800, 450), link: "" },
+      { title: "Yoga para iniciantes: por onde começar", excerpt: "Artigo · Iniciantes", imageUrl: img("yoga,pose,stretching,mat", 800, 450, 231), link: "" },
+      { title: "Meditação em 5 minutos: técnica para o dia a dia", excerpt: "Artigo · Meditação", imageUrl: img("meditation,mindfulness,calm,zen", 800, 450, 232), link: "" },
+      { title: "Como o yoga melhorou minha qualidade de sono", excerpt: "Artigo · Bem-estar", imageUrl: img("yoga,wellness,relax,sleep", 800, 450, 233), link: "" },
     ],
     galleryImages: [
-      { url: pic("yoga-gal1"), alt: "Aula de yoga", caption: "Prática ao ar livre" },
-      { url: pic("yoga-gal2"), alt: "Meditação em grupo", caption: "Encontros semanais" },
-      { url: pic("yoga-gal3"), alt: "Estúdio de yoga", caption: "Espaço tranquilo e acolhedor" },
+      { url: img("yoga,outdoor,nature,practice", 600, 600, 331), alt: "Aula de yoga", caption: "Prática ao ar livre" },
+      { url: img("meditation,group,zen,studio", 600, 600, 332), alt: "Meditação em grupo", caption: "Encontros semanais" },
+      { url: img("yoga,studio,indoor,peaceful", 600, 600, 333), alt: "Estúdio de yoga", caption: "Espaço tranquilo e acolhedor" },
     ],
     events: [
       { title: "Aula Experimental Gratuita de Yoga", date: "2026-04-04", time: "08:00", location: "Estúdio", description: "Experimente uma aula completa sem custo algum. Vagas limitadas — garante a sua!" },
@@ -150,14 +150,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Posso trazer um amigo para aula experimental?", answer: "Com certeza! Oferecemos aula experimental gratuita para visitantes. Entre em contato para agendar o melhor horário." },
     ],
     blogPosts: [
-      { title: "Como montar um treino eficiente em 45 minutos", excerpt: "Artigo · Treino", imageUrl: pic("fitness-blog1", 800, 450), link: "" },
-      { title: "Nutrição pré e pós treino: o que comer", excerpt: "Artigo · Nutrição", imageUrl: pic("fitness-blog2", 800, 450), link: "" },
-      { title: "Cardio ou musculação: qual escolher?", excerpt: "Artigo · Dicas", imageUrl: pic("fitness-blog3", 800, 450), link: "" },
+      { title: "Como montar um treino eficiente em 45 minutos", excerpt: "Artigo · Treino", imageUrl: img("gym,workout,training,exercise", 800, 450, 241), link: "" },
+      { title: "Nutrição pré e pós treino: o que comer", excerpt: "Artigo · Nutrição", imageUrl: img("running,fitness,sport,healthy", 800, 450, 242), link: "" },
+      { title: "Cardio ou musculação: qual escolher?", excerpt: "Artigo · Dicas", imageUrl: img("cardio,exercise,sport,fitness", 800, 450, 243), link: "" },
     ],
     galleryImages: [
-      { url: pic("fitness-gal1"), alt: "Área de musculação", caption: "Equipamentos modernos" },
-      { url: pic("fitness-gal2"), alt: "Aula de funcional", caption: "Treinos em grupo" },
-      { url: pic("fitness-gal3"), alt: "Personal training", caption: "Acompanhamento individual" },
+      { url: img("gym,weights,equipment,fitness", 600, 600, 341), alt: "Área de musculação", caption: "Equipamentos modernos" },
+      { url: img("crossfit,group,training,fitness", 600, 600, 342), alt: "Aula de funcional", caption: "Treinos em grupo" },
+      { url: img("personal,trainer,fitness,gym", 600, 600, 343), alt: "Personal training", caption: "Acompanhamento individual" },
     ],
     events: [
       { title: "Desafio 30 Dias — Turma Maio", date: "2026-05-04", time: "07:00", location: "Academia / Online", description: "Desafio de transformação com treinos diários, acompanhamento nutricional e suporte em grupo." },
@@ -180,14 +180,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Quais formas de pagamento são aceitas?", answer: "Aceitamos Pix, cartão de crédito/débito e dinheiro. Para serviços maiores, trabalhamos com parcelamento facilitado." },
     ],
     blogPosts: [
-      { title: "Como escolher um bom profissional de serviços", excerpt: "Artigo · Dicas", imageUrl: pic("servicos-blog1", 800, 450), link: "" },
-      { title: "Manutenção preventiva: economia a longo prazo", excerpt: "Artigo · Casa & Serviços", imageUrl: pic("servicos-blog2", 800, 450), link: "" },
-      { title: "Por que contratar um profissional qualificado", excerpt: "Artigo · Qualidade", imageUrl: pic("servicos-blog3", 800, 450), link: "" },
+      { title: "Como escolher um bom profissional de serviços", excerpt: "Artigo · Dicas", imageUrl: img("handyman,tools,repair,service", 800, 450, 251), link: "" },
+      { title: "Manutenção preventiva: economia a longo prazo", excerpt: "Artigo · Casa & Serviços", imageUrl: img("maintenance,repair,home,tools", 800, 450, 252), link: "" },
+      { title: "Por que contratar um profissional qualificado", excerpt: "Artigo · Qualidade", imageUrl: img("professional,worker,quality,service", 800, 450, 253), link: "" },
     ],
     galleryImages: [
-      { url: pic("servicos-gal1"), alt: "Serviço realizado", caption: "Qualidade em cada detalhe" },
-      { url: pic("servicos-gal2"), alt: "Equipe em ação", caption: "Profissionais experientes" },
-      { url: pic("servicos-gal3"), alt: "Resultado final", caption: "Acabamento impecável" },
+      { url: img("repair,tools,work,professional", 600, 600, 351), alt: "Serviço realizado", caption: "Qualidade em cada detalhe" },
+      { url: img("worker,team,professional,service", 600, 600, 352), alt: "Equipe em ação", caption: "Profissionais experientes" },
+      { url: img("renovation,result,clean,work", 600, 600, 353), alt: "Resultado final", caption: "Acabamento impecável" },
     ],
     events: [
       { title: "Promoção de Serviços — Mês do Cliente", date: "2026-04-01", time: "", location: "", description: "Desconto especial de 15% em todos os serviços durante o mês de abril. Aproveite!" },
@@ -209,14 +209,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Trabalham com empresas de qualquer tamanho?", answer: "Sim! Atendemos desde freelancers e empreendedores individuais até empresas de médio porte, com soluções para cada orçamento." },
     ],
     blogPosts: [
-      { title: "Por que uma identidade visual forte vale o investimento", excerpt: "Artigo · Branding", imageUrl: pic("design-blog1", 800, 450), link: "" },
-      { title: "Tendências de design gráfico para 2026", excerpt: "Artigo · Tendências", imageUrl: pic("design-blog2", 800, 450), link: "" },
-      { title: "Como escolher as cores certas para sua marca", excerpt: "Artigo · Psicologia das Cores", imageUrl: pic("design-blog3", 800, 450), link: "" },
+      { title: "Por que uma identidade visual forte vale o investimento", excerpt: "Artigo · Branding", imageUrl: img("branding,logo,identity,design", 800, 450, 261), link: "" },
+      { title: "Tendências de design gráfico para 2026", excerpt: "Artigo · Tendências", imageUrl: img("graphic,design,creative,art", 800, 450, 262), link: "" },
+      { title: "Como escolher as cores certas para sua marca", excerpt: "Artigo · Psicologia das Cores", imageUrl: img("colors,palette,design,creative", 800, 450, 263), link: "" },
     ],
     galleryImages: [
-      { url: pic("design-gal1"), alt: "Projeto de identidade visual", caption: "Branding completo" },
-      { url: pic("design-gal2"), alt: "Material gráfico criado", caption: "Design editorial" },
-      { url: pic("design-gal3"), alt: "Portfólio de projetos", caption: "Cases recentes" },
+      { url: img("logo,design,branding,creative", 600, 600, 361), alt: "Projeto de identidade visual", caption: "Branding completo" },
+      { url: img("poster,print,design,graphic", 600, 600, 362), alt: "Material gráfico criado", caption: "Design editorial" },
+      { url: img("portfolio,creative,art,design", 600, 600, 363), alt: "Portfólio de projetos", caption: "Cases recentes" },
     ],
     events: [
       { title: "Workshop: Branding do Zero para Empreendedores", date: "2026-04-17", time: "19:00", location: "Online", description: "Como criar uma identidade visual impactante mesmo sem ser designer." },
@@ -238,14 +238,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Posso escolher o estilo de edição?", answer: "Cada trabalho tem nosso estilo autoral, mas conversamos sobre o tom e a estética desejados para garantir que o resultado combine com você." },
     ],
     blogPosts: [
-      { title: "Como se preparar para um ensaio fotográfico", excerpt: "Artigo · Ensaio", imageUrl: pic("foto-blog1", 800, 450), link: "" },
-      { title: "A magia da fotografia de momentos reais", excerpt: "Artigo · Lifestyle", imageUrl: pic("foto-blog2", 800, 450), link: "" },
-      { title: "Os bastidores de um casamento fotografado", excerpt: "Artigo · Casamento", imageUrl: pic("foto-blog3", 800, 450), link: "" },
+      { title: "Como se preparar para um ensaio fotográfico", excerpt: "Artigo · Ensaio", imageUrl: img("portrait,photography,model,photo", 800, 450, 271), link: "" },
+      { title: "A magia da fotografia de momentos reais", excerpt: "Artigo · Lifestyle", imageUrl: img("lifestyle,photography,moment,real", 800, 450, 272), link: "" },
+      { title: "Os bastidores de um casamento fotografado", excerpt: "Artigo · Casamento", imageUrl: img("wedding,photography,couple,ceremony", 800, 450, 273), link: "" },
     ],
     galleryImages: [
-      { url: pic("foto-gal1"), alt: "Ensaio fotográfico", caption: "Fotografia autoral" },
-      { url: pic("foto-gal2"), alt: "Registro de evento", caption: "Momentos eternizados" },
-      { url: pic("foto-gal3"), alt: "Retrato profissional", caption: "Luz e composição" },
+      { url: img("portrait,photo,model,studio", 600, 600, 371), alt: "Ensaio fotográfico", caption: "Fotografia autoral" },
+      { url: img("event,photography,moment,celebration", 600, 600, 372), alt: "Registro de evento", caption: "Momentos eternizados" },
+      { url: img("studio,portrait,professional,photo", 600, 600, 373), alt: "Retrato profissional", caption: "Luz e composição" },
     ],
     events: [
       { title: "Ensaio Coletivo — Outono 2026", date: "2026-04-11", time: "07:30", location: "Jardim Botânico", description: "Ensaios individuais de 20 minutos em locação externa. Vagas limitadas — garanta a sua!" },
@@ -268,14 +268,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Quantos músicos acompanham a apresentação?", answer: "A formação varia de solo a banda completa (até 6 músicos), dependendo do evento e do pacote contratado." },
     ],
     blogPosts: [
-      { title: "Música ao vivo: o toque que transforma qualquer evento", excerpt: "Artigo · Eventos", imageUrl: pic("musica-blog1", 800, 450), link: "" },
-      { title: "Como escolher a trilha sonora do seu casamento", excerpt: "Artigo · Casamento", imageUrl: pic("musica-blog2", 800, 450), link: "" },
-      { title: "Por dentro de um show: da preparação ao palco", excerpt: "Artigo · Bastidores", imageUrl: pic("musica-blog3", 800, 450), link: "" },
+      { title: "Música ao vivo: o toque que transforma qualquer evento", excerpt: "Artigo · Eventos", imageUrl: img("music,live,concert,performance", 800, 450, 281), link: "" },
+      { title: "Como escolher a trilha sonora do seu casamento", excerpt: "Artigo · Casamento", imageUrl: img("wedding,music,event,couple", 800, 450, 282), link: "" },
+      { title: "Por dentro de um show: da preparação ao palco", excerpt: "Artigo · Bastidores", imageUrl: img("band,stage,performance,show", 800, 450, 283), link: "" },
     ],
     galleryImages: [
-      { url: pic("musica-gal1"), alt: "Show ao vivo", caption: "Performance impecável" },
-      { url: pic("musica-gal2"), alt: "Música em evento", caption: "Noite inesquecível" },
-      { url: pic("musica-gal3"), alt: "Ensaio de banda", caption: "Preparação e dedicação" },
+      { url: img("concert,live,music,stage", 600, 600, 381), alt: "Show ao vivo", caption: "Performance impecável" },
+      { url: img("band,music,event,performance", 600, 600, 382), alt: "Música em evento", caption: "Noite inesquecível" },
+      { url: img("musician,guitar,rehearsal,studio", 600, 600, 383), alt: "Ensaio de banda", caption: "Preparação e dedicação" },
     ],
     events: [
       { title: "Show Acústico — Sábado Cultural", date: "2026-04-18", time: "19:30", location: "Bar do Jardim", description: "Uma noite intimista com repertório variado, do clássico ao contemporâneo. Entrada franca." },
@@ -298,14 +298,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Vocês oferecem sessão gratuita?", answer: "Sim! Oferecemos uma sessão estratégica gratuita de 30 minutos para alinharmos objetivos e você conhecer a metodologia antes de se comprometer." },
     ],
     blogPosts: [
-      { title: "Como definir metas que você realmente vai alcançar", excerpt: "Artigo · Produtividade", imageUrl: pic("coaching-blog1", 800, 450), link: "" },
-      { title: "Crenças limitantes: como identificar e superar", excerpt: "Artigo · Mentalidade", imageUrl: pic("coaching-blog2", 800, 450), link: "" },
-      { title: "O poder da consistência nos resultados", excerpt: "Artigo · Desenvolvimento", imageUrl: pic("coaching-blog3", 800, 450), link: "" },
+      { title: "Como definir metas que você realmente vai alcançar", excerpt: "Artigo · Produtividade", imageUrl: img("goals,success,planning,business", 800, 450, 291), link: "" },
+      { title: "Crenças limitantes: como identificar e superar", excerpt: "Artigo · Mentalidade", imageUrl: img("mindset,motivation,growth,success", 800, 450, 292), link: "" },
+      { title: "O poder da consistência nos resultados", excerpt: "Artigo · Desenvolvimento", imageUrl: img("consistency,habit,discipline,success", 800, 450, 293), link: "" },
     ],
     galleryImages: [
-      { url: pic("coaching-gal1"), alt: "Sessão de coaching", caption: "Processo individualizado" },
-      { url: pic("coaching-gal2"), alt: "Workshop em grupo", caption: "Aprendizado colaborativo" },
-      { url: pic("coaching-gal3"), alt: "Mentoria profissional", caption: "Resultados comprovados" },
+      { url: img("coaching,session,professional,meeting", 600, 600, 391), alt: "Sessão de coaching", caption: "Processo individualizado" },
+      { url: img("workshop,group,training,learning", 600, 600, 392), alt: "Workshop em grupo", caption: "Aprendizado colaborativo" },
+      { url: img("mentor,business,meeting,success", 600, 600, 393), alt: "Mentoria profissional", caption: "Resultados comprovados" },
     ],
     events: [
       { title: "Sessão Estratégica Gratuita — Vagas Abertas", date: "2026-04-06", time: "10:00", location: "Online (Zoom)", description: "30 minutos para entender onde você está e para onde quer ir. Sem compromisso." },
@@ -328,14 +328,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Existe suporte durante o curso?", answer: "Sim! Temos grupo exclusivo de alunos e um fórum interno. Também respondemos perguntas diretamente nas aulas ao vivo e gravadas." },
     ],
     blogPosts: [
-      { title: "Como aprender mais em menos tempo com técnicas comprovadas", excerpt: "Artigo · Aprendizado", imageUrl: pic("edu-blog1", 800, 450), link: "" },
-      { title: "Por que investir em qualificação vale cada centavo", excerpt: "Artigo · Carreira", imageUrl: pic("edu-blog2", 800, 450), link: "" },
-      { title: "Habilidades mais valorizadas pelo mercado em 2026", excerpt: "Artigo · Tendências", imageUrl: pic("edu-blog3", 800, 450), link: "" },
+      { title: "Como aprender mais em menos tempo com técnicas comprovadas", excerpt: "Artigo · Aprendizado", imageUrl: img("study,learning,books,education", 800, 450, 411), link: "" },
+      { title: "Por que investir em qualificação vale cada centavo", excerpt: "Artigo · Carreira", imageUrl: img("career,education,diploma,success", 800, 450, 412), link: "" },
+      { title: "Habilidades mais valorizadas pelo mercado em 2026", excerpt: "Artigo · Tendências", imageUrl: img("skills,market,professional,training", 800, 450, 413), link: "" },
     ],
     galleryImages: [
-      { url: pic("edu-gal1"), alt: "Aula online", caption: "Conteúdo de alta qualidade" },
-      { url: pic("edu-gal2"), alt: "Alunos em formação", caption: "Centenas de formados" },
-      { url: pic("edu-gal3"), alt: "Material de estudo", caption: "Método prático e eficiente" },
+      { url: img("online,learning,computer,education", 600, 600, 421), alt: "Aula online", caption: "Conteúdo de alta qualidade" },
+      { url: img("students,education,classroom,school", 600, 600, 422), alt: "Alunos em formação", caption: "Centenas de formados" },
+      { url: img("book,study,material,learning", 600, 600, 423), alt: "Material de estudo", caption: "Método prático e eficiente" },
     ],
     events: [
       { title: "Aula Aberta Gratuita: Introdução ao Curso", date: "2026-04-09", time: "19:30", location: "Online (Zoom)", description: "Participe de uma aula demonstrativa sem custo e conheça a metodologia do curso." },
@@ -358,14 +358,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Trabalham com desenvolvimento sob demanda?", answer: "Sim, desenvolvemos soluções customizadas: sistemas web, aplicativos mobile, automações e integrações entre plataformas." },
     ],
     blogPosts: [
-      { title: "Como a automação pode reduzir custos operacionais", excerpt: "Artigo · Tecnologia", imageUrl: pic("tech-blog1", 800, 450), link: "" },
-      { title: "Segurança digital: o que toda empresa precisa saber", excerpt: "Artigo · Cibersegurança", imageUrl: pic("tech-blog2", 800, 450), link: "" },
-      { title: "Cloud ou servidor próprio: como decidir", excerpt: "Artigo · Infraestrutura", imageUrl: pic("tech-blog3", 800, 450), link: "" },
+      { title: "Como a automação pode reduzir custos operacionais", excerpt: "Artigo · Tecnologia", imageUrl: img("automation,technology,process,digital", 800, 450, 431), link: "" },
+      { title: "Segurança digital: o que toda empresa precisa saber", excerpt: "Artigo · Cibersegurança", imageUrl: img("cybersecurity,digital,security,tech", 800, 450, 432), link: "" },
+      { title: "Cloud ou servidor próprio: como decidir", excerpt: "Artigo · Infraestrutura", imageUrl: img("cloud,server,infrastructure,technology", 800, 450, 433), link: "" },
     ],
     galleryImages: [
-      { url: pic("tech-gal1"), alt: "Equipe de desenvolvimento", caption: "Time especializado" },
-      { url: pic("tech-gal2"), alt: "Infraestrutura de TI", caption: "Ambiente seguro e escalável" },
-      { url: pic("tech-gal3"), alt: "Projeto entregue", caption: "Soluções funcionando" },
+      { url: img("developer,team,coding,computer", 600, 600, 441), alt: "Equipe de desenvolvimento", caption: "Time especializado" },
+      { url: img("server,datacenter,infrastructure,technology", 600, 600, 442), alt: "Infraestrutura de TI", caption: "Ambiente seguro e escalável" },
+      { url: img("software,technology,delivery,success", 600, 600, 443), alt: "Projeto entregue", caption: "Soluções funcionando" },
     ],
     events: [
       { title: "Consultoria Diagnóstico Gratuita", date: "2026-04-13", time: "10:00", location: "Online (Meet)", description: "1 hora de análise técnica do seu ambiente digital, sem compromisso e sem custo." },
@@ -388,14 +388,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Como são definidos os honorários?", answer: "Os honorários são estabelecidos de forma transparente após a análise do caso, em conformidade com a tabela da OAB. Sem surpresas no processo." },
     ],
     blogPosts: [
-      { title: "Seus direitos como consumidor: o que você precisa saber", excerpt: "Artigo · Direito do Consumidor", imageUrl: pic("juridico-blog1", 800, 450), link: "" },
-      { title: "Demissão sem justa causa: entenda seus direitos", excerpt: "Artigo · Direito Trabalhista", imageUrl: pic("juridico-blog2", 800, 450), link: "" },
-      { title: "Como proteger legalmente o seu negócio", excerpt: "Artigo · Direito Empresarial", imageUrl: pic("juridico-blog3", 800, 450), link: "" },
+      { title: "Seus direitos como consumidor: o que você precisa saber", excerpt: "Artigo · Direito do Consumidor", imageUrl: img("justice,law,consumer,rights", 800, 450, 451), link: "" },
+      { title: "Demissão sem justa causa: entenda seus direitos", excerpt: "Artigo · Direito Trabalhista", imageUrl: img("labor,law,rights,worker", 800, 450, 452), link: "" },
+      { title: "Como proteger legalmente o seu negócio", excerpt: "Artigo · Direito Empresarial", imageUrl: img("business,law,contract,legal", 800, 450, 453), link: "" },
     ],
     galleryImages: [
-      { url: pic("juridico-gal1"), alt: "Escritório de advocacia", caption: "Ambiente profissional" },
-      { url: pic("juridico-gal2"), alt: "Reunião com cliente", caption: "Atendimento personalizado" },
-      { url: pic("juridico-gal3"), alt: "Equipe jurídica", caption: "Profissionais qualificados" },
+      { url: img("office,law,professional,lawyer", 600, 600, 461), alt: "Escritório de advocacia", caption: "Ambiente profissional" },
+      { url: img("meeting,client,professional,office", 600, 600, 462), alt: "Reunião com cliente", caption: "Atendimento personalizado" },
+      { url: img("legal,team,lawyer,professional", 600, 600, 463), alt: "Equipe jurídica", caption: "Profissionais qualificados" },
     ],
     events: [
       { title: "Palestra Gratuita: Seus Direitos na Prática", date: "2026-04-16", time: "18:30", location: "Auditório OAB Local", description: "Orientação jurídica gratuita sobre os principais direitos civis e trabalhistas do cidadão." },
@@ -417,14 +417,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Vocês ajudam a reduzir a carga tributária?", answer: "Sim! Fazemos planejamento tributário para identificar o enquadramento mais vantajoso e as oportunidades legais de economia fiscal." },
     ],
     blogPosts: [
-      { title: "Simples Nacional ou Lucro Presumido: qual escolher?", excerpt: "Artigo · Tributação", imageUrl: pic("financas-blog1", 800, 450), link: "" },
-      { title: "Como organizar as finanças da sua empresa", excerpt: "Artigo · Gestão Financeira", imageUrl: pic("financas-blog2", 800, 450), link: "" },
-      { title: "Guia para abertura de empresa passo a passo", excerpt: "Artigo · Empreendedorismo", imageUrl: pic("financas-blog3", 800, 450), link: "" },
+      { title: "Simples Nacional ou Lucro Presumido: qual escolher?", excerpt: "Artigo · Tributação", imageUrl: img("tax,finance,business,accounting", 800, 450, 471), link: "" },
+      { title: "Como organizar as finanças da sua empresa", excerpt: "Artigo · Gestão Financeira", imageUrl: img("accounting,finance,management,business", 800, 450, 472), link: "" },
+      { title: "Guia para abertura de empresa passo a passo", excerpt: "Artigo · Empreendedorismo", imageUrl: img("business,startup,entrepreneur,office", 800, 450, 473), link: "" },
     ],
     galleryImages: [
-      { url: pic("financas-gal1"), alt: "Escritório contábil", caption: "Ambiente organizado e profissional" },
-      { url: pic("financas-gal2"), alt: "Análise de relatórios", caption: "Dados sempre em dia" },
-      { url: pic("financas-gal3"), alt: "Consultoria financeira", caption: "Orientação estratégica" },
+      { url: img("office,accounting,professional,finance", 600, 600, 481), alt: "Escritório contábil", caption: "Ambiente organizado e profissional" },
+      { url: img("report,analysis,finance,charts", 600, 600, 482), alt: "Análise de relatórios", caption: "Dados sempre em dia" },
+      { url: img("consulting,financial,meeting,professional", 600, 600, 483), alt: "Consultoria financeira", caption: "Orientação estratégica" },
     ],
     events: [
       { title: "Webinar: Planejamento Tributário para 2026", date: "2026-04-14", time: "19:30", location: "Online (Zoom)", description: "Estratégias legais para reduzir impostos e aumentar a margem do seu negócio este ano." },
@@ -446,14 +446,14 @@ const MOCK_CONTENT: Record<string, MockSectionContent> = {
       { question: "Qual é o prazo médio de entrega?", answer: "O prazo varia conforme o serviço contratado. Informamos o prazo exato na proposta e cumprimos o combinado." },
     ],
     blogPosts: [
-      { title: "Como escolher o profissional certo para o seu projeto", excerpt: "Artigo · Dicas", imageUrl: pic("outro-blog1", 800, 450), link: "" },
-      { title: "A importância de investir em qualidade", excerpt: "Artigo · Qualidade", imageUrl: pic("outro-blog2", 800, 450), link: "" },
-      { title: "Nossos diferenciais: o que nos torna únicos", excerpt: "Artigo · Sobre nós", imageUrl: pic("outro-blog3", 800, 450), link: "" },
+      { title: "Como escolher o profissional certo para o seu projeto", excerpt: "Artigo · Dicas", imageUrl: img("professional,project,business,success", 800, 450, 491), link: "" },
+      { title: "A importância de investir em qualidade", excerpt: "Artigo · Qualidade", imageUrl: img("quality,investment,business,value", 800, 450, 492), link: "" },
+      { title: "Nossos diferenciais: o que nos torna únicos", excerpt: "Artigo · Sobre nós", imageUrl: img("team,unique,business,professional", 800, 450, 493), link: "" },
     ],
     galleryImages: [
-      { url: pic("outro-gal1"), alt: "Nosso trabalho", caption: "Qualidade em cada detalhe" },
-      { url: pic("outro-gal2"), alt: "Nossa equipe", caption: "Profissionais dedicados" },
-      { url: pic("outro-gal3"), alt: "Resultado para o cliente", caption: "Satisfação garantida" },
+      { url: img("work,quality,detail,professional", 600, 600, 501), alt: "Nosso trabalho", caption: "Qualidade em cada detalhe" },
+      { url: img("team,professional,business,office", 600, 600, 502), alt: "Nossa equipe", caption: "Profissionais dedicados" },
+      { url: img("result,success,satisfaction,business", 600, 600, 503), alt: "Resultado para o cliente", caption: "Satisfação garantida" },
     ],
     events: [
       { title: "Conversa Aberta com Nossos Clientes", date: "2026-04-23", time: "19:00", location: "Online", description: "Um encontro informal para ouvir feedback, tirar dúvidas e compartilhar novidades." },
