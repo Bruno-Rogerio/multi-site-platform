@@ -5,11 +5,20 @@ import * as LucideIcons from "lucide-react";
 
 type FloatingLink = { type: string; url: string; icon: string; label: string };
 
-const WHATSAPP_COLOR = "#25D366";
+const BRAND_COLORS: Record<string, string> = {
+  whatsapp:  "#25D366",
+  instagram: "#E1306C",
+  facebook:  "#1877F2",
+  youtube:   "#FF0000",
+  tiktok:    "#010101",
+  linkedin:  "#0A66C2",
+  telegram:  "#2AABEE",
+  pinterest: "#E60023",
+  email:     "#6B7280",
+};
 
 function getIconBg(type: string): string {
-  if (type === "whatsapp") return WHATSAPP_COLOR;
-  return "var(--site-primary)";
+  return BRAND_COLORS[type] ?? "var(--site-primary)";
 }
 
 function WhatsappIcon() {

@@ -581,24 +581,29 @@ export function getMockServiceCardsForSegment(segmentId: string): ServiceCard[] 
   return SERVICE_CARDS[segmentId] ?? SERVICE_CARDS["outro"];
 }
 
+/** Gera URL de imagem de capa via loremflickr com keywords relevantes ao segmento */
+function flickr(keywords: string, lock: number): string {
+  return `https://loremflickr.com/1200/700/${keywords}?lock=${lock}`;
+}
+
 /** Retorna uma URL de imagem de capa (hero) específica por segmento */
 export function getMockHeroImageForSegment(segmentId: string): string {
-  const seeds: Record<string, string> = {
-    "saude-terapia":           pic("saude-hero", 1200, 700),
-    "beleza-estetica":         pic("beleza-hero", 1200, 700),
-    "nutricao-alimentacao":    pic("nutricao-hero", 1200, 700),
-    "yoga-meditacao":          pic("yoga-hero", 1200, 700),
-    "fitness-academia":        pic("fitness-hero", 1200, 700),
-    "servicos-gerais":         pic("servicos-hero", 1200, 700),
-    "design-criacao":          pic("design-hero", 1200, 700),
-    "fotografia-arte":         pic("foto-hero", 1200, 700),
-    "musica-entretenimento":   pic("musica-hero", 1200, 700),
-    "coaching-desenvolvimento":pic("coaching-hero", 1200, 700),
-    "educacao-cursos":         pic("educacao-hero", 1200, 700),
-    "tecnologia-ti":           pic("tech-hero", 1200, 700),
-    "juridico-advocacia":      pic("juridico-hero", 1200, 700),
-    "financas-contabilidade":  pic("financas-hero", 1200, 700),
-    "outro":                   pic("outro-hero", 1200, 700),
+  const map: Record<string, string> = {
+    "saude-terapia":           flickr("healthcare,wellness,clinic", 11),
+    "beleza-estetica":         flickr("beauty,salon,cosmetics", 22),
+    "nutricao-alimentacao":    flickr("food,nutrition,healthy", 33),
+    "yoga-meditacao":          flickr("yoga,meditation,zen", 44),
+    "fitness-academia":        flickr("fitness,gym,exercise", 55),
+    "servicos-gerais":         flickr("professional,service,business", 66),
+    "design-criacao":          flickr("design,creative,studio", 77),
+    "fotografia-arte":         flickr("photography,camera,portrait", 88),
+    "musica-entretenimento":   flickr("music,concert,guitar", 99),
+    "coaching-desenvolvimento":flickr("coaching,success,motivation", 110),
+    "educacao-cursos":         flickr("education,learning,classroom", 121),
+    "tecnologia-ti":           flickr("technology,computer,digital", 132),
+    "juridico-advocacia":      flickr("law,justice,office", 143),
+    "financas-contabilidade":  flickr("finance,business,office", 154),
+    "outro":                   flickr("business,professional,office", 165),
   };
-  return seeds[segmentId] ?? pic("default-hero", 1200, 700);
+  return map[segmentId] ?? flickr("business,professional", 1);
 }

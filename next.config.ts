@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       { protocol: "http", hostname: "localhost", port: "54321" },
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "fastly.picsum.photos" },
+      { protocol: "https", hostname: "loremflickr.com" },
     ],
   },
 };
