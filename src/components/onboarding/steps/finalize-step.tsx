@@ -116,6 +116,7 @@ export function FinalizeStep() {
   }
 
   async function handleCreateDemo(ownerUserIdOverride?: string) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setPhase("creating");
     setError(null);
 

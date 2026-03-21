@@ -580,3 +580,25 @@ const SERVICE_CARDS: Record<string, ServiceCard[]> = {
 export function getMockServiceCardsForSegment(segmentId: string): ServiceCard[] {
   return SERVICE_CARDS[segmentId] ?? SERVICE_CARDS["outro"];
 }
+
+/** Retorna uma URL de imagem de capa (hero) específica por segmento */
+export function getMockHeroImageForSegment(segmentId: string): string {
+  const seeds: Record<string, string> = {
+    "saude-terapia":           pic("saude-hero", 1200, 700),
+    "beleza-estetica":         pic("beleza-hero", 1200, 700),
+    "nutricao-alimentacao":    pic("nutricao-hero", 1200, 700),
+    "yoga-meditacao":          pic("yoga-hero", 1200, 700),
+    "fitness-academia":        pic("fitness-hero", 1200, 700),
+    "servicos-gerais":         pic("servicos-hero", 1200, 700),
+    "design-criacao":          pic("design-hero", 1200, 700),
+    "fotografia-arte":         pic("foto-hero", 1200, 700),
+    "musica-entretenimento":   pic("musica-hero", 1200, 700),
+    "coaching-desenvolvimento":pic("coaching-hero", 1200, 700),
+    "educacao-cursos":         pic("educacao-hero", 1200, 700),
+    "tecnologia-ti":           pic("tech-hero", 1200, 700),
+    "juridico-advocacia":      pic("juridico-hero", 1200, 700),
+    "financas-contabilidade":  pic("financas-hero", 1200, 700),
+    "outro":                   pic("outro-hero", 1200, 700),
+  };
+  return seeds[segmentId] ?? pic("default-hero", 1200, 700);
+}

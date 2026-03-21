@@ -487,53 +487,85 @@ export function SiteBrandingEditor({
                   : s.value === "gradient"
                   ? `linear-gradient(135deg, ${primaryColor}, ${accentColor})`
                   : "#0B1020"; // dark
+              // Compute site bg for the mini-page context
+              const siteBg = asString(themeSettings.backgroundColor) || "#0B1020";
+              const isDarkSite = !siteBg.startsWith("#F") && !siteBg.startsWith("#f");
+              const contentLineColor = isDarkSite ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)";
+              const heroBtnColor = (() => {
+                const m = primaryColor.match(/\w\w/g);
+                const rgb = m ? m.map((h: string) => parseInt(h, 16)).join(",") : "59,130,246";
+                return `rgba(${rgb},0.35)`;
+              })();
+
+              const logoColor =
+                s.value === "solid" || s.value === "gradient" || s.value === "dark"
+                  ? "rgba(255,255,255,0.85)"
+                  : primaryColor;
+              const navColor =
+                s.value === "solid" || s.value === "gradient" || s.value === "dark"
+                  ? "rgba(255,255,255,0.4)"
+                  : isDarkSite ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.3)";
+              const ctaBtnBg =
+                s.value === "solid" || s.value === "gradient" || s.value === "dark"
+                  ? "rgba(255,255,255,0.2)"
+                  : heroBtnColor;
+
               return (
                 <button
                   key={s.value}
                   type="button"
                   onClick={() => set("headerStyle", s.value)}
-                  className={`rounded-xl border p-0 overflow-hidden text-left transition ${
+                  className={`overflow-hidden rounded-xl border text-left transition ${
                     isActive
-                      ? "border-[#22D3EE] ring-1 ring-[#22D3EE]/40"
+                      ? "border-[#22D3EE] shadow-[0_0_10px_rgba(34,211,238,0.2)]"
                       : "border-white/10 hover:border-white/25"
                   }`}
                 >
-                  {/* Mini preview strip */}
+                  {/* Mini page preview */}
                   <div
-                    className="flex h-8 w-full items-center justify-between px-2.5"
-                    style={{
-                      background: previewBg,
-                      backdropFilter: s.value === "blur" ? "blur(8px)" : undefined,
-                    }}
+                    className="relative h-16 w-full overflow-hidden"
+                    style={{ background: siteBg }}
                   >
+                    {/* Simulated hero content */}
+                    <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 pb-2.5">
+                      <div className="h-1.5 w-16 rounded-full" style={{ background: contentLineColor }} />
+                      <div className="h-1 w-10 rounded-full" style={{ background: contentLineColor, opacity: 0.6 }} />
+                      <div className="mt-0.5 h-3.5 w-12 rounded" style={{ background: heroBtnColor }} />
+                    </div>
+
+                    {/* Header bar */}
                     <div
-                      className="h-2 w-10 rounded-full"
+                      className="absolute inset-x-0 top-0 flex h-7 items-center justify-between px-2.5"
                       style={{
-                        backgroundColor:
-                          s.value === "solid" || s.value === "gradient" || s.value === "dark"
-                            ? "rgba(255,255,255,0.7)"
-                            : primaryColor,
+                        background: previewBg,
+                        borderBottom: s.value === "minimal" ? "1px solid rgba(255,255,255,0.07)" : "none",
                       }}
-                    />
-                    <div
-                      className="h-4 w-10 rounded"
-                      style={{
-                        backgroundColor:
-                          s.value === "solid" || s.value === "gradient" || s.value === "dark"
-                            ? "rgba(255,255,255,0.2)"
-                            : primaryColor,
-                        opacity: 0.6,
-                      }}
-                    />
-                  </div>
-                  {/* Label */}
-                  <div className="px-2.5 py-1.5">
-                    <p
-                      className={`text-[11px] font-semibold ${isActive ? "text-[#22D3EE]" : "text-[var(--platform-text)]/70"}`}
                     >
+                      {/* Logo mark */}
+                      <div className="flex items-center gap-1">
+                        <div className="h-2 w-2 rounded-full" style={{ backgroundColor: logoColor }} />
+                        <div className="h-1.5 w-8 rounded-full" style={{ backgroundColor: logoColor, opacity: 0.7 }} />
+                      </div>
+                      {/* Nav links + CTA */}
+                      <div className="flex items-center gap-1">
+                        <div className="h-1 w-4 rounded-full" style={{ background: navColor }} />
+                        <div className="h-1 w-4 rounded-full" style={{ background: navColor }} />
+                        <div className="h-3.5 w-9 rounded" style={{ background: ctaBtnBg }} />
+                      </div>
+                    </div>
+
+                    {/* Active glow ring */}
+                    {isActive && (
+                      <div className="pointer-events-none absolute inset-0 rounded-t-xl ring-1 ring-inset ring-[#22D3EE]/40" />
+                    )}
+                  </div>
+
+                  {/* Label */}
+                  <div className="bg-[#0F1628] px-2.5 py-2">
+                    <p className={`text-[11px] font-semibold leading-tight ${isActive ? "text-[#22D3EE]" : "text-[var(--platform-text)]/70"}`}>
                       {s.label}
                     </p>
-                    <p className="text-[10px] text-[var(--platform-text)]/35">{s.desc}</p>
+                    <p className="text-[10px] leading-tight text-[var(--platform-text)]/35">{s.desc}</p>
                   </div>
                 </button>
               );
