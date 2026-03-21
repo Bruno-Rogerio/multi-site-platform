@@ -17,6 +17,7 @@ import { ctaTypes } from "@/lib/onboarding/cta-types";
 import type { CtaTypeId } from "@/lib/onboarding/types";
 import * as LucideIcons from "lucide-react";
 import { moveInArray } from "@/lib/onboarding/helpers";
+import { WizardTip } from "../wizard-tip";
 
 /* ─── Section metadata ─── */
 
@@ -739,6 +740,11 @@ export function SectionCanvasStep() {
       </div>
 
       <StepNavigation canProceed={canProceed} />
+
+      <WizardTip
+        id="section-canvas-drag"
+        message="Segure e arraste as seções para reordenar a estrutura do seu site"
+      />
     </div>
   );
 }

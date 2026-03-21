@@ -6,6 +6,7 @@ import { Check, Sparkles, ChevronRight } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { palettePresets, type PalettePreset } from "@/lib/onboarding/palettes";
 import type { VisualMotion } from "@/lib/onboarding/theme-generator";
+import { WizardTip } from "../wizard-tip";
 
 /* ─── Per-palette style mapping ─── */
 
@@ -574,6 +575,12 @@ export function VisualIdentityStep() {
           </div>
         </Motion.div>
       </div>
+
+      <WizardTip
+        id="visual-identity-preview"
+        message="As alterações aparecem em tempo real no preview. Explore as paletas e veja o site mudar →"
+        delay={2000}
+      />
 
       {/* Continue */}
       <div className="mt-10 flex items-center justify-between">

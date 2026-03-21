@@ -25,6 +25,7 @@ import { ImageUpload } from "../builders/image-upload";
 import { IconPickerInline } from "../builders/icon-picker";
 import { LinkDestinationSelect } from "../builders/link-destination-select";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { WizardTip } from "../wizard-tip";
 
 /* ─── Tab metadata ─── */
 
@@ -1330,6 +1331,13 @@ export function ContentEditorStep() {
       </div>
 
       <StepNavigation canProceed={canProceed} />
+
+      <WizardTip
+        id="content-editor-bubble"
+        message="Selecione qualquer texto nos campos de edição para formatar: negrito, itálico, cor, tamanho e efeitos especiais ✨"
+        delay={2500}
+        duration={9000}
+      />
     </div>
   );
 }
