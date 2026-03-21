@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion as Motion, AnimatePresence } from "framer-motion";
 import { Check, Sparkles, ChevronRight } from "lucide-react";
 import { useWizard } from "../wizard-context";
@@ -241,6 +242,7 @@ export function VisualIdentityStep() {
 
   const [showLoading, setShowLoading] = useState(false);
   const [loadingPhase, setLoadingPhase] = useState(-1);
+  const [mounted, setMounted] = useState(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const palette = palettePresets.find((p) => p.id === selectedPaletteId) ?? palettePresets[0];
@@ -323,6 +325,7 @@ export function VisualIdentityStep() {
     });
   }
 
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => () => { timersRef.current.forEach(clearTimeout); }, []);
 
   return (
@@ -609,6 +612,7 @@ export function VisualIdentityStep() {
       </div>
 
       {/* ── Loading overlay ── */}
+      {mounted && createPortal(
       <AnimatePresence>
         {showLoading && (
           <Motion.div
@@ -713,6 +717,7 @@ export function VisualIdentityStep() {
           </Motion.div>
         )}
       </AnimatePresence>
+      , document.body)}
     </div>
   );
 }

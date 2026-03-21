@@ -14,7 +14,7 @@ interface WizardTipProps {
   duration?: number;
 }
 
-const STORAGE_KEY = (id: string) => `wizard_tip_shown_${id}`;
+const STORAGE_KEY = (id: string) => `wizard_tip_v2_shown_${id}`;
 
 export function WizardTip({ id, message, delay = 1600, duration = 7000 }: WizardTipProps) {
   const [visible, setVisible] = useState(false);

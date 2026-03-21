@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import {
   Loader2, Globe, ExternalLink, Clock, CheckCircle2, ChevronRight, Sparkles,
@@ -44,6 +45,8 @@ export function FinalizeStep() {
   } = state;
 
   const [phase, setPhase] = useState<Phase>("summary");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [previewUrl, setPreviewUrl] = useState("");
   const [siteId, setSiteId] = useState("");
   const [finalSubdomain, setFinalSubdomain] = useState(preferredSubdomain);
@@ -439,12 +442,13 @@ export function FinalizeStep() {
 
   // Creating phase — spinner while API call runs
   if (phase === "creating") {
-    return (
+    if (!mounted) return null;
+    return createPortal(
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#06080F]"
+        className="fixed inset-0 z-[200] flex items-center justify-center bg-[#06080F]"
       >
         {/* Background orbs */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -478,7 +482,8 @@ export function FinalizeStep() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </motion.div>,
+      document.body
     );
   }
 
