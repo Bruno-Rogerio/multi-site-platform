@@ -175,6 +175,7 @@ export type WizardAction =
   | { type: "SET_CHECKOUT_STATE"; state: WizardState["checkoutState"]; message?: string; url?: string }
   | { type: "TOGGLE_SECTION_PREMIUM"; sectionId: "premium-paleta" | "premium-tipografia" | "premium-variantes" | "premium-canais" | "premium-cards" }
   | { type: "SET_VISUAL_IDENTITY"; primaryColor: string; tone: "dark" | "light" | "neutral"; personality: "clean" | "bold" | "elegant" | "friendly"; motion: "none" | "subtle" | "lively" }
+  | { type: "SET_PALETTE_THEME"; paletteId: string; customColors: { primary: string; accent: string; background: string; text: string }; fontFamily: string; motionStyle: string; buttonStyle: "rounded" | "pill" | "square"; headerStyle: "blur" | "solid" | "minimal" | "gradient" | "dark"; dividerStyle: "wave" | "diagonal" | "curve" | "line" | "none" }
   | { type: "SET_IMAGE"; key: "heroImage" | "logoUrl" | "servicesImage"; url: string }
   | { type: "SET_CONTACT_SELECTED_LINKS"; links: string[] }
   | { type: "SET_LEAD_ID"; leadId: string }

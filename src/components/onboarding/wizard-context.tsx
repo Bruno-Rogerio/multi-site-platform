@@ -454,6 +454,18 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
       };
     }
 
+    case "SET_PALETTE_THEME":
+      return {
+        ...state,
+        paletteId: action.paletteId,
+        customColors: action.customColors,
+        fontFamily: action.fontFamily,
+        buttonStyle: action.buttonStyle,
+        motionStyle: action.motionStyle,
+        headerStyle: action.headerStyle,
+        dividerStyle: action.dividerStyle,
+      };
+
     case "RESET_WIZARD":
       return initialState;
 
