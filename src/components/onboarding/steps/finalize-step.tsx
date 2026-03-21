@@ -95,6 +95,11 @@ export function FinalizeStep() {
       });
       const data = await res.json();
       if (!res.ok) {
+        if (res.status === 409) {
+          // E-mail já cadastrado — cria o rascunho sem vincular (usuário pode logar depois)
+          await handleCreateDemo("");
+          return;
+        }
         setError(data.error || "Erro ao criar conta.");
         return;
       }
@@ -433,15 +438,36 @@ export function FinalizeStep() {
   if (phase === "creating") {
     return (
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35 }}
         className="mx-auto flex w-full max-w-lg flex-col items-center py-16 text-center"
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#22D3EE]/10">
-          <Loader2 size={30} className="animate-spin text-[#22D3EE]" />
+        {/* Animated ring */}
+        <div className="relative flex h-20 w-20 items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-[#22D3EE]/10 animate-ping" style={{ animationDuration: "1.5s" }} />
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-[#22D3EE]/10">
+            <Loader2 size={36} className="animate-spin text-[#22D3EE]" />
+          </div>
         </div>
-        <p className="mt-5 text-lg font-semibold text-[#EAF0FF]">Criando seu site...</p>
-        <p className="mt-2 text-sm text-[#EAF0FF]/50">Aguarde enquanto preparamos sua demonstração</p>
+        <p className="mt-6 text-xl font-bold text-[#EAF0FF]">Construindo seu site…</p>
+        <p className="mt-2 text-sm text-[#EAF0FF]/50 max-w-xs">
+          Estamos montando as seções, configurando o visual e preparando sua demonstração.
+        </p>
+        <div className="mt-8 flex flex-col items-center gap-2">
+          {["Configurando visual", "Criando seções", "Gerando demonstração"].map((step, i) => (
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.5, duration: 0.3 }}
+              className="flex items-center gap-2 text-xs text-[#EAF0FF]/40"
+            >
+              <div className="h-1.5 w-1.5 rounded-full bg-[#22D3EE]/60" />
+              {step}
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
     );
   }

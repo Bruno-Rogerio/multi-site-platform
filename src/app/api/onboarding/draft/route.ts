@@ -706,15 +706,8 @@ export async function POST(request: Request) {
     ...(contactSection ? [contactSection] : []),
   ];
 
-  const { error: sectionsError } = await admin.from("sections").insert(allInserts);
-  if (sectionsError) {
-    return NextResponse.json(
-      { error: "Rascunho criado parcialmente (falha em sections).", details: sectionsError.message },
-      { status: 500 },
-    );
-  }
-
-  // Vincular site ao usuário em user_profiles (criado pelo trigger sem site_id)
+  // Vincular site ao usuário ANTES de inserir seções — garante que o vínculo
+  // acontece mesmo que as seções falhem por algum motivo.
   if (payload.ownerUserId) {
     const { error: profileUpdateError } = await admin
       .from("user_profiles")
@@ -723,6 +716,15 @@ export async function POST(request: Request) {
     if (profileUpdateError) {
       console.error("[draft] Falha ao vincular site ao user_profiles:", profileUpdateError.message);
     }
+  }
+
+  const { error: sectionsError } = await admin.from("sections").insert(allInserts);
+  if (sectionsError) {
+    console.error("[draft] Falha ao inserir seções:", sectionsError.message, JSON.stringify(allInserts.map(s => s.type)));
+    return NextResponse.json(
+      { error: "Rascunho criado parcialmente (falha em sections).", details: sectionsError.message },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json({

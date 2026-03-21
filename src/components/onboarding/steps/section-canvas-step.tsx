@@ -160,54 +160,59 @@ function SectionBlock({
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragEnd={onDragEnd}
-      className={`group flex items-center gap-3 rounded-xl border bg-[#0F1628] p-3 transition-all ${
+      className={`group rounded-xl border bg-[#0F1628] p-3 transition-all ${
         isDropTarget
           ? "border-[#22D3EE]/50 shadow-[0_0_12px_rgba(34,211,238,0.15)]"
           : "border-white/8 hover:border-white/15"
       }`}
     >
-      {/* Colored accent bar */}
-      <div
-        className="h-8 w-1 shrink-0 rounded-full"
-        style={{ backgroundColor: meta.accent, opacity: 0.7 }}
-      />
-
-      {/* Drag handle */}
-      <div className="cursor-grab text-[var(--platform-text)]/20 transition group-hover:text-[var(--platform-text)]/40 active:cursor-grabbing">
-        <GripVertical size={16} />
-      </div>
-
-      {/* Emoji + label */}
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="text-base leading-none">{meta.emoji}</span>
-        <div>
-          <p className="text-sm font-semibold text-[var(--platform-text)] leading-tight">{meta.label}</p>
-          {!meta.removable && (
-            <p className="text-[10px] text-[var(--platform-text)]/30 leading-tight">Obrigatório</p>
-          )}
-        </div>
-      </div>
-
-      {/* Variant dropdown */}
-      {meta.variants && meta.variantAction && (
-        <VariantDropdown
-          variants={meta.variants}
-          selectedId={currentVariant}
-          onSelect={handleVariantSelect}
+      {/* Top row: accent + handle + label + delete */}
+      <div className="flex items-center gap-3">
+        {/* Colored accent bar */}
+        <div
+          className="h-8 w-1 shrink-0 rounded-full"
+          style={{ backgroundColor: meta.accent, opacity: 0.7 }}
         />
-      )}
 
-      {/* Delete button */}
-      {meta.removable ? (
-        <button
-          type="button"
-          onClick={() => dispatch({ type: "REMOVE_SECTION", sectionType: sectionId })}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--platform-text)]/20 transition hover:bg-red-500/10 hover:text-red-400"
-        >
-          <Trash2 size={14} />
-        </button>
-      ) : (
-        <div className="h-7 w-7 shrink-0" />
+        {/* Drag handle */}
+        <div className="cursor-grab text-[var(--platform-text)]/20 transition group-hover:text-[var(--platform-text)]/40 active:cursor-grabbing">
+          <GripVertical size={16} />
+        </div>
+
+        {/* Emoji + label */}
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <span className="text-base leading-none">{meta.emoji}</span>
+          <div>
+            <p className="text-sm font-semibold text-[var(--platform-text)] leading-tight">{meta.label}</p>
+            {!meta.removable && (
+              <p className="text-[10px] text-[var(--platform-text)]/30 leading-tight">Obrigatório</p>
+            )}
+          </div>
+        </div>
+
+        {/* Delete button */}
+        {meta.removable ? (
+          <button
+            type="button"
+            onClick={() => dispatch({ type: "REMOVE_SECTION", sectionType: sectionId })}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-[var(--platform-text)]/20 transition hover:bg-red-500/10 hover:text-red-400"
+          >
+            <Trash2 size={14} />
+          </button>
+        ) : (
+          <div className="h-7 w-7 shrink-0" />
+        )}
+      </div>
+
+      {/* Variant dropdown — second row */}
+      {meta.variants && meta.variantAction && (
+        <div className="mt-2 ml-9">
+          <VariantDropdown
+            variants={meta.variants}
+            selectedId={currentVariant}
+            onSelect={handleVariantSelect}
+          />
+        </div>
       )}
     </motion.div>
   );
