@@ -1754,22 +1754,181 @@ export function SectionRenderer({
       const secondaryUrl = asString(section.content.secondaryUrl);
       const secondaryLabel = asString(section.content.secondaryLabel);
       if (whatsappUrl)
-        legacyLinks.push({
-          type: "whatsapp",
-          url: whatsappUrl,
-          label: whatsappLabel,
-          icon: "MessageCircle",
-        });
+        legacyLinks.push({ type: "whatsapp", url: whatsappUrl, label: whatsappLabel, icon: "MessageCircle" });
       if (secondaryUrl && secondaryLabel)
-        legacyLinks.push({
-          type: "email",
-          url: secondaryUrl,
-          label: secondaryLabel,
-          icon: "Mail",
-        });
+        legacyLinks.push({ type: "email", url: secondaryUrl, label: secondaryLabel, icon: "Mail" });
     }
     const allLinks = socialLinks.length > 0 ? socialLinks : legacyLinks;
+    const variant = section.variant || "cards";
 
+    // Shared channel subtext
+    function channelSubtext(type: string): string {
+      switch (type) {
+        case "whatsapp": return "Resposta rápida";
+        case "instagram": return "Siga-nos";
+        case "email": return "Envie uma mensagem";
+        case "phone": return "Ligue agora";
+        case "facebook": return "Curta nossa página";
+        case "linkedin": return "Conecte-se";
+        case "youtube": return "Assista nosso canal";
+        case "tiktok": return "Nos siga";
+        case "telegram": return "Fale conosco";
+        default: return "Entrar em contato";
+      }
+    }
+
+    // ── VARIANT: buttons ────────────────────────────────────────────────────
+    if (variant === "buttons") {
+      return (
+        <section
+          id="contact"
+          className="relative w-full overflow-hidden py-16 md:py-20"
+          style={{
+            background: "radial-gradient(ellipse 70% 60% at 50% 100%, color-mix(in srgb, var(--site-primary) 8%, transparent), transparent)",
+          }}
+        >
+          <div className={`relative ${containerClass}`}>
+            <div className="text-center mb-10">
+              <SectionEyebrow label={title || "Contato"} />
+              {subtitle && <p className="mt-3 text-base opacity-70 max-w-md mx-auto">{subtitle}</p>}
+            </div>
+            {allLinks.length > 0 && (
+              <div className="mx-auto max-w-md space-y-3">
+                {allLinks.map((link) => {
+                  const Icon = getIcon(link.icon);
+                  return (
+                    <a
+                      key={link.url}
+                      href={link.url}
+                      target={link.url.startsWith("#") ? undefined : "_blank"}
+                      rel={link.url.startsWith("#") ? undefined : "noreferrer"}
+                      className="group flex w-full items-center gap-4 rounded-[var(--site-radius,16px)] border px-6 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:brightness-105"
+                      style={{
+                        borderColor: "color-mix(in srgb, var(--site-primary) 30%, transparent)",
+                        background: "color-mix(in srgb, var(--site-primary) 6%, transparent)",
+                      }}
+                    >
+                      <span
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                        style={{ ...iconGradient }}
+                      >
+                        {Icon && <Icon size={20} className="text-[var(--site-primary)]" />}
+                      </span>
+                      <div className="flex-1 min-w-0 text-left">
+                        <span className="block text-base font-semibold">{link.label}</span>
+                        <span className="block text-xs opacity-50">{channelSubtext(link.type)}</span>
+                      </div>
+                      <span
+                        className="text-xl font-light opacity-30 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-1"
+                        style={{ color: "var(--site-primary)" }}
+                      >
+                        →
+                      </span>
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    // ── VARIANT: icons ──────────────────────────────────────────────────────
+    if (variant === "icons") {
+      return (
+        <section
+          id="contact"
+          className="relative w-full overflow-hidden py-16 md:py-24"
+        >
+          <div className={`relative ${containerClass} text-center`}>
+            <SectionEyebrow label={title || "Contato"} />
+            {subtitle && <p className="mt-3 text-base opacity-70 max-w-md mx-auto">{subtitle}</p>}
+            {allLinks.length > 0 && (
+              <div className="mt-12 flex flex-wrap items-start justify-center gap-8 md:gap-12">
+                {allLinks.map((link) => {
+                  const Icon = getIcon(link.icon);
+                  return (
+                    <a
+                      key={link.url}
+                      href={link.url}
+                      target={link.url.startsWith("#") ? undefined : "_blank"}
+                      rel={link.url.startsWith("#") ? undefined : "noreferrer"}
+                      className="group flex flex-col items-center gap-3 transition-all duration-200 hover:-translate-y-1"
+                    >
+                      <span
+                        className="flex h-16 w-16 items-center justify-center rounded-2xl transition-all duration-200 group-hover:shadow-[0_8px_24px_color-mix(in_srgb,var(--site-primary)_35%,transparent)] group-hover:scale-105"
+                        style={{ ...iconGradient }}
+                      >
+                        {Icon && <Icon size={28} className="text-[var(--site-primary)]" />}
+                      </span>
+                      <span className="text-sm font-semibold opacity-80 group-hover:opacity-100">{link.label}</span>
+                    </a>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </section>
+      );
+    }
+
+    // ── VARIANT: banner ─────────────────────────────────────────────────────
+    if (variant === "banner") {
+      return (
+        <section
+          id="contact"
+          className="relative w-full overflow-hidden py-12 md:py-16"
+          style={{
+            background: "color-mix(in srgb, var(--site-primary) 8%, var(--site-bg, transparent))",
+            borderTop: "1px solid color-mix(in srgb, var(--site-primary) 15%, transparent)",
+          }}
+        >
+          <div className={`relative ${containerClass}`}>
+            <div className="flex flex-col items-center gap-6 md:flex-row md:items-center md:justify-between">
+              {/* Title side */}
+              <div className="text-center md:text-left">
+                <p
+                  className="text-[11px] font-bold uppercase tracking-[0.2em]"
+                  style={{ color: "var(--site-accent)" }}
+                >
+                  {title || "Contato"}
+                </p>
+                {subtitle && (
+                  <p className="mt-1 text-sm opacity-60 max-w-xs">{subtitle}</p>
+                )}
+              </div>
+              {/* Links side */}
+              {allLinks.length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-2 md:justify-end">
+                  {allLinks.map((link) => {
+                    const Icon = getIcon(link.icon);
+                    return (
+                      <a
+                        key={link.url}
+                        href={link.url}
+                        target={link.url.startsWith("#") ? undefined : "_blank"}
+                        rel={link.url.startsWith("#") ? undefined : "noreferrer"}
+                        className="group flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110"
+                        style={{
+                          borderColor: "color-mix(in srgb, var(--site-primary) 35%, transparent)",
+                          background: "color-mix(in srgb, var(--site-primary) 10%, transparent)",
+                        }}
+                      >
+                        {Icon && <Icon size={14} className="shrink-0 text-[var(--site-primary)]" />}
+                        <span>{link.label}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // ── VARIANT: cards (default) ────────────────────────────────────────────
     return (
       <section
         id="contact"
@@ -1789,7 +1948,7 @@ export function SectionRenderer({
           style={{ background: "var(--site-accent)" }}
         />
         <div className={`relative ${containerClass} text-center`}>
-          <SectionEyebrow label={asString(section.content.title) || "Contato"} />
+          <SectionEyebrow label={title || "Contato"} />
           {subtitle && <p className="mt-3 text-base opacity-70">{subtitle}</p>}
           {allLinks.length > 0 && (
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -1819,13 +1978,7 @@ export function SectionRenderer({
                         className="mt-0.5 block text-xs font-medium"
                         style={{ color: "var(--site-accent)" }}
                       >
-                        {link.type === "whatsapp" && "Resposta rápida"}
-                        {link.type === "instagram" && "Siga-nos"}
-                        {link.type === "email" && "Envie uma mensagem"}
-                        {link.type === "phone" && "Ligue agora"}
-                        {link.type === "facebook" && "Curta nossa página"}
-                        {link.type === "website" && "Acesse o site"}
-                        {!["whatsapp","instagram","email","phone","facebook","website"].includes(link.type) && "Entrar em contato"}
+                        {channelSubtext(link.type)}
                       </span>
                     </div>
                     <span

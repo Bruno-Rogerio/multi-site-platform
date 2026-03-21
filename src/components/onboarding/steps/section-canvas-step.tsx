@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
-import { heroVariants, servicesVariants, ctaVariants, testimonialsVariants, galleryVariants, faqVariants, blogVariants, eventsVariants, statsVariants } from "@/lib/onboarding/section-styles";
+import { heroVariants, servicesVariants, ctaVariants, testimonialsVariants, galleryVariants, faqVariants, blogVariants, eventsVariants, statsVariants, contactVariants } from "@/lib/onboarding/section-styles";
 import { ctaTypes } from "@/lib/onboarding/cta-types";
 import type { CtaTypeId } from "@/lib/onboarding/types";
 import * as LucideIcons from "lucide-react";
@@ -27,8 +27,8 @@ type SectionMeta = {
   accent: string;
   removable: boolean;
   variants?: { id: string; name: string; description: string; premium: boolean }[];
-  variantKey?: keyof { heroVariant: string; servicesVariant: string; ctaVariant: string; testimonialsVariant: string; galleryVariant: string; faqVariant: string; blogVariant: string; eventsVariant: string; statsVariant: string };
-  variantAction?: "SET_HERO_VARIANT" | "SET_SERVICES_VARIANT" | "SET_CTA_VARIANT" | "SET_TESTIMONIALS_VARIANT" | "SET_GALLERY_VARIANT" | "SET_FAQ_VARIANT" | "SET_BLOG_VARIANT" | "SET_EVENTS_VARIANT" | "SET_STATS_VARIANT";
+  variantKey?: keyof { heroVariant: string; servicesVariant: string; ctaVariant: string; testimonialsVariant: string; galleryVariant: string; faqVariant: string; blogVariant: string; eventsVariant: string; statsVariant: string; contactVariant: string };
+  variantAction?: "SET_HERO_VARIANT" | "SET_SERVICES_VARIANT" | "SET_CTA_VARIANT" | "SET_TESTIMONIALS_VARIANT" | "SET_GALLERY_VARIANT" | "SET_FAQ_VARIANT" | "SET_BLOG_VARIANT" | "SET_EVENTS_VARIANT" | "SET_STATS_VARIANT" | "SET_CONTACT_VARIANT";
 };
 
 const SECTION_META: Record<string, SectionMeta> = {
@@ -37,7 +37,7 @@ const SECTION_META: Record<string, SectionMeta> = {
   about:        { id: "about",        label: "Sobre mim",   emoji: "👤", accent: "#3B82F6", removable: true },
   testimonials: { id: "testimonials", label: "Depoimentos", emoji: "⭐", accent: "#F59E0B", removable: true, variants: testimonialsVariants, variantKey: "testimonialsVariant", variantAction: "SET_TESTIMONIALS_VARIANT" },
   cta:          { id: "cta",          label: "CTA",         emoji: "📣", accent: "#10B981", removable: true,  variants: ctaVariants,      variantKey: "ctaVariant",      variantAction: "SET_CTA_VARIANT" },
-  contact:      { id: "contact",      label: "Contato",     emoji: "📞", accent: "#22D3EE", removable: false },
+  contact:      { id: "contact",      label: "Contato",     emoji: "📞", accent: "#22D3EE", removable: false, variants: contactVariants, variantKey: "contactVariant", variantAction: "SET_CONTACT_VARIANT" },
   blog:         { id: "blog",         label: "Blog",        emoji: "📝", accent: "#EC4899", removable: true, variants: blogVariants, variantKey: "blogVariant", variantAction: "SET_BLOG_VARIANT" },
   gallery:      { id: "gallery",      label: "Galeria",     emoji: "🖼️", accent: "#6366F1", removable: true, variants: galleryVariants, variantKey: "galleryVariant", variantAction: "SET_GALLERY_VARIANT" },
   faq:          { id: "faq",          label: "FAQ",         emoji: "❓", accent: "#F59E0B", removable: true, variants: faqVariants, variantKey: "faqVariant", variantAction: "SET_FAQ_VARIANT" },
@@ -165,6 +165,7 @@ function SectionBlock({
     if (meta.variantAction === "SET_BLOG_VARIANT") dispatch({ type: "SET_BLOG_VARIANT", variant: id });
     if (meta.variantAction === "SET_EVENTS_VARIANT") dispatch({ type: "SET_EVENTS_VARIANT", variant: id });
     if (meta.variantAction === "SET_STATS_VARIANT") dispatch({ type: "SET_STATS_VARIANT", variant: id });
+    if (meta.variantAction === "SET_CONTACT_VARIANT") dispatch({ type: "SET_CONTACT_VARIANT", variant: id });
   }
 
   return (

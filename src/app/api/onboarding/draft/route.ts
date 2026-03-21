@@ -51,6 +51,7 @@ type OnboardingDraftPayload = {
   faqVariant?: string;
   blogVariant?: string;
   eventsVariant?: string;
+  contactVariant?: string;
 };
 
 function normalizeSubdomain(input: string): string {
@@ -627,7 +628,7 @@ export async function POST(request: Request) {
     {
       page_id: page.id,
       type: "contact",
-      variant: "default",
+      variant: (payload.contactVariant as string) || "cards",
       order: payload.creationMode === "builder-premium"
         ? (testimonials && testimonials.length > 0 ? 7 : 6)
         : (testimonials && testimonials.length > 0 ? 6 : 5),

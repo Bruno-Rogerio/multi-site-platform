@@ -1098,6 +1098,12 @@ function ContactContentEditor() {
       <div className="border-t border-white/10 pt-4 space-y-4">
         <Input label="Título da seção" value={String(content.contactTitle ?? "")} onChange={v => set("contactTitle", v)} placeholder="Ex: Entre em contato" />
         <Input label="Subtítulo" value={String(content.contactSubtitle ?? "")} onChange={v => set("contactSubtitle", v)} placeholder="Ex: Estou aqui para ajudar" />
+        <VariantBar
+          label="Estilo"
+          options={[{ id: "cards", name: "Cards" }, { id: "buttons", name: "Botões" }, { id: "icons", name: "Ícones" }, { id: "banner", name: "Faixa" }]}
+          value={state.contactVariant ?? "cards"}
+          onChange={id => dispatch({ type: "SET_CONTACT_VARIANT", variant: id })}
+        />
       </div>
       <div className="border-t border-white/10 pt-4 space-y-3">
         <p className="text-xs font-medium text-[var(--platform-text)]/60">Informações de contato (preencha os que você usa)</p>

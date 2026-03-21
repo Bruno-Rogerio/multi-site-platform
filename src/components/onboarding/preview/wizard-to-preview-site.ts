@@ -227,6 +227,7 @@ function buildSection(
         id: "contact",
         type: "contact",
         order,
+        variant: state.contactVariant || "cards",
         content: {
           title: str(content.contactTitle) || "Contato",
           subtitle: str(content.contactSubtitle),

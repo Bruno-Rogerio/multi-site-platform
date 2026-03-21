@@ -54,6 +54,7 @@ const initialState: WizardState = {
   blogVariant: "grid",
   eventsVariant: "timeline",
   statsVariant: "default",
+  contactVariant: "cards",
   motionStyle: "motion-fade",
   headerStyle: "blur" as const,
   dividerStyle: "wave" as const,
@@ -223,6 +224,9 @@ function wizardReducer(state: WizardState, action: WizardAction): WizardState {
 
     case "SET_STATS_VARIANT":
       return { ...state, statsVariant: action.variant };
+
+    case "SET_CONTACT_VARIANT":
+      return { ...state, contactVariant: action.variant };
 
     case "SET_MOTION_STYLE":
       return { ...state, motionStyle: action.style };

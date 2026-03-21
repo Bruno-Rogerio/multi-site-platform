@@ -68,6 +68,13 @@ export const statsVariants: SectionVariant[] = [
   { id: "accent", name: "Destaque", description: "Linha sólida no topo, estilo editorial", premium: false },
 ];
 
+export const contactVariants: SectionVariant[] = [
+  { id: "cards",   name: "Cards",   description: "Cards com glassmorphism e ícone de canal", premium: false },
+  { id: "buttons", name: "Botões",  description: "Botões largos empilhados, estilo CTA",     premium: false },
+  { id: "icons",   name: "Ícones",  description: "Ícones grandes em linha, visual minimalista", premium: false },
+  { id: "banner",  name: "Faixa",   description: "Chips compactos em linha, estilo corporativo", premium: false },
+];
+
 export const motionStyles: SectionVariant[] = [
   { id: "motion-none", name: "Sem animação", description: "Minimalista e direto", premium: false },
   { id: "motion-fade", name: "Fade simples", description: "Transição suave de opacidade", premium: false },

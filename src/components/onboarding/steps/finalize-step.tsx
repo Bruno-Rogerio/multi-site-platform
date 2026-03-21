@@ -40,6 +40,7 @@ export function FinalizeStep() {
     heroImage, logoUrl, addonsSelected, ctaConfig, selectedCtaTypes,
     contactSelectedLinks, enabledSections, floatingCtaEnabled, floatingCtaChannels,
     testimonialsVariant, galleryVariant, faqVariant, blogVariant, eventsVariant,
+    contactVariant,
   } = state;
 
   const [phase, setPhase] = useState<Phase>("summary");
@@ -173,6 +174,7 @@ export function FinalizeStep() {
       faqVariant,
       blogVariant,
       eventsVariant,
+      contactVariant,
     };
 
     try {
