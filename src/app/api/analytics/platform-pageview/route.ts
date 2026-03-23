@@ -10,11 +10,8 @@ export async function POST(request: Request) {
 
   const admin = createSupabaseAdminClient();
   if (admin) {
-    try {
-      await admin.from("platform_page_views").insert({ path });
-    } catch {
-      // ignore
-    }
+    const { error } = await admin.from("platform_page_views").insert({ path });
+    if (error) console.error("[platform-pageview]", error.message);
   }
 
   return new Response(null, { status: 204 });
