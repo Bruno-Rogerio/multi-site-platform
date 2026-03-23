@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PenTool, Paintbrush, MessageSquare, LayoutGrid, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -66,6 +67,8 @@ export function UnifiedSiteEditor({
   }
 
   const scopedSites = [{ id: siteId, name: siteName, domain: siteDomain }];
+
+  const [liveSocialLinks, setLiveSocialLinks] = useState<FloatingLink[]>(socialLinks);
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
@@ -141,7 +144,11 @@ export function UnifiedSiteEditor({
             <p className="mb-4 text-xs text-[var(--platform-text)]/50">
               Configure os canais exibidos na seção de contato e disponíveis para botões flutuantes.
             </p>
-            <ContactChannelsEditor siteId={siteId} contactSection={contactSection} />
+            <ContactChannelsEditor
+              siteId={siteId}
+              contactSection={contactSection}
+              onSocialLinksChange={setLiveSocialLinks}
+            />
           </div>
           <div>
             <h2 className="mb-1 text-base font-semibold text-[var(--platform-text)]">Botões flutuantes</h2>
@@ -152,7 +159,7 @@ export function UnifiedSiteEditor({
               siteId={siteId}
               enabled={floatingButtonsEnabled}
               floatingLinks={floatingLinks}
-              socialLinks={socialLinks}
+              socialLinks={liveSocialLinks}
             />
           </div>
         </div>

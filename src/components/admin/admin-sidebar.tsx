@@ -19,6 +19,8 @@ import {
   ChevronRight,
   Menu,
   X,
+  Inbox,
+  BookOpen,
 } from "lucide-react";
 import type { AppRole } from "@/lib/auth/session";
 
@@ -41,9 +43,11 @@ const platformNav: NavItem[] = [
 ];
 
 const clientNav: NavItem[] = [
-  { label: "Dashboard", href: "/admin/client", icon: LayoutDashboard },
-  { label: "Meu site", href: "/admin/client/editor", icon: PenTool },
-  { label: "Mensagens", href: "/admin/client/messages", icon: MessageSquare },
+  { label: "Dashboard",   href: "/admin/client",          icon: LayoutDashboard },
+  { label: "Meu site",    href: "/admin/client/editor",   icon: PenTool },
+  { label: "Blog",        href: "/admin/client/blog",     icon: BookOpen },
+  { label: "Formulários", href: "/admin/client/contacts", icon: Inbox },
+  { label: "Mensagens",   href: "/admin/client/messages", icon: MessageSquare },
   { label: "Configurações", href: "/admin/client/settings", icon: Settings },
 ];
 
@@ -53,22 +57,26 @@ type AdminSidebarProps = {
   logoUrl: string;
   pendingDrafts?: number;
   openTicketsCount?: number;
+  unreadContactMessages?: number;
 };
 
-export function AdminSidebar({ role, brandName, logoUrl, pendingDrafts, openTicketsCount }: AdminSidebarProps) {
+export function AdminSidebar({ role, brandName, logoUrl, pendingDrafts, openTicketsCount, unreadContactMessages }: AdminSidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = role === "admin" ? platformNav : clientNav;
 
-  // Add badges: pipeline for pending drafts, messages for open tickets (client)
+  // Add badges
   const itemsWithBadges = navItems.map((item) => {
     if (item.href === "/admin/platform/pipeline" && pendingDrafts && pendingDrafts > 0) {
       return { ...item, badge: pendingDrafts };
     }
     if (item.href === "/admin/client/messages" && openTicketsCount && openTicketsCount > 0) {
       return { ...item, badge: openTicketsCount };
+    }
+    if (item.href === "/admin/client/contacts" && unreadContactMessages && unreadContactMessages > 0) {
+      return { ...item, badge: unreadContactMessages };
     }
     return item;
   });

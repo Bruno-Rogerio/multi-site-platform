@@ -19,6 +19,7 @@ import { FinalCta } from "@/components/landing/final-cta";
 import { Footer } from "@/components/landing/footer";
 import { CookieBanner } from "@/components/landing/cookie-banner";
 import { FloatingSocialButtons } from "@/components/landing/floating-social-buttons";
+import { PlatformPageTracker } from "@/components/platform-page-tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -162,6 +163,7 @@ export default async function PlatformLandingPage() {
 
   return (
     <>
+      <PlatformPageTracker path="/" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

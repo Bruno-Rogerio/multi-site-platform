@@ -31,15 +31,24 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     pendingDrafts = count ?? 0;
   }
 
-  // Fetch open tickets count for client sidebar badge
+  // Fetch open tickets + unread contact messages counts for client sidebar badges
   let openTicketsCount = 0;
+  let unreadContactMessages = 0;
   if (profile.role === "client" && profile.site_id && supabase) {
-    const { count } = await supabase
-      .from("support_tickets")
-      .select("*", { count: "exact", head: true })
-      .eq("site_id", profile.site_id)
-      .in("status", ["open", "in_progress"]);
-    openTicketsCount = count ?? 0;
+    const [ticketsResult, contactsResult] = await Promise.all([
+      supabase
+        .from("support_tickets")
+        .select("*", { count: "exact", head: true })
+        .eq("site_id", profile.site_id)
+        .in("status", ["open", "in_progress"]),
+      supabase
+        .from("contact_messages")
+        .select("*", { count: "exact", head: true })
+        .eq("site_id", profile.site_id)
+        .eq("read", false),
+    ]);
+    openTicketsCount = ticketsResult.count ?? 0;
+    unreadContactMessages = contactsResult.count ?? 0;
   }
 
   return (
@@ -51,6 +60,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           logoUrl={branding.logo_url || ""}
           pendingDrafts={pendingDrafts}
           openTicketsCount={openTicketsCount}
+          unreadContactMessages={unreadContactMessages}
         />
         <div className="flex flex-1 flex-col overflow-hidden">
           <AdminTopbar email={profile.email} role={profile.role} userId={profile.id} />

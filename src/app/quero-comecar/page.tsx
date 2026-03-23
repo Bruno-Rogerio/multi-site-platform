@@ -6,6 +6,7 @@ import { WizardShell } from "@/components/onboarding/wizard-shell";
 import { Brand } from "@/components/platform/brand";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
 import { getPlanPrices } from "@/lib/onboarding/get-plan-prices";
+import { PlatformPageTracker } from "@/components/platform-page-tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function QueroComecarPage({
 
   return (
     <main className="relative min-h-screen bg-[var(--platform-bg)]">
+      <PlatformPageTracker path="/quero-comecar" />
       {/* Top navigation bar */}
       <div className="sticky top-0 z-50 border-b border-white/10 bg-[#0B1020]/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-3 md:px-6 lg:px-8">

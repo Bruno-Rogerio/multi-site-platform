@@ -77,9 +77,10 @@ const CHANNEL_COLORS: Record<string, string> = {
 type Props = {
   siteId: string;
   contactSection: Section | null;
+  onSocialLinksChange?: (links: SocialLink[]) => void;
 };
 
-export function ContactChannelsEditor({ siteId, contactSection }: Props) {
+export function ContactChannelsEditor({ siteId, contactSection, onSocialLinksChange }: Props) {
   const initialLinks = contactSection ? parseSocialLinks(contactSection.content) : [];
 
   // Local state: map of type -> display value (raw input)
@@ -126,6 +127,7 @@ export function ContactChannelsEditor({ siteId, contactSection }: Props) {
       const data = await res.json().catch(() => null) as { ok?: boolean; error?: string } | null;
       if (res.ok && data?.ok) {
         toast("Canais de contato salvos!", "success");
+        onSocialLinksChange?.(socialLinks);
       } else {
         toast(data?.error ?? "Erro ao salvar.", "error");
       }
