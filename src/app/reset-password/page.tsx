@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { Brand } from "@/components/platform/brand";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
+
+export const metadata: Metadata = {
+  title: "Redefinir senha",
+  robots: { index: false, follow: false },
+};
 
 export default async function ResetPasswordPage() {
   const host = await getRequestHostClassification();

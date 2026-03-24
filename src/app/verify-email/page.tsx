@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { Brand } from "@/components/platform/brand";
 import { VerifyEmailForm } from "@/components/auth/verify-email-form";
+
+export const metadata: Metadata = {
+  title: "Verificar e-mail",
+  robots: { index: false, follow: false },
+};
 
 export default function VerifyEmailPage() {
   return (

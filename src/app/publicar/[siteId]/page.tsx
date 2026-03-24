@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect, notFound } from "next/navigation";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
@@ -5,6 +6,10 @@ import { getRequestHostClassification } from "@/lib/tenant/request-host";
 import { PublicarClient } from "./publicar-client";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 type Props = {
   params: Promise<{ siteId: string }>;
