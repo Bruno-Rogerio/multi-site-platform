@@ -12,13 +12,12 @@ import {
   Settings,
   ArrowUpRight,
   TicketCheck,
-  TrendingUp,
 } from "lucide-react";
 
 import { requireUserProfile } from "@/lib/auth/session";
 import { getPlatformBrandingSettings } from "@/lib/platform/settings";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { PlatformAnalyticsWidget } from "@/components/admin/platform-analytics-widget";
 
 const PLAN_LABELS: Record<string, string> = {
   basico:       "Básico",
@@ -85,46 +84,6 @@ export default async function PlatformAdminPage() {
 
     recentSites   = (recentSitesResult.data   ?? []) as typeof recentSites;
     recentTickets = (recentTicketsResult.data  ?? []) as unknown as typeof recentTickets;
-  }
-
-  // Platform page analytics (last 30 days)
-  type PageViewRow = { path: string; views: number };
-  let platformPageViews: PageViewRow[] = [];
-  let platformViewsToday = 0;
-  let platformViews7d = 0;
-  const adminDb = createSupabaseAdminClient();
-  if (adminDb) {
-    const since30d = new Date(Date.now() - 30 * 86400_000).toISOString();
-    const since7d  = new Date(Date.now() -  7 * 86400_000).toISOString();
-    const since1d  = new Date(Date.now() -      86400_000).toISOString();
-
-    const [all30d, count7d, count1d] = await Promise.all([
-      adminDb
-        .from("platform_page_views")
-        .select("path")
-        .gte("visited_at", since30d),
-      adminDb
-        .from("platform_page_views")
-        .select("id", { count: "exact", head: true })
-        .gte("visited_at", since7d),
-      adminDb
-        .from("platform_page_views")
-        .select("id", { count: "exact", head: true })
-        .gte("visited_at", since1d),
-    ]);
-
-    platformViews7d   = count7d.count  ?? 0;
-    platformViewsToday = count1d.count ?? 0;
-
-    // Aggregate by path client-side (simpler than raw SQL via supabase-js)
-    const countMap = new Map<string, number>();
-    for (const row of (all30d.data ?? []) as { path: string }[]) {
-      countMap.set(row.path, (countMap.get(row.path) ?? 0) + 1);
-    }
-    platformPageViews = Array.from(countMap.entries())
-      .map(([path, views]) => ({ path, views }))
-      .sort((a, b) => b.views - a.views)
-      .slice(0, 8);
   }
 
   const quickActions = [
@@ -210,42 +169,7 @@ export default async function PlatformAdminPage() {
         })}
       </div>
 
-      {/* Platform page analytics */}
-      <div className="mt-6 rounded-xl border border-white/10 bg-[#12182B] p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <TrendingUp size={15} className="text-[#22D3EE]" />
-            <h2 className="text-sm font-semibold text-[var(--platform-text)]">Visitas ao site (últimos 30 dias)</h2>
-          </div>
-          <div className="flex gap-4 text-xs text-[var(--platform-text)]/50">
-            <span>Hoje: <strong className="text-[var(--platform-text)]/80">{platformViewsToday}</strong></span>
-            <span>7 dias: <strong className="text-[var(--platform-text)]/80">{platformViews7d}</strong></span>
-          </div>
-        </div>
-        {platformPageViews.length === 0 ? (
-          <p className="py-6 text-center text-xs text-[var(--platform-text)]/30">
-            Nenhuma visita registrada ainda. O tracker é ativado ao primeiro acesso às páginas públicas.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {(() => {
-              const max = platformPageViews[0]?.views ?? 1;
-              return platformPageViews.map(({ path, views }) => (
-                <div key={path} className="flex items-center gap-3">
-                  <p className="w-40 shrink-0 truncate text-xs font-medium text-[var(--platform-text)]/70">{path}</p>
-                  <div className="flex-1 overflow-hidden rounded-full bg-white/[0.05]" style={{ height: 6 }}>
-                    <div
-                      className="h-full rounded-full bg-[linear-gradient(90deg,#3B82F6,#22D3EE)]"
-                      style={{ width: `${Math.round((views / max) * 100)}%` }}
-                    />
-                  </div>
-                  <p className="w-10 text-right text-xs tabular-nums text-[var(--platform-text)]/50">{views}</p>
-                </div>
-              ));
-            })()}
-          </div>
-        )}
-      </div>
+      <PlatformAnalyticsWidget />
 
       {/* Recent activity */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
