@@ -29,13 +29,38 @@ export async function generateMetadata(): Promise<Metadata> {
   const prices = await getPlanPrices();
   const priceStr = formatBRL(prices.basico);
   return {
-    title: "BuildSphere — Criador de site profissional para psicólogos, coaches e autônomos",
-    description: `Criador de site profissional para autônomos e prestadores de serviço. Crie seu site em menos de 5 minutos, sem código e sem taxa de setup. Para psicólogos, coaches, nutricionistas e consultores. A partir de ${priceStr}/mês.`,
+    title: "Crie seu site profissional em minutos — BuildSphere",
+    description: `Criador de site profissional para autônomos e MEIs. Sem código, sem taxa de setup, sem programador. Para psicólogos, coaches e nutricionistas. A partir de ${priceStr}/mês.`,
+    keywords: [
+      "criar site profissional",
+      "criador de site profissional",
+      "site para autônomo",
+      "site para MEI",
+      "criar site sem programador",
+      "site para psicólogo",
+      "site para coach",
+      "site para nutricionista",
+      "site para personal trainer",
+      "site para fotógrafo",
+      "construtor de sites Brasil",
+      "criar site grátis",
+      "site profissional barato",
+    ],
     alternates: { canonical: `https://${ROOT}` },
     openGraph: {
+      type: "website",
+      locale: "pt_BR",
+      siteName: "BuildSphere",
       url: `https://${ROOT}`,
-      title: "BuildSphere — Criador de site profissional para autônomos",
-      description: `Criador de site profissional sem código. Crie seu site em menos de 5 minutos. Para psicólogos, coaches, nutricionistas e consultores. A partir de ${priceStr}/mês.`,
+      title: "Crie seu site profissional em minutos — BuildSphere",
+      description: `Criador de site profissional para autônomos. Sem código, sem taxa de setup. Psicólogos, coaches, nutricionistas e fotógrafos. A partir de ${priceStr}/mês.`,
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BuildSphere — Criador de site profissional para autônomos" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Crie seu site profissional em minutos — BuildSphere",
+      description: `Criador de site profissional para autônomos. Sem código, sem taxa de setup. A partir de ${priceStr}/mês.`,
+      images: ["/og-image.png"],
     },
   };
 }

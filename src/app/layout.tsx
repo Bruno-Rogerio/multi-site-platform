@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Sora } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -10,29 +10,36 @@ const sora = Sora({
 
 const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#0B1020",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${ROOT}`),
   title: {
-    default: "BuildSphere — Criador de site profissional para autônomos",
+    default: "Crie seu site profissional sem código — BuildSphere",
     template: "%s | BuildSphere",
   },
   description:
-    "O criador de site profissional mais fácil do Brasil. Crie seu site em menos de 5 minutos sem código e sem taxa de setup. Para psicólogos, coaches, consultores e autônomos. A partir de R$ 59,90/mês.",
+    "O criador de site profissional mais fácil do Brasil. Sem código, sem taxa de setup, sem programador. Para autônomos, MEIs, psicólogos, coaches e nutricionistas. A partir de R$ 59,90/mês.",
   keywords: [
-    "criador de site",
-    "criador de site profissional",
     "criar site profissional",
-    "criador de site para autônomo",
-    "criar site sem código",
-    "site para psicólogo",
-    "site para coach",
-    "site para nutricionista",
+    "criador de site profissional",
     "site para autônomo",
-    "construtor de sites",
-    "site profissional barato",
-    "presença online profissional",
-    "site para pequenas empresas",
+    "site para MEI",
+    "construtor de sites Brasil",
+    "criar site sem programador",
+    "site para fotógrafo",
+    "site para personal trainer",
+    "site para nutricionista",
+    "site para advogado",
+    "plataforma de sites",
     "criar site grátis",
+    "site profissional barato",
+    "criador de site para autônomo",
   ],
   authors: [{ name: "BuildSphere", url: `https://${ROOT}` }],
   creator: "BuildSphere",
@@ -47,28 +54,51 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: `https://${ROOT}`,
     siteName: "BuildSphere",
-    title: "BuildSphere — Criador de site profissional para autônomos",
+    title: "Crie seu site profissional sem código — BuildSphere",
     description:
-      "O criador de site mais fácil do Brasil. Crie seu site profissional em menos de 5 minutos, sem código e sem taxa de setup. A partir de R$ 59,90/mês.",
+      "O criador de site profissional mais fácil do Brasil. Sem código, sem taxa de setup. Para autônomos, MEIs, psicólogos, coaches e nutricionistas.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "BuildSphere — Criador de site profissional para autônomos",
+        alt: "BuildSphere — Criador de site profissional para autônomos e MEIs",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BuildSphere — Criador de site profissional para autônomos",
+    title: "Crie seu site profissional sem código — BuildSphere",
     description:
-      "O criador de site mais fácil do Brasil. Crie seu site em menos de 5 minutos, sem código e sem taxa de setup. A partir de R$ 59,90/mês.",
+      "O criador de site mais fácil do Brasil. Sem código, sem taxa de setup. Para autônomos, MEIs e prestadores de serviço. A partir de R$ 59,90/mês.",
     images: ["/og-image.png"],
   },
   alternates: {
     canonical: `https://${ROOT}`,
   },
+};
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": `https://${ROOT}/#organization`,
+  name: "BuildSphere",
+  url: `https://${ROOT}`,
+  logo: {
+    "@type": "ImageObject",
+    url: `https://${ROOT}/og-image.png`,
+    width: 1200,
+    height: 630,
+  },
+  description:
+    "BuildSphere é o criador de site profissional para autônomos e MEIs. Psicólogos, coaches, nutricionistas, fotógrafos e personal trainers criam sites sem código em menos de 5 minutos.",
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: "+55-11-91519-4173",
+    contactType: "customer service",
+    availableLanguage: "Portuguese",
+  },
+  sameAs: [],
 };
 
 export default function RootLayout({
@@ -78,6 +108,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
+      </head>
       <body className={`${sora.variable} antialiased`}>
         {children}
 

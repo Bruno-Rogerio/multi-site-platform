@@ -3,9 +3,20 @@ import Link from "next/link";
 import { Brand } from "@/components/platform/brand";
 import { getPlatformBrandingSettings } from "@/lib/platform/settings";
 
+const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
+
 export const metadata: Metadata = {
-  title: "Termos de Uso — BuildSphere",
-  description: "Termos e condições de uso da plataforma BuildSphere.",
+  title: "Termos de Uso da Plataforma BuildSphere",
+  description:
+    "Leia os termos e condições de uso da BuildSphere. Direitos, obrigações, política de pagamentos, cancelamento e reembolso da assinatura do criador de sites.",
+  alternates: { canonical: `https://${ROOT}/termos` },
+  robots: { index: true, follow: true },
+  openGraph: {
+    title: "Termos de Uso — BuildSphere",
+    description:
+      "Termos e condições de uso da plataforma BuildSphere. Saiba seus direitos e obrigações ao usar o criador de sites profissionais.",
+    url: `https://${ROOT}/termos`,
+  },
 };
 
 export default async function TermosPage() {

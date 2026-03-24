@@ -10,11 +10,34 @@ import { PlatformPageTracker } from "@/components/platform-page-tracker";
 
 export const dynamic = "force-dynamic";
 
+const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
+
 export const metadata: Metadata = {
-  title: "Criar meu site profissional — BuildSphere",
+  title: "Criar meu site profissional grátis — BuildSphere",
   description:
-    "Configure seu site profissional em menos de 5 minutos. Escolha seu plano, personalize e publique. Sem código, sem taxa de setup.",
+    "Configure seu site profissional em menos de 5 minutos. Plano Básico ou Premium, sem código, sem taxa de setup. Para autônomos, MEIs e prestadores de serviço.",
+  keywords: [
+    "criar site profissional",
+    "criar site sem código",
+    "criar site para autônomo",
+    "criar site MEI",
+    "criar site grátis",
+  ],
+  alternates: { canonical: `https://${ROOT}/quero-comecar` },
   robots: { index: true, follow: false },
+  openGraph: {
+    title: "Criar meu site profissional grátis — BuildSphere",
+    description:
+      "Configure seu site profissional em menos de 5 minutos. Sem código, sem taxa de setup. Para autônomos e MEIs.",
+    url: `https://${ROOT}/quero-comecar`,
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Criar meu site profissional grátis — BuildSphere",
+    description: "Configure seu site profissional em menos de 5 minutos. Sem código, sem taxa de setup.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default async function QueroComecarPage({

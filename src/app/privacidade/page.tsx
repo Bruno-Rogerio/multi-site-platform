@@ -3,9 +3,20 @@ import Link from "next/link";
 import { Brand } from "@/components/platform/brand";
 import { getPlatformBrandingSettings } from "@/lib/platform/settings";
 
+const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
+
 export const metadata: Metadata = {
-  title: "Política de Privacidade — BuildSphere",
-  description: "Como a BuildSphere coleta, usa e protege seus dados pessoais conforme a LGPD.",
+  title: "Política de Privacidade e LGPD — BuildSphere",
+  description:
+    "Como a BuildSphere coleta, usa e protege seus dados conforme a LGPD. Direitos dos titulares, cookies, compartilhamento e retenção de dados pessoais.",
+  alternates: { canonical: `https://${ROOT}/privacidade` },
+  robots: { index: true, follow: true },
+  openGraph: {
+    title: "Política de Privacidade — BuildSphere",
+    description:
+      "Política de privacidade e proteção de dados da BuildSphere conforme a LGPD. Saiba como coletamos e protegemos suas informações pessoais.",
+    url: `https://${ROOT}/privacidade`,
+  },
 };
 
 export default async function PrivacidadePage() {
