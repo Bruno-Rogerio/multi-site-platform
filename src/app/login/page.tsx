@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { LoginForm } from "@/components/auth/login-form";
 import { Brand } from "@/components/platform/brand";
 import { getRequestHostClassification } from "@/lib/tenant/request-host";
 import { getCurrentUserProfile } from "@/lib/auth/session";
+
+export const metadata: Metadata = {
+  title: "Entrar",
+  robots: { index: false, follow: false },
+};
 
 type Props = {
   searchParams: Promise<{ checkout?: string; return?: string }>;

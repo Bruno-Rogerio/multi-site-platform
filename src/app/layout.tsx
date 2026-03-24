@@ -12,22 +12,26 @@ const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
 export const metadata: Metadata = {
   metadataBase: new URL(`https://${ROOT}`),
   title: {
-    default: "BuildSphere — Crie seu site profissional em minutos",
+    default: "BuildSphere — Criador de site profissional para autônomos",
     template: "%s | BuildSphere",
   },
   description:
-    "Crie seu site profissional em menos de 5 minutos. Planos a partir de R$ 59,90/mês para psicólogos, coaches, consultores e autônomos. Sem código, sem complicação.",
+    "O criador de site profissional mais fácil do Brasil. Crie seu site em menos de 5 minutos sem código e sem taxa de setup. Para psicólogos, coaches, consultores e autônomos. A partir de R$ 59,90/mês.",
   keywords: [
+    "criador de site",
+    "criador de site profissional",
     "criar site profissional",
+    "criador de site para autônomo",
+    "criar site sem código",
     "site para psicólogo",
     "site para coach",
+    "site para nutricionista",
     "site para autônomo",
     "construtor de sites",
-    "plataforma de sites",
     "site profissional barato",
-    "criar site sem código",
     "presença online profissional",
     "site para pequenas empresas",
+    "criar site grátis",
   ],
   authors: [{ name: "BuildSphere", url: `https://${ROOT}` }],
   creator: "BuildSphere",
@@ -42,23 +46,23 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     url: `https://${ROOT}`,
     siteName: "BuildSphere",
-    title: "BuildSphere — Crie seu site profissional em minutos",
+    title: "BuildSphere — Criador de site profissional para autônomos",
     description:
-      "Crie seu site profissional em menos de 5 minutos. Planos a partir de R$ 59,90/mês para psicólogos, coaches, consultores e autônomos.",
+      "O criador de site mais fácil do Brasil. Crie seu site profissional em menos de 5 minutos, sem código e sem taxa de setup. A partir de R$ 59,90/mês.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "BuildSphere — Plataforma de sites profissionais",
+        alt: "BuildSphere — Criador de site profissional para autônomos",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "BuildSphere — Crie seu site profissional em minutos",
+    title: "BuildSphere — Criador de site profissional para autônomos",
     description:
-      "Crie seu site profissional em menos de 5 minutos. Planos a partir de R$ 59,90/mês. Sem código, sem complicação.",
+      "O criador de site mais fácil do Brasil. Crie seu site em menos de 5 minutos, sem código e sem taxa de setup. A partir de R$ 59,90/mês.",
     images: ["/og-image.png"],
   },
   alternates: {

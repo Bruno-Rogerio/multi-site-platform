@@ -29,13 +29,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const prices = await getPlanPrices();
   const priceStr = formatBRL(prices.basico);
   return {
-    title: "BuildSphere — Crie seu site profissional em minutos",
-    description: `Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Sem código, sem taxa de setup. Planos a partir de ${priceStr}/mês.`,
+    title: "BuildSphere — Criador de site profissional para psicólogos, coaches e autônomos",
+    description: `Criador de site profissional para autônomos e prestadores de serviço. Crie seu site em menos de 5 minutos, sem código e sem taxa de setup. Para psicólogos, coaches, nutricionistas e consultores. A partir de ${priceStr}/mês.`,
     alternates: { canonical: `https://${ROOT}` },
     openGraph: {
       url: `https://${ROOT}`,
-      title: "BuildSphere — Crie seu site profissional em minutos",
-      description: `Crie seu site profissional em menos de 5 minutos. Ideal para psicólogos, coaches, consultores e autônomos. Planos a partir de ${priceStr}/mês.`,
+      title: "BuildSphere — Criador de site profissional para autônomos",
+      description: `Criador de site profissional sem código. Crie seu site em menos de 5 minutos. Para psicólogos, coaches, nutricionistas e consultores. A partir de ${priceStr}/mês.`,
     },
   };
 }
@@ -103,18 +103,19 @@ export default async function PlatformLandingPage() {
           url: `https://${ROOT}/og-image.png`,
         },
         description:
-          "Plataforma SaaS para criação de sites profissionais. Ideal para psicólogos, coaches, consultores e autônomos.",
+          "BuildSphere é um criador de site profissional para autônomos e prestadores de serviço. Psicólogos, coaches, nutricionistas e consultores criam seus sites sem código em menos de 5 minutos.",
         sameAs: [],
       },
       {
         "@type": "SoftwareApplication",
         "@id": `https://${ROOT}/#product`,
-        name: "BuildSphere",
-        applicationCategory: "WebApplication",
+        name: "BuildSphere — Criador de site profissional",
+        applicationCategory: "BusinessApplication",
+        applicationSubCategory: "Website Builder",
         operatingSystem: "Web",
         url: `https://${ROOT}`,
         description:
-          "Crie seu site profissional em menos de 5 minutos, sem precisar saber programar. Planos mensais sem taxa de setup.",
+          "Criador de site profissional para autônomos, psicólogos, coaches, nutricionistas e consultores. Crie seu site em menos de 5 minutos sem código e sem taxa de setup.",
         offers: [
           {
             "@type": "Offer",
