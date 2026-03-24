@@ -21,6 +21,7 @@ import {
   X,
   Inbox,
   BookOpen,
+  BarChart3,
 } from "lucide-react";
 import type { AppRole } from "@/lib/auth/session";
 
@@ -32,14 +33,15 @@ type NavItem = {
 };
 
 const platformNav: NavItem[] = [
-  { label: "Dashboard", href: "/admin/platform", icon: LayoutDashboard },
-  { label: "Sites", href: "/admin/platform/sites", icon: Globe },
-  { label: "Usuários", href: "/admin/platform/users", icon: Users },
-  { label: "Pipeline", href: "/admin/platform/pipeline", icon: Kanban },
-  { label: "Branding", href: "/admin/platform/branding", icon: Palette },
-  { label: "Planos & Promoções", href: "/admin/platform/plans", icon: Tag },
-  { label: "Mensagens",     href: "/admin/platform/messages", icon: MessageSquare },
-  { label: "Configurações", href: "/admin/platform/settings", icon: Settings },
+  { label: "Dashboard",        href: "/admin/platform",            icon: LayoutDashboard },
+  { label: "Analytics",        href: "/admin/platform/analytics",  icon: BarChart3 },
+  { label: "Sites",            href: "/admin/platform/sites",      icon: Globe },
+  { label: "Usuários",         href: "/admin/platform/users",      icon: Users },
+  { label: "Pipeline",         href: "/admin/platform/pipeline",   icon: Kanban },
+  { label: "Branding",         href: "/admin/platform/branding",   icon: Palette },
+  { label: "Planos & Promoções", href: "/admin/platform/plans",    icon: Tag },
+  { label: "Mensagens",        href: "/admin/platform/messages",   icon: MessageSquare },
+  { label: "Configurações",    href: "/admin/platform/settings",   icon: Settings },
 ];
 
 const clientNav: NavItem[] = [

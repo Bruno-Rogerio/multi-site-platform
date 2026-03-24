@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   Globe,
   Users,
-  Shield,
   Clock,
   CreditCard,
   MessageSquare,
@@ -12,12 +11,15 @@ import {
   Settings,
   ArrowUpRight,
   TicketCheck,
+  DollarSign,
 } from "lucide-react";
 
 import { requireUserProfile } from "@/lib/auth/session";
 import { getPlatformBrandingSettings } from "@/lib/platform/settings";
 import { createSupabaseServerAuthClient } from "@/lib/supabase/server";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { PlatformAnalyticsWidget } from "@/components/admin/platform-analytics-widget";
+import { formatBRL } from "@/lib/onboarding/get-plan-prices";
 
 const PLAN_LABELS: Record<string, string> = {
   basico:       "Básico",
@@ -47,16 +49,23 @@ export default async function PlatformAdminPage() {
   const supabase = await createSupabaseServerAuthClient();
   const platformBranding = await getPlatformBrandingSettings();
 
-  type MetricItem = { label: string; value: number; hint: string; icon: typeof Globe; color: string; bg: string; href: string };
+  type MetricItem = { label: string; value: number | string; hint: string; icon: typeof Globe; color: string; bg: string; href: string };
   let metrics: MetricItem[] = [];
   let recentSites:   Array<{ id: string; name: string; domain: string; theme_settings: Record<string, unknown> | null; created_at: string }> = [];
   let recentTickets: Array<{ id: string; subject: string; status: string; created_at: string; sites: { name: string } | null }> = [];
+
+  const adminDb = createSupabaseAdminClient();
+  let mrr = 0;
+
+  if (adminDb) {
+    const mrrRes = await adminDb.from("billing_profiles").select("monthly_amount").eq("billing_status", "active");
+    mrr = ((mrrRes.data ?? []) as { monthly_amount: number | null }[]).reduce((s, b) => s + (b.monthly_amount ?? 0), 0);
+  }
 
   if (supabase) {
     const [
       sitesCount,
       clientsCount,
-      adminsCount,
       draftsCount,
       billingCount,
       ticketsCount,
@@ -65,7 +74,6 @@ export default async function PlatformAdminPage() {
     ] = await Promise.all([
       supabase.from("sites").select("id", { count: "exact", head: true }),
       supabase.from("user_profiles").select("id", { count: "exact", head: true }).eq("role", "client"),
-      supabase.from("user_profiles").select("id", { count: "exact", head: true }).eq("role", "admin"),
       supabase.from("onboarding_drafts").select("id", { count: "exact", head: true }).in("status", ["draft", "checkout_pending"]),
       supabase.from("billing_profiles").select("id", { count: "exact", head: true }).eq("billing_status", "active"),
       supabase.from("support_tickets").select("id", { count: "exact", head: true }).in("status", ["open", "in_progress"]),
@@ -74,12 +82,12 @@ export default async function PlatformAdminPage() {
     ]);
 
     metrics = [
-      { label: "Sites ativos",         value: sitesCount.count    ?? 0, hint: "Total de tenants",          icon: Globe,         color: "text-blue-400",    bg: "bg-blue-500/10",    href: "/admin/platform/sites" },
-      { label: "Clientes",             value: clientsCount.count  ?? 0, hint: "Usuários finais",           icon: Users,         color: "text-emerald-400", bg: "bg-emerald-500/10", href: "/admin/platform/users" },
-      { label: "Admins",               value: adminsCount.count   ?? 0, hint: "Equipe interna",            icon: Shield,        color: "text-purple-400",  bg: "bg-purple-500/10",  href: "/admin/platform/users" },
-      { label: "Onboarding pendente",  value: draftsCount.count   ?? 0, hint: "Draft / checkout",          icon: Clock,         color: "text-amber-400",   bg: "bg-amber-500/10",   href: "/admin/platform/pipeline" },
-      { label: "Assinaturas ativas",   value: billingCount.count  ?? 0, hint: "billing_status = active",   icon: CreditCard,    color: "text-cyan-400",    bg: "bg-cyan-500/10",    href: "/admin/platform/sites" },
-      { label: "Chamados abertos",     value: ticketsCount.count  ?? 0, hint: "Aberto + Em andamento",     icon: TicketCheck,   color: "text-rose-400",    bg: "bg-rose-500/10",    href: "/admin/platform/messages" },
+      { label: "MRR",                  value: formatBRL(mrr),             hint: "receita mensal recorrente", icon: DollarSign,    color: "text-emerald-400", bg: "bg-emerald-500/10", href: "/admin/platform/analytics" },
+      { label: "Sites ativos",         value: sitesCount.count    ?? 0,   hint: "Total de tenants",          icon: Globe,         color: "text-blue-400",    bg: "bg-blue-500/10",    href: "/admin/platform/sites" },
+      { label: "Clientes",             value: clientsCount.count  ?? 0,   hint: "Usuários finais",           icon: Users,         color: "text-emerald-400", bg: "bg-emerald-500/10", href: "/admin/platform/users" },
+      { label: "Onboarding pendente",  value: draftsCount.count   ?? 0,   hint: "Draft / checkout",          icon: Clock,         color: "text-amber-400",   bg: "bg-amber-500/10",   href: "/admin/platform/pipeline" },
+      { label: "Assinaturas ativas",   value: billingCount.count  ?? 0,   hint: "billing_status = active",   icon: CreditCard,    color: "text-cyan-400",    bg: "bg-cyan-500/10",    href: "/admin/platform/sites" },
+      { label: "Chamados abertos",     value: ticketsCount.count  ?? 0,   hint: "Aberto + Em andamento",     icon: TicketCheck,   color: "text-rose-400",    bg: "bg-rose-500/10",    href: "/admin/platform/messages" },
     ];
 
     recentSites   = (recentSitesResult.data   ?? []) as typeof recentSites;
@@ -144,7 +152,7 @@ export default async function PlatformAdminPage() {
                   <Icon size={14} className={m.color} />
                 </div>
               </div>
-              <p className="mt-3 text-3xl font-bold text-[var(--platform-text)]">{m.value}</p>
+              <p className={`mt-3 font-bold tabular-nums text-[var(--platform-text)] ${typeof m.value === "string" ? "text-xl" : "text-3xl"}`}>{m.value}</p>
               <p className="mt-1 text-[10px] text-[var(--platform-text)]/40">{m.hint}</p>
             </Link>
           );
