@@ -193,23 +193,28 @@ export async function PlatformAnalyticsWidget() {
   let topPages: PageRow[] = [];
 
   if (adminDb) {
-    const now      = Date.now();
-    const t1d      = new Date(now -       86_400_000).toISOString();
-    const t2d      = new Date(now -   2 * 86_400_000).toISOString();
-    const t7d      = new Date(now -   7 * 86_400_000).toISOString();
-    const t14d     = new Date(now -  14 * 86_400_000).toISOString();
-    const t30d     = new Date(now -  30 * 86_400_000).toISOString();
-    const t60d     = new Date(now -  60 * 86_400_000).toISOString();
+    const now = Date.now();
+
+    // Calendar-day boundaries (midnight local → UTC)
+    const todayMidnight = new Date(); todayMidnight.setHours(0, 0, 0, 0);
+    const yesterdayMidnight = new Date(todayMidnight); yesterdayMidnight.setDate(yesterdayMidnight.getDate() - 1);
+
+    const tToday = todayMidnight.toISOString();
+    const tYest  = yesterdayMidnight.toISOString();
+    const t7d    = new Date(now -   7 * 86_400_000).toISOString();
+    const t14d   = new Date(now -  14 * 86_400_000).toISOString();
+    const t30d   = new Date(now -  30 * 86_400_000).toISOString();
+    const t60d   = new Date(now -  60 * 86_400_000).toISOString();
 
     const [
       res1d, resYest, res7d, res7dPrev,
       res30d, res30dPrev, resTotal,
       res14dRaw, res30dPaths,
     ] = await Promise.all([
-      // today
-      adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", t1d),
-      // yesterday (2d → 1d)
-      adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", t2d).lt("visited_at", t1d),
+      // today (desde meia-noite)
+      adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", tToday),
+      // yesterday (meia-noite de ontem → meia-noite de hoje)
+      adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", tYest).lt("visited_at", tToday),
       // last 7d
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", t7d),
       // prev 7d (14d → 7d)
