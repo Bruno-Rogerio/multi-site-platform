@@ -63,8 +63,10 @@ function StatCard({
 function BarChart({ days }: { days: DaySlot[] }) {
   const max    = Math.max(...days.map((d) => d.count), 1);
   const W      = 560;
-  const H      = 72;
+  const H      = 88;       // extra height for value labels
+  const labelH = 14;       // reserved at top for numbers
   const pad    = 4;
+  const barArea = H - labelH - pad;
   const slot   = W / days.length;
   const barW   = Math.max(4, slot - 6);
   const today  = new Date().toISOString().slice(0, 10);
@@ -74,7 +76,7 @@ function BarChart({ days }: { days: DaySlot[] }) {
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className="w-full"
-        style={{ height: 72 }}
+        style={{ height: 88 }}
         aria-label="Visitas diárias"
       >
         <defs>
@@ -85,19 +87,34 @@ function BarChart({ days }: { days: DaySlot[] }) {
         </defs>
 
         {days.map((day, i) => {
-          const barH  = Math.max(3, ((day.count / max) * (H - pad * 2)));
+          const barH  = Math.max(3, (day.count / max) * barArea);
           const x     = i * slot + (slot - barW) / 2;
           const y     = H - pad - barH;
+          const cx    = i * slot + slot / 2;
           const isNow = day.date === today;
           return (
-            <rect
-              key={day.date}
-              x={x} y={y}
-              width={barW} height={barH}
-              rx={3}
-              fill={isNow ? "#22D3EE" : "url(#pg)"}
-              opacity={isNow ? 1 : 0.65}
-            />
+            <g key={day.date}>
+              <rect
+                x={x} y={y}
+                width={barW} height={barH}
+                rx={3}
+                fill={isNow ? "#22D3EE" : "url(#pg)"}
+                opacity={isNow ? 1 : 0.65}
+              />
+              {day.count > 0 && (
+                <text
+                  x={cx}
+                  y={y - 3}
+                  textAnchor="middle"
+                  fontSize={8}
+                  fontFamily="inherit"
+                  fill={isNow ? "#22D3EE" : "rgba(234,240,255,0.5)"}
+                  fontWeight={isNow ? "700" : "400"}
+                >
+                  {day.count}
+                </text>
+              )}
+            </g>
           );
         })}
       </svg>
