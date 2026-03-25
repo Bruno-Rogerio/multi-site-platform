@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | BuildSphere",
   },
   description:
-    "O criador de site profissional mais fácil do Brasil. Sem código, sem taxa de setup, sem programador. Para autônomos, MEIs, psicólogos, coaches e nutricionistas. A partir de R$ 59,90/mês.",
+    "O criador de site profissional mais fácil do Brasil. Sem código, sem taxa de setup, sem programador. Para autônomos, MEIs, psicólogos, coaches e nutricionistas. A partir de R$ 29,90/mês.",
   keywords: [
     "criar site profissional",
     "criador de site profissional",
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Crie seu site profissional sem código — BuildSphere",
     description:
-      "O criador de site mais fácil do Brasil. Sem código, sem taxa de setup. Para autônomos, MEIs e prestadores de serviço. A partir de R$ 59,90/mês.",
+      "O criador de site mais fácil do Brasil. Sem código, sem taxa de setup. Para autônomos, MEIs e prestadores de serviço. A partir de R$ 29,90/mês.",
     images: ["/og-image.png"],
   },
   alternates: {

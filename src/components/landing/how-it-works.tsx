@@ -24,7 +24,7 @@ const STEPS = [
     subtitle: "3 minutos",
     description:
       "Adicione suas informações, fotos, serviços e configure a identidade visual com paletas prontas e personalizáveis.",
-    highlights: ["13 paletas de cores profissionais", "Logo, fontes e estilos", "Preview em tempo real"],
+    highlights: ["Templates profissionais pré-criados", "Logo, identidade visual e estilo", "Preview em tempo real"],
     gradient: "from-[#7C5CFF] to-[#A855F7]",
     glow: "rgba(124,92,255,0.3)",
     accent: "#7C5CFF",

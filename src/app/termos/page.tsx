@@ -36,7 +36,7 @@ export default async function TermosPage() {
       <main className="mx-auto max-w-4xl px-6 py-12 md:py-16">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#22D3EE]">Legal</p>
         <h1 className="mt-3 text-3xl font-black md:text-4xl">Termos de Uso</h1>
-        <p className="mt-2 text-sm text-[#EAF0FF]/50">Última atualização: março de 2025</p>
+        <p className="mt-2 text-sm text-[#EAF0FF]/50">Última atualização: março de 2026</p>
 
         <div className="prose prose-invert mt-10 max-w-none space-y-8 text-sm leading-relaxed text-[#EAF0FF]/80 [&_h2]:mb-3 [&_h2]:mt-8 [&_h2]:text-base [&_h2]:font-bold [&_h2]:text-[#EAF0FF] [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-5 [&_ul>li]:mb-1.5">
 
@@ -67,8 +67,8 @@ export default async function TermosPage() {
           <ul>
             <li>Subdomínio personalizado no formato <em>seunome.bsph.com.br</em> (ou domínio configurado pela plataforma);</li>
             <li>Painel de administração para edição de conteúdo e configurações do site;</li>
-            <li>Hospedagem e entrega do site ao público via CDN;</li>
-            <li>Recursos adicionais conforme o plano contratado (blog, galeria, SEO avançado, personalização visual, etc.).</li>
+            <li>Hospedagem e entrega do site ao público via CDN com SSL automático;</li>
+            <li>Recursos conforme o plano contratado: o <strong>Plano Starter</strong> inclui seções essenciais e logo; o <strong>Plano Básico</strong> adiciona todas as seções, suporte prioritário e personalização expandida; o <strong>Plano Premium Full</strong> oferece blog, galeria, eventos, SEO avançado e personalização visual completa.</li>
           </ul>
 
           <h2>4. Planos e pagamentos</h2>

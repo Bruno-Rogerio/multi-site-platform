@@ -27,7 +27,7 @@ const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
 
 export async function generateMetadata(): Promise<Metadata> {
   const prices = await getPlanPrices();
-  const priceStr = formatBRL(prices.basico);
+  const priceStr = formatBRL(prices.starter);
   return {
     title: "Crie seu site profissional em minutos — BuildSphere",
     description: `Criador de site profissional para autônomos e MEIs. Sem código, sem taxa de setup, sem programador. Para psicólogos, coaches e nutricionistas. A partir de ${priceStr}/mês.`,
@@ -144,7 +144,19 @@ export default async function PlatformLandingPage() {
         offers: [
           {
             "@type": "Offer",
-            name: "Plano Essencial",
+            name: "Plano Starter",
+            price: planPrices.starter.toFixed(2),
+            priceCurrency: "BRL",
+            priceSpecification: {
+              "@type": "RecurringCharge",
+              billingDuration: 1,
+              billingIncrement: "month",
+            },
+            description: "Site profissional com seções essenciais, logo e subdomínio inclusos.",
+          },
+          {
+            "@type": "Offer",
+            name: "Plano Básico",
             price: planPrices.basico.toFixed(2),
             priceCurrency: "BRL",
             priceSpecification: {
@@ -152,7 +164,7 @@ export default async function PlatformLandingPage() {
               billingDuration: 1,
               billingIncrement: "month",
             },
-            description: "Site profissional com personalização de logo e domínio.",
+            description: "Site completo com todas as seções, logo, domínio e suporte em até 24h.",
           },
           {
             "@type": "Offer",

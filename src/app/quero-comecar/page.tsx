@@ -15,7 +15,7 @@ const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
 export const metadata: Metadata = {
   title: "Criar meu site profissional grátis — BuildSphere",
   description:
-    "Configure seu site profissional em menos de 5 minutos. Plano Básico ou Premium, sem código, sem taxa de setup. Para autônomos, MEIs e prestadores de serviço.",
+    "Configure seu site profissional em menos de 5 minutos. Planos Starter, Básico ou Premium, sem código, sem taxa de setup. Para autônomos, MEIs e prestadores de serviço.",
   keywords: [
     "criar site profissional",
     "criar site sem código",
