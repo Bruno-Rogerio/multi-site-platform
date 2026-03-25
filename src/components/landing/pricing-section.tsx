@@ -3,17 +3,18 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Check, Star } from "lucide-react";
+import { Check, Star, Zap } from "lucide-react";
 
 type Plan = {
   name: string;
   badge?: string;
+  badgeColor?: string;
   price: string;
   priceNote: string;
   description: string;
   features: string[];
-  extraNote?: string;
   cta: string;
+  ctaHref: string;
   highlighted?: boolean;
 };
 
@@ -22,53 +23,60 @@ function buildPlans(starterPrice: number, basicoPrice: number, premiumPrice: num
   return [
   {
     name: "Starter",
+    badge: "Menor preço",
+    badgeColor: "emerald",
     price: fmt(starterPrice),
     priceNote: "/mês",
     description:
-      "Comece com o essencial. Quatro seções fixas para publicar seu site rapidamente.",
+      "Comece rápido com o essencial. Quatro seções prontas para você publicar em menos de 5 minutos.",
     features: [
       "8 templates disponíveis",
       "4 seções fixas (Capa, Serviços, CTA, Contato)",
+      "Até 3 cards de serviço",
       "Subdomínio personalizado",
       "Design 100% responsivo",
       "SSL e hospedagem inclusa",
       "Suporte em até 48h",
     ],
     cta: "Começar com Starter",
+    ctaHref: "/quero-comecar?plan=starter",
   },
   {
     name: "Básico",
     price: fmt(basicoPrice),
     priceNote: "/mês",
     description:
-      "Acesso a todas as 7 seções disponíveis, CTA flutuante e 20 templates para personalizar.",
+      "Acesso completo: todas as 7 seções, serviços ilimitados e botão flutuante para converter mais.",
     features: [
       "20 templates disponíveis",
       "Todas as 7 seções incluídas",
-      "CTA flutuante liberado",
       "Serviços ilimitados",
+      "CTA flutuante desbloqueado",
       "Subdomínio personalizado",
       "Suporte em até 24h",
     ],
     cta: "Começar com Básico",
+    ctaHref: "/quero-comecar",
   },
   {
     name: "Premium",
     badge: "Recomendado",
+    badgeColor: "gradient",
     price: fmt(premiumPrice),
     priceNote: "/mês",
     description:
       "Personalização visual completa, múltiplas páginas e todos os recursos desbloqueados.",
     features: [
       "Tudo do plano Básico",
-      "Personalização visual com IA",
-      "FAQ, Depoimentos ilimitados",
+      "Personalização visual completa",
       "Blog, Galeria e Eventos",
+      "FAQ e Depoimentos ilimitados",
       "SEO configurável",
       "Sem branding BuildSphere",
       "Prioridade no suporte",
     ],
     cta: "Quero o Premium",
+    ctaHref: "/quero-comecar?plan=premium",
     highlighted: true,
   },
   ];
@@ -106,9 +114,15 @@ export function PricingSection({ starterPrice, basicoPrice, premiumPrice }: { st
           >
             <div className="relative rounded-3xl bg-[#0F162A] p-8">
               {/* Badge */}
-              {plan.badge && (
+              {plan.badge && plan.badgeColor === "gradient" && (
                 <div className="absolute -top-3 right-6 inline-flex items-center gap-1 rounded-full bg-[linear-gradient(135deg,#3B82F6,#7C5CFF)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-[0_4px_12px_rgba(124,92,255,0.4)]">
                   <Star size={10} fill="white" />
+                  {plan.badge}
+                </div>
+              )}
+              {plan.badge && plan.badgeColor === "emerald" && (
+                <div className="absolute -top-3 left-6 inline-flex items-center gap-1 rounded-full bg-[linear-gradient(135deg,#059669,#10B981)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-[0_4px_12px_rgba(16,185,129,0.4)]">
+                  <Zap size={10} fill="white" />
                   {plan.badge}
                 </div>
               )}
@@ -122,6 +136,8 @@ export function PricingSection({ starterPrice, basicoPrice, premiumPrice }: { st
                   className={`text-4xl font-black ${
                     plan.highlighted
                       ? "bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] bg-clip-text text-transparent"
+                      : plan.badgeColor === "emerald"
+                      ? "bg-[linear-gradient(135deg,#059669,#22D3EE)] bg-clip-text text-transparent"
                       : "text-[var(--platform-text)]"
                   }`}
                 >
@@ -144,24 +160,20 @@ export function PricingSection({ starterPrice, basicoPrice, premiumPrice }: { st
                   >
                     <Check
                       size={16}
-                      className="mt-0.5 shrink-0 text-[#22D3EE]"
+                      className={`mt-0.5 shrink-0 ${plan.badgeColor === "emerald" ? "text-emerald-400" : "text-[#22D3EE]"}`}
                     />
                     {feature}
                   </li>
                 ))}
               </ul>
 
-              {plan.extraNote && (
-                <p className="mt-4 text-xs text-[var(--platform-text)]/40 italic">
-                  {plan.extraNote}
-                </p>
-              )}
-
               <Link
-                href={plan.highlighted ? "/quero-comecar?plan=premium" : plan.name === "Starter" ? "/quero-comecar?plan=starter" : "/quero-comecar"}
+                href={plan.ctaHref}
                 className={`mt-8 block w-full rounded-xl py-3.5 text-center text-sm font-semibold transition-all duration-300 ${
                   plan.highlighted
                     ? "bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] text-white shadow-[0_10px_40px_rgba(59,130,246,0.45)] hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(124,92,255,0.5)]"
+                    : plan.badgeColor === "emerald"
+                    ? "bg-[linear-gradient(135deg,rgba(5,150,105,0.15),rgba(16,185,129,0.15))] border border-emerald-500/30 text-emerald-400 hover:border-emerald-500/60 hover:bg-[linear-gradient(135deg,rgba(5,150,105,0.25),rgba(16,185,129,0.25))]"
                     : "border border-white/15 bg-white/[0.04] text-[var(--platform-text)] hover:bg-white/[0.08]"
                 }`}
               >

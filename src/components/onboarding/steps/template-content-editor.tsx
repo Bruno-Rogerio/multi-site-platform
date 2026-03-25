@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { moveInArray } from "@/lib/onboarding/helpers";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { getServiceCardsLimit } from "@/lib/onboarding/premium-gate";
 
 function str(v: unknown): string { return String(v ?? ""); }
 
@@ -283,9 +284,14 @@ const SECTION_META_BASIC: Record<string, { label: string; emoji: string; accent:
   contact:      { label: "Contato",        emoji: "📞", accent: "#22D3EE", fixed: true },
 };
 
+const STARTER_SECTION_TYPES = ["hero", "services", "cta", "contact"] as const;
+
 function SectionOrderCard() {
   const { state, dispatch } = useWizard();
-  const sections = state.enabledSections;
+  const isStarterPlan = state.selectedPlan === "starter";
+  const sections = isStarterPlan
+    ? state.enabledSections.filter((s) => (STARTER_SECTION_TYPES as readonly string[]).includes(s))
+    : state.enabledSections;
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropTargetIndex, setDropTargetIndex] = useState<number | null>(null);
@@ -370,7 +376,9 @@ function SectionOrderCard() {
 
 export function TemplateContentEditor() {
   const { state, dispatch } = useWizard();
-  const { selectedTemplateSlug, content, serviceCards } = state;
+  const { selectedTemplateSlug, content, serviceCards, selectedPlan } = state;
+  const isStarterPlan = selectedPlan === "starter";
+  const serviceCardsLimit = getServiceCardsLimit(selectedPlan ?? null);
 
   // Accordion state — default: first section open
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(["order", "contacts"]));
@@ -798,8 +806,13 @@ export function TemplateContentEditor() {
               description="Aparece acima dos cards de serviço · 4:3 · máx. 5 MB"
             />
 
+            {isStarterPlan && (
+              <p className="text-[10px] text-[#22D3EE]/70 rounded-lg border border-[#22D3EE]/15 bg-[#22D3EE]/5 px-3 py-2">
+                ⚡ Plano Starter: até {serviceCardsLimit} serviços ({serviceCards.length}/{serviceCardsLimit} usados)
+              </p>
+            )}
             <div className="space-y-3">
-              {serviceCards.slice(0, 4).map((card, i) => (
+              {serviceCards.slice(0, serviceCardsLimit).map((card, i) => (
                 <div key={i} className="rounded-lg border border-white/10 bg-white/[0.03] p-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-medium text-[var(--platform-text)]/50">
@@ -872,7 +885,7 @@ export function TemplateContentEditor() {
                   />
                 </div>
               ))}
-              {serviceCards.length < 4 && (
+              {serviceCards.length < serviceCardsLimit && (
                 <button
                   type="button"
                   onClick={() => dispatch({ type: "ADD_SERVICE_CARD" })}
@@ -963,7 +976,7 @@ export function TemplateContentEditor() {
         </AccordionSection>
 
         {/* ─── 6. Stats ─── */}
-        {statsItems.length > 0 && (
+        {!isStarterPlan && statsItems.length > 0 && (
           <section className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-[#22D3EE]">
@@ -995,6 +1008,15 @@ export function TemplateContentEditor() {
         )}
 
         {/* ─── 7. Sobre ─── */}
+        {isStarterPlan ? (
+          <div className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-5 py-4 opacity-50">
+            <div>
+              <p className="text-sm font-semibold text-[var(--platform-text)]">Sobre você</p>
+              <p className="text-xs text-[var(--platform-text)]/50">Disponível no Plano Básico e Premium</p>
+            </div>
+            <span className="rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold text-[var(--platform-text)]/40">🔒 Bloqueado</span>
+          </div>
+        ) : (
         <AccordionSection
           id="about"
           title="Sobre você"
@@ -1040,12 +1062,13 @@ export function TemplateContentEditor() {
             </div>
           </div>
         </AccordionSection>
+        )}
 
         {/* ─── 8. Seção de contato ─── */}
         <AccordionSection
           id="contact"
           title="Seção de Contato"
-          subtitle="Ative o botão flutuante para até 2 canais"
+          subtitle={isStarterPlan ? "Botão flutuante não disponível no Starter" : "Ative o botão flutuante para até 2 canais"}
           isOpen={openSections.has("contact")}
           onToggle={toggleSection}
         >
@@ -1057,8 +1080,15 @@ export function TemplateContentEditor() {
             ) : (
               <>
                 <p className="mb-3 text-[10px] text-[var(--platform-text)]/40">
-                  Todos os canais cadastrados aparecem na seção de contato. Ative o flutuante para fixar até 2 no canto da tela.
+                  {isStarterPlan
+                    ? "Todos os canais cadastrados aparecem na seção de contato."
+                    : "Todos os canais cadastrados aparecem na seção de contato. Ative o flutuante para fixar até 2 no canto da tela."}
                 </p>
+                {isStarterPlan && (
+                  <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-400/80">
+                    🔒 Botão flutuante disponível a partir do Plano Básico
+                  </div>
+                )}
                 {registeredLinks.map((link) => {
                   const isFloating = state.floatingCtaChannels.includes(
                     link.type as import("@/lib/onboarding/types").CtaTypeId
@@ -1071,8 +1101,8 @@ export function TemplateContentEditor() {
                     >
                       <link.Icon size={14} className="text-[var(--platform-text)]/60 shrink-0" />
                       <span className="flex-1 text-sm text-[var(--platform-text)]">{link.label}</span>
-                      {/* Mini floating toggle */}
-                      <button
+                      {/* Mini floating toggle — hidden for Starter */}
+                      {!isStarterPlan && <button
                         type="button"
                         disabled={atLimit}
                         onClick={() => toggleFloatingChannel(link.type)}
@@ -1097,11 +1127,11 @@ export function TemplateContentEditor() {
                           />
                         </div>
                         Flutuante
-                      </button>
+                      </button>}
                     </div>
                   );
                 })}
-                {state.floatingCtaChannels.length >= 2 && (
+                {!isStarterPlan && state.floatingCtaChannels.length >= 2 && (
                   <p className="mt-1 text-[10px] text-[#22D3EE]/70">Máximo de 2 botões flutuantes ativados</p>
                 )}
               </>
@@ -1110,6 +1140,15 @@ export function TemplateContentEditor() {
         </AccordionSection>
 
         {/* ─── 9. Depoimentos ─── */}
+        {isStarterPlan ? (
+          <div className="flex items-center justify-between rounded-xl border border-white/8 bg-white/[0.02] px-5 py-4 opacity-50">
+            <div>
+              <p className="text-sm font-semibold text-[var(--platform-text)]">Depoimentos</p>
+              <p className="text-xs text-[var(--platform-text)]/50">Disponível no Plano Básico e Premium</p>
+            </div>
+            <span className="rounded-full border border-white/15 px-3 py-1 text-[10px] font-semibold text-[var(--platform-text)]/40">🔒 Bloqueado</span>
+          </div>
+        ) : (
         <AccordionSection
           id="testimonials"
           title="Depoimentos"
@@ -1223,6 +1262,7 @@ export function TemplateContentEditor() {
             )}
           </div>
         </AccordionSection>
+        )}
 
         {/* ─── 10. SEO ─── */}
         <AccordionSection

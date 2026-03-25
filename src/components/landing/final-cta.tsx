@@ -61,12 +61,28 @@ export function FinalCta() {
               </h2>
 
               <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#EAF0FF]/55 md:text-lg">
-                Junte-se a centenas de profissionais que já têm presença online profissional. Configure
-                em minutos, sem código e sem complicação.
+                Junte-se a centenas de profissionais que já têm presença online. Configure em minutos,
+                sem código e sem complicação.
               </p>
 
+              {/* Price highlight */}
+              <div className="mx-auto mt-7 inline-flex items-center gap-3 rounded-2xl border border-[#22D3EE]/20 bg-[linear-gradient(135deg,rgba(59,130,246,0.06),rgba(34,211,238,0.06))] px-6 py-3">
+                <div className="text-left">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#EAF0FF]/40">A partir de</p>
+                  <p className="text-2xl font-black text-[#EAF0FF]">
+                    R$ 29,90
+                    <span className="ml-1 text-sm font-medium text-[#EAF0FF]/50">/mês</span>
+                  </p>
+                </div>
+                <div className="h-10 w-px bg-white/10" />
+                <div className="text-left text-xs text-[#EAF0FF]/50 leading-relaxed">
+                  <p>✓ Sem taxa de setup</p>
+                  <p>✓ Cancele quando quiser</p>
+                </div>
+              </div>
+
               {/* Trust stats */}
-              <div className="mx-auto mt-8 grid max-w-lg grid-cols-3 gap-4">
+              <div className="mx-auto mt-6 grid max-w-lg grid-cols-3 gap-4">
                 {[
                   { icon: Zap, value: "< 5 min", label: "Para publicar" },
                   { icon: Star, value: "4.9★", label: "Avaliação" },
@@ -80,7 +96,7 @@ export function FinalCta() {
                 ))}
               </div>
 
-              <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
                   href="/quero-comecar"
                   className="group inline-flex items-center gap-2.5 rounded-2xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-10 py-4 text-base font-bold text-white shadow-[0_0_50px_rgba(124,92,255,0.4)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_70px_rgba(124,92,255,0.6)]"
@@ -89,10 +105,10 @@ export function FinalCta() {
                   <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
                 </Link>
                 <Link
-                  href="/premium"
+                  href="/#precos"
                   className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-10 py-4 text-base font-semibold text-[#EAF0FF]/80 transition-all duration-300 hover:border-white/30 hover:bg-white/[0.08]"
                 >
-                  Ver planos →
+                  Ver todos os planos →
                 </Link>
               </div>
 

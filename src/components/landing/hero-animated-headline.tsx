@@ -130,18 +130,36 @@ export function HeroAnimatedHeadline() {
           sem complicação. Do zero ao site publicado em menos de 5 minutos.
         </motion.p>
 
+        {/* Price anchor pill */}
+        <motion.div
+          className="mt-9"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.55 }}
+        >
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#22D3EE]/25 bg-[linear-gradient(135deg,rgba(59,130,246,0.08),rgba(34,211,238,0.08))] px-5 py-2 text-xs font-semibold text-[#EAF0FF]/80 backdrop-blur-sm">
+            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[#22D3EE] text-[10px] font-black text-[#0B1020]">✓</span>
+            Planos a partir de{" "}
+            <span className="bg-[linear-gradient(135deg,#22D3EE,#3B82F6)] bg-clip-text font-black text-transparent">
+              R$ 29,90/mês
+            </span>
+            <span className="text-[#EAF0FF]/40">·</span>
+            <span className="text-[#EAF0FF]/50">Sem taxa de setup</span>
+          </span>
+        </motion.div>
+
         {/* CTAs */}
         <motion.div
-          className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
+          className="mt-6 flex flex-col items-center gap-4 sm:flex-row"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.6 }}
+          transition={{ duration: 0.5, delay: 0.65 }}
         >
           <Link
             href="/quero-comecar"
             className="group relative inline-flex items-center gap-2.5 overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] px-9 py-4 text-base font-bold text-white shadow-[0_0_40px_rgba(124,92,255,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_60px_rgba(124,92,255,0.7)]"
           >
-            <span className="relative z-10">Criar meu site grátis</span>
+            <span className="relative z-10">Criar meu site agora</span>
             <ArrowRight
               size={18}
               className="relative z-10 transition-transform duration-300 group-hover:translate-x-1"
@@ -149,19 +167,19 @@ export function HeroAnimatedHeadline() {
             <div className="absolute inset-0 -translate-x-full bg-white/10 transition-transform duration-500 group-hover:translate-x-0" />
           </Link>
           <a
-            href="#exemplos"
+            href="#precos"
             className="inline-flex items-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-9 py-4 text-base font-semibold text-[#EAF0FF]/80 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/[0.08]"
           >
-            Ver exemplos reais
+            Ver planos e preços
           </a>
         </motion.div>
 
         {/* Trust badges */}
         <motion.div
-          className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
+          className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
+          transition={{ duration: 0.5, delay: 0.85 }}
         >
           {[
             { icon: Shield, text: "Sem taxa de setup" },

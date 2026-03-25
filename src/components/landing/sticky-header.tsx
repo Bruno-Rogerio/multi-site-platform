@@ -38,13 +38,13 @@ export function StickyHeader({ brandElement }: StickyHeaderProps) {
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.06)_50%,transparent_100%)] animate-[shimmer_3s_ease-in-out_infinite]" />
           <span className="relative inline-flex items-center gap-2.5">
             <Sparkles size={12} className="shrink-0 text-[#22D3EE]" />
-            <span className="hidden sm:inline text-white/80">Novidade:</span>
-            <span className="font-bold">Blog, Galeria e Eventos no Plano Premium</span>
+            <span className="hidden sm:inline text-white/80">Oferta:</span>
+            <span className="font-bold">Planos a partir de <span className="text-[#22D3EE]">R$ 29,90/mês</span> — sem taxa de setup</span>
             <Link
-              href="/premium"
+              href="/quero-comecar"
               className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-0.5 text-[11px] font-bold text-white ring-1 ring-white/25 transition-all hover:bg-white/25 hover:ring-white/40"
             >
-              Ver planos
+              Começar agora
               <ArrowRight size={10} />
             </Link>
           </span>
