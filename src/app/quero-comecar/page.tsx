@@ -52,7 +52,7 @@ export default async function QueroComecarPage({
 
   const params = await searchParams;
   const planParam = typeof params.plan === "string" ? params.plan : undefined;
-  const initialPlan = planParam === "premium" ? "premium" : planParam === "basico" ? "basico" : undefined;
+  const initialPlan = planParam === "premium" ? "premium" : planParam === "basico" ? "basico" : planParam === "starter" ? "starter" : undefined;
 
   const planPrices = await getPlanPrices();
 

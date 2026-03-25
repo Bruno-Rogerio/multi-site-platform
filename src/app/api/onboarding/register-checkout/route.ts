@@ -275,7 +275,11 @@ export async function POST(request: Request) {
   const selectedPlanKey = typeof (site.theme_settings as Record<string, unknown>)?.selectedPlan === "string"
     ? ((site.theme_settings as Record<string, unknown>).selectedPlan as string)
     : "basico";
-  const planDbKey = ["premium", "premium-full", "construir"].includes(selectedPlanKey) ? "premium" : "basico";
+  const planDbKey = ["premium", "premium-full", "construir"].includes(selectedPlanKey)
+    ? "premium"
+    : selectedPlanKey === "starter"
+    ? "starter"
+    : "basico";
 
   const { data: planRow } = await supabaseAdmin
     .from("platform_plans")
@@ -283,15 +287,20 @@ export async function POST(request: Request) {
     .eq("key", planDbKey)
     .maybeSingle();
 
-  const basePlanPrice = planRow?.monthly_price ?? (planDbKey === "premium" ? 109.80 : 59.90);
+  const basePlanPrice = planRow?.monthly_price ?? (planDbKey === "premium" ? 109.80 : planDbKey === "starter" ? 29.90 : 59.90);
   const extrasTotal = addonsTotal(addonsSelected);
   const monthlyAmount = basePlanPrice + extrasTotal;
 
-  // Se não há addons, usa o Price ID fixo do Stripe; senão, price_data com valor total
-  const stripePriceOrAmount: string | number =
-    extrasTotal === 0 && planRow?.stripe_price_id
-      ? planRow.stripe_price_id
-      : monthlyAmount;
+  // Para o plano Starter, usa a variável de ambiente STRIPE_STARTER_PRICE_ID
+  // Para os demais, usa o Price ID fixo do Stripe armazenado no DB
+  let stripePriceOrAmount: string | number = monthlyAmount;
+  if (extrasTotal === 0) {
+    if (planDbKey === "starter") {
+      stripePriceOrAmount = process.env.STRIPE_STARTER_PRICE_ID ?? monthlyAmount;
+    } else if (planRow?.stripe_price_id) {
+      stripePriceOrAmount = planRow.stripe_price_id;
+    }
+  }
 
   // --- BYPASS: skip Stripe, activate site directly ---
   if (bypassPayment) {
@@ -300,6 +309,8 @@ export async function POST(request: Request) {
     const { onboardingDraft: _, ...activeSettings } = currentSettings;
     const activePlan = ["premium", "premium-full", "construir"].includes(currentSettings.selectedPlan as string)
       ? "pro"
+      : (currentSettings.selectedPlan as string) === "starter"
+      ? "starter"
       : "landing";
 
     await supabaseAdmin
@@ -332,7 +343,7 @@ export async function POST(request: Request) {
     );
 
     // Send welcome + receipt emails (mirrors what the Stripe webhook does)
-    const planName = monthlyAmount >= 100 ? "Plano Premium Full" : "Plano Básico";
+    const planName = monthlyAmount >= 100 ? "Plano Premium Full" : monthlyAmount >= 50 ? "Plano Básico" : "Plano Starter";
     const referenceId = `BYPASS-${site.id.slice(-8).toUpperCase()}`;
     const dashboardUrl = `${process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ? `https://${process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN}` : "https://bsph.com.br"}/admin/client`;
 

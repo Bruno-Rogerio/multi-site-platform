@@ -2,6 +2,7 @@ import type { OnboardingPlan, StepDefinition } from "./types";
 
 /* ─── Pricing constants ─── */
 
+export const STARTER_MONTHLY_PRICE = 29.9;
 export const BASICO_MONTHLY_PRICE = 59.9;
 export const PREMIUM_MONTHLY_PRICE = 109.8;
 
@@ -27,18 +28,33 @@ export function getPlanById(id: OnboardingPlan): PlanDefinition | undefined {
 
 export const planDefinitions: PlanDefinition[] = [
   {
+    id: "starter",
+    name: "Starter",
+    tagline: "Simples e acessível",
+    price: "R$ 29,90",
+    priceNote: "/mês",
+    description:
+      "Comece com o essencial. Quatro seções prontas para personalizar e publicar rapidamente.",
+    highlights: [
+      "8 templates disponíveis",
+      "4 seções fixas incluídas",
+      "Subdomínio personalizado",
+      "Online em minutos",
+    ],
+  },
+  {
     id: "basico",
     name: "Básico",
-    tagline: "Rápido e pronto",
+    tagline: "Rápido e completo",
     price: "R$ 59,90",
     priceNote: "/mês",
     description:
-      "Escolha um layout pronto e personalize apenas o conteúdo. Ideal para quem quer praticidade.",
+      "Escolha um layout pronto e personalize o conteúdo. Acesso a todas as 7 seções disponíveis.",
     highlights: [
-      "8+ layouts profissionais prontos",
-      "Personalize textos e serviços",
+      "20 templates disponíveis",
+      "Todas as 7 seções incluídas",
+      "CTA flutuante liberado",
       "Subdomínio personalizado",
-      "Online em menos de 5 minutos",
     ],
   },
   {
@@ -77,7 +93,7 @@ export function getStepsForPlan(plan: OnboardingPlan | null): StepDefinition[] {
     ];
   }
 
-  if (plan === "basico") {
+  if (plan === "starter" || plan === "basico") {
     return [
       LEAD_CAPTURE_STEP,
       { id: "plan-selection", label: "Plano", subtitle: "Escolha seu modo" },

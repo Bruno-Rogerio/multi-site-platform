@@ -46,7 +46,7 @@ export function CheckoutStep() {
   }
 
   function deriveCreationMode(): "template" | "builder-premium" {
-    if (selectedPlan === "basico") return "template";
+    if (selectedPlan === "starter" || selectedPlan === "basico") return "template";
     return "builder-premium";
   }
 

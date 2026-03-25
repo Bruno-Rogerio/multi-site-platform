@@ -24,24 +24,31 @@ import {
 /* ─── Data ───────────────────────────────────────────────── */
 
 const FEATURES = [
-  // ── Incluso em ambos ──
-  { label: "Site profissional completo",         basic: true,  premium: true },
-  { label: "Subdomínio personalizado",           basic: true,  premium: true },
-  { label: "Design responsivo",                  basic: true,  premium: true },
-  { label: "SSL gratuito automático",            basic: true,  premium: true },
-  { label: "Edição pelo painel",                 basic: true,  premium: true },
-  { label: "Logo personalizada",                 basic: true,  premium: true },
-  { label: "Suporte por e-mail",                 basic: true,  premium: true },
+  // ── Incluso em todos ──
+  { label: "Site profissional completo",         starter: true,  basic: true,  premium: true },
+  { label: "Subdomínio personalizado",           starter: true,  basic: true,  premium: true },
+  { label: "Design responsivo",                  starter: true,  basic: true,  premium: true },
+  { label: "SSL gratuito automático",            starter: true,  basic: true,  premium: true },
+  { label: "Edição pelo painel",                 starter: true,  basic: true,  premium: true },
+  { label: "Logo personalizada",                 starter: true,  basic: true,  premium: true },
+  // ── Starter tem limitado ──
+  { label: "Templates disponíveis (8 / 20 / 20)", starter: true, basic: true,  premium: true },
+  { label: "Seções (4 fixas / 7 / 7)",          starter: true,  basic: true,  premium: true },
+  { label: "Cards de serviço (máx. 3 / ∞ / ∞)", starter: true, basic: true,  premium: true },
+  // ── Só no Básico e Premium ──
+  { label: "CTA flutuante",                      starter: false, basic: true,  premium: true },
+  { label: "Seções: Números, Sobre, Depoimentos",starter: false, basic: true,  premium: true },
+  { label: "Suporte em até 24h",                 starter: false, basic: true,  premium: true },
   // ── Só no Premium ──
-  { label: "Personalização visual com IA",       basic: false, premium: true },
-  { label: "13 paletas + cores + fontes",        basic: false, premium: true },
-  { label: "Blog / Artigos",                     basic: false, premium: true },
-  { label: "Galeria / Portfólio",                basic: false, premium: true },
-  { label: "Eventos / Agenda",                   basic: false, premium: true },
-  { label: "FAQ interativo",                     basic: false, premium: true },
-  { label: "SEO configurável",                   basic: false, premium: true },
-  { label: "Sem branding BuildSphere",           basic: false, premium: true },
-  { label: "Suporte prioritário",                basic: false, premium: true },
+  { label: "Personalização visual com IA",       starter: false, basic: false, premium: true },
+  { label: "13 paletas + cores + fontes",        starter: false, basic: false, premium: true },
+  { label: "Blog / Artigos",                     starter: false, basic: false, premium: true },
+  { label: "Galeria / Portfólio",                starter: false, basic: false, premium: true },
+  { label: "Eventos / Agenda",                   starter: false, basic: false, premium: true },
+  { label: "FAQ interativo",                     starter: false, basic: false, premium: true },
+  { label: "SEO configurável",                   starter: false, basic: false, premium: true },
+  { label: "Sem branding BuildSphere",           starter: false, basic: false, premium: true },
+  { label: "Suporte prioritário (até 2h)",       starter: false, basic: false, premium: true },
 ];
 
 const DIFFERENTIALS = [
@@ -268,10 +275,12 @@ function BeforeAfterSection() {
 
 export function PremiumPage({
   brandElement,
+  starterPrice = 29.9,
   basicoPrice = 59.9,
   premiumPrice = 109.8,
 }: {
   brandElement: React.ReactNode;
+  starterPrice?: number;
   basicoPrice?: number;
   premiumPrice?: number;
 }) {
@@ -375,13 +384,20 @@ export function PremiumPage({
 
             <div className="overflow-hidden rounded-3xl border border-white/10">
               {/* Table header */}
-              <div className="grid grid-cols-[1fr_110px_140px] bg-[#0E1428]">
+              <div className="grid grid-cols-[1fr_90px_90px_130px] bg-[#0E1428]">
                 <div className="border-b border-white/10 px-6 py-5" />
 
+                {/* Starter header */}
+                <div className="border-b border-l border-white/10 px-3 py-5 text-center">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#EAF0FF]/40">Starter</p>
+                  <p className="mt-1.5 text-lg font-black text-[#EAF0FF]">{fmt(starterPrice)}</p>
+                  <p className="text-[10px] text-[#EAF0FF]/30">/mês</p>
+                </div>
+
                 {/* Básico header */}
-                <div className="border-b border-l border-white/10 px-4 py-5 text-center">
+                <div className="border-b border-l border-white/10 px-3 py-5 text-center">
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#EAF0FF]/40">Básico</p>
-                  <p className="mt-1.5 text-xl font-black text-[#EAF0FF]">{fmt(basicoPrice)}</p>
+                  <p className="mt-1.5 text-lg font-black text-[#EAF0FF]">{fmt(basicoPrice)}</p>
                   <p className="text-[10px] text-[#EAF0FF]/30">/mês</p>
                 </div>
 
@@ -394,7 +410,7 @@ export function PremiumPage({
                     </span>
                   </div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[#A78BFA]">Premium</p>
-                  <p className="mt-1.5 text-xl font-black text-[#EAF0FF]">{fmt(premiumPrice)}</p>
+                  <p className="mt-1.5 text-lg font-black text-[#EAF0FF]">{fmt(premiumPrice)}</p>
                   <p className="text-[10px] text-[#EAF0FF]/30">/mês</p>
                 </div>
               </div>
@@ -405,7 +421,7 @@ export function PremiumPage({
                 return (
                   <div
                     key={i}
-                    className={`grid grid-cols-[1fr_110px_140px] items-center border-t border-white/[0.06] ${
+                    className={`grid grid-cols-[1fr_90px_90px_130px] items-center border-t border-white/[0.06] ${
                       isPremiumOnly ? "bg-[rgba(124,92,255,0.03)]" : ""
                     }`}
                   >
@@ -417,6 +433,13 @@ export function PremiumPage({
                         <span className="rounded-full bg-[#7C5CFF]/15 px-1.5 py-0.5 text-[9px] font-bold text-[#A78BFA]">
                           Premium
                         </span>
+                      )}
+                    </div>
+                    <div className="flex justify-center border-l border-white/[0.06] py-3.5">
+                      {feature.starter ? (
+                        <Check size={16} className="text-emerald-400" />
+                      ) : (
+                        <Minus size={14} className="text-[#EAF0FF]/15" />
                       )}
                     </div>
                     <div className="flex justify-center border-l border-white/[0.06] py-3.5">
@@ -438,14 +461,22 @@ export function PremiumPage({
               })}
 
               {/* Table footer CTAs */}
-              <div className="grid grid-cols-[1fr_110px_140px] border-t border-white/10 bg-[#0E1428]">
+              <div className="grid grid-cols-[1fr_90px_90px_130px] border-t border-white/10 bg-[#0E1428]">
                 <div className="px-6 py-5" />
-                <div className="border-l border-white/10 px-3 py-5 text-center">
+                <div className="border-l border-white/10 px-2 py-5 text-center">
+                  <Link
+                    href="/quero-comecar?plan=starter"
+                    className="block rounded-xl border border-white/15 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-[#EAF0FF]/70 transition hover:bg-white/[0.08]"
+                  >
+                    Starter
+                  </Link>
+                </div>
+                <div className="border-l border-white/10 px-2 py-5 text-center">
                   <Link
                     href="/quero-comecar"
-                    className="block rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-semibold text-[#EAF0FF]/70 transition hover:bg-white/[0.08]"
+                    className="block rounded-xl border border-white/15 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-[#EAF0FF]/70 transition hover:bg-white/[0.08]"
                   >
-                    Começar
+                    Básico
                   </Link>
                 </div>
                 <div className="border-l border-[#7C5CFF]/20 bg-[rgba(124,92,255,0.04)] px-3 py-5 text-center">

@@ -140,7 +140,8 @@ const LABEL_CLS = "text-xs font-semibold uppercase tracking-wide text-[var(--pla
 
 // Sections fixed at top/bottom for clients (cannot be moved or deleted)
 const FIXED_SECTION_TYPES: Set<Section["type"]> = new Set(["hero", "contact"]);
-// Sections allowed in basic plan
+// Sections allowed per plan
+const STARTER_PLAN_SECTION_TYPES: Section["type"][] = ["hero", "services", "cta", "contact"];
 const BASIC_PLAN_SECTION_TYPES: Section["type"][] = ["hero", "services", "stats", "about", "cta", "testimonials", "contact"];
 
 /* ─── Component ──────────────────────────────────────────── */
@@ -1419,8 +1420,11 @@ export function SectionsEditor({ sites, defaultSiteId, role = "platform", plan }
   }
 
   const activeTypesSet = new Set(sections.map((s) => s.type));
+  const isStarterPlan = isClient && (plan === "starter");
   const isBasicPlan = isClient && (plan === "basico" || plan === "landing" || !plan);
-  const allowedSectionTypes = isBasicPlan
+  const allowedSectionTypes = isStarterPlan
+    ? STARTER_PLAN_SECTION_TYPES
+    : isBasicPlan
     ? BASIC_PLAN_SECTION_TYPES
     : (Object.keys(SECTION_META) as Section["type"][]);
   const availableToAdd = allowedSectionTypes.filter((t) => !activeTypesSet.has(t));

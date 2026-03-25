@@ -23,7 +23,7 @@ export async function GET() {
 }
 
 // ─── PATCH /api/admin/plans ───────────────────────────────────────────────────
-// Body: { key: "basico" | "premium", monthly_price: number }
+// Body: { key: "starter" | "basico" | "premium", monthly_price: number }
 // Cria novo Price no Stripe (imutáveis), arquiva o antigo, atualiza DB.
 export async function PATCH(request: Request) {
   const profile = await getCurrentUserProfile();
@@ -39,7 +39,7 @@ export async function PATCH(request: Request) {
   const key = body?.key;
   const monthly_price = body?.monthly_price;
 
-  if (!key || !["basico", "premium"].includes(key)) {
+  if (!key || !["starter", "basico", "premium"].includes(key)) {
     return NextResponse.json({ error: "Plano inválido." }, { status: 400 });
   }
   if (typeof monthly_price !== "number" || monthly_price < 1 || monthly_price > 99999) {

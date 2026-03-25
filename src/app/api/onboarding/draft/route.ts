@@ -313,6 +313,8 @@ export async function POST(request: Request) {
 
   const sitePlan = ["premium", "premium-full", "construir"].includes(payload.selectedPlan ?? "")
     ? "pro"
+    : payload.selectedPlan === "starter"
+    ? "starter"
     : "landing";
 
   let site: { id: string; name: string; domain: string };

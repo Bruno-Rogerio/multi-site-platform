@@ -1,12 +1,14 @@
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { BASICO_MONTHLY_PRICE, PREMIUM_MONTHLY_PRICE } from "./plans";
+import { STARTER_MONTHLY_PRICE, BASICO_MONTHLY_PRICE, PREMIUM_MONTHLY_PRICE } from "./plans";
 
 export type PlanPrices = {
+  starter: number;
   basico: number;
   premium: number;
 };
 
 const FALLBACK: PlanPrices = {
+  starter: STARTER_MONTHLY_PRICE,
   basico: BASICO_MONTHLY_PRICE,
   premium: PREMIUM_MONTHLY_PRICE,
 };
@@ -24,6 +26,7 @@ export async function getPlanPrices(): Promise<PlanPrices> {
 
   const result = { ...FALLBACK };
   for (const row of data) {
+    if (row.key === "starter") result.starter = Number(row.monthly_price);
     if (row.key === "basico") result.basico = Number(row.monthly_price);
     if (row.key === "premium") result.premium = Number(row.monthly_price);
   }

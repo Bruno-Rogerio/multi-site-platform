@@ -42,7 +42,7 @@ export async function POST(request: Request) {
   if (planKey && coupon.applicable_plans && coupon.applicable_plans.length > 0) {
     if (!coupon.applicable_plans.includes(planKey)) {
       const planNames = coupon.applicable_plans.map((p: string) =>
-        p === "basico" ? "Básico" : "Premium"
+        p === "starter" ? "Starter" : p === "basico" ? "Básico" : "Premium"
       ).join(" ou ");
       return NextResponse.json({
         valid: false,

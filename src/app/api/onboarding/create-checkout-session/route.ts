@@ -146,9 +146,10 @@ export async function POST(request: Request) {
 
     // Send welcome + receipt emails (fire-and-forget)
     const selectedPlan = typeof settings.selectedPlan === "string" ? settings.selectedPlan : "";
-    const isPremiumPlan = selectedPlan === "premium-full";
-    const planName = isPremiumPlan ? "Premium Full" : "Essencial";
-    const amountBRL = isPremiumPlan ? 109.80 : 59.90;
+    const isPremiumPlan = ["premium", "premium-full", "construir"].includes(selectedPlan);
+    const isStarterPlan = selectedPlan === "starter";
+    const planName = isPremiumPlan ? "Premium Full" : isStarterPlan ? "Starter" : "Básico";
+    const amountBRL = isPremiumPlan ? 109.80 : isStarterPlan ? 29.90 : 59.90;
     const referenceId = `BYPASS-${site.id.slice(-8).toUpperCase()}`;
     const dashboardUrl = "https://bsph.com.br/admin/client";
     Promise.all([

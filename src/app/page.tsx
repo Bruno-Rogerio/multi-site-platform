@@ -398,7 +398,7 @@ export default async function PlatformLandingPage() {
               </p>
             </AnimatedSection>
 
-            <PricingSection basicoPrice={planPrices.basico} premiumPrice={planPrices.premium} />
+            <PricingSection starterPrice={planPrices.starter} basicoPrice={planPrices.basico} premiumPrice={planPrices.premium} />
           </div>
         </section>
 

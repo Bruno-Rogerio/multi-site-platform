@@ -45,5 +45,5 @@ export default async function PremiumRoutePage() {
   ]);
   const brandEl = <Brand compact settings={platformBranding} />;
 
-  return <PremiumPage brandElement={brandEl} basicoPrice={planPrices.basico} premiumPrice={planPrices.premium} />;
+  return <PremiumPage brandElement={brandEl} starterPrice={planPrices.starter} basicoPrice={planPrices.basico} premiumPrice={planPrices.premium} />;
 }

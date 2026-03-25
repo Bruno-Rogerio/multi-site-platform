@@ -8,11 +8,13 @@ import { useToast } from "@/components/admin/toast-provider";
 type Props = {
   selectedPlan: string;
   siteId: string;
+  starterPrice?: number;
   basicoPrice?: number;
   premiumPrice?: number;
 };
 
 const PLAN_LABELS: Record<string, string> = {
+  starter:        "Starter",
   basico:         "Básico",
   construir:      "Construir",
   "premium-full": "Premium",
@@ -41,9 +43,10 @@ const PREMIUM_BENEFITS = [
   },
 ] as const;
 
-export function PlanUpgradeSection({ selectedPlan, siteId: _siteId, basicoPrice = 59.9, premiumPrice = 109.8 }: Props) {
+export function PlanUpgradeSection({ selectedPlan, siteId: _siteId, starterPrice = 29.9, basicoPrice = 59.9, premiumPrice = 109.8 }: Props) {
   const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   const planPriceLabel: Record<string, string> = {
+    starter:        `${fmt(starterPrice)}/mês`,
     basico:         `${fmt(basicoPrice)}/mês`,
     construir:      `${fmt(basicoPrice)}/mês`,
     "premium-full": `${fmt(premiumPrice)}/mês`,

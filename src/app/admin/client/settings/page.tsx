@@ -57,7 +57,7 @@ export default async function ClientSettingsPage({ searchParams }: Props) {
   }
 
   // Usar sites.plan como fonte da verdade
-  const selectedPlan = site?.plan === "pro" ? "premium-full" : "basico";
+  const selectedPlan = site?.plan === "pro" ? "premium-full" : site?.plan === "starter" ? "starter" : "basico";
   const initialTab = resolveTab(params.tab);
   const domainSuccess = params.success === "1" && params.tab === "dominio";
 
@@ -81,6 +81,7 @@ export default async function ClientSettingsPage({ searchParams }: Props) {
           initialTab={initialTab}
           domainSuccess={domainSuccess}
           billingProfile={billing ?? undefined}
+          starterPrice={planPrices.starter}
           basicoPrice={planPrices.basico}
           premiumPrice={planPrices.premium}
         />

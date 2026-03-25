@@ -17,24 +17,40 @@ type Plan = {
   highlighted?: boolean;
 };
 
-function buildPlans(basicoPrice: number, premiumPrice: number): Plan[] {
+function buildPlans(starterPrice: number, basicoPrice: number, premiumPrice: number): Plan[] {
   const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   return [
+  {
+    name: "Starter",
+    price: fmt(starterPrice),
+    priceNote: "/mês",
+    description:
+      "Comece com o essencial. Quatro seções fixas para publicar seu site rapidamente.",
+    features: [
+      "8 templates disponíveis",
+      "4 seções fixas (Capa, Serviços, CTA, Contato)",
+      "Subdomínio personalizado",
+      "Design 100% responsivo",
+      "SSL e hospedagem inclusa",
+      "Suporte em até 48h",
+    ],
+    cta: "Começar com Starter",
+  },
   {
     name: "Básico",
     price: fmt(basicoPrice),
     priceNote: "/mês",
     description:
-      "Escolha um layout pronto e personalize o conteúdo. Ideal para quem quer praticidade e velocidade.",
+      "Acesso a todas as 7 seções disponíveis, CTA flutuante e 20 templates para personalizar.",
     features: [
-      "Site profissional completo",
-      "8+ layouts prontos",
+      "20 templates disponíveis",
+      "Todas as 7 seções incluídas",
+      "CTA flutuante liberado",
+      "Serviços ilimitados",
       "Subdomínio personalizado",
-      "Design 100% responsivo",
-      "SSL e hospedagem inclusa",
-      "Suporte por e-mail",
+      "Suporte em até 24h",
     ],
-    cta: "Começar agora",
+    cta: "Começar com Básico",
   },
   {
     name: "Premium",
@@ -58,15 +74,15 @@ function buildPlans(basicoPrice: number, premiumPrice: number): Plan[] {
   ];
 }
 
-export function PricingSection({ basicoPrice, premiumPrice }: { basicoPrice: number; premiumPrice: number }) {
-  const plans = buildPlans(basicoPrice, premiumPrice);
+export function PricingSection({ starterPrice, basicoPrice, premiumPrice }: { starterPrice: number; basicoPrice: number; premiumPrice: number }) {
+  const plans = buildPlans(starterPrice, basicoPrice, premiumPrice);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
     <div
       ref={ref}
-      className="mx-auto mt-12 grid max-w-4xl gap-6 md:grid-cols-2"
+      className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3"
     >
       {plans.map((plan, i) => (
         <motion.div
@@ -142,7 +158,7 @@ export function PricingSection({ basicoPrice, premiumPrice }: { basicoPrice: num
               )}
 
               <Link
-                href={plan.highlighted ? "/quero-comecar?plan=premium" : "/quero-comecar"}
+                href={plan.highlighted ? "/quero-comecar?plan=premium" : plan.name === "Starter" ? "/quero-comecar?plan=starter" : "/quero-comecar"}
                 className={`mt-8 block w-full rounded-xl py-3.5 text-center text-sm font-semibold transition-all duration-300 ${
                   plan.highlighted
                     ? "bg-[linear-gradient(135deg,#3B82F6,#7C5CFF,#22D3EE)] text-white shadow-[0_10px_40px_rgba(59,130,246,0.45)] hover:-translate-y-0.5 hover:shadow-[0_20px_50px_rgba(124,92,255,0.5)]"

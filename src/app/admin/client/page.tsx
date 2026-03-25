@@ -26,6 +26,10 @@ type SiteRow = {
 };
 
 const PLAN_LABELS: Record<string, { name: string; badge: string }> = {
+  starter: {
+    name: "Starter",
+    badge: "text-emerald-300 border-emerald-400/30 bg-emerald-500/10",
+  },
   basico: {
     name: "Básico",
     badge: "text-blue-300 border-blue-400/30 bg-blue-500/10",
@@ -53,7 +57,7 @@ export default async function ClientAdminPage() {
   const ts = site?.theme_settings ?? {};
   const isDraft = ts.onboardingDraft === true;
   // Usar sites.plan como fonte da verdade (evita discrepâncias com selectedPlan antigo)
-  const selectedPlan = site?.plan === "pro" ? "premium-full" : "basico";
+  const selectedPlan = site?.plan === "pro" ? "premium-full" : site?.plan === "starter" ? "starter" : "basico";
   const planInfo = PLAN_LABELS[selectedPlan] ?? PLAN_LABELS.basico;
   const previewExpiresAt = ts.previewExpiresAt as string | undefined;
 

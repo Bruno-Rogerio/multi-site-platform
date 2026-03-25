@@ -73,12 +73,12 @@ export function FinalizeStep() {
     passwordValidation.valid &&
     !isRegistering;
 
-  const planLabel = selectedPlan === "basico" ? "Básico" : "Premium";
+  const planLabel = selectedPlan === "starter" ? "Starter" : selectedPlan === "basico" ? "Básico" : "Premium";
 
   const planPrice = formatPrice(monthlyTotal);
 
   function deriveCreationMode(): "template" | "builder-premium" {
-    if (selectedPlan === "basico") return "template";
+    if (selectedPlan === "starter" || selectedPlan === "basico") return "template";
     return "builder-premium";
   }
 

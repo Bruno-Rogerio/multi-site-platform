@@ -491,7 +491,7 @@ type WizardContextValue = {
 
 const WizardContext = createContext<WizardContextValue | null>(null);
 
-export function WizardProvider({ children, initialPlan, planPrices: externalPlanPrices }: { children: ReactNode; initialPlan?: "basico" | "premium"; planPrices?: PlanPrices }) {
+export function WizardProvider({ children, initialPlan, planPrices: externalPlanPrices }: { children: ReactNode; initialPlan?: "starter" | "basico" | "premium"; planPrices?: PlanPrices }) {
   const [state, dispatch] = useReducer(
     wizardReducer,
     initialPlan ? { ...initialState, selectedPlan: initialPlan } : initialState,
@@ -499,9 +499,9 @@ export function WizardProvider({ children, initialPlan, planPrices: externalPlan
 
   const value = useMemo(() => {
     const steps = getStepsForPlan(state.selectedPlan);
-    const planPrices: PlanPrices = externalPlanPrices ?? { basico: 59.9, premium: 109.8 };
+    const planPrices: PlanPrices = externalPlanPrices ?? { starter: 29.9, basico: 59.9, premium: 109.8 };
     const monthlyTotal = state.selectedPlan
-      ? (state.selectedPlan === "premium" ? planPrices.premium : planPrices.basico)
+      ? (state.selectedPlan === "premium" ? planPrices.premium : state.selectedPlan === "starter" ? planPrices.starter : planPrices.basico)
       : calculateMonthlyTotal(state.selectedPlan);
 
     return {

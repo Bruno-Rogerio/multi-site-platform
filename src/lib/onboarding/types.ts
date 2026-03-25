@@ -1,6 +1,6 @@
 /* ─── Core types for the onboarding wizard ─── */
 
-export type OnboardingPlan = "basico" | "premium";
+export type OnboardingPlan = "starter" | "basico" | "premium";
 
 export type StepDefinition = {
   id: string;

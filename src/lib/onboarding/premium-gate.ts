@@ -27,20 +27,24 @@ export function isFeatureUnlocked(
 
 export function getServiceCardsLimit(plan: OnboardingPlan | null): number {
   if (plan === "premium") return 20;
-  return 4; // basico
+  if (plan === "starter") return 3;
+  return 999; // basico: ilimitado
 }
 
 export function getSectionsLimit(plan: OnboardingPlan | null): number {
   if (plan === "premium") return 10;
-  return 4; // basico
+  if (plan === "starter") return 4;
+  return 99; // basico: todas as seções disponíveis
 }
 
 export function getCtaTypesLimit(plan: OnboardingPlan | null): number {
   if (plan === "premium") return 5;
-  return 2; // basico
+  if (plan === "starter") return 1;
+  return 99; // basico: todos os tipos disponíveis
 }
 
 export function getFloatingCtaSlotsLimit(plan: OnboardingPlan | null): number {
   if (plan === "premium") return 2;
-  return 0; // basico
+  if (plan === "basico") return 2; // liberto no Básico
+  return 0; // starter: bloqueado
 }

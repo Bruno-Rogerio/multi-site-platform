@@ -27,6 +27,7 @@ type Props = {
   initialTab?: Tab;
   domainSuccess?: boolean;
   billingProfile?: BillingProfile;
+  starterPrice?: number;
   basicoPrice?: number;
   premiumPrice?: number;
 };
@@ -47,6 +48,7 @@ export function SettingsTabs({
   initialTab = "conta",
   domainSuccess = false,
   billingProfile,
+  starterPrice,
   basicoPrice,
   premiumPrice,
 }: Props) {
@@ -101,7 +103,7 @@ export function SettingsTabs({
         />
       )}
       {activeTab === "plano" && (
-        <PlanUpgradeSection selectedPlan={selectedPlan} siteId={siteId} basicoPrice={basicoPrice} premiumPrice={premiumPrice} />
+        <PlanUpgradeSection selectedPlan={selectedPlan} siteId={siteId} starterPrice={starterPrice} basicoPrice={basicoPrice} premiumPrice={premiumPrice} />
       )}
     </>
   );

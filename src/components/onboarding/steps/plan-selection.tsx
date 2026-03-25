@@ -1,12 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, Sparkles, Layout } from "lucide-react";
+import { Check, Sparkles, Layout, Zap } from "lucide-react";
 import { useWizard } from "../wizard-context";
 import { StepNavigation } from "../step-navigation";
 import { planDefinitions, type PlanDefinition } from "@/lib/onboarding/plans";
 
 const planIcons = {
+  starter: Zap,
   basico: Layout,
   premium: Sparkles,
 };
@@ -116,9 +117,9 @@ export function PlanSelection() {
       </div>
 
       {/* Plan cards */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         {planDefinitions.map((plan) => {
-          const dynamicPrice = planPrices[plan.id as "basico" | "premium"];
+          const dynamicPrice = planPrices[plan.id as "starter" | "basico" | "premium"];
           const planWithPrice = {
             ...plan,
             price: dynamicPrice.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
