@@ -91,7 +91,7 @@ export default async function PublicarPage({ params }: Props) {
 
   const starterPriceId = process.env.STRIPE_STARTER_PRICE_ID ?? "";
   const priceId = planDbKey === "starter"
-    ? (starterPriceId || planRow?.stripe_price_id ?? "")
+    ? (starterPriceId || (planRow?.stripe_price_id ?? ""))
     : (planRow?.stripe_price_id ?? (planDbKey === "premium" ? "price_1T59ImFFAjgAeuC1PHZZu2M7" : "price_1T59HfFFAjgAeuC1RGfeU8wW"));
   const monthlyPrice = planRow?.monthly_price ?? (planDbKey === "premium" ? 109.80 : planDbKey === "starter" ? 29.90 : 59.90);
 
