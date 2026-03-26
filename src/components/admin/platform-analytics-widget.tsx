@@ -69,7 +69,8 @@ function BarChart({ days }: { days: DaySlot[] }) {
   const barArea = H - labelH - pad;
   const slot   = W / days.length;
   const barW   = Math.max(4, slot - 6);
-  const today  = new Date().toISOString().slice(0, 10);
+  const TZ     = "America/Sao_Paulo";
+  const today  = new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
 
   return (
     <div className="w-full overflow-hidden">
@@ -195,12 +196,13 @@ export async function PlatformAnalyticsWidget() {
   if (adminDb) {
     const now = Date.now();
 
-    // Calendar-day boundaries (midnight local → UTC)
-    const todayMidnight = new Date(); todayMidnight.setHours(0, 0, 0, 0);
-    const yesterdayMidnight = new Date(todayMidnight); yesterdayMidnight.setDate(yesterdayMidnight.getDate() - 1);
-
-    const tToday = todayMidnight.toISOString();
-    const tYest  = yesterdayMidnight.toISOString();
+    // Calendar-day boundaries in Brazil timezone (America/Sao_Paulo = UTC-3, sem DST desde 2019)
+    const TZ_OFFSET = "-03:00";
+    const brFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+    const todayBR     = brFmt.format(new Date());
+    const yesterdayBR = brFmt.format(new Date(now - 86_400_000));
+    const tToday = new Date(`${todayBR}T00:00:00${TZ_OFFSET}`).toISOString();
+    const tYest  = new Date(`${yesterdayBR}T00:00:00${TZ_OFFSET}`).toISOString();
     const t7d    = new Date(now -   7 * 86_400_000).toISOString();
     const t14d   = new Date(now -  14 * 86_400_000).toISOString();
     const t30d   = new Date(now -  30 * 86_400_000).toISOString();
@@ -239,18 +241,19 @@ export async function PlatformAnalyticsWidget() {
     views30dPrev = res30dPrev.count ?? 0;
     viewsTotal   = resTotal.count   ?? 0;
 
-    // Build daily slots (last 14 days)
+    // Build daily slots (last 14 days) — grouping in Brazil timezone
+    const brDateFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
     const dayCounts = new Map<string, number>();
     for (const row of (res14dRaw.data ?? []) as { visited_at: string }[]) {
-      const d = row.visited_at.slice(0, 10);
+      const d = brDateFmt.format(new Date(row.visited_at));
       dayCounts.set(d, (dayCounts.get(d) ?? 0) + 1);
     }
     days = Array.from({ length: 14 }, (_, i) => {
       const dt = new Date(now - (13 - i) * 86_400_000);
-      const key = dt.toISOString().slice(0, 10);
+      const key = brDateFmt.format(dt);
       return {
         date: key,
-        label: dt.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+        label: dt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" }),
         count: dayCounts.get(key) ?? 0,
       };
     });

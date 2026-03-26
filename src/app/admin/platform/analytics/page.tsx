@@ -70,7 +70,9 @@ export default async function PlatformAnalyticsPage() {
   const now = Date.now();
   const since30d = new Date(now - 30 * 86_400_000).toISOString();
   const since7d  = new Date(now -  7 * 86_400_000).toISOString();
-  const thisMonthStart = new Date(); thisMonthStart.setDate(1); thisMonthStart.setHours(0, 0, 0, 0);
+  const brFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+  const thisMonthBR = brFmt.format(new Date(now)).slice(0, 7) + "-01"; // "YYYY-MM-01"
+  const thisMonthStart = new Date(`${thisMonthBR}T00:00:00-03:00`);
 
   const [
     activeBillingsRes,

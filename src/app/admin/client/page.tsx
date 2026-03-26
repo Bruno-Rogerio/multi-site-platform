@@ -68,10 +68,16 @@ export default async function ClientAdminPage() {
   if (!isDraft && site?.id) {
     const adminDb = createSupabaseAdminClient();
     if (adminDb) {
-      const now = new Date();
-      const startDay = new Date(now); startDay.setHours(0, 0, 0, 0);
-      const startWeek = new Date(now); startWeek.setDate(now.getDate() - 6); startWeek.setHours(0, 0, 0, 0);
-      const startMonth = new Date(now); startMonth.setDate(now.getDate() - 29); startMonth.setHours(0, 0, 0, 0);
+      // Use Brazil timezone (UTC-3, sem DST desde 2019) para meia-noite de calendário
+      const TZ_OFFSET = "-03:00";
+      const brFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+      const nowTs = Date.now();
+      const todayBR = brFmt.format(new Date(nowTs));
+      const startDayBR = brFmt.format(new Date(nowTs - 6 * 86_400_000));   // 6 dias atrás
+      const startMonthBR = brFmt.format(new Date(nowTs - 29 * 86_400_000)); // 29 dias atrás
+      const startDay   = new Date(`${todayBR}T00:00:00${TZ_OFFSET}`);
+      const startWeek  = new Date(`${startDayBR}T00:00:00${TZ_OFFSET}`);
+      const startMonth = new Date(`${startMonthBR}T00:00:00${TZ_OFFSET}`);
 
       const [r1, r2, r3] = await Promise.all([
         adminDb.from("page_view_logs").select("id", { count: "exact", head: true }).eq("site_id", site.id).gte("visited_at", startDay.toISOString()),
