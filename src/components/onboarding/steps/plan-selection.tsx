@@ -60,6 +60,7 @@ const COMPARISON = [
   { label: "Seções",          starter: "4 fixas",     basico: "7 seções",    premium: "7 seções" },
   { label: "Cards de serviço",starter: "até 3",       basico: "ilimitado",   premium: "ilimitado" },
   { label: "CTA flutuante",   starter: "—",           basico: "✓",           premium: "✓" },
+  { label: "SEO",             starter: "—",           basico: "básico",      premium: "avançado" },
   { label: "Blog / Galeria",  starter: "—",           basico: "—",           premium: "✓" },
   { label: "Sem branding",    starter: "—",           basico: "—",           premium: "✓" },
   { label: "Suporte",         starter: "até 48h",     basico: "até 24h",     premium: "prioritário" },

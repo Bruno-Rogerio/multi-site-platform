@@ -68,7 +68,7 @@ export default async function TermosPage() {
             <li>Subdomínio personalizado no formato <em>seunome.bsph.com.br</em> (ou domínio configurado pela plataforma);</li>
             <li>Painel de administração para edição de conteúdo e configurações do site;</li>
             <li>Hospedagem e entrega do site ao público via CDN com SSL automático;</li>
-            <li>Recursos conforme o plano contratado: o <strong>Plano Starter</strong> inclui seções essenciais e logo; o <strong>Plano Básico</strong> adiciona todas as seções, suporte prioritário e personalização expandida; o <strong>Plano Premium Full</strong> oferece blog, galeria, eventos, SEO avançado e personalização visual completa.</li>
+            <li>Recursos conforme o plano contratado: o <strong>Plano Starter</strong> inclui seções essenciais e logo; o <strong>Plano Básico</strong> adiciona todas as seções, SEO básico e personalização expandida; o <strong>Plano Premium Full</strong> oferece blog, galeria, eventos, SEO avançado e personalização visual completa.</li>
           </ul>
 
           <h2>4. Planos e pagamentos</h2>

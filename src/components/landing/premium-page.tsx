@@ -46,7 +46,8 @@ const FEATURES = [
   { label: "Galeria / Portfólio",                starter: false, basic: false, premium: true },
   { label: "Eventos / Agenda",                   starter: false, basic: false, premium: true },
   { label: "FAQ interativo",                     starter: false, basic: false, premium: true },
-  { label: "SEO configurável",                   starter: false, basic: false, premium: true },
+  { label: "SEO básico",                          starter: false, basic: true,  premium: true },
+  { label: "SEO avançado",                        starter: false, basic: false, premium: true },
   { label: "Sem branding BuildSphere",           starter: false, basic: false, premium: true },
   { label: "Suporte prioritário (até 2h)",       starter: false, basic: false, premium: true },
 ];
@@ -71,7 +72,7 @@ const DIFFERENTIALS = [
   {
     Icon: Search,
     emoji: "🔍",
-    title: "SEO Configurável",
+    title: "SEO Avançado",
     description:
       "Defina o título e a meta descrição que aparecem no Google e nas redes sociais. Atraia mais visitantes orgânicos e expanda sua visibilidade.",
     accent: "#22D3EE",
@@ -189,7 +190,7 @@ function BeforeAfterSection() {
             </div>
             {/* Missing features */}
             <div className="space-y-2 px-5 pb-5">
-              {["Personalização visual limitada", "Rodapé com branding BuildSphere", "Sem blog, galeria ou eventos", "Sem SEO configurável"].map((item) => (
+              {["Personalização visual limitada", "Rodapé com branding BuildSphere", "Sem blog, galeria ou eventos", "Sem SEO avançado"].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <Minus size={13} className="shrink-0 text-[#EAF0FF]/20" />
                   <span className="text-xs text-[#EAF0FF]/40">{item}</span>
@@ -257,7 +258,7 @@ function BeforeAfterSection() {
             </div>
             {/* Premium features */}
             <div className="space-y-2 px-5 pb-5">
-              {["Identidade visual gerada com IA", "Sem branding BuildSphere", "Blog, galeria e eventos ativos", "SEO com título e descrição próprios"].map((item) => (
+              {["Identidade visual gerada com IA", "Sem branding BuildSphere", "Blog, galeria e eventos ativos", "SEO avançado com meta tags próprias"].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <Check size={13} className="shrink-0 text-[#A78BFA]" />
                   <span className="text-xs text-[#EAF0FF]/70">{item}</span>

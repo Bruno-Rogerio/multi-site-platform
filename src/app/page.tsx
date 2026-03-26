@@ -100,7 +100,7 @@ const faqItems: FaqItem[] = [
   {
     question: "Meu site aparece no Google?",
     answer:
-      "Sim. Todos os sites são otimizados para mecanismos de busca (SEO) com boas práticas de performance, meta tags e estrutura semântica.",
+      "Sim. O Plano Básico inclui SEO básico (título e descrição configuráveis). O Plano Premium oferece SEO avançado com controle total de meta tags para cada página. Todos os sites seguem boas práticas de performance e estrutura semântica.",
   },
 ];
 
@@ -164,7 +164,7 @@ export default async function PlatformLandingPage() {
               billingDuration: 1,
               billingIncrement: "month",
             },
-            description: "Site completo com todas as seções, logo, domínio e suporte em até 24h.",
+            description: "Site completo com todas as seções, SEO básico, logo, domínio e suporte em até 24h.",
           },
           {
             "@type": "Offer",

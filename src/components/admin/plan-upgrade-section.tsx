@@ -76,7 +76,7 @@ export function PlanUpgradeSection({
         "Personalização visual completa",
         "Blog, Galeria e Eventos",
         "FAQ e Depoimentos ilimitados",
-        "SEO configurável",
+        "SEO avançado",
         "Sem branding BuildSphere",
         "Prioridade no suporte",
       ],
@@ -125,7 +125,7 @@ export function PlanUpgradeSection({
           {[
             "Personalização visual completa",
             "Blog, Galeria e Eventos",
-            "SEO configurável",
+            "SEO avançado",
             "Sem branding BuildSphere",
             "Prioridade no suporte",
           ].map((b) => (
