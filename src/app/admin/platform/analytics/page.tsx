@@ -76,6 +76,7 @@ export default async function PlatformAnalyticsPage() {
     activeBillingsRes,
     newClientsRes,
     platformViews30dRes,
+    premiumViews30dRes,
     allDraftsRes,
     checkoutDraftsRes,
     activeDraftsRes,
@@ -97,6 +98,7 @@ export default async function PlatformAnalyticsPage() {
 
     // Funnel (last 30 days)
     adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", since30d),
+    adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).eq("path", "/premium").gte("visited_at", since30d),
     adminDb.from("onboarding_drafts").select("id", { count: "exact", head: true }),
     adminDb.from("onboarding_drafts").select("id", { count: "exact", head: true }).in("status", ["checkout_pending", "active", "archived"]),
     adminDb.from("onboarding_drafts").select("id", { count: "exact", head: true }).eq("status", "active"),
@@ -143,6 +145,7 @@ export default async function PlatformAnalyticsPage() {
     planMap.set(p, (planMap.get(p) ?? 0) + 1);
   }
   const planDist = [
+    { label: "Starter",      key: "starter",       color: "#10B981" },
     { label: "Básico",       key: "basico",        color: "#3B82F6" },
     { label: "Premium Full", key: "premium-full",  color: "#7C5CFF" },
     { label: "Pro",          key: "pro",            color: "#22D3EE" },
@@ -151,6 +154,8 @@ export default async function PlatformAnalyticsPage() {
     .map((d) => ({ ...d, count: planMap.get(d.key) ?? 0 }))
     .filter((d) => d.count > 0);
   const planTotal = planDist.reduce((s, d) => s + d.count, 0) || 1;
+
+  const premiumViews30d = premiumViews30dRes.count ?? 0;
 
   /* ── Conversion funnel ──────────────────────────────── */
   const funnelSteps = [
@@ -338,7 +343,14 @@ export default async function PlatformAnalyticsPage() {
             <h2 className="text-sm font-semibold text-[var(--platform-text)]">Funil de conversão · últimos 30 dias</h2>
             <p className="text-[10px] text-[var(--platform-text)]/35">Do primeiro acesso ao site até a ativação.</p>
           </div>
-          <Activity size={15} className="text-[#22D3EE]" />
+          <div className="flex items-center gap-3">
+            {/* Premium page visits highlight */}
+            <div className="flex items-center gap-1.5 rounded-xl border border-[#7C5CFF]/20 bg-[#7C5CFF]/[0.06] px-3 py-1.5">
+              <div className="h-1.5 w-1.5 rounded-full bg-[#A78BFA]" />
+              <span className="text-[10px] font-semibold text-[#A78BFA]">{fmtShort(premiumViews30d)} visitas /premium</span>
+            </div>
+            <Activity size={15} className="text-[#22D3EE]" />
+          </div>
         </div>
         <div className="space-y-3">
           {funnelSteps.map((step, i) => {

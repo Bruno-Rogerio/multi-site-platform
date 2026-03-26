@@ -70,37 +70,42 @@ const faqItems: FaqItem[] = [
   {
     question: "Preciso saber programar para usar a BuildSphere?",
     answer:
-      "Não! A BuildSphere foi criada pensando em profissionais que não tem conhecimento técnico. Todo o processo de configuração e edição é visual e intuitivo.",
+      "Não. A BuildSphere foi criada pensando em profissionais sem conhecimento técnico. Todo o processo — desde a escolha do template até a publicação — é visual, guiado e intuitivo.",
   },
   {
-    question: "Quais profissionais podem usar a BuildSphere?",
+    question: "Qual a diferença entre os planos Starter, Básico e Premium?",
     answer:
-      "A BuildSphere é ideal para qualquer profissional autônomo ou prestador de serviço: psicólogos, nutricionistas, coaches, advogados, fotógrafos, personal trainers, consultores, professores particulares, terapeutas e muito mais. Se você precisa de presença online profissional, a BuildSphere é para você.",
+      "O Starter (R$ 29,90/mês) é o ponto de entrada: 8 templates, 4 seções fixas e até 3 cards de serviço. O Básico (R$ 59,90/mês) desbloqueia todos os 20 templates, 7 seções completas, serviços ilimitados, CTA flutuante e SEO básico. O Premium (R$ 109,80/mês) vai além: identidade visual gerada por IA, blog, galeria, eventos, SEO avançado e site sem branding BuildSphere.",
   },
   {
     question: "Quanto tempo leva para ter meu site no ar?",
     answer:
-      "Menos de 5 minutos. Nosso assistente de configuração guia você por todas as etapas e seu site fica online imediatamente após a conclusão.",
+      "Menos de 5 minutos. O assistente de configuração guia você por cada etapa e o site fica online imediatamente após a conclusão do pagamento.",
   },
   {
     question: "Existe taxa de setup ou contrato de fidelidade?",
     answer:
-      "Não. O plano é mensal e você pode cancelar a qualquer momento. Não cobramos taxa de setup nem exigimos permanência mínima.",
+      "Não. O plano é mensal, sem taxa de adesão e sem prazo mínimo. Você pode cancelar a qualquer momento pelo painel de administração.",
+  },
+  {
+    question: "Posso mudar de plano depois que meu site estiver no ar?",
+    answer:
+      "Sim. Você pode fazer upgrade do Starter para o Básico ou Premium, e do Básico para o Premium, a qualquer momento pelo painel de configurações. O acesso ao novo plano é liberado imediatamente e o valor atualizado é cobrado na próxima renovação.",
   },
   {
     question: "Posso editar meu site depois de publicado?",
     answer:
-      "Sim! Você tem acesso a um painel administrativo completo onde pode alterar textos, imagens, cores e informações sempre que precisar.",
-  },
-  {
-    question: "A BuildSphere é indicada para quais profissionais?",
-    answer:
-      "Psicólogos, terapeutas, coaches, nutricionistas, consultores e qualquer profissional autônomo que precise de presença online profissional.",
+      "Sim. Você tem acesso a um painel administrativo completo onde pode alterar textos, imagens, cores, serviços e informações sempre que precisar — sem depender de ninguém.",
   },
   {
     question: "Meu site aparece no Google?",
     answer:
       "Sim. O Plano Básico inclui SEO básico (título e descrição configuráveis). O Plano Premium oferece SEO avançado com controle total de meta tags para cada página. Todos os sites seguem boas práticas de performance e estrutura semântica.",
+  },
+  {
+    question: "Quais profissionais podem usar a BuildSphere?",
+    answer:
+      "Qualquer profissional autônomo ou prestador de serviço: psicólogos, nutricionistas, coaches, advogados, fotógrafos, personal trainers, consultores, professores particulares, terapeutas e muito mais. Se você precisa de presença online profissional, a BuildSphere é para você.",
   },
 ];
 
