@@ -12,7 +12,10 @@ const COUNTERS = [
 ];
 
 function Counter({ target, suffix, duration = 2000 }: { target: number; suffix: string; duration?: number }) {
-  const [count, setCount] = useState(0);
+  // Inicializa com o valor final para que o SSR/crawlers leiam o número correto.
+  // A animação visual começa do zero no cliente durante o fade-in do motion.div,
+  // tornando o flash imperceptível.
+  const [count, setCount] = useState(target);
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
 
