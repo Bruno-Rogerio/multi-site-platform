@@ -101,9 +101,17 @@ function TemplateCard({
   );
 }
 
+// Starter plan: only first 8 templates available
+const STARTER_TEMPLATE_COUNT = 8;
+
 export function TemplateGallery() {
   const { state, dispatch } = useWizard();
   const { selectedTemplateSlug } = state;
+
+  const isStarterPlan = state.selectedPlan === "starter";
+  const visibleTemplates = isStarterPlan
+    ? templatePresets.slice(0, STARTER_TEMPLATE_COUNT)
+    : templatePresets;
 
   const recommendedSlug = state.businessSegment
     ? getTemplateForBusinessType(state.businessSegment)
@@ -173,11 +181,16 @@ export function TemplateGallery() {
           Cada template foi criado pensando em um tipo de profissional. Escolha o que
           mais combina com você e personalize o conteúdo.
         </p>
+        {isStarterPlan && (
+          <p className="mt-2 text-xs text-[#22D3EE]/70">
+            ⚡ Plano Starter — {STARTER_TEMPLATE_COUNT} templates disponíveis
+          </p>
+        )}
       </div>
 
       {/* Template grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {templatePresets.map((template) => (
+        {visibleTemplates.map((template) => (
           <TemplateCard
             key={template.slug}
             template={template}
