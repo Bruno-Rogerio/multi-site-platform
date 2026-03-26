@@ -53,7 +53,7 @@ export function SettingsTabs({
   premiumPrice,
 }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
-  const isPremium = selectedPlan === "premium-full";
+  const isPremium = selectedPlan === "premium-full" || selectedPlan === "construir";
 
   return (
     <>
