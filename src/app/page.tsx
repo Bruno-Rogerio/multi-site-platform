@@ -12,13 +12,6 @@ import { HeroAnimatedHeadline } from "@/components/landing/hero-animated-headlin
 import { SocialProofCounter } from "@/components/landing/social-proof-counter";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { AnimatedSection } from "@/components/landing/animated-section";
-const ProductMockup = dynamicImport(
-  () => import("@/components/landing/product-mockup").then((m) => ({ default: m.ProductMockup })),
-  {
-    ssr: false,
-    loading: () => <div className="mt-12 h-[380px] animate-pulse rounded-2xl bg-white/[0.04]" />,
-  }
-);
 import { PricingSection } from "@/components/landing/pricing-section";
 import { TestimonialsStrip } from "@/components/landing/testimonials-strip";
 import { FaqAccordion, type FaqItem } from "@/components/landing/faq-accordion";
@@ -27,6 +20,14 @@ import { Footer } from "@/components/landing/footer";
 import { CookieBanner } from "@/components/landing/cookie-banner";
 import { FloatingSocialButtons } from "@/components/landing/floating-social-buttons";
 import { PlatformPageTracker } from "@/components/platform-page-tracker";
+
+const ProductMockup = dynamicImport(
+  () => import("@/components/landing/product-mockup").then((m) => ({ default: m.ProductMockup })),
+  {
+    ssr: false,
+    loading: () => <div className="mt-12 h-[380px] animate-pulse rounded-2xl bg-white/[0.04]" />,
+  }
+);
 
 export const dynamic = "force-dynamic";
 
