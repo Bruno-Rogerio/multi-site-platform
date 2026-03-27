@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import dynamicImport from "next/dynamic";
 
 import { Brand } from "@/components/platform/brand";
 import { getPlatformBrandingSettings } from "@/lib/platform/settings";
@@ -11,7 +12,13 @@ import { HeroAnimatedHeadline } from "@/components/landing/hero-animated-headlin
 import { SocialProofCounter } from "@/components/landing/social-proof-counter";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { AnimatedSection } from "@/components/landing/animated-section";
-import { ProductMockup } from "@/components/landing/product-mockup";
+const ProductMockup = dynamicImport(
+  () => import("@/components/landing/product-mockup").then((m) => ({ default: m.ProductMockup })),
+  {
+    ssr: false,
+    loading: () => <div className="mt-12 h-[380px] animate-pulse rounded-2xl bg-white/[0.04]" />,
+  }
+);
 import { PricingSection } from "@/components/landing/pricing-section";
 import { TestimonialsStrip } from "@/components/landing/testimonials-strip";
 import { FaqAccordion, type FaqItem } from "@/components/landing/faq-accordion";
@@ -213,7 +220,10 @@ export default async function PlatformLandingPage() {
       />
 
       {/* Global background orbs */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+      <div
+        className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+        style={{ contain: "layout paint" }}
+      >
         <div className="absolute left-[5%] top-[10%] h-[500px] w-[500px] rounded-full bg-[#22D3EE]/10 blur-[120px]" />
         <div className="absolute right-[10%] top-[20%] h-[600px] w-[600px] rounded-full bg-[#7C5CFF]/12 blur-[140px]" />
         <div className="absolute bottom-[10%] left-[40%] h-[400px] w-[400px] rounded-full bg-[#3B82F6]/8 blur-[100px]" />

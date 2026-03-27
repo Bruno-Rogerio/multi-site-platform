@@ -5,7 +5,7 @@ import "./globals.css";
 
 const sora = Sora({
   variable: "--font-sora",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 const ROOT = process.env.NEXT_PUBLIC_PLATFORM_ROOT_DOMAIN ?? "bsph.com.br";
