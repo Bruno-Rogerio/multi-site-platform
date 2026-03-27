@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { LazyMotion, domAnimation, m, useInView } from "framer-motion";
 import { UserCheck, Palette, Globe } from "lucide-react";
 
 const STEPS = [
@@ -49,7 +49,7 @@ function Step({ step, index }: { step: (typeof STEPS)[number]; index: number }) 
   const Icon = step.icon;
 
   return (
-    <motion.div
+    <m.div
       ref={ref}
       initial={{ opacity: 0, y: 50 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -113,7 +113,7 @@ function Step({ step, index }: { step: (typeof STEPS)[number]; index: number }) 
           </ul>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -131,11 +131,13 @@ export function HowItWorks() {
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-3">
-        {STEPS.map((step, i) => (
-          <Step key={step.number} step={step} index={i} />
-        ))}
-      </div>
+      <LazyMotion features={domAnimation}>
+        <div className="grid gap-5 lg:grid-cols-3">
+          {STEPS.map((step, i) => (
+            <Step key={step.number} step={step} index={i} />
+          ))}
+        </div>
+      </LazyMotion>
     </div>
   );
 }

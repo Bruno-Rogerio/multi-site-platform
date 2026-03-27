@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 
 export type FaqItem = {
@@ -53,35 +53,39 @@ function FaqRow({ item, index }: { item: FaqItem; index: number }) {
         </div>
 
         {/* Chevron */}
-        <motion.span
-          animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.25, ease: "easeInOut" }}
-          className={`mt-0.5 shrink-0 transition-colors duration-200 ${
-            open ? "text-[#22D3EE]" : "text-[#EAF0FF]/20"
-          }`}
-        >
-          <ChevronDown size={16} />
-        </motion.span>
+        <LazyMotion features={domAnimation}>
+          <m.span
+            animate={{ rotate: open ? 180 : 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className={`mt-0.5 shrink-0 transition-colors duration-200 ${
+              open ? "text-[#22D3EE]" : "text-[#EAF0FF]/20"
+            }`}
+          >
+            <ChevronDown size={16} />
+          </m.span>
+        </LazyMotion>
       </button>
 
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
-            className="overflow-hidden"
-          >
-            <div className="px-6 pb-6 pl-16">
-              {/* Accent left bar */}
-              <div className="relative border-l-2 border-[#3B82F6]/30 pl-4">
-                <p className="text-sm leading-relaxed text-[#EAF0FF]/55">{item.answer}</p>
+      <LazyMotion features={domAnimation}>
+        <AnimatePresence initial={false}>
+          {open && (
+            <m.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="px-6 pb-6 pl-16">
+                {/* Accent left bar */}
+                <div className="relative border-l-2 border-[#3B82F6]/30 pl-4">
+                  <p className="text-sm leading-relaxed text-[#EAF0FF]/55">{item.answer}</p>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </m.div>
+          )}
+        </AnimatePresence>
+      </LazyMotion>
     </div>
   );
 }

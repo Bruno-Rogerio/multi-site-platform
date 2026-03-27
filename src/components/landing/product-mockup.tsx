@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { LazyMotion, domAnimation, m, useScroll, useTransform } from "framer-motion";
 
 // Total display time per site (ms): ~7% fade-in, ~81% scroll, ~12% fade-out
 const DURATION_MS = 9000;
@@ -26,7 +26,7 @@ function MiniFooter({ bg, left, right, lightText }: { bg: string; left: string; 
 
 // ─── Site content definitions ─────────────────────────────────────────────────
 
-type Site = { id: string; label: string; url: string; content: React.ReactNode };
+type Site = { id: string; label: string; url: string; renderContent: () => React.ReactNode };
 
 const SITES: Site[] = [
   // ── Psicóloga — tema claro, header minimal centrado, botões pill, cards com ícone em círculo ──
@@ -34,7 +34,7 @@ const SITES: Site[] = [
     id: "psicologa",
     label: "Psicóloga",
     url: "dra-ana-silva.bsph.com.br",
-    content: (
+    renderContent: () => (
       <div style={{ fontFamily: "system-ui, sans-serif", background: "#FAFAF9", minHeight: `${CONTENT_H}px` }}>
         {/* Header: minimal — nome centrado, nav abaixo */}
         <div style={{ background: "#ffffffee", borderBottom: "1px solid rgba(124,58,237,0.1)", padding: "10px 18px 8px", textAlign: "center" }}>
@@ -108,7 +108,7 @@ const SITES: Site[] = [
     id: "restaurante",
     label: "Restaurante",
     url: "brasa-co.bsph.com.br",
-    content: (
+    renderContent: () => (
       <div style={{ fontFamily: "system-ui, sans-serif", background: "#0A0500", minHeight: `${CONTENT_H}px` }}>
         {/* Header: logo + tagline + botão "Reservar" no nav */}
         <div style={{ background: "rgba(10,5,0,0.96)", borderBottom: "1px solid rgba(245,158,11,0.14)", padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -199,7 +199,7 @@ const SITES: Site[] = [
     id: "personal",
     label: "Personal Trainer",
     url: "diego-martins.bsph.com.br",
-    content: (
+    renderContent: () => (
       <div style={{ fontFamily: "system-ui, sans-serif", background: "#020802", minHeight: `${CONTENT_H}px` }}>
         {/* Header: sólido na cor primária */}
         <div style={{ background: "#16A34A", padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -286,7 +286,7 @@ const SITES: Site[] = [
     id: "advogado",
     label: "Advogado",
     url: "dr-carlos-mendes.bsph.com.br",
-    content: (
+    renderContent: () => (
       <div style={{ fontFamily: "system-ui, sans-serif", background: "#080E1A", minHeight: `${CONTENT_H}px` }}>
         {/* Header: solid navy com gold border bottom */}
         <div style={{ background: "#0B1628", borderBottom: "2px solid rgba(201,168,76,0.35)", padding: "10px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -399,55 +399,57 @@ export function ProductMockup() {
         ))}
       </div>
 
-      <motion.div
-        style={{ y }}
-        className="relative mx-auto max-w-2xl"
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-      >
-        {/* Browser chrome */}
-        <div className="rounded-2xl border border-white/15 bg-[#0A0F1E] p-1 shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(59,130,246,0.10)]">
-          <div className="flex items-center gap-2 rounded-t-xl bg-[#0D1325] px-5 py-3">
-            <span className="h-3 w-3 rounded-full bg-[#FF5F56]" />
-            <span className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
-            <span className="h-3 w-3 rounded-full bg-[#27C93F]" />
-            <span className="ml-4 flex-1 rounded-lg bg-white/[0.06] px-4 py-1.5 text-xs text-[var(--platform-text)]/40">
-              {site.url}
-            </span>
+      <LazyMotion features={domAnimation}>
+        <m.div
+          style={{ y }}
+          className="relative mx-auto max-w-2xl"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {/* Browser chrome */}
+          <div className="rounded-2xl border border-white/15 bg-[#0A0F1E] p-1 shadow-[0_30px_80px_rgba(0,0,0,0.5),0_0_60px_rgba(59,130,246,0.10)]">
+            <div className="flex items-center gap-2 rounded-t-xl bg-[#0D1325] px-5 py-3">
+              <span className="h-3 w-3 rounded-full bg-[#FF5F56]" />
+              <span className="h-3 w-3 rounded-full bg-[#FFBD2E]" />
+              <span className="h-3 w-3 rounded-full bg-[#27C93F]" />
+              <span className="ml-4 flex-1 rounded-lg bg-white/[0.06] px-4 py-1.5 text-xs text-[var(--platform-text)]/40">
+                {site.url}
+              </span>
+            </div>
+
+            {/* Scrolling viewport — overflow hidden simulates the browser window */}
+            <div className="overflow-hidden rounded-b-xl" style={{ height: `${FRAME_H}px` }}>
+              <m.div
+                key={`${site.id}-${active}`}
+                animate={{
+                  y: [0, 0, -SCROLL_PX, -SCROLL_PX],
+                  opacity: [0, 1, 1, 0],
+                }}
+                transition={{
+                  duration: DURATION_MS / 1000,
+                  times: [0, 0.07, 0.88, 1],
+                  ease: "linear",
+                }}
+              >
+                {site.renderContent()}
+              </m.div>
+            </div>
           </div>
 
-          {/* Scrolling viewport — overflow hidden simulates the browser window */}
-          <div className="overflow-hidden rounded-b-xl" style={{ height: `${FRAME_H}px` }}>
-            <motion.div
-              key={`${site.id}-${active}`}
-              animate={{
-                y: [0, 0, -SCROLL_PX, -SCROLL_PX],
-                opacity: [0, 1, 1, 0],
-              }}
-              transition={{
-                duration: DURATION_MS / 1000,
-                times: [0, 0.07, 0.88, 1],
-                ease: "linear",
-              }}
-            >
-              {site.content}
-            </motion.div>
+          {/* Progress bar */}
+          <div className="mt-4 h-0.5 overflow-hidden rounded-full bg-white/10">
+            {!isPaused && (
+              <m.div
+                key={`bar-${site.id}-${active}`}
+                className="h-full rounded-full bg-[#22D3EE]"
+                initial={{ width: "0%" }}
+                animate={{ width: "100%" }}
+                transition={{ duration: DURATION_MS / 1000, ease: "linear" }}
+              />
+            )}
           </div>
-        </div>
-
-        {/* Progress bar */}
-        <div className="mt-4 h-0.5 overflow-hidden rounded-full bg-white/10">
-          {!isPaused && (
-            <motion.div
-              key={`bar-${site.id}-${active}`}
-              className="h-full rounded-full bg-[#22D3EE]"
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ duration: DURATION_MS / 1000, ease: "linear" }}
-            />
-          )}
-        </div>
-      </motion.div>
+        </m.div>
+      </LazyMotion>
 
       {/* Navigation dots */}
       <div className="mt-4 flex justify-center gap-2">

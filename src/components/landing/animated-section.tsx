@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { LazyMotion, domAnimation, m, useInView } from "framer-motion";
 
 type AnimatedSectionProps = {
   children: React.ReactNode;
@@ -26,14 +26,16 @@ export function AnimatedSection({
   };
 
   return (
-    <motion.div
-      ref={ref}
-      className={className}
-      initial={initial}
-      animate={isInView ? { opacity: 1, y: 0, x: 0 } : initial}
-      transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1], delay }}
-    >
-      {children}
-    </motion.div>
+    <LazyMotion features={domAnimation}>
+      <m.div
+        ref={ref}
+        className={className}
+        initial={initial}
+        animate={isInView ? { opacity: 1, y: 0, x: 0 } : initial}
+        transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1], delay }}
+      >
+        {children}
+      </m.div>
+    </LazyMotion>
   );
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { LazyMotion, domAnimation, m, useInView } from "framer-motion";
 import { Check, Star, Zap } from "lucide-react";
 
 type Plan = {
@@ -89,12 +89,13 @@ export function PricingSection({ starterPrice, basicoPrice, premiumPrice }: { st
   const isInView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
+    <LazyMotion features={domAnimation}>
     <div
       ref={ref}
       className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3"
     >
       {plans.map((plan, i) => (
-        <motion.div
+        <m.div
           key={plan.name}
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -182,7 +183,7 @@ export function PricingSection({ starterPrice, basicoPrice, premiumPrice }: { st
               </Link>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       ))}
 
       {/* Bottom note */}
@@ -198,5 +199,6 @@ export function PricingSection({ starterPrice, basicoPrice, premiumPrice }: { st
         </Link>
       </div>
     </div>
+    </LazyMotion>
   );
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { LazyMotion, domAnimation, m, useInView } from "framer-motion";
 import { ArrowRight, Shield, Zap, Star, Clock } from "lucide-react";
 
 export function FinalCta() {
@@ -12,7 +12,8 @@ export function FinalCta() {
   return (
     <section ref={ref} className="py-14 md:py-20">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <motion.div
+        <LazyMotion features={domAnimation}>
+        <m.div
           className="relative overflow-hidden rounded-3xl"
           initial={{ opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -41,7 +42,7 @@ export function FinalCta() {
               />
             </div>
 
-            <motion.div
+            <m.div
               className="relative"
               initial={{ opacity: 0, y: 20 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -124,9 +125,10 @@ export function FinalCta() {
                   </span>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
+        </LazyMotion>
       </div>
     </section>
   );

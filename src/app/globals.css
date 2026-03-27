@@ -43,6 +43,23 @@ body {
 
 /* --- Animations --- */
 
+/* Hero above-fold reveal (CSS, no JS needed) */
+@keyframes heroSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-anim {
+  animation: heroSlideUp 0.55s ease-out both;
+}
+.hero-delay-1 { animation-delay: 0.10s; }
+.hero-delay-2 { animation-delay: 0.25s; }
+.hero-delay-3 { animation-delay: 0.40s; }
+.hero-delay-4 { animation-delay: 0.52s; }
+.hero-delay-5 { animation-delay: 0.64s; }
+.hero-delay-6 { animation-delay: 0.82s; }
+.hero-delay-7 { animation-delay: 0.90s; }
+
 .animate-fade-up {
   animation: fadeUp 0.35s ease-out both;
 }
@@ -137,11 +154,6 @@ body {
   animation: marquee-reverse linear infinite;
 }
 
-/* Shimmer for announcement bar */
-@keyframes shimmer {
-  0%, 100% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-}
 
 /* Grain texture overlay */
 .bg-grain {

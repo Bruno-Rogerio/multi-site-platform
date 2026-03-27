@@ -23,10 +23,17 @@ export function StickyHeader({ brandElement }: StickyHeaderProps) {
   const [announcementVisible, setAnnouncementVisible] = useState(true);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    let rafId: number;
+    const onScroll = () => {
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => setScrolled(window.scrollY > 40));
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (

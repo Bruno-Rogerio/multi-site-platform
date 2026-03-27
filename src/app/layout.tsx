@@ -109,8 +109,6 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://connect.facebook.net" crossOrigin="anonymous" />
         <script
           type="application/ld+json"
@@ -121,7 +119,7 @@ export default function RootLayout({
         {children}
 
         {/* Meta Pixel */}
-        <Script id="meta-pixel" strategy="afterInteractive">
+        <Script id="meta-pixel" strategy="lazyOnload">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
