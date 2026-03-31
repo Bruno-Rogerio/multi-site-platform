@@ -1,7 +1,8 @@
 import { TrendingUp, TrendingDown, Minus, Eye } from "lucide-react";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { AnalyticsPeriodSelector } from "./analytics-period-selector";
 
-/* ─── helpers ─────────────────────────────────────────── */
+/* ─── helpers ──────────────────────────────────────────────────── */
 
 function pct(a: number, b: number) {
   if (b === 0) return a > 0 ? 100 : 0;
@@ -9,14 +10,15 @@ function pct(a: number, b: number) {
 }
 
 function fmtShort(n: number) {
-  if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
+  if (n >= 10_000) return `${(n / 1000).toFixed(0)}k`;
+  if (n >= 1_000)  return `${(n / 1000).toFixed(1)}k`;
   return String(n);
 }
 
-type DaySlot = { date: string; label: string; count: number };
+type DaySlot = { date: string; label: string; count: number; isToday: boolean };
 type PageRow  = { path: string; views: number; pct: number };
 
-/* ─── stat card ───────────────────────────────────────── */
+/* ─── stat card ────────────────────────────────────────────────── */
 
 function StatCard({
   label,
@@ -58,59 +60,112 @@ function StatCard({
   );
 }
 
-/* ─── bar chart (SVG, server-rendered) ───────────────── */
+/* ─── bar chart (SVG, server-rendered) ─────────────────────────── */
 
-function BarChart({ days }: { days: DaySlot[] }) {
-  const max    = Math.max(...days.map((d) => d.count), 1);
-  const W      = 560;
-  const H      = 88;       // extra height for value labels
-  const labelH = 14;       // reserved at top for numbers
-  const pad    = 4;
-  const barArea = H - labelH - pad;
-  const slot   = W / days.length;
-  const barW   = Math.max(4, slot - 6);
-  const TZ     = "America/Sao_Paulo";
-  const today  = new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
+function BarChart({ days, period }: { days: DaySlot[]; period: number }) {
+  const max     = Math.max(...days.map((d) => d.count), 1);
+  const maxIdx  = days.reduce((mi, d, i) => d.count > days[mi].count ? i : mi, 0);
+
+  // Layout constants
+  const W  = 560;
+  const H  = 170;
+  const CL = 34;  // left margin for y-axis labels
+  const CT = 14;  // top padding for value labels
+  const CB = 20;  // bottom padding for x-axis labels
+  const CR = 4;   // right margin
+  const CW = W - CL - CR;   // 522
+  const CH = H - CT - CB;   // 136
+
+  const baseline = CT + CH;  // y of x-axis baseline = 150
+  const slot     = CW / days.length;
+  const barW     = Math.max(2, Math.min(slot - 4, slot * 0.7));
+
+  // X-axis label skip — always show first, last, today
+  const skipN = period <= 7 ? 1 : period <= 14 ? 2 : period <= 30 ? 5 : 15;
+
+  // Value label visibility
+  const showValueFor = (i: number, isToday: boolean, count: number) => {
+    if (count === 0) return false;
+    if (isToday) return true;
+    if (period <= 14) return true;
+    if (period <= 30) return i === maxIdx;
+    return false;
+  };
+
+  // Y-axis reference values and positions
+  const yRefs = [
+    { val: max,           y: CT },
+    { val: Math.round(max / 2), y: CT + CH / 2 },
+    { val: 0,             y: baseline },
+  ];
 
   return (
     <div className="w-full overflow-hidden">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className="w-full"
-        style={{ height: 88 }}
+        style={{ height: 170 }}
         aria-label="Visitas diárias"
       >
         <defs>
-          <linearGradient id="pg" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%"   stopColor="#3B82F6" />
             <stop offset="100%" stopColor="#7C5CFF" />
           </linearGradient>
         </defs>
 
+        {/* Horizontal grid lines */}
+        {yRefs.map(({ y }, gi) => (
+          <line
+            key={gi}
+            x1={CL} y1={y}
+            x2={W - CR} y2={y}
+            stroke="rgba(234,240,255,0.07)"
+            strokeWidth={gi === 2 ? 1 : 0.5}
+            strokeDasharray={gi === 2 ? undefined : "3 4"}
+          />
+        ))}
+
+        {/* Y-axis labels */}
+        {yRefs.map(({ val, y }, gi) => (
+          <text
+            key={gi}
+            x={CL - 3}
+            y={y + (gi === 2 ? -2 : 3.5)}
+            textAnchor="end"
+            fontSize={7}
+            fontFamily="inherit"
+            fill="rgba(234,240,255,0.22)"
+          >
+            {fmtShort(val)}
+          </text>
+        ))}
+
+        {/* Bars + value labels */}
         {days.map((day, i) => {
-          const barH  = Math.max(3, (day.count / max) * barArea);
-          const x     = i * slot + (slot - barW) / 2;
-          const y     = H - pad - barH;
-          const cx    = i * slot + slot / 2;
-          const isNow = day.date === today;
+          const barH   = Math.max(2, (day.count / max) * CH);
+          const bx     = CL + i * slot + (slot - barW) / 2;
+          const by     = baseline - barH;
+          const cx     = CL + i * slot + slot / 2;
+          const showVal = showValueFor(i, day.isToday, day.count);
           return (
             <g key={day.date}>
               <rect
-                x={x} y={y}
+                x={bx} y={by}
                 width={barW} height={barH}
-                rx={3}
-                fill={isNow ? "#22D3EE" : "url(#pg)"}
-                opacity={isNow ? 1 : 0.65}
+                rx={period <= 30 ? 2 : 1}
+                fill={day.isToday ? "#22D3EE" : "url(#barGrad)"}
+                opacity={day.isToday ? 1 : 0.72}
               />
-              {day.count > 0 && (
+              {showVal && (
                 <text
                   x={cx}
-                  y={y - 3}
+                  y={by - 3}
                   textAnchor="middle"
-                  fontSize={8}
+                  fontSize={7}
                   fontFamily="inherit"
-                  fill={isNow ? "#22D3EE" : "rgba(234,240,255,0.5)"}
-                  fontWeight={isNow ? "700" : "400"}
+                  fill={day.isToday ? "#22D3EE" : "rgba(234,240,255,0.5)"}
+                  fontWeight={day.isToday ? "700" : "400"}
                 >
                   {day.count}
                 </text>
@@ -118,37 +173,43 @@ function BarChart({ days }: { days: DaySlot[] }) {
             </g>
           );
         })}
-      </svg>
 
-      {/* date labels — show every other one on narrow */}
-      <div className="mt-1 flex w-full">
+        {/* X-axis labels */}
         {days.map((day, i) => {
-          const show = days.length <= 10 || i % 2 === 0;
+          const show = (i % skipN === 0) || i === days.length - 1 || day.isToday;
+          if (!show) return null;
+          const cx = CL + i * slot + slot / 2;
           return (
-            <div
-              key={day.date}
-              className="flex-1 text-center"
-              style={{ fontSize: 9, color: "rgba(234,240,255,0.28)", lineHeight: 1 }}
+            <text
+              key={`xl-${day.date}`}
+              x={cx}
+              y={baseline + 13}
+              textAnchor="middle"
+              fontSize={7.5}
+              fontFamily="inherit"
+              fill={day.isToday ? "#22D3EE" : "rgba(234,240,255,0.28)"}
+              fontWeight={day.isToday ? "700" : "400"}
             >
-              {show ? day.label : ""}
-            </div>
+              {day.isToday ? "hoje" : day.label}
+            </text>
           );
         })}
-      </div>
+      </svg>
     </div>
   );
 }
 
-/* ─── top pages ──────────────────────────────────────── */
+/* ─── top pages ─────────────────────────────────────────────────── */
 
-function TopPages({ pages }: { pages: PageRow[] }) {
+function TopPages({ pages, period }: { pages: PageRow[]; period: number }) {
   if (pages.length === 0) return null;
-  const max = pages[0].views;
+  const maxViews = pages[0].views;
+  const periodLabel = period <= 7 ? "7 dias" : period <= 14 ? "14 dias" : period <= 30 ? "30 dias" : "90 dias";
 
   return (
     <div className="mt-5 border-t border-white/[0.06] pt-5">
       <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--platform-text)]/40">
-        Top páginas · 30 dias
+        Top páginas · {periodLabel}
       </p>
       <div className="space-y-2.5">
         {pages.map((p, i) => (
@@ -162,7 +223,7 @@ function TopPages({ pages }: { pages: PageRow[] }) {
             <div className="flex-1 overflow-hidden rounded-full bg-white/[0.04]" style={{ height: 5 }}>
               <div
                 className="h-full rounded-full bg-[linear-gradient(90deg,#3B82F6,#22D3EE)]"
-                style={{ width: `${Math.round((p.views / max) * 100)}%` }}
+                style={{ width: `${Math.round((p.views / maxViews) * 100)}%` }}
               />
             </div>
             <span className="w-8 shrink-0 text-right text-xs tabular-nums text-[var(--platform-text)]/50">
@@ -178,19 +239,21 @@ function TopPages({ pages }: { pages: PageRow[] }) {
   );
 }
 
-/* ─── main widget ─────────────────────────────────────── */
+/* ─── main widget ──────────────────────────────────────────────── */
 
-export async function PlatformAnalyticsWidget() {
+export async function PlatformAnalyticsWidget({ period = 14 }: { period?: number }) {
   const adminDb = createSupabaseAdminClient();
 
-  let viewsToday    = 0;
-  let viewsYest     = 0;
-  let views7d       = 0;
-  let views7dPrev   = 0;
-  let views30d      = 0;
-  let views30dPrev  = 0;
-  let viewsTotal    = 0;
-  let days: DaySlot[] = [];
+  let viewsToday   = 0;
+  let viewsYest    = 0;
+  let views7d      = 0;
+  let views7dPrev  = 0;
+  let views30d     = 0;
+  let views30dPrev = 0;
+  let viewsTotal   = 0;
+  let viewsPeriod     = 0;
+  let viewsPeriodPrev = 0;
+  let days: DaySlot[]  = [];
   let topPages: PageRow[] = [];
 
   if (adminDb) {
@@ -198,91 +261,113 @@ export async function PlatformAnalyticsWidget() {
 
     // Calendar-day boundaries in Brazil timezone (America/Sao_Paulo = UTC-3, sem DST desde 2019)
     const TZ_OFFSET = "-03:00";
-    const brFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
+    const brFmt       = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
     const todayBR     = brFmt.format(new Date());
     const yesterdayBR = brFmt.format(new Date(now - 86_400_000));
-    const tToday = new Date(`${todayBR}T00:00:00${TZ_OFFSET}`).toISOString();
-    const tYest  = new Date(`${yesterdayBR}T00:00:00${TZ_OFFSET}`).toISOString();
-    const t7d    = new Date(now -   7 * 86_400_000).toISOString();
-    const t14d   = new Date(now -  14 * 86_400_000).toISOString();
-    const t30d   = new Date(now -  30 * 86_400_000).toISOString();
-    const t60d   = new Date(now -  60 * 86_400_000).toISOString();
+
+    const tToday      = new Date(`${todayBR}T00:00:00${TZ_OFFSET}`).toISOString();
+    const tYest       = new Date(`${yesterdayBR}T00:00:00${TZ_OFFSET}`).toISOString();
+    const t7d         = new Date(now -   7 * 86_400_000).toISOString();
+    const t14d        = new Date(now -  14 * 86_400_000).toISOString();
+    const t30d        = new Date(now -  30 * 86_400_000).toISOString();
+    const t60d        = new Date(now -  60 * 86_400_000).toISOString();
+    const tPeriod     = new Date(now -  period * 86_400_000).toISOString();
+    const tPeriodPrev = new Date(now -  period * 2 * 86_400_000).toISOString();
+    // top pages uses the selected period (min 30d for meaningful data)
+    const tTopPages   = new Date(now - Math.max(period, 30) * 86_400_000).toISOString();
 
     const [
-      res1d, resYest, res7d, res7dPrev,
-      res30d, res30dPrev, resTotal,
-      res14dRaw, res30dPaths,
+      res1d, resYest,
+      res7d, res7dPrev,
+      res30d, res30dPrev,
+      resTotal,
+      resPeriodCount, resPeriodPrevCount,
+      resPeriodRaw,
+      resTopPaths,
     ] = await Promise.all([
-      // today (desde meia-noite)
+      // today
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", tToday),
-      // yesterday (meia-noite de ontem → meia-noite de hoje)
+      // yesterday
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", tYest).lt("visited_at", tToday),
-      // last 7d
+      // 7d
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", t7d),
       // prev 7d (14d → 7d)
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", t14d).lt("visited_at", t7d),
-      // last 30d
+      // 30d
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", t30d),
       // prev 30d (60d → 30d)
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", t60d).lt("visited_at", t30d),
       // total
       adminDb.from("platform_page_views").select("id", { count: "exact", head: true }),
-      // raw rows for 14d chart
-      adminDb.from("platform_page_views").select("visited_at").gte("visited_at", t14d),
-      // raw rows for top pages (30d)
-      adminDb.from("platform_page_views").select("path").gte("visited_at", t30d),
+      // selected period count (for chart comparison)
+      adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", tPeriod),
+      // previous period count
+      adminDb.from("platform_page_views").select("id", { count: "exact", head: true }).gte("visited_at", tPeriodPrev).lt("visited_at", tPeriod),
+      // raw rows for chart (selected period)
+      adminDb.from("platform_page_views").select("visited_at").gte("visited_at", tPeriod),
+      // raw rows for top pages
+      adminDb.from("platform_page_views").select("path").gte("visited_at", tTopPages),
     ]);
 
-    viewsToday   = res1d.count   ?? 0;
-    viewsYest    = resYest.count ?? 0;
-    views7d      = res7d.count   ?? 0;
-    views7dPrev  = res7dPrev.count  ?? 0;
-    views30d     = res30d.count  ?? 0;
-    views30dPrev = res30dPrev.count ?? 0;
-    viewsTotal   = resTotal.count   ?? 0;
+    viewsToday      = res1d.count          ?? 0;
+    viewsYest       = resYest.count        ?? 0;
+    views7d         = res7d.count          ?? 0;
+    views7dPrev     = res7dPrev.count      ?? 0;
+    views30d        = res30d.count         ?? 0;
+    views30dPrev    = res30dPrev.count     ?? 0;
+    viewsTotal      = resTotal.count       ?? 0;
+    viewsPeriod     = resPeriodCount.count ?? 0;
+    viewsPeriodPrev = resPeriodPrevCount.count ?? 0;
 
-    // Build daily slots (last 14 days) — grouping in Brazil timezone
+    // Build daily slots for chart (Brazil timezone)
     const brDateFmt = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" });
     const dayCounts = new Map<string, number>();
-    for (const row of (res14dRaw.data ?? []) as { visited_at: string }[]) {
+    for (const row of (resPeriodRaw.data ?? []) as { visited_at: string }[]) {
       const d = brDateFmt.format(new Date(row.visited_at));
       dayCounts.set(d, (dayCounts.get(d) ?? 0) + 1);
     }
-    days = Array.from({ length: 14 }, (_, i) => {
-      const dt = new Date(now - (13 - i) * 86_400_000);
+    days = Array.from({ length: period }, (_, i) => {
+      const dt  = new Date(now - (period - 1 - i) * 86_400_000);
       const key = brDateFmt.format(dt);
       return {
-        date: key,
-        label: dt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" }),
-        count: dayCounts.get(key) ?? 0,
+        date:    key,
+        label:   dt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" }),
+        count:   dayCounts.get(key) ?? 0,
+        isToday: key === todayBR,
       };
     });
 
     // Build top pages
     const pathMap = new Map<string, number>();
-    for (const row of (res30dPaths.data ?? []) as { path: string }[]) {
+    for (const row of (resTopPaths.data ?? []) as { path: string }[]) {
       pathMap.set(row.path, (pathMap.get(row.path) ?? 0) + 1);
     }
-    const total30 = views30d || 1;
+    const topTotal = (resTopPaths.data?.length ?? 0) || 1;
     topPages = Array.from(pathMap.entries())
-      .map(([path, views]) => ({ path, views, pct: Math.round((views / total30) * 100) }))
+      .map(([path, views]) => ({ path, views, pct: Math.round((views / topTotal) * 100) }))
       .sort((a, b) => b.views - a.views)
       .slice(0, 6);
   }
 
-  const noData = viewsTotal === 0;
+  const noData       = viewsTotal === 0;
+  const periodChange = pct(viewsPeriod, viewsPeriodPrev);
+  const pUp          = periodChange > 0;
+  const pDown        = periodChange < 0;
 
   return (
     <div className="mt-6 rounded-2xl border border-white/10 bg-[#12182B] p-5">
       {/* Header */}
-      <div className="mb-5 flex items-center gap-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#22D3EE]/10">
-          <Eye size={14} className="text-[#22D3EE]" />
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#22D3EE]/10">
+            <Eye size={14} className="text-[#22D3EE]" />
+          </div>
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--platform-text)]">Visitas ao site</h2>
+            <p className="text-[10px] text-[var(--platform-text)]/35">Tráfego nas páginas públicas da plataforma</p>
+          </div>
         </div>
-        <div>
-          <h2 className="text-sm font-semibold text-[var(--platform-text)]">Visitas ao site</h2>
-          <p className="text-[10px] text-[var(--platform-text)]/35">Tráfego nas páginas públicas da plataforma</p>
-        </div>
+        <AnalyticsPeriodSelector current={period} />
       </div>
 
       {noData ? (
@@ -297,25 +382,32 @@ export async function PlatformAnalyticsWidget() {
         <>
           {/* Stat cards */}
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard label="Hoje"    value={viewsToday}  change={pct(viewsToday, viewsYest)} />
-            <StatCard label="7 dias"  value={views7d}     change={pct(views7d, views7dPrev)} />
-            <StatCard label="30 dias" value={views30d}    change={pct(views30d, views30dPrev)} />
-            <StatCard label="Total"   value={viewsTotal}  sub="desde o início" />
+            <StatCard label="Hoje"    value={viewsToday} change={pct(viewsToday, viewsYest)} />
+            <StatCard label="7 dias"  value={views7d}    change={pct(views7d, views7dPrev)} />
+            <StatCard label="30 dias" value={views30d}   change={pct(views30d, views30dPrev)} />
+            <StatCard label="Total"   value={viewsTotal} sub="desde o início" />
           </div>
 
-          {/* Daily bar chart */}
+          {/* Bar chart with period comparison */}
           <div className="mt-5">
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--platform-text)]/40">
-              Últimos 14 dias
-              <span className="ml-2 font-normal normal-case tracking-normal text-[#22D3EE]/70">
-                — barra azul = hoje
-              </span>
-            </p>
-            <BarChart days={days} />
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--platform-text)]/40">
+                Últimos {period} dias
+              </p>
+              <div className={`flex items-center gap-1 text-[11px] font-medium ${
+                pUp ? "text-emerald-400" : pDown ? "text-rose-400" : "text-[var(--platform-text)]/30"
+              }`}>
+                {pUp   && <TrendingUp  size={11} />}
+                {pDown && <TrendingDown size={11} />}
+                {!pUp && !pDown && <Minus size={11} />}
+                {pUp ? "+" : ""}{periodChange}% vs período anterior
+              </div>
+            </div>
+            <BarChart days={days} period={period} />
           </div>
 
           {/* Top pages */}
-          <TopPages pages={topPages} />
+          <TopPages pages={topPages} period={period} />
         </>
       )}
     </div>

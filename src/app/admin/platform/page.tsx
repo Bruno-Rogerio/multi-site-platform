@@ -21,6 +21,8 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { PlatformAnalyticsWidget } from "@/components/admin/platform-analytics-widget";
 import { formatBRL } from "@/lib/onboarding/get-plan-prices";
 
+export const dynamic = "force-dynamic";
+
 const PLAN_LABELS: Record<string, string> = {
   basico:       "Básico",
   construir:    "Construir",
@@ -44,7 +46,13 @@ function formatRelative(dateStr: string): string {
   return `${Math.floor(diff / 86400)}d atrás`;
 }
 
-export default async function PlatformAdminPage() {
+export default async function PlatformAdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ period?: string }>;
+}) {
+  const sp     = await searchParams;
+  const period = ([7, 14, 30, 90] as const).find((p) => p === Number(sp.period)) ?? 14;
   const profile = await requireUserProfile(["admin"]);
   const supabase = await createSupabaseServerAuthClient();
   const platformBranding = await getPlatformBrandingSettings();
@@ -177,7 +185,7 @@ export default async function PlatformAdminPage() {
         })}
       </div>
 
-      <PlatformAnalyticsWidget />
+      <PlatformAnalyticsWidget period={period} />
 
       {/* Recent activity */}
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
